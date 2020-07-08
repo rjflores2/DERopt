@@ -1,0 +1,3 @@
+# Ignore MATLAB autosave and CPLEX log files#
+*.asv
+*.log
