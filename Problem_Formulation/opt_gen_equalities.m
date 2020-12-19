@@ -4,7 +4,7 @@ K = size(elec,2);  %k-th building from 1...K
  %%For each building k, all timesteps t 
  %Vectorized
     Constraints = [Constraints 
-        (import + pv_elec + ees_dchrg + rees_dchrg == elec + ees_chrg):'BLDG Energy Balance'];
+        (import + pv_elec + ees_dchrg + rees_dchrg == elec + ees_chrg):'BLDG Electricity Balance'];
 
 
 %%

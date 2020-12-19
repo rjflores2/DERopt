@@ -8,9 +8,6 @@ if opt_now==1
             0 <= pv_nem
             0 <= pv_wholesale
             0 <= pv_adopt <= 99999 %Big M 
-            0 <= nontou_dc
-            0 <= onpeak_dc
-            0 <= midpeak_dc
             0 <= rees_adopt <= 99999 %Big M
             0 <= import
             0 <= rees_chrg
@@ -22,6 +19,11 @@ if opt_now==1
             0 <= ees_dchrg
             0 <= ees_soc
             ];
+        
+        
+%           0 <= nontou_dc
+%             0 <= onpeak_dc
+%             0 <= midpeak_dc
   
    if exist('qimport','var')  
      Constraints=[Constraints        
@@ -36,11 +38,11 @@ if opt_now==1
   
     options = cplexoptimset;
     options.Display='on';
-    options.Diagnostics='on';
-    options.TolFun=1e-10;
-    cplex = Cplex(model);%instantiate object cplex of class Cplex 
-    %cplex.Param.mip.tolerances.mipgap.Cur = 4/100; %Relative MIP Gap
-    options.parameter2009 = 0.004;
+%     options.Diagnostics='on';
+%     options.TolFun=1e-10;
+% %     cplex = Cplex(model);%instantiate object cplex of class Cplex 
+%     %cplex.Param.mip.tolerances.mipgap.Cur = 4/100; %Relative MIP Gap
+%     options.parameter2009 = 0.004;
     
     lb=-1*inf(size(model.f)); 
     ub=inf(size(lb));

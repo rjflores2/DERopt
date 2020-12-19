@@ -23,6 +23,7 @@ if dlpfc || lindist
 else 
     cnstrts = table(nopv,noees,tc,nem_c,dlpfc,lindist,Rmulti,'VariableNames',{'nopv','noees','tc','nem_c','dlpf','lindist','Rmulti'})
 end 
+
 %% Load MATPOWER Test Case
 %% For DERopt + Transformer Paper %54-node
 %mpc = loadcase('caseAEC')
@@ -120,7 +121,7 @@ filter_yr_2_day = 1;
 filtering = 0;
 window = 3; % minimum percent
 min_percent = 0.2; % if filtering = 2, the minimum load threshold as % of mean load
-
+return
 %% opt.m
 %%%Choose optimizaiton solver 
 opt_now = 1; %CPLEX

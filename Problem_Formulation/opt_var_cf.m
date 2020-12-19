@@ -5,6 +5,8 @@ Constraints=[];
 T = length(time);     %t-th time interval from 1...T
 K = size(elec,2);     %k-kth building from 
 M = length(endpts);   %# of months in the simulation
+
+
 %% Utility Electricity
 if isempty(utility_exists) == 0
     %%%Electrical Import Variables
