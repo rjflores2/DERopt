@@ -8,44 +8,28 @@ clear all; close all; clc ; started_at = datetime('now'); startsim = tic;
 opt_now = 1; %CPLEX
 opt_now_yalmip = 0; %YALMIP
 
-%% PV (opt_pv.m)
-pv_maxarea = 1;
-
-%% PV (opt_pv.m)
-pv_maxarea = 1;
-%% Too little PV/EES
-toolittle_pv = 1;
-toolittle_storage = 1;
-
 %% Island operation (opt_nem.m) 
 island = 0;
-%% EES (opt_ees.m)
-%%% Avoid simultaneous Charge and Discharge (xd & xc binaries)
-ees_onoff = 0; 
-%socc = 0; % SOC constraint: for each individual ees and rees, final SOC >= Initial SOC
 
-%% REES (opt_var_cf.m)
-%%%Allow renewable storage decision using EES type
-rees_exist = 1;
+%% Turning technologies on/off (opt_var_cf.m and tech_select.m)
+nopv = 0;        %Turn off all PV
+noees = 0;       %Turn off all EES/REES
+rees_exist = 1;  %Turn on REES
+%% PV (opt_pv.m)
+pv_maxarea = 1; %%% Limits maximum PV size, based on initially solar PV panel
+toolittle_pv = 1; %%% Forces solar PV adoption - 3 kW
+
+%% EES (opt_ees.m & opt_rees.m)
+ees_onoff = 0;  %%% Avoid simultaneous Charge and Discharge (xd & xc binaries)
+toolittle_storage = 1; %%%Forces EES adoption - 13.5 kWh
+socc = 0; % SOC constraint: for each individual ees and rees, final SOC >= Initial SOC
 
 %% Grid limits 
 %%% On/Off Grid Import Limit 
 grid_import_on = 0;
 %%%Limit on grid import power  
 import_limit = .8;
-%% Quick Constraints
-nopv = 0;        %Turn off all PV
-noees = 0;       %Turn off all EES/REES
-tc = 0;          %On/Off tranformer constraints 
-nem_c = 1;       %On/Off NEM constraints 
-dlpfc = 1;       %On/Off Decoupled Linearized Power Flow (DLPF) constraints 
-lindist = 0;     %On/Off LinDistFlow constraints 
-socc = 0;        %On/Off SOC constraints 
-voltage = 1;     %Use upped and lower limit for voltage 
-branch = 1;      %On/Off Banch kVA constraints 
-VH = 1.05;       %Low Voltage Limit (p.u.)
-VL = 0.95;        %High Voltage Limit(p.u.)
-Rmulti = 1;      %Multiplier for resistance in impedance matrix
+
 
 %% Adding paths
 %%%YALMIP Master Path
@@ -59,45 +43,30 @@ addpath('H:\_Research_\CEC_OVMG\URBANopt\UO_Results')
 
 %%%DERopt paths
 addpath(genpath('H:\_Tools_\DERopt'))
+
+%%%Specific project path
+addpath('H:\_Research_\CEC_OVMG\DERopt')
+
 %% Loading building demand
 
 %%%Loading Data
 dt = load('Sc1_0_Baseline.mat');
 
 %%%Pulling out load data
-elec_o = dt.loads_fac;
+elec = dt.loads_fac;
 gas = dt.gas_fac;
 
-dc_exist = [0 0];
-rate={'R1'	'R1'};%Mar.15.19
-elec = elec_o(:,[1 2]);
-day_multi=ones(length(elec),1);
+%%%Reading dc_exist and rate info
+[ri_num,ri_txt] = xlsread('bldg_rate_info.xlsx');
 
-%% Filling a time gap 
+dc_exist = ri_num; %%%DC Exist - 1 = yes, 0 = no
+rate = ri_txt(2:end,2); %%%Rate info for each building
 
-time = datenum([2019 1 1 0 0 0]);
-
-for ii = 2:length(elec)
-    time(ii,1) = time(ii-1,1) + 1/24;
-end
+%%%Clearing extra data
+clear ri_num ri_txt
  
-%%%Date vectors for all time stamps
-datetimev=datevec(time);
-%%% Finding month start/endpoints
-end_cnt = 1;
-stpts=1;
-for ii = 2:length(time)
-    if datetimev(ii,2) ~= datetimev(ii-1,2)
-        endpts(end_cnt,1) = ii-1;
-        stpts(end_cnt+1,1) = ii;
-        end_cnt = end_cnt +1;
-    end
-    if ii == length(time);
-        endpts(end_cnt,1) = ii;
-    end
-end  
-
-load 'solar_sna.mat'
+%% Formatting Building Data
+bldg_loader_OVMG
 
 %% Tech Parameters/Costs
 %%%Technology Parameters
@@ -108,11 +77,14 @@ req_return_on = 1;
 tech_payment
 
 %% Utility Data
-%%%Loading and formatting utility data
-utility
-%%%Energy charges for TOU Rates
-elec_vecs
+%%%Loading Utility Data and Generating Energy Charge Vectors
+utility_SCE_2020
 
+%% Utility Data
+% %%%Loading and formatting utility data
+% utility
+% %%%Energy charges for TOU Rates
+% elec_vecs
 
 %% DERopt
 %% Setting up variables and cost function

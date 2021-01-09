@@ -54,9 +54,9 @@ xfmr_v = [1090];
 %% Tech select
 
 if nopv
-pv_v=[];
+    pv_v=[];
 end
 
 if noees
-ees_v =[];
-end 
+    ees_v =[];
+end

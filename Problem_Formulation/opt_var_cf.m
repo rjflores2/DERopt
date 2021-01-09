@@ -27,7 +27,8 @@ if isempty(utility_exists) == 0
     
     %%% Cost of Imports + Demand Charges 
     dc_count=1;
-    for i=1:K
+    for i=1:K %%%Going through all buildings
+        i
         %%%Find the applicable utility rate
         index=find(ismember(rate_labels,rate(i)));
 
@@ -59,49 +60,50 @@ end
 if isempty(pv_v) == 0
     
     %%%PV Generation to meet building demand (kWh)
-    pv_elec = sdpvar(T,K,'full');
+    pv_elec = sdpvar(T,K,'full'); %%% PV Production sent to the building
     
     %%%Size of installed System (kW)
-    pv_adopt= sdpvar(1,K,'full');
-    %pv_adopt= semivar(1,K,'full');
+    pv_adopt= sdpvar(1,K,'full'); %%%PV Size 
     
-    pv_nem = sdpvar(T,K,'full');
-    pv_wholesale = sdpvar(T,K,'full');
-    
- if island ==0  %If not islanded, AEC can export PV for revenue under NEM and wholesale 
-   
-    pv_nem_revenue = sdpvar(1,K,'full');
-    pv_w_revenue = sdpvar(1,K,'full');
-    
-    %%%PV Export - NEM (kWh)
-    %%% k index: Building
-    for k = 1:K
-        index=find(ismember(rate_labels,rate(k)));
-        Objective = Objective...
-          - (day_multi.*pv_nem(:,k))'*export_price(:,index);
-          %- pv_nem(:,k)'*export_price(:,index);
-
-        pv_nem_revenue(k) = (day_multi.*pv_nem(:,k))'*export_price(:,index);
-    end
+    if island == 0  %If not islanded,  can export PV for revenue under NEM and wholesale
         
-    %%%PV Export - Wholesale (kWh)
-    %%% k index: Building
-    for k = 1:K
-        Objective = Objective...
-          - ex_wholesale*sum(day_multi.*pv_wholesale(:,k));  
-          %- ex_wholesale*sum(pv_wholesale(:,k));
-                
-         pv_w_revenue(k) = ex_wholesale*sum(day_multi.*pv_wholesale(:,k));
+        %%% Variables that exist when grid tied
+        pv_nem = sdpvar(T,K,'full'); %%% PV Production exported w/ NEM
+        pv_wholesale = sdpvar(T,K,'full'); %%% PV Production exported under NEM rates
+        pv_nem_revenue = sdpvar(1,K,'full'); %%%Total NEM Revenue
+        pv_w_revenue = sdpvar(1,K,'full'); %%%Total Wholesale Revenue
+        
+        %%%PV Export - NEM (kWh)
+        %%% k index: Building
+        for k = 1:K
+            k
+            index=find(ismember(rate_labels,rate(k)));
+            Objective = Objective...
+                - (day_multi.*pv_nem(:,k))'*export_price(:,index) ... %%%NEM Revenue csot
+                 - ex_wholesale*sum(day_multi.*pv_wholesale(:,k)); %%%Wholesale Revenue cost
+            %- pv_nem(:,k)'*export_price(:,index);
+            
+            pv_nem_revenue(k) = (day_multi.*pv_nem(:,k))'*export_price(:,index);
+            pv_w_revenue(k) = ex_wholesale*sum(day_multi.*pv_wholesale(:,k));
+        end
+        
+        %%%PV Export - Wholesale (kWh)
+        %%% k index: Building
+%         for k = 1:K
+%             Objective = Objective...
+%                
+%             %- ex_wholesale*sum(pv_wholesale(:,k));
+%             
+%         end
     end
- end    
- 
-    %%%PV Cost 
-        Objective=Objective ...
-            + pv_v(1)*M*sum(pv_adopt)... %%%PV Capital Cost ($/kW installed)
-            + pv_v(3)*( sum(sum(repmat(day_multi,1,K).*(pv_elec + pv_nem + pv_wholesale))) ); %%%PV O&M Cost ($/kWh generated)    
-            %+ pv_v(3)*(sum(sum(pv_elec))+ sum(sum(pv_nem)) + sum(sum(pv_wholesale)) ); %%%PV O&M Cost ($/kWh generated)
+    
+    %%%PV Cost
+    Objective=Objective ...
+        + pv_v(1)*M*sum(pv_adopt)... %%%PV Capital Cost ($/kW installed)
+        + pv_v(3)*( sum(sum(repmat(day_multi,1,K).*(pv_elec + pv_nem + pv_wholesale))) ); %%%PV O&M Cost ($/kWh generated)
+    %+ pv_v(3)*(sum(sum(pv_elec))+ sum(sum(pv_nem)) + sum(sum(pv_wholesale)) ); %%%PV O&M Cost ($/kWh generated)
 
-%%% Allow for adoption of Renewable paired storage (REES)(if enabled)
+%%% Allow for adoption of Renewable paired storage when enabled (REES)
 if isempty(ees_v) == 0 && rees_exist == 1
 
     %%%Adopted REES Size
