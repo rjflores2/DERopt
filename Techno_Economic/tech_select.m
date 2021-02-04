@@ -9,9 +9,13 @@ utility_exists=1;
 %%% Power output per unit area (kW/m^2);
 
 %pv_v=[3500; 0.2 ; 0.001];
-pv_v=[2000; 0.2 ; 0.001];
+pv_v=[600; 0.2 ; 0.001];
 
 pv_cap=pv_v(1,:);
+
+%%%How pv capital cost is modified for different types of buildings
+pv_cap_mod = [2/2.65 %%%Commercial/industrial
+    2.65/2.65]; %%%Residential
 
 %% Electrical Energy Storage
 %%% (1) Capital Cost ($/kWh installed) 
@@ -31,10 +35,14 @@ pv_cap=pv_v(1,:);
 %ees_v=[200; 0.001; 0.001; 0.1; 0.95; 0.25; 0.25; .95; .95; .995];
 %ees_v=[300; 0.001; 0.001; 0.1; 0.95; 0.25; 0.25; .95; .95; .995];
 %ees_v=[500; 0.001; 0.001; 0.1; 0.95; 0.25; 0.25; .95; .95; .995];
-ees_v=[600; 0.001; 0.001; 0.1; 0.95; 0.25; 0.25; .90; .90; .995];
+ees_v=[500; 0.001; 0.001; 0.1; 0.95; 0.25; 0.25; .90; .90; .995];
 %ees_v=[600; 0.001; 0.001; 0.1; 0.95; 0.25; 0.25; 1; 1; .995]; %Testing with 100% RTE 
 
 ees_cap=ees_v(1);
+
+%%%How pv capital cost is modified for different types of buildings
+ees_cap_mod = [575/830 %%%Commercial/industrial
+    830/830]; %%%Residential
 
 %% Building space
 %%%[space available for PV (m^2)
@@ -53,10 +61,10 @@ xfmr_v = [1090];
 
 %% Tech select
 
-if nopv
+if ~pv_on
     pv_v=[];
 end
 
-if noees
+if ~ees_on
     ees_v =[];
 end

@@ -47,8 +47,16 @@ else
         summer_month=counter;
     end
 end
+
 %% Loading solar data
 load 'solar_sna.mat'
 
 %% Day multiplier
 day_multi = ones(length(time),1);
+
+%% Loading SGIP CO2 Signal
+sgip_signal = xlsread('hourly_resolved.csv');
+
+ind = find(datevec(sgip_signal(:,1)) == datetimev(1));
+
+sgip_signal = sgip_signal(ind(1):ind(1)+8760-1,:);

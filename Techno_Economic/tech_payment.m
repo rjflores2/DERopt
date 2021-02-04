@@ -41,3 +41,9 @@ for i=1:size(xfmr_v,2)
         req_return_on*(equity)*(required_return*(1+required_return)^(period*12))...
         /((1+required_return)^(period*12)-1));
 end
+
+%% Converting SGIP values to annualized values
+for i = 2:length(sgip)
+    sgip(i)=sgip(i)*(interest*(1+interest)^(period*12))...
+        /((1+interest)^(period*12)-1);%%%Money to pay back bank
+end

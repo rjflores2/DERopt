@@ -12,13 +12,17 @@ opt_now_yalmip = 0; %YALMIP
 island = 0;
 
 %% Turning technologies on/off (opt_var_cf.m and tech_select.m)
-nopv = 0;        %Turn off all PV
-noees = 0;       %Turn off all EES/REES
-rees_exist = 1;  %Turn on REES
+pv_on = 1;        %Turn on PV
+ees_on = 1;       %Turn on EES/REES
+rees_on = 1;  %Turn on REES
+
+%% Turning incentives and other financial tools on/off
+sgip_on = 1;
+
 %% PV (opt_pv.m)
 pv_maxarea = 1; %%% Limits maximum PV size, based on initially solar PV panel
-toolittle_pv = 1; %%% Forces solar PV adoption - 3 kW
-
+toolittle_pv = 0; %%% Forces solar PV adoption - value is defined by toolittle_pv value - kW
+curtail = 1; %%%Allows curtailment is = 1
 %% EES (opt_ees.m & opt_rees.m)
 ees_onoff = 0;  %%% Avoid simultaneous Charge and Discharge (xd & xc binaries)
 toolittle_storage = 1; %%%Forces EES adoption - 13.5 kWh
@@ -47,6 +51,9 @@ addpath(genpath('H:\_Tools_\DERopt'))
 %%%Specific project path
 addpath('H:\_Research_\CEC_OVMG\DERopt')
 
+%%%SGIP CO2 Signal
+addpath('H:\Data\CPUC_SGIP_Signal')
+
 %% Loading building demand
 
 %%%Loading Data
@@ -65,8 +72,18 @@ rate = ri_txt(2:end,2); %%%Rate info for each building
 %%%Clearing extra data
 clear ri_num ri_txt
  
+%%% Cutting elec down to the first couple buildings
+elec = elec(:,306);
+rate = rate([306]);
+dc_exist = [1];
+
 %% Formatting Building Data
 bldg_loader_OVMG
+
+
+%% Utility Data
+%%%Loading Utility Data and Generating Energy Charge Vectors
+utility_SCE_2020
 
 %% Tech Parameters/Costs
 %%%Technology Parameters
@@ -76,15 +93,8 @@ req_return_on = 1;
 %%%Technology Capital Costs
 tech_payment
 
-%% Utility Data
-%%%Loading Utility Data and Generating Energy Charge Vectors
-utility_SCE_2020
-
-%% Utility Data
-% %%%Loading and formatting utility data
-% utility
-% %%%Energy charges for TOU Rates
-% elec_vecs
+%%%Capital cost mofificaitons
+cap_cost_mod
 
 %% DERopt
 %% Setting up variables and cost function
@@ -93,10 +103,11 @@ tic
 opt_var_cf %%%Added NEM and wholesale export to the PV Section
 elapsed = toc;
 fprintf('Took %.2f seconds \n', elapsed)
+return
 %% General Equality Constraints
 fprintf('%s: General Equalities.', datestr(now,'HH:MM:SS'))
 tic
-opt_gen_equalities %%%Include NEM and wholesale in elec equality constraint
+opt_gen_equalities %%%Does not include NEM and wholesale in elec equality constraint
 elapsed = toc;
 fprintf('Took %.2f seconds \n', elapsed)
 
@@ -123,6 +134,7 @@ fprintf('Took %.2f seconds \n', elapsed)
 %% Optimize
 fprintf('%s: Optimizing \n....', datestr(now,'HH:MM:SS'))
 opt
+return
 %% Timer
 finish = datetime('now') ; totalelapsed = toc(startsim)
 

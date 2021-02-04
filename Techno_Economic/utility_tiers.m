@@ -24,7 +24,6 @@ if t_step == 15
                 end
             end
         else
-            
             %%%If the current time equals to the time of change
             if datetimev(i,4) == tou_winter(tou_index) ...
                     && time_index > 5 %%%and the time index is not back inside the same hour
