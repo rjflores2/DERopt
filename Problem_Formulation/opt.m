@@ -28,6 +28,8 @@ if opt_now==1
     exitflag
     fval
     
+    
+    
 %     cplex = Cplex(model); %instantiate object cplex of class Cplex 
 %     cplex.solve() %metod solve() to create Solution dynamic property
 %     cplex.Solution.status
@@ -40,27 +42,40 @@ if opt_now==1
     %%% evaluating performance of the model
     %%%Utility values
     import = value(import);
-    nontou_dc = value(nontou_dc);
-    onpeak_dc = value(onpeak_dc);
-    midpeak_dc = value(midpeak_dc);
+%     nontou_dc = value(nontou_dc);
+%     onpeak_dc = value(onpeak_dc);
+%     midpeak_dc = value(midpeak_dc);
     
     %%%Solar PV values
     pv_elec = value(pv_elec);
-    pv_adopt = value(pv_adopt);
+    pv_adopt = value(pv_adopt)
     pv_nem = value(pv_nem);
-    pv_wholesale = value(pv_wholesale);
+%     pv_wholesale = value(pv_wholesale);
     
     %%%EES Values
-    ees_adopt = value(ees_adopt);
+    ees_adopt = value(ees_adopt)
     ees_soc = value(ees_soc);
     ees_chrg = value(ees_chrg);
     ees_dchrg = value(ees_dchrg);
     
+    %%%REES Values
+    rees_adopt = value(rees_adopt)
+    rees_soc = value(rees_soc);
+    rees_chrg = value(rees_chrg);
+    rees_dchrg = value(rees_dchrg);
+    rees_dchrg_nem = value(rees_dchrg_nem);
+    
+    %%%SGIP values
+    sgip_ees_pbi = value(sgip_ees_pbi)
+    sgip_ees_npbi = value(sgip_ees_npbi)
+    sgip_ees_npbi_equity = value(sgip_ees_npbi_equity)
+    sgip_rees_npbi = value(sgip_rees_npbi)
+    sgip_rees_npbi_equity = value(sgip_rees_npbi_equity)
     
     
     dc_count = 1;
     
-    
+    energy_cost = [];
     for i = 1:size(import,2)
          %%%Find the applicable utility rate
         index=find(ismember(rate_labels,rate(i)));
@@ -93,7 +108,7 @@ if opt_now==1
         end
     end
 end
-check_nontou_dc - nontou_dc
+check_nontou_dc - nontou_dc;
 %% Optimize thru YALMIP
 if opt_now_yalmip==1  
 %% Lower Bound Constraints

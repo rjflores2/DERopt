@@ -9,7 +9,7 @@ utility_exists=1;
 %%% Power output per unit area (kW/m^2);
 
 %pv_v=[3500; 0.2 ; 0.001];
-pv_v=[600; 0.2 ; 0.001];
+pv_v=[2650; 0.2 ; 0.001];
 
 pv_cap=pv_v(1,:);
 
@@ -17,6 +17,8 @@ pv_cap=pv_v(1,:);
 pv_cap_mod = [2/2.65 %%%Commercial/industrial
     2.65/2.65]; %%%Residential
 
+%%%Solar on multifamily affordable homes (SOMAH)
+somah = [2600];
 %% Electrical Energy Storage
 %%% (1) Capital Cost ($/kWh installed) 
 %%% (2) Charge O&M ($/kWh charged) 
@@ -35,7 +37,7 @@ pv_cap_mod = [2/2.65 %%%Commercial/industrial
 %ees_v=[200; 0.001; 0.001; 0.1; 0.95; 0.25; 0.25; .95; .95; .995];
 %ees_v=[300; 0.001; 0.001; 0.1; 0.95; 0.25; 0.25; .95; .95; .995];
 %ees_v=[500; 0.001; 0.001; 0.1; 0.95; 0.25; 0.25; .95; .95; .995];
-ees_v=[500; 0.001; 0.001; 0.1; 0.95; 0.25; 0.25; .90; .90; .995];
+ees_v=[880; 0.001; 0.001; 0.1; 0.95; 0.25; 0.25; .90; .90; .995];
 %ees_v=[600; 0.001; 0.001; 0.1; 0.95; 0.25; 0.25; 1; 1; .995]; %Testing with 100% RTE 
 
 ees_cap=ees_v(1);
@@ -44,6 +46,16 @@ ees_cap=ees_v(1);
 ees_cap_mod = [575/830 %%%Commercial/industrial
     830/830]; %%%Residential
 
+
+%%%Self generation incentive program (SGIP) values
+sgip = [5 %%% 1:CO2 reduction required per kWh for large scale systems
+    350 %%% 2: Large storage incentive($/kWh)
+    200 %%% 3: Residential storage incentive ($/kWh)
+    850 %%% 4: Equity rate ($/kWh)
+    2000]; %%% 5: kWh incriment at which SGIP decreases
+    
+%%%Non_residential rates that receive sgip(2) incentive
+non_res_rates = [1 2];
 %% Building space
 %%%[space available for PV (m^2)
 %%%Cooling loop input (C)

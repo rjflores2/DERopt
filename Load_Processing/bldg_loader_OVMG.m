@@ -57,6 +57,6 @@ day_multi = ones(length(time),1);
 %% Loading SGIP CO2 Signal
 sgip_signal = xlsread('hourly_resolved.csv');
 
+%%%Lining up SGIP signal with current time step
 ind = find(datevec(sgip_signal(:,1)) == datetimev(1));
-
 sgip_signal = sgip_signal(ind(1):ind(1)+8760-1,:);

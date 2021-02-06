@@ -4,14 +4,6 @@ addpath('H:\_Research_\CEC_OVMG\Rates\SCE') %%%Same path used for UO Analysis
 %%% Wholesale export rate, Net Surplus Compensation Rate ($/kWh)
 ex_wholesale = 0.03;
 
-%%%SGIP values
-sgip = [5 %%%CO2 reduction required per kWh for large scale systems
-    350 %%%Large storage incentive($/kWh)
-    200 %%%Residential storage incentive ($/kWh)
-    850]; %%%Equity rate ($/kWh)
-
-%%%Non_residential rates that receive sgip(2) incentive
-non_res_rates = [1 2];
 %% Loading Electric Rates
 
 %%%Residential TOU Rates

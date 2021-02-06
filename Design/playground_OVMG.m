@@ -44,6 +44,7 @@ addpath(genpath('C:\Program Files\IBM\ILOG\CPLEX_Studio128\cplex\matlab\x64_win6
 
 %%%Source of URBANopt Results
 addpath('H:\_Research_\CEC_OVMG\URBANopt\UO_Results')
+addpath('H:\_Research_\CEC_OVMG\URBANopt')
 
 %%%DERopt paths
 addpath(genpath('H:\_Tools_\DERopt'))
@@ -62,24 +63,45 @@ dt = load('Sc1_0_Baseline.mat');
 %%%Pulling out load data
 elec = dt.loads_fac;
 gas = dt.gas_fac;
-
+elec_o = elec;
+% return
+%%
 %%%Reading dc_exist and rate info
 [ri_num,ri_txt] = xlsread('bldg_rate_info.xlsx');
 
 dc_exist = ri_num; %%%DC Exist - 1 = yes, 0 = no
 rate = ri_txt(2:end,2); %%%Rate info for each building
 
-%%%Clearing extra data
-clear ri_num ri_txt
- 
-%%% Cutting elec down to the first couple buildings
-elec = elec(:,306);
-rate = rate([306]);
-dc_exist = [1];
+%%%Low income properties
+low_income = xlsread('OV_Low_Income_Properties.xlsx');
+
+%%%Estimating residential units
+res_units = floor(cell2mat(dt.bldg_info(:,6))./1100);
+
+for ii = 1:size(dt.bldg_info,1)
+    if not(cellfun('isempty',strfind({'Multifamily (2 to 4 units)'},char(dt.bldg_info(ii,3))))) || ...
+            not(cellfun('isempty',strfind({'Single-Family'},char(dt.bldg_info(ii,3)))))
+        res_units(ii) = res_units(ii);
+    else
+        res_units(ii) = 0;
+    end
+end
+
+%%% maximum PV
+maxpv = cell2mat(dt.bldg_info(:,4))./10.76*0.2*.7;
+
+% bldg_ind = [180:200];
+% 
+% elec = [elec_o(:,bldg_ind)];
+% rate = rate(bldg_ind);
+% dc_exist = dc_exist(bldg_ind);
+% low_income = low_income(bldg_ind);
+% res_units = res_units(bldg_ind);
+
+sgip_pbi = strcmp(rate,'TOU8') + strcmp(rate,'GS1');
 
 %% Formatting Building Data
 bldg_loader_OVMG
-
 
 %% Utility Data
 %%%Loading Utility Data and Generating Energy Charge Vectors
@@ -103,7 +125,7 @@ tic
 opt_var_cf %%%Added NEM and wholesale export to the PV Section
 elapsed = toc;
 fprintf('Took %.2f seconds \n', elapsed)
-return
+% return
 %% General Equality Constraints
 fprintf('%s: General Equalities.', datestr(now,'HH:MM:SS'))
 tic
@@ -128,6 +150,13 @@ fprintf('Took %.2f seconds \n', elapsed)
 fprintf('%s: EES Constraints.', datestr(now,'HH:MM:SS'))
 tic
 opt_ees
+elapsed = toc;
+fprintf('Took %.2f seconds \n', elapsed)
+
+%% DER Incentives
+fprintf('%s: DER Incentives Constraints.', datestr(now,'HH:MM:SS'))
+tic
+opt_incentives
 elapsed = toc;
 fprintf('Took %.2f seconds \n', elapsed)
 
@@ -193,3 +222,25 @@ if island == 0 % If not an island
         pv_w_revenue=0;
     end 
 end 
+
+%% Close all
+close all
+figure
+hold on
+plot(elec(:,1),'LineWidth',2)
+box on
+set(gca,'FontSize',16,...
+    'XTick',[])
+
+ylabel('Electric Demand (kW)','FontSize',16)
+ylim([0 700])
+% title('Winter','FontSize',16)
+% xlim([0 24*7])
+
+
+title('Summer','FontSize',16)
+xlim([24*240 24*240+24*7])
+
+
+
+set(gcf, 'Position',  [-1500, -150, 900, 300])

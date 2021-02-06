@@ -43,7 +43,7 @@ for i=1:size(xfmr_v,2)
 end
 
 %% Converting SGIP values to annualized values
-for i = 2:length(sgip)
+for i = 2:(length(sgip) - 1)
     sgip(i)=sgip(i)*(interest*(1+interest)^(period*12))...
         /((1+interest)^(period*12)-1);%%%Money to pay back bank
 end

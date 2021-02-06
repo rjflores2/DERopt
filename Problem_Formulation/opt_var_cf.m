@@ -41,9 +41,9 @@ if isempty(utility_exists) == 0
     
     %%%Import Energy charges
     Objective = sum(sum(import.*temp_cf));
-    
+
     %%%Clearing temporary cost function matrix
-%     clear temp_cf
+    clear temp_cf
 
     for i =1:K
         if dc_exist(i) == 1
@@ -88,7 +88,7 @@ if isempty(pv_v) == 0
         
         %%% Variables that exist when grid tied
         pv_nem = sdpvar(T,K,'full'); %%% PV Production exported w/ NEM
-        pv_wholesale = sdpvar(T,K,'full'); %%% PV Production exported under NEM rates
+%         pv_wholesale = sdpvar(T,K,'full'); %%% PV Production exported under NEM rates
         
         %%%PV Export - NEM (kWh)
         temp_cf1 = zeros(size(elec));
@@ -99,23 +99,25 @@ if isempty(pv_v) == 0
             
             %%%Filling in temp cost function arrays 
             temp_cf1(:,k) = -day_multi.*export_price(:,index);
-            temp_cf2(:,k) = -day_multi.*ex_wholesale;
+%             temp_cf2(:,k) = -day_multi.*ex_wholesale;
             
         end
+
         %%%Adding values to the cost function
          Objective = Objective...
-             + sum(sum(temp_cf1.*pv_nem)) ... %%%NEM Revenue Cost
-             + sum(sum(temp_cf2.*pv_wholesale)); %%%Wholesale Revenue
+             + sum(sum(temp_cf1.*pv_nem)); %%%NEM Revenue Cost
+%              + sum(sum(temp_cf2.*pv_wholesale)); %%%Wholesale Revenue
          
          %%%Clearing temporary variables
-%          clear temp_cf1 temp_cf2
+         clear temp_cf1 temp_cf2
     end
     
     %%%PV Cost
     Objective=Objective ...
         + sum((pv_v(1)*M*cap_mod.pv - cap_scalar.pv).*pv_adopt)... %%%PV Capital Cost ($/kW installed)
-        + pv_v(3)*(sum(sum(repmat(day_multi,1,K).*(pv_elec + pv_nem + pv_wholesale))) ); %%%PV O&M Cost ($/kWh generated)
-    
+        + pv_v(3)*(sum(sum(repmat(day_multi,1,K).*(pv_elec + pv_nem))) ); %%%PV O&M Cost ($/kWh generated)
+%         + pv_v(3)*(sum(sum(repmat(day_multi,1,K).*(pv_elec + pv_nem + pv_wholesale))) ); %%%PV O&M Cost ($/kWh generated)
+
     %%% Allow for adoption of Renewable paired storage when enabled (REES)
     if isempty(ees_v) == 0 && rees_on == 1
         
@@ -131,7 +133,7 @@ if isempty(pv_v) == 0
         rees_soc=sdpvar(T,K,'full');
         %%%REES Cost Functions
         Objective = Objective...
-            + sum((ees_v(1)*M*cap_mod.rees + cap_scalar.rees).*rees_adopt) ...%%%Capital Cost
+            + sum((ees_v(1)*M*cap_mod.rees + cap_scalar.rees*M).*rees_adopt) ...%%%Capital Cost
             + ees_v(2)*sum(sum(repmat(day_multi,1,K).*rees_chrg))... %%%Charging O&M
             + ees_v(3)*(sum(sum(repmat(day_multi,1,K).*(rees_dchrg))));%%%Discharging O&M
         
@@ -157,7 +159,6 @@ if isempty(pv_v) == 0
         else
             rees_dchrg_nem=zeros(T,K);
         end
-        
     else
         rees_adopt=zeros(1,K);
         rees_chrg=zeros(T,K);
@@ -178,7 +179,7 @@ else
     rees_soc=zeros(T,K);
 end
 toc
-%% Electrical Energy Storage 
+%% Electrical Energy Storage
 if isempty(ees_v) == 0
     
     %%%Adopted EES Size
@@ -190,12 +191,40 @@ if isempty(ees_v) == 0
     ees_dchrg=sdpvar(T,K,'full');
     %%%EES SOC
     ees_soc=sdpvar(T,K,'full');
-
+    
     %%%EES Cost Functions
     Objective = Objective...
-        + sum((ees_v(1)*M*cap_mod.ees + cap_scalar.ees).*ees_adopt)...%%%Capital Cost
-        + ees_v(2)*sum(sum(repmat(day_multi,1,K).*ees_chrg))...%%%Charging O&M
+        + sum((ees_v(1)*M*cap_mod.ees + cap_scalar.ees*M).*ees_adopt) ...%%%Capital Cost
+        + ees_v(2)*sum(sum(repmat(day_multi,1,K).*ees_chrg)) ...%%%Charging O&M
         + ees_v(3)*sum(sum(repmat(day_multi,1,K).*ees_dchrg));%%%Discharging O&M
+    
+    %%%SGIP rates
+    if sgip_on
+        %%%Residential Credits
+        sgip_ees_npbi = sdpvar(1,sum((res_units>0).*(~low_income>0)),'full');
+        %%%Residential Equity Credits
+        sgip_ees_npbi_equity = sdpvar(1,sum(low_income>0),'full');
+        
+        Objective = Objective ...
+            - sum(sgip(3)*M*sgip_ees_npbi) ...
+            - sum(sgip(4)*M*sgip_ees_npbi_equity);
+        
+        if sum(sgip_pbi)>0
+            %%% Performance based incentives
+            sgip_ees_pbi = sdpvar(3,sum(sgip_pbi),'full');
+            
+            Objective = Objective ...
+                - sum(sgip(2)*M*sgip_ees_pbi(1,:)) ...
+                - sum(sgip(2)*0.5*M*sgip_ees_pbi(2,:)) ...
+                - sum(sgip(2)*0.25*M*sgip_ees_pbi(3,:));
+        else
+            sgip_ees_pbi = zeros(3,1);
+        end
+    else
+        sgip_ees_pbi = zeroes(3,1);
+        sgip_ees_npbi = 0;
+        sgip_ees_npbi_equity = 0;
+    end
     
 else
     ees_adopt=zeros(1,K);
