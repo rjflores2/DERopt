@@ -221,7 +221,7 @@ if isempty(ees_v) == 0
             sgip_ees_pbi = zeros(3,1);
         end
     else
-        sgip_ees_pbi = zeroes(3,1);
+        sgip_ees_pbi = zeros(3,1);
         sgip_ees_npbi = 0;
         sgip_ees_npbi_equity = 0;
     end
