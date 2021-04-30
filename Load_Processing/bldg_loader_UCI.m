@@ -8,10 +8,18 @@
 %%% Time Step
 t_step = 15;
 
-time = dt.Time;
+time = dt.x___Time;
 
 %%%Date vectors for all time stamps
 datetimev=datevec(time);
+
+%%%Cutting down data
+idx = datetimev(:,1) == 2018;
+elec = elec(idx);
+time = time(idx);
+datetimev=datevec(time);
+
+
 %%% Finding month start/endpoints
 end_cnt = 1;
 stpts=1;
