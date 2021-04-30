@@ -42,10 +42,6 @@ addpath(genpath('H:\Matlab_Paths\YALMIP-master'))
 %%%CPLEX Path
 addpath(genpath('C:\Program Files\IBM\ILOG\CPLEX_Studio128\cplex\matlab\x64_win64'))
 
-%%%Source of URBANopt Results
-addpath('H:\_Research_\CEC_OVMG\URBANopt\UO_Results')
-addpath('H:\_Research_\CEC_OVMG\URBANopt')
-
 %%%DERopt paths
 addpath(genpath('H:\_Tools_\DERopt'))
 
@@ -58,68 +54,21 @@ addpath('H:\Data\CPUC_SGIP_Signal')
 %% Loading building demand
 
 %%%Loading Data
-dt = load('H:\_Research_\CEC_OVMG\URBANopt\UO_Results\UES_Sc1\Sc1_0_Baseline.mat');
-
-%%%Pulling out load data
-elec = dt.loads_fac;
-gas = dt.gas_fac;
-elec_o = elec;
-% return
-%%
-%%%Reading dc_exist and rate info
-[ri_num,ri_txt] = xlsread('bldg_rate_info.xlsx');
-
-dc_exist = ri_num; %%%DC Exist - 1 = yes, 0 = no
-rate = ri_txt(2:end,2); %%%Rate info for each building
-
-%%%Low income properties
-low_income = xlsread('OV_Low_Income_Properties.xlsx');
-
-%%%Estimating residential units
-res_units = floor(cell2mat(dt.bldg_info(:,6))./1100);
-
-for ii = 1:size(dt.bldg_info,1)
-    if not(cellfun('isempty',strfind({'Multifamily (2 to 4 units)'},char(dt.bldg_info(ii,3))))) || ...
-            not(cellfun('isempty',strfind({'Single-Family'},char(dt.bldg_info(ii,3)))))
-        res_units(ii) = res_units(ii);
-    else
-        res_units(ii) = 0;
-    end
-end
-
-%%% maximum PV
-maxpv = cell2mat(dt.bldg_info(:,4))./10.76*0.2*.7;
-
-bldg_ind = [306];
-
-% elec = [elec_o(:,bldg_ind)];
-% rate = rate(bldg_ind);
-% dc_exist = dc_exist(bldg_ind);
-% low_income = low_income(bldg_ind);
-% res_units = res_units(bldg_ind);
-
-bldg_ind = find(res_units==0);
-
-bldg_ind = 1;
-% return
-% bldg_ind = [1:160];
-bldg_name = dt.bldg_info(bldg_ind,:);
-elec = elec(:,bldg_ind);
-elec_o = elec_o(:,bldg_ind);
-dc_exist = dc_exist(bldg_ind);
-rate = rate(bldg_ind);
-low_income = low_income(bldg_ind);
-res_units = res_units(bldg_ind);
-maxpv = maxpv(bldg_ind);
-sgip_pbi = strcmp(rate,'TOU8') + strcmp(rate,'GS1');
-
-% return
+dt = readtable('H:\Data\UCI\UCI_Loads.csv');
+elec = dt.nonCoolingElec;
+%% Placeholders
+dc_exist = 1;
+rate = {'TOU8'};
+low_income = 0;
+maxpv = 100000./.2;
+sgip_pbi = 1;
+res_units = 0;
 %% Formatting Building Data
-bldg_loader_OVMG
+bldg_loader_UCI
 
 %% Utility Data
 %%%Loading Utility Data and Generating Energy Charge Vectors
-utility_SCE_2020
+utility_UCI
 
 %% Tech Parameters/Costs
 %%%Technology Parameters

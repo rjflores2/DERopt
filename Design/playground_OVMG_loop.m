@@ -56,15 +56,15 @@ addpath('H:\_Research_\CEC_OVMG\DERopt')
 addpath('H:\Data\CPUC_SGIP_Signal')
 
 %% Loading building demand
+file_name = 'UES_Sc2\Sc2_19_UES_ERSH_ACboost';
 
 %%%Loading Data
-dt = load('Sc1_0_Baseline.mat');
+dt = load(strcat('H:\_Research_\CEC_OVMG\URBANopt\UO_Results\',file_name,'.mat'));
 
 %%%Pulling out load data
 elec = dt.loads_fac;
 gas = dt.gas_fac;
 elec_o = elec;
-% return
 %%
 %%%Reading dc_exist and rate info
 [ri_num,ri_txt] = xlsread('bldg_rate_info.xlsx');
@@ -97,6 +97,18 @@ maxpv = cell2mat(dt.bldg_info(:,4))./10.76*0.2*.7;
 % low_income = low_income(bldg_ind);
 % res_units = res_units(bldg_ind);
 
+
+%%
+% bldg_ind = find(res_units~=0);
+bldg_ind = 1:10;
+bldg_name = dt.bldg_info(bldg_ind,:);
+elec = elec(:,bldg_ind);
+elec_o = elec_o(:,bldg_ind);
+dc_exist = dc_exist(bldg_ind);
+rate = rate(bldg_ind);
+low_income = low_income(bldg_ind);
+res_units = res_units(bldg_ind);
+maxpv = maxpv(bldg_ind);
 sgip_pbi = strcmp(rate,'TOU8') + strcmp(rate,'GS1');
 
 %% Formatting Building Data
@@ -126,8 +138,11 @@ sgip_pbi_o = sgip_pbi;
 low_income_o = low_income;
 cap_mod_o = cap_mod;
 cap_scalar_o = cap_scalar;
+dc_exist_o = dc_exist;
 %% DERopt
-for bldg_ind = 1:size(elec_o,2)
+time_start = clock
+
+for bldg_ind = 1%:size(elec_o,2)
     %% Current variable set
     elec = elec_o(:,bldg_ind);
     rate = rate_o(bldg_ind);
@@ -135,6 +150,7 @@ for bldg_ind = 1:size(elec_o,2)
     maxpv = maxpv_o(bldg_ind);
     sgip_pbi = sgip_pbi_o(bldg_ind);
     low_income = low_income_o(bldg_ind);
+    dc_exist = dc_exist_o(bldg_ind);
     cap_mod.pv = cap_mod_o.pv(bldg_ind);
     cap_mod.rees = cap_mod_o.rees(bldg_ind);
     cap_mod.ees = cap_mod_o.ees(bldg_ind);
@@ -191,7 +207,7 @@ for bldg_ind = 1:size(elec_o,2)
     rec_pv_elec(:,bldg_ind) = pv_elec;
     rec_pv_nem(:,bldg_ind) = pv_nem;
     rec_pv_adopt(1,bldg_ind) = pv_adopt;
-    
+    pv_adopt
     rec_ees_adopt(1,bldg_ind) = value(ees_adopt);
     rec_ees_soc(:,bldg_ind) = value(ees_soc);
     rec_ees_chrg(:,bldg_ind) = value(ees_chrg);
@@ -207,7 +223,37 @@ for bldg_ind = 1:size(elec_o,2)
     rec_sgip_ees_npbi(:,bldg_ind) = sgip_ees_npbi;
     rec_sgip_ees_npbi_equity(:,bldg_ind) = sgip_ees_npbi_equity;
     
-    rec_fval(1,bldg_inf) = fval;
+    rec_fval(1,bldg_ind) = fval;
     
     bldg_ind
 end
+
+time_end = clock
+
+%% Save Results
+save(strcat('H:\_Research_\CEC_OVMG\URBANopt\UO_Results\',file_name,'_DER.mat'),...
+    'rec_import',...
+    'rec_pv_elec',...
+    'rec_pv_nem',...
+    'rec_pv_adopt',...
+    'rec_ees_adopt',...
+    'rec_ees_soc',...
+    'rec_ees_chrg',...
+    'rec_ees_dchrg',...
+    'rec_rees_adopt',...
+    'rec_rees_soc',...
+    'rec_rees_chrg',...
+    'rec_rees_dchrg',...
+    'rec_rees_dchrg_nem',...
+    'rec_sgip_ees_pbi',...
+    'rec_sgip_ees_npbi',...
+    'rec_sgip_ees_npbi_equity',...
+    'rec_fval',...
+    'cap_mod_o',...
+    'cap_scalar_o',...
+    'pv_v',...
+    'pv_cap',...
+    'ees_v',...
+    'ees_cap',...
+    'sgip_o')
+    

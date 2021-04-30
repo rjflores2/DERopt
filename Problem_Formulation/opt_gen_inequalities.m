@@ -71,16 +71,10 @@ if strcmp(class(pv_nem),'sdpvar') || strcmp(class(rees_dchrg_nem),'sdpvar') %%%I
         Constraints = [Constraints
             (export_price(:,index)'*(rees_dchrg_nem(:,k)+pv_nem(:,k)) <= import_price(:,index)'*import(:,k)):'NEM Credits < Import Cost'];
         
-%         if net_import_on == 1
-%             %%% Export to be always greater than a percentage of import. Export >= net_import_limit.*import
-%             %%% net_import_limit = 1 for NET ZERO.
-%             
-%             if nem_annual == 1
-%                 %%% Calculated annually
-%                 Constraints=[Constraints
-%                     %(sum(sum(pv_nem)) + sum(sum(pv_wholesale)) + sum(sum(rees_dchrg_nem)) >= net_import_limit.*sum(sum(import))):'ZNE Annual'];
-%                     (sum(sum(pv_nem)) + sum(sum(pv_wholesale)) + sum(sum(rees_dchrg_nem)) >= net_import_limit.*sum(sum(import)) + sum(ees_soc(1,:)+ rees_soc(1,:))):'ZNE Annual: Export Revenue <= Import Energy Cost'];
-%             end
-%         end
+        
+        Constraints = [Constraints
+            (sum(rees_dchrg_nem(:,k)+pv_nem(:,k)) <= sum(import(:,k))):'NEM Energy < Import Energy'];
+        
+
     end
 end

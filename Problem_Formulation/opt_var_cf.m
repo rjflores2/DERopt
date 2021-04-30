@@ -113,9 +113,12 @@ if isempty(pv_v) == 0
     end
     
     %%%PV Cost
+%     mod_val = 0.7
+%     mod_val*pv_cap
+%      mod_val*(pv_v(1)*M*cap_mod.pv - cap_scalar.pv)
     Objective=Objective ...
-        + sum((pv_v(1)*M*cap_mod.pv - cap_scalar.pv).*pv_adopt)... %%%PV Capital Cost ($/kW installed)
-        + pv_v(3)*(sum(sum(repmat(day_multi,1,K).*(pv_elec + pv_nem))) ); %%%PV O&M Cost ($/kWh generated)
+        + sum(M*pv_mthly_debt.*pv_cap_mod'.*pv_adopt)... %%%PV Capital Cost ($/kW installed)
+        + pv_v(3)*(sum(sum(repmat(day_multi,1,K).*(pv_elec + pv_nem)))); %%%PV O&M Cost ($/kWh generated)
 %         + pv_v(3)*(sum(sum(repmat(day_multi,1,K).*(pv_elec + pv_nem + pv_wholesale))) ); %%%PV O&M Cost ($/kWh generated)
 
     %%% Allow for adoption of Renewable paired storage when enabled (REES)
@@ -131,9 +134,9 @@ if isempty(pv_v) == 0
         
         %%%REES SOC
         rees_soc=sdpvar(T,K,'full');
-        %%%REES Cost Functions
+        %%%REES Cost Functions        
         Objective = Objective...
-            + sum((ees_v(1)*M*cap_mod.rees + cap_scalar.rees*M).*rees_adopt) ...%%%Capital Cost
+            + sum(ees_v(1)*M.*rees_cap_mod'.*rees_adopt) ...%%%Capital Cost
             + ees_v(2)*sum(sum(repmat(day_multi,1,K).*rees_chrg))... %%%Charging O&M
             + ees_v(3)*(sum(sum(repmat(day_multi,1,K).*(rees_dchrg))));%%%Discharging O&M
         
@@ -194,7 +197,7 @@ if isempty(ees_v) == 0
     
     %%%EES Cost Functions
     Objective = Objective...
-        + sum((ees_v(1)*M*cap_mod.ees + cap_scalar.ees*M).*ees_adopt) ...%%%Capital Cost
+        + sum(ees_v(1)*M.*ees_cap_mod'.*ees_adopt) ...%%%Capital Cost
         + ees_v(2)*sum(sum(repmat(day_multi,1,K).*ees_chrg)) ...%%%Charging O&M
         + ees_v(3)*sum(sum(repmat(day_multi,1,K).*ees_dchrg));%%%Discharging O&M
     
