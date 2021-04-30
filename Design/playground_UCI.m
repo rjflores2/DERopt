@@ -55,7 +55,7 @@ addpath('H:\Data\CPUC_SGIP_Signal')
 
 %%%Loading Data
 dt = readtable('H:\Data\UCI\UCI_Loads.csv');
-elec = dt.nonCoolingElec;
+elec = dt.plugloads;
 %% Placeholders
 dc_exist = 1;
 rate = {'TOU8'};

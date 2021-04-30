@@ -7,8 +7,7 @@
 
 %%% Time Step
 t_step = 15;
-
-time = dt.x___Time;
+time = table2array(dt(1:end,1));
 
 %%%Date vectors for all time stamps
 datetimev=datevec(time);
