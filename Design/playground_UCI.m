@@ -17,7 +17,7 @@ ees_on = 1;       %Turn on EES/REES
 rees_on = 1;  %Turn on REES
 
 %% Turning incentives and other financial tools on/off
-sgip_on = 1;
+sgip_on = 0;
 
 %% PV (opt_pv.m)
 pv_maxarea = 1; %%% Limits maximum PV size, based on initially solar PV panel
@@ -56,6 +56,9 @@ addpath('H:\Data\CPUC_SGIP_Signal')
 %%%Loading Data
 dt = readtable('H:\Data\UCI\UCI_Loads.csv');
 elec = dt.plugloads;
+heat = dt.heat;
+cool = dt.cool;
+
 %% Placeholders
 dc_exist = 1;
 rate = {'TOU8'};
@@ -68,6 +71,7 @@ bldg_loader_UCI
 
 %% Utility Data
 %%%Loading Utility Data and Generating Energy Charge Vectors
+
 utility_UCI
 
 %% Tech Parameters/Costs

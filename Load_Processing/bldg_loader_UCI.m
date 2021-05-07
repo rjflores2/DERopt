@@ -43,11 +43,30 @@ for ii = 2:length(time)
         day_endpts(day_cnt,1) = ii;
     end
 end
-%% Placeholders
-sgip_signal = rand(size(elec));
-solar = rand(size(elec));
+
+%% Loading/processing solar data
+load('UCI_Solar_Normalized');
+
+%%%Extracting solar data from the loaded normalized factor
+solar = interp1(norm_slr(:,1),norm_slr(:,2),time);
+
+%% Day multiplier
+
+%%%Currently set to one as long as entire years are considered during
+%%%optimization
 day_multi = ones(size(elec));
 
+%% Loading SGIP CO2 Signal
+sgip_signal_hour = xlsread('hourly_resolved.csv');
+
+%%%Mannually adjusting SGIP time signal to fit with current UCI Data
+delta = time(1) - sgip_signal_hour(1);
+sgip_signal_hour(:,1) = sgip_signal_hour(:,1) + 365;
+
+%%% Interpolating data from hourly to 15 minutes
+sgip_signal = interp1(sgip_signal_hour(:,1),sgip_signal_hour(:,2),time);
+
+%%%Assembling sgip_signal_vector
 sgip_signal = [time sgip_signal];
 
 %% Locating Summer Months
