@@ -11,6 +11,9 @@ opt_now_yalmip = 0; %YALMIP
 %% Island operation (opt_nem.m) 
 island = 0;
 
+%%%Toggles NEM/Wholesale export on/off
+export_on = 1;
+
 %% Turning technologies on/off (opt_var_cf.m and tech_select.m)
 pv_on = 1;        %Turn on PV
 ees_on = 1;       %Turn on EES/REES
@@ -54,10 +57,12 @@ addpath('H:\Data\CPUC_SGIP_Signal')
 %% Loading building demand
 
 %%%Loading Data
-dt = readtable('H:\Data\UCI\UCI_Loads.csv');
-elec = dt.plugloads;
-heat = dt.heat;
-cool = dt.cool;
+dt = load('H:\Data\UCI\Campus_Loads_2014_2019.mat');
+
+elec = dt.loads.elec;
+heat = dt.loads.heating;
+cool = dt.loads.cooling;
+time = dt.loads.time;
 
 %% Placeholders
 dc_exist = 1;
@@ -71,20 +76,23 @@ bldg_loader_UCI
 
 %% Utility Data
 %%%Loading Utility Data and Generating Energy Charge Vectors
-
 utility_UCI
+
+%%%Placeholder natural gas cost
+ng_cost = 0.5/29.3; %$/kWh --> Converted from $/therm to $/kWh, 29.3 kWh / 1 Therm
 
 %% Tech Parameters/Costs
 %%%Technology Parameters
-tech_select
+tech_select_UCI
+
 %%%Including Required Return with Capital Payment (1 = Yes)
 req_return_on = 1;
 
-%%%Technology Capital Costs
-% tech_payment
-
 %%%Capital cost mofificaitons
 cap_cost_mod
+
+%% Legacy Technologies
+tech_legacy_UCI
 
 %% DERopt
 %% Setting up variables and cost function
@@ -93,7 +101,7 @@ tic
 opt_var_cf %%%Added NEM and wholesale export to the PV Section
 elapsed = toc;
 fprintf('Took %.2f seconds \n', elapsed)
-% return
+
 %% General Equality Constraints
 fprintf('%s: General Equalities.', datestr(now,'HH:MM:SS'))
 tic
@@ -105,6 +113,12 @@ fprintf('Took %.2f seconds \n', elapsed)
 fprintf('%s: General Inequalities. ', datestr(now,'HH:MM:SS'))
 tic
 opt_gen_inequalities
+elapsed = toc;
+fprintf('Took %.2f seconds \n', elapsed)
+%% Legacy DG Constraints
+fprintf('%s: Legacy DG Constraints. ', datestr(now,'HH:MM:SS'))
+tic
+opt_dg_legacy
 elapsed = toc;
 fprintf('Took %.2f seconds \n', elapsed)
 %% Solar PV Constraints

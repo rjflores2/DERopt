@@ -1,5 +1,11 @@
 %% General Inequalities
 %% Demand Charges
+
+%%%Checking if e_adjust factor exists
+if ~exist('e_adjust','var')
+    e_adjust = 1;
+end
+
 if utility_exists == 1
     dc_count=1;
     for ii = 1:size(elec,2) %ii loops thorugh buildings
@@ -9,10 +15,10 @@ if utility_exists == 1
             for i=1:length(endpts) %i counts months 
                 if i==1 % for January
                     Constraints=[Constraints
-                        (import(1:endpts(1),ii) <= nontou_dc(i,dc_count)):'Non TOU DC January'];
+                        (import(1:endpts(1),ii).*e_adjust <= nontou_dc(i,dc_count)):'Non TOU DC January'];
                 else % for all other months 
                     Constraints=[Constraints
-                        (import(endpts(i-1)+1:endpts(i),ii) <= nontou_dc(i,dc_count)):'Non TOU DC'];
+                        (import(endpts(i-1)+1:endpts(i),ii).*e_adjust <= nontou_dc(i,dc_count)):'Non TOU DC'];
                 end
             end
             %% TOU On-Peak & Mid-Peak Demand Chargers
@@ -36,7 +42,7 @@ if utility_exists == 1
                     
                     %%%Setting Cosntraints
                     Constraints=[Constraints
-                        (import(on_index,ii) <= onpeak_dc(on_dc_count,dc_count)):'TOU DC Onpeak'];
+                        (import(on_index,ii).*e_adjust <= onpeak_dc(on_dc_count,dc_count)):'TOU DC Onpeak'];
                     
                     %%%Advancing on peak counter
                     on_dc_count = on_dc_count + 1;
@@ -49,7 +55,7 @@ if utility_exists == 1
                     
                     %%%Setting Cosntraints
                     Constraints=[Constraints
-                        (import(mid_index,ii) <= midpeak_dc(mid_dc_count,dc_count)):'TOU DC Midpeak'];
+                        (import(mid_index,ii).*e_adjust <= midpeak_dc(mid_dc_count,dc_count)):'TOU DC Midpeak'];
                                         
                     %%%Advancing on peak counter
                     mid_dc_count = mid_dc_count + 1;

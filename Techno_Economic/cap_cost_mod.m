@@ -58,7 +58,7 @@ if ~isempty(pv_v)
         %%%or installing maximum capacity
         pv_scale_factor = min([sum(elec(:,i))./(0.2*8760) maxpv(i)]);
         if pv_scale_factor > 1000
-            pv_scale_factor = pv_scale_factor;
+            pv_scale_factor = 1000;
         end
         
         pv_scale_factor = pv_scale_factor.*ones(1,size(pv_v,2));
@@ -104,7 +104,7 @@ if ~isempty(ees_v)
         %%%or installing maximum capacity
         pv_scale_factor = min([sum(elec(:,i))./(0.2*8760) maxpv(i)]);
         if pv_scale_factor > 1000
-            pv_scale_factor = pv_scale_factor;
+            pv_scale_factor = 1000;
         end
         
         ees_scale_factor = pv_scale_factor*2.5; %%%Assume 2.5 kWh storage per kW of PV

@@ -14,13 +14,14 @@ if opt_now==1
   
     options = cplexoptimset;
     options.Display='on';
-    options.MaxTime = 2*3600;
+%     options.MaxTime = 2*3600;
+options.MaxNodes = 100;
 
     
     fprintf('%s Starting CPLEX Solver \n', datestr(now,'HH:MM:SS'))
     tic
-    [x, fval, exitflag, output, lambda] = cplexlp(model.f, model.Aineq, model.bineq, model.Aeq, model.beq, lb, ub, [], options);
-%     [x, fval, exitflag, output] = cplexmilp(model.f, model.Aineq, model.bineq, model.Aeq, model.beq, [],[],[],lb,ub,model.ctype,[],options);
+%     [x, fval, exitflag, output, lambda] = cplexlp(model.f, model.Aineq, model.bineq, model.Aeq, model.beq, lb, ub, [], options);
+    [x, fval, exitflag, output] = cplexmilp(model.f, model.Aineq, model.bineq, model.Aeq, model.beq, [],[],[],lb,ub,model.ctype,[],options);
     elapsed = toc;
     fprintf('CPLEX took %.2f seconds \n', elapsed)
     

@@ -3,11 +3,18 @@
 % Solar
 % SGIP
 
-%% Setting Simulaiton Time
-
 %%% Time Step
-t_step = 15;
-time = table2array(dt(1:end,1));
+t_step = round((time(2) - time(1))*(24*60)); %Minutes
+
+%%%Demand Charge Adjustment
+e_adjust = 60/t_step;
+
+%%%Adjusting Data from power to energy
+elec = elec.*(t_step/60);
+heat = heat.*(t_step/60);
+cool = cool.*(t_step/60);
+
+%% Setting Simulaiton Time
 
 %%%Date vectors for all time stamps
 datetimev=datevec(time);
@@ -43,6 +50,9 @@ for ii = 2:length(time)
         day_endpts(day_cnt,1) = ii;
     end
 end
+
+%% Adjusting load data from avg power to energy
+t_delta = (time(3) - time(2))
 
 %% Loading/processing solar data
 load('UCI_Solar_Normalized');

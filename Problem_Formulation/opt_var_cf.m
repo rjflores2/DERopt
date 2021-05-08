@@ -84,7 +84,7 @@ if isempty(pv_v) == 0
     %%%Size of installed System (kW)
     pv_adopt= sdpvar(1,K,'full'); %%%PV Size
     
-    if island == 0  %If grid tied, then include NEM and wholesale export
+    if island == 0 && export_on == 1  %If grid tied, then include NEM and wholesale export
         
         %%% Variables that exist when grid tied
         pv_nem = sdpvar(T,K,'full'); %%% PV Production exported w/ NEM
@@ -110,6 +110,8 @@ if isempty(pv_v) == 0
          
          %%%Clearing temporary variables
          clear temp_cf1 temp_cf2
+    else
+        pv_nem = [];
     end
     
     %%%PV Cost
@@ -236,3 +238,60 @@ else
     ees_dchrg=zeros(T,K);
 end
 toc
+
+%% Legacy Technologies
+%% Generic DG
+
+%% Legacy PV
+%%%Only need to add variables if new PV is not considered
+if isempty(pv_legacy) == 0 && isempty(pv_v) == 1
+    
+    if island == 0 && export_on == 1 %If grid tied, then include NEM and wholesale export
+        %%% Variables that exist when grid tied
+        pv_nem = sdpvar(T,K,'full'); %%% PV Production exported w/ NEM
+        for k = 1:K
+            %%%Utility rates for building k
+            index=find(ismember(rate_labels,rate(k)));
+            
+            %%%Adding values to the cost function
+            Objective = Objective...
+                + sum(sum(-day_multi.*export_price(:,index).*pv_nem)); %%%NEM Revenue Cost
+        end
+    else
+        pv_nem = [];
+    end
+    
+    %%%PV Generation to meet building demand (kWh)
+    pv_elec = sdpvar(T,K,'full'); %%% PV Production sent to the building
+    
+    %%%Operating Costs
+    Objective=Objective ...
+        + pv_v(3)*(sum(sum(repmat(day_multi,1,K).*(pv_elec + pv_nem))));
+    
+elseif isempty(pv_legacy) == 1
+    %%%If Legacy PV does not exist, then make the existing pv value zero
+    pv_legacy = zeros(2,K);
+end
+
+%% Legacy DG
+if ~isempty(dg_legacy)
+    %%%DG Electrical Output
+    ldg_elec = sdpvar(T,K,'full');
+    %%%DG Fuel Input
+    ldg_fuel = sdpvar(T,K,'full');
+    %%%DG On/Off State - Number of variables is equal to:
+    %%% (Time Instances) / On/Off length
+%     (dg_legacy(end,i)/t_step)
+%     ldg_off=binvar(ceil(length(time)/(dg_legacy(end,i)/t_step)),K,'full');
+    
+    for ii = 1:K
+        Objective=Objective ...
+            + sum(ldg_elec(:,ii))*dg_legacy(1,ii) ...
+            + sum(ldg_fuel(:,ii))*ng_cost;
+    end
+else
+    ldg_elec = [];
+    ldg_fuel = [];
+    ldg_off = [];
+    
+end
