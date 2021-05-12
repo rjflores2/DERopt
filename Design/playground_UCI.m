@@ -123,6 +123,12 @@ tic
 opt_gen_inequalities
 elapsed = toc;
 fprintf('Took %.2f seconds \n', elapsed)
+%% Heat Recovery Inequality Constraints
+fprintf('%s: Heat Recovery Inequalities. ', datestr(now,'HH:MM:SS'))
+tic
+opt_heat_recovery
+elapsed = toc;
+fprintf('Took %.2f seconds \n', elapsed)
 %% Legacy DG Constraints
 fprintf('%s: Legacy DG Constraints. ', datestr(now,'HH:MM:SS'))
 tic

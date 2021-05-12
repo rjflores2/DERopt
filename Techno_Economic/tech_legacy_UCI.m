@@ -40,13 +40,13 @@ dg_legacy = [0.026; 14500; 9000; 0.01; 0.01; 0.52;f1; f2; q1; q2; 60*24*3];
 %%%Efficiency - 4
 %%%Heat utilization - 5
 bot_legacy = [0.01; 4500; .1; 0.9; 0.3];
-bot_legacy = [];
+% bot_legacy = [];
 %% Heat Recovery 
 
 %%%[O&M ($/kWh) - 1
 %%%Effectivness - 2
 hr_legacy = [0.001; 0.8];
-hr_legacy = [];
+% hr_legacy = [];
 %% Combustion heater systems
 
 %%%Duct burner operation
@@ -60,7 +60,7 @@ db_legacy = [0.0001; 0.63];
 boil_legacy = [0.001; 0.8];
 
 
-db_legacy = [];
+% db_legacy = [];
 boil_legacy = [];
 %% Cooling
 %%% Existing vapor compression

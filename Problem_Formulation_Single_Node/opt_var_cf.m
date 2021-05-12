@@ -301,7 +301,24 @@ else
     var_ldg.ldg_off = [];
     
 end
+%% Legacy bottoming systems
+%%%Bottoming generator is any electricity producing device that operates
+%%%based on heat recovered from another generator
 
+if ~isempty(bot_legacy)
+    %%%Bottom electrical output
+    var_lbot.lbot_elec = sdpvar(length(elec),size(bot_legacy,2),'full');
+    %%%Bottom operational state
+    var_lbot.lbot_on = binvar(length(elec),size(bot_legacy,2),'full');
+    
+    %%%Bottoming cycle
+    for i=1:size(bot_legacy,2)
+        Objective=Objective+var_lbot.lbot_elec(:,1)'*(bot_legacy(1,i)*ones(length(time),1));%%%Bottoming cycle O&M
+    end
+else
+    var_lbot.lbot_elec = zeros(T,1);
+    var_lbot.lbot_on = zeros(T,1);
+end
 %% Legacy Heat recovery
 if ~isempty(dg_legacy) && ~isempty(hr_legacy)
     %%%Heat recovery output
