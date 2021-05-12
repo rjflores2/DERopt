@@ -80,7 +80,7 @@ vc_v7=[0.017; 5.2; 10550./4; .8;];
 vc_legacy = [vc_v1 vc_v2 vc_v3 vc_v4 vc_v5 vc_v6 vc_v7];
 
 
- vc_legacy = [];
+%  vc_legacy = [];
 %% Thermal Energy Storage Vector - Initial charge is inserted later
 %%%[Capacity (kWh) [1]
 %%% Charge O&M ($/kWh) [2]
@@ -103,7 +103,7 @@ tes_legacy = [99010; %1
     .95; %9
     .999]; %10
 
-tes_legacy = [];
+% tes_legacy = [];
 %% Campus Properties
 %%%[Available area for solar
 %%% Cooling loop input (C)

@@ -97,8 +97,6 @@ req_return_on = 1;
 %%%Capital cost mofificaitons
 cap_cost_mod
 
-
-
 %% Legacy Technologies
 tech_legacy_UCI
 
@@ -148,7 +146,18 @@ tic
 opt_ees
 elapsed = toc;
 fprintf('Took %.2f seconds \n', elapsed)
-
+%% Legacy VC Constraints
+fprintf('%s: Legacy VC Constraints.', datestr(now,'HH:MM:SS'))
+tic
+opt_vc_legacy
+elapsed = toc;
+fprintf('Took %.2f seconds \n', elapsed)
+%% Legacy TES Constraints
+fprintf('%s: Legacy TES Constraints.', datestr(now,'HH:MM:SS'))
+tic
+opt_tes_legacy
+elapsed = toc;
+fprintf('Took %.2f seconds \n', elapsed)
 %% DER Incentives
 fprintf('%s: DER Incentives Constraints.', datestr(now,'HH:MM:SS'))
 tic

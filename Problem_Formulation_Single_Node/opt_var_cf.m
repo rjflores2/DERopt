@@ -343,9 +343,9 @@ if ~isempty(dg_legacy) && ~isempty(hr_legacy)
     end
     
 else
-    var_ldg.hr_heat = [];
-    var_ldg.db_fire = [];
-    var_ldg.db_rfire = [];
+    var_ldg.hr_heat = zeros(T,1);
+    var_ldg.db_fire = zeros(T,1);
+    var_ldg.db_rfire = zeros(T,1);
 end
 %% Legacy boiler
 if ~isempty(boil_legacy)
@@ -356,4 +356,66 @@ if ~isempty(boil_legacy)
     Objective=Objective ...
         +  sum(var_boil.boil_fuel)*(boil_legacy(1) + ng_cost) ...
         +sum(var_boil.boil_rfuel)*(boil_legacy(1) + rng_cost);
+else
+    var_boil.boil_fuel = zeros(T,1);
+    var_boil.boil_rfuel = zeros(T,1);
+end
+
+%% Legacy Generic Chiller
+if ~isempty(cool) && sum(cool) > 0  && isempty(vc_legacy)
+    var_vc.generic_cool = sdpvar(length(elec),size(boil_legacy,2),'full');
+else
+    var_vc.generic_cool = zeros(T,1);
+end
+
+%% Legacy Cold TES
+if ~isempty(cool) && sum(cool) >0 && ~isempty(tes_legacy)
+    %%%TES Energy Storage Vector
+    %%%TES State of Charge
+    var_ltes.ltes_soc = sdpvar(length(elec),size(tes_legacy,2),'full');
+    %%%TES charging/discharging
+    var_ltes.ltes_chrg = sdpvar(length(elec),size(tes_legacy,2),'full');
+    var_ltes.ltes_dchrg = sdpvar(length(elec),size(tes_legacy,2),'full');
+    
+    %%%TES
+    for i=1:size(tes_legacy,2)
+        Objective=Objective + var_ltes.ltes_chrg(:,i)'*(tes_legacy(2,i)*ones(length(time),1))...
+            + var_ltes.ltes_dchrg(:,i)'*(tes_legacy(3,i)*ones(length(time),1));
+    end
+    
+else
+    var_ltes.ltes_soc = zeros(T,1);
+    var_ltes.ltes_chrg = zeros(T,1);
+    var_ltes.ltes_dchrg = zeros(T,1);
+end
+
+%% Legacy Chillers
+if ~isempty(cool) && sum(cool) >0 && ~isempty(vc_legacy)
+    
+    vc_hour_num = ceil(length(time)/4);
+    
+    
+    %%%VC Cooling output
+    var_lvc.lvc_cool = sdpvar(length(elec),size(vc_legacy,2),'full');
+    %%%VC Operational State
+    var_lvc.lvc_op = binvar(vc_hour_num,size(vc_legacy,2),'full');
+    %%%VC Start
+    % vc_start=binvar(length(elec),size(vc_v,2),'full');
+    % vc_start=binvar(length(elec),size(vc_v,2),'full');
+    
+    %%%Electric Vapor Compression
+    for i=1:size(vc_legacy,2)
+        Objective = Objective ...
+            + var_lvc.lvc_cool(:,i)'*(vc_legacy(1,i)*ones(length(time),1)); ...
+            %         + 10*sum(sum(vc_start));
+    end
+    
+    vc_cop=ones(length(elec),size(vc_legacy,2));
+    for i=1:length(elec)
+        vc_cop(i,:)=vc_cop(i,:).*(1./vc_legacy(2,:));
+        vc_size(i,:) = vc_legacy(3,:);
+    end
+    
+else
+    
 end
