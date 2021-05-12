@@ -6,6 +6,7 @@
 %%%  PW Capacity (kW)] - 2
 pv_legacy = [0.001; 4000];
 
+% pv_legacy=[];
 %% Generic generator
 %%%[O&M ($/kWh)  -  1
 %%% Maximum output (kW)  -  2
@@ -28,7 +29,7 @@ dg_legacy = [0.026; 14500; 9000; 0.01; 0.01; 0.52;f1; f2; q1; q2; 60*24*3];
 
 %  top_f = [f1 f2];
 %     top_q = [q1 q2];
-
+% dg_legacy = [];
 %% Bottoming Generator
 %%%Bottoming generator is any electricity producing device that operates
 %%%based on heat recovered from another generator
@@ -39,13 +40,13 @@ dg_legacy = [0.026; 14500; 9000; 0.01; 0.01; 0.52;f1; f2; q1; q2; 60*24*3];
 %%%Efficiency - 4
 %%%Heat utilization - 5
 bot_legacy = [0.01; 4500; .1; 0.9; 0.3];
-
+bot_legacy = [];
 %% Heat Recovery 
 
 %%%[O&M ($/kWh) - 1
 %%%Effectivness - 2
 hr_legacy = [0.001; 0.8];
-
+hr_legacy = [];
 %% Combustion heater systems
 
 %%%Duct burner operation
@@ -58,6 +59,9 @@ db_legacy = [0.0001; 0.63];
 %%% Utilizaiton
 boil_legacy = [0.001; 0.8];
 
+
+db_legacy = [];
+boil_legacy = [];
 %% Cooling
 %%% Existing vapor compression
 %%%Vapor Compression Informaiton
@@ -75,6 +79,8 @@ vc_v6=[0.012; 5.2; 10550./4; .8;];
 vc_v7=[0.017; 5.2; 10550./4; .8;];
 vc_legacy = [vc_v1 vc_v2 vc_v3 vc_v4 vc_v5 vc_v6 vc_v7];
 
+
+ vc_legacy = [];
 %% Thermal Energy Storage Vector - Initial charge is inserted later
 %%%[Capacity (kWh) [1]
 %%% Charge O&M ($/kWh) [2]
@@ -97,6 +103,7 @@ tes_legacy = [99010; %1
     .95; %9
     .999]; %10
 
+tes_legacy = [];
 %% Campus Properties
 %%%[Available area for solar
 %%% Cooling loop input (C)

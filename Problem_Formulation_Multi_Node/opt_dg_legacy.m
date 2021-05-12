@@ -2,7 +2,7 @@
 if ~isempty(dg_legacy)
     for i = 1:size(dg_legacy,2)
         Constraints = [Constraints
-        -dg_legacy(2,i)*dg_legacy(5,i)<=ldg_elec(2:size(ldg_elec,1),i)-ldg_elec(1:size(ldg_elec,1)-1,i)<=dg_legacy(2,i)*dg_legacy(4,i) %];
+        -dg_legacy(2,i)*dg_legacy(5,i) <= ldg_elec(2:size(ldg_elec,1),i) - ldg_elec(1:size(ldg_elec,1)-1,i) <= dg_legacy(2,i)*dg_legacy(4,i) %];
         (dg_legacy(3,i)*(1/e_adjust)) <= ldg_elec(:,i) <= (dg_legacy(2,i)*(1/e_adjust))]; %%%Min/Max Power output for generator & on/off behavior
         
 %         onoff = (dg_legacy(end,i)/t_step);

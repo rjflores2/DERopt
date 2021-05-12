@@ -46,10 +46,16 @@ addpath(genpath('H:\Matlab_Paths\YALMIP-master'))
 addpath(genpath('C:\Program Files\IBM\ILOG\CPLEX_Studio128\cplex\matlab\x64_win64'))
 
 %%%DERopt paths
-addpath(genpath('H:\_Tools_\DERopt'))
+addpath(genpath('H:\_Tools_\DERopt\Design'))
+addpath(genpath('H:\_Tools_\DERopt\Input_Data'))
+addpath(genpath('H:\_Tools_\DERopt\Load_Processing'))
+addpath(genpath('H:\_Tools_\DERopt\Post_Processing'))
+addpath(genpath('H:\_Tools_\DERopt\Problem_Formulation_Single_Node'))
+addpath(genpath('H:\_Tools_\DERopt\Techno_Economic'))
+addpath(genpath('H:\_Tools_\DERopt\Utilities'))
 
 %%%Specific project path
-addpath('H:\_Research_\CEC_OVMG\DERopt')
+% addpath('H:\_Research_\CEC_OVMG\DERopt')
 
 %%%SGIP CO2 Signal
 addpath('H:\Data\CPUC_SGIP_Signal')
@@ -80,7 +86,7 @@ utility_UCI
 
 %%%Placeholder natural gas cost
 ng_cost = 0.5/29.3; %$/kWh --> Converted from $/therm to $/kWh, 29.3 kWh / 1 Therm
-
+rng_cost = ng_cost*2;
 %% Tech Parameters/Costs
 %%%Technology Parameters
 tech_select_UCI
@@ -90,6 +96,8 @@ req_return_on = 1;
 
 %%%Capital cost mofificaitons
 cap_cost_mod
+
+
 
 %% Legacy Technologies
 tech_legacy_UCI

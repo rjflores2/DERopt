@@ -9,9 +9,9 @@ utility_exists=1;
 %%% Power output per unit area (kW/m^2);
 
 %pv_v=[3500; 0.2 ; 0.001];
-pv_v=[265000; 0.2 ; 0.001];
 
-pv_cap=pv_v(1,:);
+pv_v=[3000; 0.2 ; 0.001];
+
 
 %%%How pv capital cost is modified for different types of buildings
 pv_cap_mod = [2/2.65 %%%Commercial/industrial
@@ -26,9 +26,17 @@ pv_fin = [-0.4648; ... %%%Scaling linear factor - Based on Lazards cost of elect
     0; ... %%%MACRS Schedule
     0]; ... %%%ITC Benefit
     
+% pv_v = [pv_v pv_v];
+% pv_fin = [pv_fin pv_fin];
+% pv_cap_mod = [pv_cap_mod pv_cap_mod];
 
+
+
+pv_cap=pv_v(1,:);
 %%%Solar on multifamily affordable homes (SOMAH)
 somah = [2600];
+
+% pv_v = [];
 %% Electrical Energy Storage
 %%% (1) Capital Cost ($/kWh installed)
 %%% (2) Charge O&M ($/kWh charged)
@@ -49,20 +57,20 @@ somah = [2600];
 %ees_v=[500; 0.001; 0.001; 0.1; 0.95; 0.25; 0.25; .95; .95; .995];
 ees_v=[830; 0.001; 0.001; 0.1; 0.95; 0.25; 0.25; .90; .90; .995];
 %ees_v=[600; 0.001; 0.001; 0.1; 0.95; 0.25; 0.25; 1; 1; .995]; %Testing with 100% RTE
+% ees_v=[100; 0.001; 0.001; 0.1; 0.95; 0.25; 0.25; .90; .90; .995];
 
-ees_cap=ees_v(1);
 
 %%%How pv capital cost is modified for different types of buildings
 ees_cap_mod = [575/830 %%%Commercial/industrial
     830/830]; %%%Residential
 
 %%%Financial Aspects - EES
-ees_fin = [-0.4648;... %%%Scaling linear factor - Based on Lazards cost of electricity
+ees_fin = [-0.1306;... %%%Scaling linear factor - Based on Lazards cost of electricity
     7; ... %%%MACRS Schedule
     0]; ... %%%ITC Benefit
     
 %%%Financial Aspects - EES
-rees_fin = [-0.4648;... %%%Scaling linear factor - Based on Lazards cost of electricity
+rees_fin = [-0.1306;... %%%Scaling linear factor - Based on Lazards cost of electricity
     5; ... %%%MACRS Schedule
     1]; ... %%%ITC Benefit
     
@@ -75,6 +83,17 @@ sgip = [5 %%% 1:CO2 reduction required per kWh for large scale systems
 sgip_o = sgip;
 %%%Non_residential rates that receive sgip(2) incentive
 non_res_rates = [1 2];
+
+
+
+% ees_v = [ees_v ees_v];
+% ees_cap_mod = [ees_cap_mod ees_cap_mod];
+% ees_fin = [ees_fin ees_fin];
+% rees_fin = [rees_fin rees_fin];
+
+ees_cap=ees_v(1);
+
+% ees_v = [];
 %% Building space
 %%%[space available for PV (m^2)
 %%%Cooling loop input (C)

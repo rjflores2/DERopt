@@ -279,19 +279,48 @@ if ~isempty(dg_legacy)
     ldg_elec = sdpvar(T,K,'full');
     %%%DG Fuel Input
     ldg_fuel = sdpvar(T,K,'full');
+    %%%DG Fuel Input
+    ldg_rfuel = sdpvar(T,K,'full');
     %%%DG On/Off State - Number of variables is equal to:
     %%% (Time Instances) / On/Off length
-%     (dg_legacy(end,i)/t_step)
-%     ldg_off=binvar(ceil(length(time)/(dg_legacy(end,i)/t_step)),K,'full');
+    %     (dg_legacy(end,i)/t_step)
+    %     ldg_off=binvar(ceil(length(time)/(dg_legacy(end,i)/t_step)),K,'full');
     
     for ii = 1:K
         Objective=Objective ...
             + sum(ldg_elec(:,ii))*dg_legacy(1,ii) ...
-            + sum(ldg_fuel(:,ii))*ng_cost;
+            + sum(ldg_fuel(:,ii))*ng_cost ...
+            + sum(ldg_rfuel(:,ii))*ng_cost;
     end
 else
     ldg_elec = [];
     ldg_fuel = [];
     ldg_off = [];
     
+end
+
+%% Legacy Heat recovery
+if ~isempty(dg_legacy) && ~isempty(hr_legacy)
+    %%%Heat recovery output
+    hr_heat=sdpvar(length(elec),1,'full');
+    
+    %%%If duct burner or HR heating source is available
+    if ~isempty(db_legacy)
+        %%%Duct burner - Conventional
+        db_fire=sdpvar(length(elec),1,'full');
+        %%%Duct burner - Renewable
+        db_rfire=sdpvar(length(elec),1,'full');
+        
+        %%%Duct burner and renewable duct burner
+        Objective=Objective+db_fire'*((db(1)+ng_cost)*ones(length(time),1))+...
+            db_rfire'*((db(1)+rng_cost)*ones(length(time),1));
+    else
+        db_fire = [];
+        db_rfire = [];
+    end
+    
+else
+    hr_heat = [];
+    db_fire = [];
+    db_rfire = [];
 end
