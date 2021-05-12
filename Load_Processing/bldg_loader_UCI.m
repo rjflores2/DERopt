@@ -22,6 +22,8 @@ datetimev=datevec(time);
 %%%Cutting down data
 idx = datetimev(:,1) == 2018;
 elec = elec(idx);
+heat = heat(idx);
+cool = cool(idx);
 time = time(idx);
 datetimev=datevec(time);
 

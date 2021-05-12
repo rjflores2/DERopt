@@ -347,3 +347,13 @@ else
     var_ldg.db_fire = [];
     var_ldg.db_rfire = [];
 end
+%% Legacy boiler
+if ~isempty(boil_legacy)
+    %%%Basic boiler
+    var_boil.boil_fuel = sdpvar(length(elec),size(boil_legacy,2),'full');
+    var_boil.boil_rfuel = sdpvar(length(elec),size(boil_legacy,2),'full');
+    
+    Objective=Objective ...
+        +  sum(var_boil.boil_fuel)*(boil_legacy(1) + ng_cost) ...
+        +sum(var_boil.boil_rfuel)*(boil_legacy(1) + rng_cost);
+end

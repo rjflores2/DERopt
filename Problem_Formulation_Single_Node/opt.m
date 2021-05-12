@@ -45,9 +45,10 @@ options.MaxNodes = 100;
     
     figure
     hold on
-    plot(value(var_ldg.ldg_elec))
-    plot(value(var_util.import) + value(var_ldg.ldg_elec))
-    plot(value(var_util.import) + value(var_pv.pv_elec) + value(var_ldg.ldg_elec))
+    plot(value(var_ldg.ldg_elec) )
+    plot(value(var_ldg.ldg_elec) + value(var_lbot.lbot_elec))
+    plot(value(var_util.import) + value(var_ldg.ldg_elec) + value(var_lbot.lbot_elec))
+    plot(value(var_util.import) + value(var_pv.pv_elec) + value(var_ldg.ldg_elec) + value(var_lbot.lbot_elec))
     
     return
     

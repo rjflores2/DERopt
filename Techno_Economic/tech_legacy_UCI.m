@@ -61,7 +61,7 @@ boil_legacy = [0.001; 0.8];
 
 
 % db_legacy = [];
-boil_legacy = [];
+% boil_legacy = [];
 %% Cooling
 %%% Existing vapor compression
 %%%Vapor Compression Informaiton
