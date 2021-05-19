@@ -12,18 +12,25 @@ e_adjust = 60/t_step;
 %%%Adjusting Data from power to energy
 elec = elec.*(t_step/60);
 heat = heat.*(t_step/60);
-cool = cool.*(t_step/60);
-
+if ~isempty(cool)
+    cool = cool.*(t_step/60);
+end
 %% Setting Simulaiton Time
 
 %%%Date vectors for all time stamps
 datetimev=datevec(time);
 
 %%%Cutting down data
-idx = datetimev(:,1) == 2018;
+
+%%% change IDX to a specific month to allow for faster testing %%%
+
+idx = (datetimev(:,1) == 2018 & datetimev(:,2) == 7);
+% idx = (datetimev(:,1) == 2018);
 elec = elec(idx);
 heat = heat(idx);
-cool = cool(idx);
+if ~isempty(cool)
+    cool = cool(idx);
+end
 time = time(idx);
 datetimev=datevec(time);
 

@@ -2,9 +2,11 @@
 if ~isempty(dg_legacy)
     for i = 1:size(dg_legacy,2)
         Constraints = [Constraints
-            -dg_legacy(2,i)*dg_legacy(5,i) <= var_ldg.ldg_elec(2:size(var_ldg.ldg_elec,1),i) - var_ldg.ldg_elec(1:size(var_ldg.ldg_elec,1)-1,i) <= dg_legacy(2,i)*dg_legacy(4,i) %];
-            (dg_legacy(3,i)*(1/e_adjust)) <= var_ldg.ldg_elec(:,i) <= (dg_legacy(2,i)*(1/e_adjust)) %%%Min/Max Power output for generator & on/off behavior
-            dg_legacy(7,i)*var_ldg.ldg_elec(:,i) + dg_legacy(8,i) == (var_ldg.ldg_fuel(:,i) + var_ldg.ldg_rfuel(:,i))]; %%%Fuel Consumption to produce electricity
+            (-dg_legacy(2,i)*dg_legacy(5,i) <= var_ldg.ldg_elec(2:size(var_ldg.ldg_elec,1),i) - var_ldg.ldg_elec(1:size(var_ldg.ldg_elec,1)-1,i) <= dg_legacy(2,i)*dg_legacy(4,i)) %Ramp Rates Constraints
+            ((dg_legacy(3,i)*(1/e_adjust)) <= var_ldg.ldg_elec(:,i) <= (dg_legacy(2,i)*(1/e_adjust))) %%%Min/Max Power output for generator & on/off behavior
+            (dg_legacy(7,i)*var_ldg.ldg_elec(:,i) + dg_legacy(8,i) == (var_ldg.ldg_fuel(:,i) + var_ldg.ldg_rfuel(:,i)))]; %%%Fuel Consumption to produce electricity
+%             dg_legacy(7,i)*var_ldg.ldg_elec(:,i) + dg_legacy(8,i) == (var_ldg.ldg_fuel(:,i) + var_ldg.ldg_rfuel(:,i))]; %%%Fuel Consumption to produce electricity
+%             dg_legacy(7,i)*var_ldg.ldg_elec(:,i) + dg_legacy(8,i) == (var_ldg.ldg_fuel(:,i) + var_ldg.ldg_rfuel(:,i) + sum(var_el.el_prod,2) + sum(var_h2es.h2es_dchrg,2))]; %%%Fuel Consumption to produce electricity
         
         %         onoff = (dg_legacy(end,i)/t_step);
         %         for j = 1:ceil(length(time)/(dg_legacy(end,i)/t_step))

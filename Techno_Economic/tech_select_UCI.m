@@ -6,7 +6,6 @@ utility_exists=1;
 %%% Cap cost ($/kW)
 %%% Efficiency / Conversion Percent at 1 kW/m^2
 %%% O&M ($/kWh generated)
-%%% Power output per unit area (kW/m^2);
 
 %pv_v=[3500; 0.2 ; 0.001];
 
@@ -93,7 +92,28 @@ non_res_rates = [1 2];
 
 ees_cap=ees_v(1);
 
-% ees_v = [];
+%% Generic Electrolyzer & Hydrogen Storage
+
+%%% (1) Captail Cost ($/kW H2 produced)
+%%% (2) Variable O&M ($/kWh H2 produced)
+%%% (3) Electrolyzer efficiency (kWh H2/kWh elec)
+el_v = [600; 0.01; 0.72];
+
+%%%Hydrogen energy storage
+%%% (1) Capital Cost ($/kWh installed)
+%%% (2) Charge O&M ($/kWh charged)
+%%% (3) Discharge O&M ($/kWh discharged)
+%%% (4) Minimum state of charge
+%%% (5) Maximum state of charge
+%%% (6) Maximum charge rate (% Capacity/hr)
+%%% (7) Maximum discharge rate (% Capacity/hr)
+%%% (8) Charging efficiency
+%%% (9) Discharging efficiency
+%%% (10) State of charge holdover
+h2es_v = [20;0.001;0.001;0.01;1;1;1;1;1;1]
+
+% el_v = []
+% h2es_v = [];
 %% Building space
 %%%[space available for PV (m^2)
 %%%Cooling loop input (C)

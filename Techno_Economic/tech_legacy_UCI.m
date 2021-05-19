@@ -1,13 +1,14 @@
 %% Legacy Technologies
 
 %% Legacy PV
-
-%%%[O&M ($/kWh)  -  1
-%%%  PW Capacity (kW)] - 2
-pv_legacy = [0.001; 4000];
-
-% pv_legacy=[];
-%% Generic generator
+if lpv_on
+    %%%[O&M ($/kWh)  -  1
+    %%%  PW Capacity (kW)] - 2
+    pv_legacy = [0.001; 4000];
+else
+    pv_legacy=[];
+end
+%% Generic generator - e.g. gas turbine
 %%%[O&M ($/kWh)  -  1
 %%% Maximum output (kW)  -  2
 %%% Minimum output (kW)  -  3
@@ -25,12 +26,12 @@ f2 = 2.056635913250589e+03;
 q1 = 1.165836640310779;
 q2 = 65.443426383939470;
 
-dg_legacy = [0.026; 14500; 9000; 0.01; 0.01; 0.52;f1; f2; q1; q2; 60*24*3];
+dg_legacy = [0.026; 14500; 6000; 0.01; 0.01; 0.52;f1; f2; q1; q2; 60*24*3];
 
 %  top_f = [f1 f2];
 %     top_q = [q1 q2];
 % dg_legacy = [];
-%% Bottoming Generator
+%% Bottoming Generator - steam turbine
 %%%Bottoming generator is any electricity producing device that operates
 %%%based on heat recovered from another generator
 
@@ -70,13 +71,13 @@ boil_legacy = [0.001; 0.8];
 %%% Max output (kW)
 %%% Min Setting (%)
 
-vc_v1=[0.014; 5.4; 3938./4; .8; ];
-vc_v2=[0.01; 4.8; 4500./4; .8;];
-vc_v3=[0.02; 4.8; 4500./4; .8; ];
-vc_v4=[0.005; 6.8; 8800./4; .8; ];
-vc_v5=[0.007; 6.8; 8800./4; .8; ];
-vc_v6=[0.012; 5.2; 10550./4; .8;];
-vc_v7=[0.017; 5.2; 10550./4; .8;];
+vc_v1=[0.014; 5.4; 3938; .8; ];
+vc_v2=[0.01; 4.8; 4500; .8;];
+vc_v3=[0.02; 4.8; 4500.; .8; ];
+vc_v4=[0.005; 6.8; 8800; .8; ];
+vc_v5=[0.007; 6.8; 8800; .8; ];
+vc_v6=[0.012; 5.2; 10550; .8;];
+vc_v7=[0.017; 5.2; 10550; .8;];
 vc_legacy = [vc_v1 vc_v2 vc_v3 vc_v4 vc_v5 vc_v6 vc_v7];
 
 

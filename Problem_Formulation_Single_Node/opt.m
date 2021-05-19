@@ -15,7 +15,7 @@ if opt_now==1
     options = cplexoptimset;
     options.Display='on';
 %     options.MaxTime = 2*3600;
-options.MaxNodes = 10000;
+options.MaxNodes = 80000;
 
     
     fprintf('%s Starting CPLEX Solver \n', datestr(now,'HH:MM:SS'))
@@ -30,6 +30,8 @@ options.MaxNodes = 10000;
     fval
     
     
+  
+    
     
 %     cplex = Cplex(model); %instantiate object cplex of class Cplex 
 %     cplex.solve() %metod solve() to create Solution dynamic property
@@ -38,6 +40,12 @@ options.MaxNodes = 10000;
     
     % Recovering data and assigning to the YALMIP variables
     assign(recover(recoverymodel.used_variables),x)
+    
+      sum(value(var_ldg.ldg_fuel))
+    sum(value(var_ldg.ldg_rfuel))
+    sum(value(var_el.el_prod))
+    sum(value(var_h2es.h2es_dchrg))
+    return
     
     
     (sum(value(var_pv.pv_adopt))+sum(pv_legacy(2,:))).*sum(solar)*(1/e_adjust)

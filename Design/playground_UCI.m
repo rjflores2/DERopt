@@ -8,17 +8,23 @@ clear all; close all; clc ; started_at = datetime('now'); startsim = tic;
 opt_now = 1; %CPLEX
 opt_now_yalmip = 0; %YALMIP
 
+%%%Optimize chiller plant operation
+chiller_plant_opt = 0;
 %% Island operation (opt_nem.m) 
 island = 0;
 
 %%%Toggles NEM/Wholesale export on/off
 export_on = 1;
 
+%% Carbon Related Constraints
+h2_fuel_fraction = 0.1; %%%Energy fuel requirements
 %% Turning technologies on/off (opt_var_cf.m and tech_select.m)
 pv_on = 1;        %Turn on PV
 ees_on = 1;       %Turn on EES/REES
 rees_on = 1;  %Turn on REES
 
+
+lpv_on = 1; %Turn on legacy PV
 %% Turning incentives and other financial tools on/off
 sgip_on = 0;
 
@@ -65,11 +71,16 @@ addpath('H:\Data\CPUC_SGIP_Signal')
 %%%Loading Data
 dt = load('H:\Data\UCI\Campus_Loads_2014_2019.mat');
 
-elec = dt.loads.elec;
 heat = dt.loads.heating;
-cool = dt.loads.cooling;
 time = dt.loads.time;
-
+if chiller_plant_opt
+    elec = dt.loads.elec;
+    cool = dt.loads.cooling;
+else
+    elec = dt.loads.elec_total;
+    cool = [];
+end
+% return
 %% Placeholders
 dc_exist = 1;
 rate = {'TOU8'};
@@ -77,6 +88,7 @@ low_income = 0;
 maxpv = 100000./.2;
 sgip_pbi = 1;
 res_units = 0;
+
 %% Formatting Building Data
 bldg_loader_UCI
 
@@ -86,7 +98,7 @@ utility_UCI
 
 %%%Placeholder natural gas cost
 ng_cost = 0.5/29.3; %$/kWh --> Converted from $/therm to $/kWh, 29.3 kWh / 1 Therm
-rng_cost = ng_cost*2;
+rng_cost = ng_cost*10;
 %% Tech Parameters/Costs
 %%%Technology Parameters
 tech_select_UCI
@@ -111,7 +123,12 @@ fprintf('Took %.2f seconds \n', elapsed)
 %% General Equality Constraints
 fprintf('%s: General Equalities.', datestr(now,'HH:MM:SS'))
 tic
-opt_gen_equalities %%%Does not include NEM and wholesale in elec equality constraint
+
+if onoff_model
+    opt_gen_equalities %%%Does not include NEM and wholesale in elec equality constraint
+else
+    opt_gen_equalities_vc_mod
+end
 elapsed = toc;
 fprintf('Took %.2f seconds \n', elapsed)
 
@@ -149,7 +166,9 @@ fprintf('Took %.2f seconds \n', elapsed)
 %% Legacy VC Constraints
 fprintf('%s: Legacy VC Constraints.', datestr(now,'HH:MM:SS'))
 tic
+if onoff_model
 opt_vc_legacy
+end
 elapsed = toc;
 fprintf('Took %.2f seconds \n', elapsed)
 %% Legacy TES Constraints
@@ -165,6 +184,12 @@ opt_incentives
 elapsed = toc;
 fprintf('Took %.2f seconds \n', elapsed)
 
+%% H2 production Constraints
+fprintf('%s: Electrolyzer and H2 Storage Constraints.', datestr(now,'HH:MM:SS'))
+tic
+opt_h2_production
+elapsed = toc;
+fprintf('Took %.2f seconds \n', elapsed)
 %% Optimize
 fprintf('%s: Optimizing \n....', datestr(now,'HH:MM:SS'))
 opt

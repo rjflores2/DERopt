@@ -78,3 +78,13 @@ if strcmp(class(var_pv.pv_nem),'sdpvar') || strcmp(class(var_rees.rees_dchrg_nem
 
 %     end
 end
+
+%% Gas Turbine Fuel Input Constraint - Hydrogen
+% h2_fuel_fraction = 0;
+if h2_fuel_fraction > 0 && ~isempty(el_v)
+    Constraints = [Constraints
+        (h2_fuel_fraction.*(sum(var_ldg.ldg_fuel,2) +  sum(var_ldg.ldg_rfuel,2)) <= (1 - h2_fuel_fraction).*(sum(var_el.el_prod,2) + sum(var_h2es.h2es_dchrg,2))):'H2 Fuel Requirement'];   
+end
+
+Constraints = [Constraints
+    sum(var_ldg.ldg_elec) <= 9.6e6];

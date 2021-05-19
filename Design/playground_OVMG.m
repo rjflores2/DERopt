@@ -145,6 +145,7 @@ fprintf('Took %.2f seconds \n', elapsed)
 fprintf('%s: General Equalities.', datestr(now,'HH:MM:SS'))
 tic
 opt_gen_equalities %%%Does not include NEM and wholesale in elec equality constraint
+
 elapsed = toc;
 fprintf('Took %.2f seconds \n', elapsed)
 

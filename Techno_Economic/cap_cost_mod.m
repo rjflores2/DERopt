@@ -41,6 +41,26 @@ if ~isempty(ees_v)
     end
 end
 
+%%%Generic electrolyzer
+if ~isempty(el_v)
+    for ii=1:size(el_v,2)
+        el_mthly_debt(ii,1)=el_v(1,ii)*((1-equity)*(interest*(1+interest)^(period*12))...
+            /((1+interest)^(period*12)-1)+...%%%Money to pay back bank
+            req_return_on*(equity)*(required_return*(1+required_return)^(period*12))...
+            /((1+required_return)^(period*12)-1));
+    end
+end
+
+%%%Generic Hydrogen energy storage
+if ~isempty(h2es_v)
+    for ii=1:size(h2es_v,2)
+        h2es_mthly_debt(ii,1)=h2es_v(1,ii)*((1-equity)*(interest*(1+interest)^(period*12))...
+            /((1+interest)^(period*12)-1)+...%%%Money to pay back bank
+            req_return_on*(equity)*(required_return*(1+required_return)^(period*12))...
+            /((1+required_return)^(period*12)-1));
+    end
+end
+
 %% Calculating cost scalars for various technologies
 %% Solar PV
 if ~isempty(pv_v)
@@ -76,7 +96,6 @@ if ~isempty(pv_v)
                         /((1+interest)^(period*12)-1)+...%%%Money to pay back bank
                         req_return_on*(equity)*(required_return*(1+required_return)^(period*12))...
                         /((1+required_return)^(period*12)-1));
-                    
                     
                     pv_cap_mod(i,ii) = cap_cost_scaling(tr,pv_v(:,ii),pv_fin(:,ii),pv_scale_factor,debt,discount_rate);
                     

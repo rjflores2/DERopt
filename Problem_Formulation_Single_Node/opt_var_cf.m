@@ -233,16 +233,63 @@ if isempty(ees_v) == 0
     end
     
 else
-    var_ees.ees_adopt=zeros(1,1);
-    var_ees.ees_soc=zeros(T,1);
-    var_ees.ees_chrg=zeros(T,1);
-    var_ees.ees_dchrg=zeros(T,1);
+    var_ees.ees_adopt = zeros(1,1);
+    var_ees.ees_soc = zeros(T,1);
+    var_ees.ees_chrg = zeros(T,1);
+    var_ees.ees_dchrg = zeros(T,1);
 end
 toc
 
-%% Legacy Technologies
-%% Generic DG
+%% H2 Production and Storage
 
+%%%Electrolyzer
+if ~isempty(el_v)
+    
+    %%%Electrolyzer efficiency
+    el_eff = ones(T,size(el_v,2));
+    for ii = 1:size(el_v,2)
+        el_eff(:,ii) = (1/el_v(3,ii)).*el_eff(:,ii);
+    end
+    
+    %%%Adoption technologies
+    var_el.el_adopt = sdpvar(1,size(el_v,2),'full');
+    %%%Electrolyzer production
+    var_el.el_prod = sdpvar(T,size(el_v,2),'full');
+    for ii = 1:size(el_v,2)
+        %%%Electrolyzer Cost Functions
+        Objective = Objective...
+            + sum(M.*el_mthly_debt.*var_el.el_adopt) ... %%%Capital Cost
+            + sum(sum(var_el.el_prod).*el_v(2,:));
+    end
+    
+    if ~isempty(h2es_v)
+        %%%H2 Storage
+        %%%Adopted EES Size
+        var_h2es.h2es_adopt = sdpvar(1,size(h2es_v,2),'full');
+        %var_ees.ees_adopt = semivar(1,K,'full');
+        %%%EES Charging
+        var_h2es.h2es_chrg = sdpvar(T,size(h2es_v,2),'full');
+        %%%EES discharging
+        var_h2es.h2es_dchrg = sdpvar(T,size(h2es_v,2),'full');
+        %%%EES SOC
+        var_h2es.h2es_soc=sdpvar(T,size(h2es_v,2),'full');
+        for ii = 1:size(h2es_v,2)
+            %%%Electrolyzer Cost Functions
+            Objective = Objective...
+                + sum(M.*h2es_mthly_debt.*var_el.el_adopt) ... %%%Capital Cost
+                + sum(sum(var_h2es.h2es_chrg).*el_v(2,:)) ... %%%Charging Cost
+                + sum(sum(var_h2es.h2es_dchrg).*el_v(3,:)); %%%Discharging Cost
+        end
+    end
+    
+else
+    var_el.el_prod = zeros(T,1);
+    var_h2es.h2es_chrg = zeros(T,1);
+    var_h2es.h2es_dchrg = zeros(T,1);
+    el_eff = zeros(T,1);
+end
+
+%% Legacy Technologies
 %% Legacy PV
 %%%Only need to add variables if new PV is not considered
 if isempty(pv_legacy) == 0 && sum(pv_legacy(2,:)) > 0 &&  isempty(pv_v)
@@ -267,6 +314,11 @@ if isempty(pv_legacy) == 0 && sum(pv_legacy(2,:)) > 0 &&  isempty(pv_v)
     var_pv.pv_elec = [];
     var_pv.pv_elec = sdpvar(T,1,'full'); %%% PV Production sent to the building
     
+%     if ~iesmpty(el_v)
+%         var_pv.pv_h2 = sdpvar(T,1,'full'); %%% PV Production sent to the building
+%     end
+    
+    
     %%%Operating Costs
     Objective=Objective ...
         + pv_legacy(1,1)*(sum(sum(day_multi.*(var_pv.pv_elec + var_pv.pv_nem))));
@@ -276,7 +328,7 @@ elseif isempty(pv_legacy) == 1
     pv_legacy = zeros(2,1);
 end
 
-%% Legacy DG
+%% Legacy generator
 if ~isempty(dg_legacy)
     %%%DG Electrical Output
     var_ldg.ldg_elec = sdpvar(T,size(dg_legacy,2),'full');
@@ -293,7 +345,7 @@ if ~isempty(dg_legacy)
         Objective=Objective ...
             + sum(var_ldg.ldg_elec(:,ii))*dg_legacy(1,ii) ...
             + sum(var_ldg.ldg_fuel(:,ii))*ng_cost ...
-            + sum(var_ldg.ldg_rfuel(:,ii))*ng_cost;
+            + sum(var_ldg.ldg_rfuel(:,ii))*rng_cost;
     end
 else
     var_ldg.ldg_elec = zeros(T,1);
@@ -390,32 +442,51 @@ else
 end
 
 %% Legacy Chillers
+onoff_model = 1;
+
 if ~isempty(cool) && sum(cool) >0 && ~isempty(vc_legacy)
-    
+     %%%Operational windows
     vc_hour_num = ceil(length(time)/4);
+   
     
     
+    if onoff_model
+   
+        vc_size = zeros(length(elec),size(vc_legacy,2));
+        vc_cop=ones(length(elec),size(vc_legacy,2));
+        for i=1:length(elec)
+            vc_cop(i,:)=vc_cop(i,:).*(1./vc_legacy(2,:));
+            vc_size(i,:) = vc_legacy(3,:);
+        end
+        
+        
     %%%VC Cooling output
     var_lvc.lvc_cool = sdpvar(length(elec),size(vc_legacy,2),'full');
     %%%VC Operational State
     var_lvc.lvc_op = binvar(vc_hour_num,size(vc_legacy,2),'full');
+
     %%%VC Start
-    % vc_start=binvar(length(elec),size(vc_v,2),'full');
-    % vc_start=binvar(length(elec),size(vc_v,2),'full');
+%     vc_start=binvar(vc_hour_num,size(vc_legacy,2),'full');
     
     %%%Electric Vapor Compression
     for i=1:size(vc_legacy,2)
         Objective = Objective ...
-            + var_lvc.lvc_cool(:,i)'*(vc_legacy(1,i)*ones(length(time),1)); ...
-            %         + 10*sum(sum(vc_start));
+            + var_lvc.lvc_cool(:,i)'*(vc_legacy(1,i)*ones(length(time),1));
+        %             + var_lvc.lvc_cool(:,i)'*(vc_legacy(1,i)*ones(length(time),1)); ...
+        %                     + 10*sum(sum(vc_start));
     end
     
-    vc_cop=ones(length(elec),size(vc_legacy,2));
-    for i=1:length(elec)
-        vc_cop(i,:)=vc_cop(i,:).*(1./vc_legacy(2,:));
-        vc_size(i,:) = vc_legacy(3,:);
+    
+    
+    else
+        %%%VC Operational State
+        vc_size = vc_legacy(3,:)/e_adjust;
+        vc_cop = (1./vc_legacy(2,:));
+    var_lvc.lvc_op = binvar(vc_hour_num,size(vc_legacy,2),'full');
+        
     end
     
 else
-    
+    var_lvc.lvc_cool = zeros(T,1);
+    vc_cop = 0;
 end
