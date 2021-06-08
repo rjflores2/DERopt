@@ -22,8 +22,13 @@ if isempty(utility_exists) == 0
         var_util.nontou_dc=sdpvar(M,1,'full');
         
         %%%On Peak/ Mid Peak TOU DC
-        var_util.onpeak_dc=sdpvar(onpeak_count,1,'full');
-        var_util.midpeak_dc=sdpvar(midpeak_count,1,'full');
+        if onpeak_count > 0
+            var_util.onpeak_dc=sdpvar(onpeak_count,1,'full');
+            var_util.midpeak_dc=sdpvar(midpeak_count,1,'full');
+        else
+            var_util.onpeak_dc = 0;
+            var_util.midpeak_dc = 0;
+        end
     end
     
     %%% Cost of Imports + Demand Charges
@@ -255,11 +260,12 @@ if ~isempty(el_v)
     var_el.el_adopt = sdpvar(1,size(el_v,2),'full');
     %%%Electrolyzer production
     var_el.el_prod = sdpvar(T,size(el_v,2),'full');
+    
     for ii = 1:size(el_v,2)
         %%%Electrolyzer Cost Functions
         Objective = Objective...
             + sum(M.*el_mthly_debt.*var_el.el_adopt) ... %%%Capital Cost
-            + sum(sum(var_el.el_prod).*el_v(2,:));
+            + sum(sum(var_el.el_prod).*el_v(2,:)); %%%VO&M
     end
     
     if ~isempty(h2es_v)
@@ -272,7 +278,7 @@ if ~isempty(el_v)
         %%%EES discharging
         var_h2es.h2es_dchrg = sdpvar(T,size(h2es_v,2),'full');
         %%%EES SOC
-        var_h2es.h2es_soc=sdpvar(T,size(h2es_v,2),'full');
+        var_h2es.h2es_soc = sdpvar(T,size(h2es_v,2),'full');
         for ii = 1:size(h2es_v,2)
             %%%Electrolyzer Cost Functions
             Objective = Objective...
@@ -280,6 +286,8 @@ if ~isempty(el_v)
                 + sum(sum(var_h2es.h2es_chrg).*el_v(2,:)) ... %%%Charging Cost
                 + sum(sum(var_h2es.h2es_dchrg).*el_v(3,:)); %%%Discharging Cost
         end
+        
+        h2_chrg_eff = 1 - h2es_v(8,:);
     end
     
 else
@@ -341,6 +349,13 @@ if ~isempty(dg_legacy)
     %     (dg_legacy(end,i)/t_step)
     %     ldg_off=binvar(ceil(length(time)/(dg_legacy(end,i)/t_step)),K,'full');
     
+    %%%If hydrogen production is an option
+    if ~isempty(el_v)
+      var_ldg.ldg_hfuel = sdpvar(T,size(dg_legacy,2),'full');
+    else
+        var_ldg.ldg_hfuel = zeros(T,1);
+    end
+    
     for ii = 1:size(dg_legacy,2)
         Objective=Objective ...
             + sum(var_ldg.ldg_elec(:,ii))*dg_legacy(1,ii) ...
@@ -349,6 +364,7 @@ if ~isempty(dg_legacy)
     end
 else
     var_ldg.ldg_elec = zeros(T,1);
+        var_ldg.ldg_hfuel = zeros(T,1);
     var_ldg.ldg_fuel = [];
     var_ldg.ldg_off = [];
     
@@ -383,21 +399,31 @@ if ~isempty(dg_legacy) && ~isempty(hr_legacy)
         %%%Duct burner - Renewable
         var_ldg.db_rfire=sdpvar(length(elec),size(db_legacy,2),'full');
         
+        %%%If hydrogen production is an option
+        if ~isempty(el_v)
+            var_ldg.db_hfire = sdpvar(T,size(dg_legacy,2),'full');
+        else
+            var_ldg.db_hfire = zeros(T,1);
+        end
+                
         for ii = 1:size(db_legacy,2)
             %%%Duct burner and renewable duct burner
             Objective=Objective ...
                 + var_ldg.db_fire'*((db(1,ii)+ng_cost)*ones(length(time),1)) ...
-                + var_ldg.db_rfire'*((db(1,ii)+rng_cost)*ones(length(time),1));
+                + var_ldg.db_rfire'*((db(1,ii)+rng_cost)*ones(length(time),1)) ...
+                + var_ldg.db_hfire'*((db(1,ii)+rng_cost)*ones(length(time),1));
         end
     else
         var_ldg.db_fire = [];
         var_ldg.db_rfire = [];
+        var_ldg.db_hfire = [];
     end
     
 else
     var_ldg.hr_heat = zeros(T,1);
     var_ldg.db_fire = zeros(T,1);
     var_ldg.db_rfire = zeros(T,1);
+        var_ldg.db_hfire = [];
 end
 %% Legacy boiler
 if ~isempty(boil_legacy)
@@ -405,12 +431,21 @@ if ~isempty(boil_legacy)
     var_boil.boil_fuel = sdpvar(length(elec),size(boil_legacy,2),'full');
     var_boil.boil_rfuel = sdpvar(length(elec),size(boil_legacy,2),'full');
     
+    %%%If hydrogen production is an option
+    if ~isempty(el_v)
+        var_boil.boil_hfuel = sdpvar(T,size(dg_legacy,2),'full');
+    else
+        var_boil.boil_hfuel = zeros(T,1);
+    end
+    
     Objective=Objective ...
         +  sum(var_boil.boil_fuel)*(boil_legacy(1) + ng_cost) ...
-        +sum(var_boil.boil_rfuel)*(boil_legacy(1) + rng_cost);
+        +sum(var_boil.boil_rfuel)*(boil_legacy(1) + rng_cost)...
+        +sum(var_boil.boil_hfuel)*(boil_legacy(1) + rng_cost);
 else
     var_boil.boil_fuel = zeros(T,1);
     var_boil.boil_rfuel = zeros(T,1);
+    var_boil.boil_hfuel = zeros(T,1);
 end
 
 %% Legacy Generic Chiller

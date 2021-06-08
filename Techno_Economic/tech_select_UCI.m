@@ -21,10 +21,10 @@ pv_fin = [-0.4648; ... %%%Scaling linear factor - Based on Lazards cost of elect
     5; ... %%%MACRS Schedule
     1]; ... %%%ITC Benefit
     
-pv_fin = [-0.4648; ... %%%Scaling linear factor - Based on Lazards cost of electricity
-    0; ... %%%MACRS Schedule
-    0]; ... %%%ITC Benefit
-    
+% pv_fin = [-0.4648; ... %%%Scaling linear factor - Based on Lazards cost of electricity
+%     0; ... %%%MACRS Schedule
+%     0]; ... %%%ITC Benefit
+
 % pv_v = [pv_v pv_v];
 % pv_fin = [pv_fin pv_fin];
 % pv_cap_mod = [pv_cap_mod pv_cap_mod];
@@ -93,11 +93,16 @@ non_res_rates = [1 2];
 ees_cap=ees_v(1);
 
 %% Generic Electrolyzer & Hydrogen Storage
-
+%%% Generic electrolyzer
 %%% (1) Captail Cost ($/kW H2 produced)
 %%% (2) Variable O&M ($/kWh H2 produced)
 %%% (3) Electrolyzer efficiency (kWh H2/kWh elec)
-el_v = [600; 0.01; 0.72];
+el_v = [2100; 0.01; 0.6];
+
+%%%Financial Aspects - Electrolyzer
+el_fin = [-0.02; ... %%%Scaling linear factor - Based on CA Roadmap - 2k H2 per day vs. 20k H2 per day
+    5; ... %%%MACRS Schedule
+    1]; ... %%%ITC Benefit
 
 %%%Hydrogen energy storage
 %%% (1) Capital Cost ($/kWh installed)
@@ -110,7 +115,7 @@ el_v = [600; 0.01; 0.72];
 %%% (8) Charging efficiency
 %%% (9) Discharging efficiency
 %%% (10) State of charge holdover
-h2es_v = [20;0.001;0.001;0.01;1;1;1;1;1;1]
+h2es_v = [20;0.001;0.001;0.01;1;1;1;0.95;1;1];
 
 % el_v = []
 % h2es_v = [];

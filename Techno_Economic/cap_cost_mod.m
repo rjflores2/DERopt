@@ -163,3 +163,37 @@ if ~isempty(ees_v)
         end
     end
 end
+%% Electrolyzer
+if ~isempty(el_v)
+    el_cap_mod = [];
+    for i = 1:size(elec,2)
+        %%%Applicable tax rate
+        if strcmp(rate{i},'R1')
+            tr = tax_rates(1);
+        else
+            tr = tax_rates(2);
+        end
+        
+        %%%Electrolyzer examination
+        el_scale_factor = (sum(elec)./0.33*h2_fuel_fraction)/length(elec)*e_adjust;
+        if el_scale_factor >= 28000
+            el_scale_factor = 2800
+        end
+        %%% Scaling Factor
+        if ~low_income(i)
+            %%%Decrease in cost due to scale
+            el_scale_factor = el_scale_factor*el_fin(1,ii);
+            
+            %%%Adjsuted PV Costs
+            debt =12.*ones(10,1).*(el_v(1,ii) + el_scale_factor)*((1-equity)*(interest*(1+interest)^(period*12))...
+                /((1+interest)^(period*12)-1)+...%%%Money to pay back bank
+                req_return_on*(equity)*(required_return*(1+required_return)^(period*12))...
+                /((1+required_return)^(period*12)-1));
+            
+            
+                    el_cap_mod(i,ii) = cap_cost_scaling(tr,el_v(:,ii),el_fin(:,ii),el_scale_factor,debt,discount_rate);
+        else
+         end
+        
+    end
+end
