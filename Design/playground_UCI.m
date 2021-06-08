@@ -108,7 +108,7 @@ req_return_on = 1;
 
 %%%Capital cost mofificaitons
 cap_cost_mod
-asss
+
 %% Legacy Technologies
 tech_legacy_UCI
 
