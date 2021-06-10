@@ -69,6 +69,21 @@ load('UCI_Solar_Normalized');
 %%%Extracting solar data from the loaded normalized factor
 solar = interp1(norm_slr(:,1),norm_slr(:,2),time);
 
+%% Loadings Emission Factors
+
+%%%Grid emission factors
+grid_co2 = xlsread('grid_co2_factors.xlsx');
+
+% grid_co2(:,1) = grid_co2(:,1) - (grid_co2(1) - year(time(1)));
+% co2_time = datenum(grid_co2(:,1:6));
+co2_time = [];
+co2_time(1) = time(1);
+for ii = 2:size(grid_co2,1)
+    co2_time(ii,1) = co2_time(ii-1) + 1/24;
+end
+
+import_co2 = interp1(co2_time,grid_co2(:,7),time);
+
 %% Day multiplier
 
 %%%Currently set to one as long as entire years are considered during

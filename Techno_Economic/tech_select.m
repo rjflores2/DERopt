@@ -95,3 +95,7 @@ end
 if ~ees_on
     ees_v =[];
 end
+
+%% Placeholders
+
+el_v = [];

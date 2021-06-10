@@ -66,6 +66,9 @@ addpath(genpath('H:\_Tools_\DERopt\Utilities'))
 %%%SGIP CO2 Signal
 addpath('H:\Data\CPUC_SGIP_Signal')
 
+%%%CO2 Signal Path
+addpath('H:\Data\Emission_Factors')
+
 %% Loading building demand
 
 %%%Loading Data
@@ -91,7 +94,7 @@ res_units = 0;
 
 %% Formatting Building Data
 bldg_loader_UCI
-
+return
 %% Utility Data
 %%%Loading Utility Data and Generating Energy Charge Vectors
 utility_UCI

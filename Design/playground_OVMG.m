@@ -55,6 +55,9 @@ addpath('H:\_Research_\CEC_OVMG\DERopt')
 %%%SGIP CO2 Signal
 addpath('H:\Data\CPUC_SGIP_Signal')
 
+%%%Emission Factors
+addpath('H:\Data\Emission_Factors')
+
 %% Loading building demand
 
 %%%Loading Data
