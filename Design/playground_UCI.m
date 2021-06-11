@@ -17,7 +17,11 @@ island = 0;
 export_on = 1;
 
 %% Carbon Related Constraints
+%%%Required fuel input
 h2_fuel_fraction = 0.1; %%%Energy fuel requirements
+
+%%%CO2 Limit
+co2_lim = 5;
 %% Turning technologies on/off (opt_var_cf.m and tech_select.m)
 pv_on = 1;        %Turn on PV
 ees_on = 1;       %Turn on EES/REES
@@ -31,7 +35,7 @@ sgip_on = 0;
 %% PV (opt_pv.m)
 pv_maxarea = 1; %%% Limits maximum PV size, based on initially solar PV panel
 toolittle_pv = 0; %%% Forces solar PV adoption - value is defined by toolittle_pv value - kW
-curtail = 1; %%%Allows curtailment is = 1
+curtail = 0; %%%Allows curtailment is = 1
 %% EES (opt_ees.m & opt_rees.m)
 ees_onoff = 0;  %%% Avoid simultaneous Charge and Discharge (xd & xc binaries)
 toolittle_storage = 1; %%%Forces EES adoption - 13.5 kWh
@@ -94,7 +98,7 @@ res_units = 0;
 
 %% Formatting Building Data
 bldg_loader_UCI
-return
+
 %% Utility Data
 %%%Loading Utility Data and Generating Energy Charge Vectors
 utility_UCI

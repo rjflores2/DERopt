@@ -88,3 +88,13 @@ end
 
 % Constraints = [Constraints
 %     sum(var_ldg.ldg_elec) <= 9.6e6];
+
+%% CO2 limit
+if ~isempty(co2_lim)
+    Constraints = [Constraints
+        sum(var_util.import.*co2_import) ... %%%CO2 from imports
+        + co2_ng*(sum(sum(var_ldg.ldg_fuel)) + sum(sum(var_ldg.db_fire)) + sum(sum(var_boil.boil_fuel)))... %%%CO2 from NG combustion
+        + co2_rng*(sum(sum(var_ldg.ldg_rfuel)) + sum(sum(var_ldg.db_rfire)) + sum(sum(var_boil.boil_rfuel))) ...
+        <= ...
+        co2_lim*5.6548e+06];
+    end
