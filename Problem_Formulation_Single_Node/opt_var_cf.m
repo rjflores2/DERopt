@@ -12,7 +12,7 @@ M = length(endpts);   %# of months in the simulation
 %% Utility Electricity
 if isempty(utility_exists) == 0
     %%%Electrical Import Variables
-    var_util.import=sdpvar(T,1,'full');
+    var_util.import = sdpvar(T,1,'full');
     
     %%%Demand Charge Variables
     %%%Only creating variables for # of months and number of applicable
@@ -522,6 +522,7 @@ if ~isempty(cool) && sum(cool) >0 && ~isempty(vc_legacy)
     end
     
 else
+    var_lvc.lvc_op = 0;
     var_lvc.lvc_cool = zeros(T,1);
     vc_cop = 0;
 end
