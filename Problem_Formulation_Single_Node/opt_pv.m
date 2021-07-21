@@ -2,6 +2,7 @@
 if ~isempty(pv_v) || (~isempty(pv_legacy) && sum(pv_legacy(2,:)) > 0)
     %% PV Energy balance when curtailment is allowed
     if curtail
+        %%%%CHANGES
         Constraints = [Constraints
             (var_pv.pv_elec + var_pv.pv_nem + sum(var_rees.rees_chrg,2) <= (sum(pv_legacy(2,:))/e_adjust)*solar + (sum(var_pv.pv_adopt))/e_adjust*solar) :'PV Energy Balance'];
 %         Constraints = [Constraints, (pv_wholesale + pv_elec + pv_nem + rees_chrg <= repmat(solar,1,K).*repmat(pv_adopt,T,1)):'PV Energy Balance'];
