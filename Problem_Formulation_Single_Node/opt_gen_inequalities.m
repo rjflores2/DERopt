@@ -97,4 +97,10 @@ if ~isempty(co2_lim)
         + co2_rng*(sum(sum(var_ldg.ldg_rfuel)) + sum(sum(var_ldg.db_rfire)) + sum(sum(var_boil.boil_rfuel))) ...
         <= ...
         co2_lim*5.6548e+06];
-    end
+end
+
+%% Renewable biogas limit
+if ~isempty(biogas_limit)
+    Constraints = [Constraints
+    (sum(var_ldg.ldg_rfuel  + var_boil.boil_rfuel + var_ldg.db_rfire) <= biogas_limit):'Renewable biogas limit'];
+end

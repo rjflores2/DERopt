@@ -16,6 +16,10 @@ island = 0;
 %%%Toggles NEM/Wholesale export on/off
 export_on = 1;
 
+
+%% Renewable biogas Constarints
+biogas_limit = 144E6; %kWh
+
 %% Carbon Related Constraints
 %%%Required fuel input
 h2_fuel_fraction = 0.1; %%%Energy fuel requirements
@@ -50,10 +54,12 @@ import_limit = .8;
 
 %% Adding paths
 %%%YALMIP Master Path
-addpath(genpath('H:\Matlab_Paths\YALMIP-master'))
+addpath(genpath('H:\Matlab_Paths\YALMIP-master')) %rjf path
+addpath(genpath('C:\Program Files\MATLAB\YALMIP-master')) %cyc path
 
 %%%CPLEX Path
-addpath(genpath('C:\Program Files\IBM\ILOG\CPLEX_Studio128\cplex\matlab\x64_win64'))
+addpath(genpath('C:\Program Files\IBM\ILOG\CPLEX_Studio128\cplex\matlab\x64_win64')) %rjf path
+addpath(genpath('C:\Program Files\IBM\ILOG\CPLEX_Studio1263\cplex\matlab\x64_win64')) %cyc path
 
 %%%DERopt paths
 addpath(genpath('H:\_Tools_\DERopt\Design'))
@@ -64,27 +70,30 @@ addpath(genpath('H:\_Tools_\DERopt\Problem_Formulation_Single_Node'))
 addpath(genpath('H:\_Tools_\DERopt\Techno_Economic'))
 addpath(genpath('H:\_Tools_\DERopt\Utilities'))
 
-addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\Research\PhD\DERopt\DERopt-master\Design'))
-addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\Research\PhD\DERopt\DERopt-master\Input_Data'))
-addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\Research\PhD\DERopt\DERopt-master\Load_Processing'))
-addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\Research\PhD\DERopt\DERopt-master\Post_Processing'))
-addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\Research\PhD\DERopt\DERopt-master\Problem_Formulation_Single_Node'))
-addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\Research\PhD\DERopt\DERopt-master\Techno_Economic'))
-addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\Research\PhD\DERopt\DERopt-master\Utilities'))
+addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Design'))
+addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Input_Data'))
+addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Load_Processing'))
+addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Post_Processing'))
+addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Problem_Formulation_Single_Node'))
+addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Techno_Economic'))
+addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Utilities'))
 
 %%%Specific project path
 % addpath('H:\_Research_\CEC_OVMG\DERopt')
 
 %%%SGIP CO2 Signal
 addpath('H:\Data\CPUC_SGIP_Signal')
+addpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Data')
 
 %%%CO2 Signal Path
 addpath('H:\Data\Emission_Factors')
+addpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Data\Emission_Factors')
 
 %% Loading building demand
 
 %%%Loading Data
-dt = load('H:\Data\UCI\Campus_Loads_2014_2019.mat');
+%dt = load('H:\Data\UCI\Campus_Loads_2014_2019.mat');
+dt = load('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Data\Campus_Loads_2014_2019.mat');
 
 heat = dt.loads.heating;
 time = dt.loads.time;
