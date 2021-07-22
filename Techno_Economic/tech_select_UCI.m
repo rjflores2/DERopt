@@ -24,7 +24,7 @@ pv_fin = [-0.4648; ... %%%Scaling linear factor - Based on Lazards cost of elect
 % pv_fin = [-0.4648; ... %%%Scaling linear factor - Based on Lazards cost of electricity
 %     0; ... %%%MACRS Schedule
 %     0]; ... %%%ITC Benefit
-
+    
 % pv_v = [pv_v pv_v];
 % pv_fin = [pv_fin pv_fin];
 % pv_cap_mod = [pv_cap_mod pv_cap_mod];
@@ -119,6 +119,16 @@ h2es_v = [20;0.001;0.001;0.01;1;1;1;0.95;1;1];
 
 % el_v = []
 % h2es_v = [];
+%% Reversible electroyzer
+%%% (1) Captail Cost ($/kW H2 produced)
+%%% (2) Variable O&M ($/kWh H2 produced)
+%%% (3) Electrolyzer efficiency (kWh H2/kWh elec)
+%%% (4) Fuel Cell Efficiency (kWh elec/kWh H2)
+%%% (5) Ratio of electrolyzer electricity in to fuel cell capacity (kW electrolyzer input / kW fuel cell output
+rsoc_v = [500*.12/12;0.01;0.7;0.6;1.5];
+
+%%%Dummy variable for reversible SOC capital cost
+rsoc_mthly_debt = rsoc_v(1);
 %% Building space
 %%%[space available for PV (m^2)
 %%%Cooling loop input (C)

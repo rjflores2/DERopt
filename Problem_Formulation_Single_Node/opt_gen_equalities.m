@@ -3,10 +3,11 @@
 %%For  all timesteps t
 %Vectorized
 Constraints = [Constraints
-    (sum(var_util.import,2) + sum(var_pv.pv_elec,2) + sum(var_ees.ees_dchrg,2) + sum(var_rees.rees_dchrg,2) + sum(var_ldg.ldg_elec,2) + sum(var_lbot.lbot_elec,2) ... %%%Production
+    (sum(var_util.import,2) + sum(var_pv.pv_elec,2) + sum(var_ees.ees_dchrg,2) + sum(var_rees.rees_dchrg,2) + sum(var_ldg.ldg_elec,2) + sum(var_lbot.lbot_elec,2) + sum(var_rsoc.rsoc_elec,2)... %%%Production
     ==...
-    elec + sum(var_ees.ees_chrg,2) + var_vc.generic_cool./4  + sum(var_lvc.lvc_cool.*vc_cop,2) + sum(el_eff.*var_el.el_prod,2) + sum(h2_chrg_eff.*var_h2es.h2es_chrg,2) ):'Electricity Balance']; %%%Demand
-
+    elec + sum(var_ees.ees_chrg,2) + var_vc.generic_cool./4  + sum(var_lvc.lvc_cool.*vc_cop,2) + sum(el_eff.*var_el.el_prod,2) + sum(h2_chrg_eff.*var_h2es.h2es_chrg,2) + sum(var_rsoc.rsoc_prod./rsoc_v(3),2) ...
+    ):'Electricity Balance']; %%%Demand
+%+ sum(var_el.el_prod,2) ./ sum(var_h2es.h2es_soc,2) .* sum(var_ldg.ldg_hfuel,2) 
 %% Heat Balance
 if ~isempty(heat) && sum(heat>0)>0
     Constraints = [Constraints
@@ -25,5 +26,8 @@ end
 %% Chemical ennergy conversion balance - Hydrogen
 if ~isempty(el_v)
     Constraints = [Constraints
-       sum(var_el.el_prod,2) + sum(var_h2es.h2es_dchrg,2) == sum(var_ldg.ldg_hfuel,2) + sum(var_ldg.db_hfire,2) + sum(var_boil.boil_hfuel,2) + sum(var_h2es.h2es_chrg,2)];
+       sum(var_el.el_prod,2) + sum(var_h2es.h2es_dchrg,2) + ...
+       sum(var_rsoc.rsoc_prod,2) == sum(var_ldg.ldg_hfuel,2) + ...
+       sum(var_ldg.db_hfire,2) + sum(var_boil.boil_hfuel,2) + ...
+       sum(var_h2es.h2es_chrg,2) + sum(var_rsoc.rsoc_elec./rsoc_v(4),2)];
 end

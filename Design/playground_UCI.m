@@ -24,9 +24,8 @@ h2_fuel_fraction = 0.1; %%%Energy fuel requirements
 co2_lim = 1;
 %% Turning technologies on/off (opt_var_cf.m and tech_select.m)
 pv_on = 1;        %Turn on PV
-ees_on = 1;       %Turn on EES/REES
+ees_on = 1;       %Turn on EES
 rees_on = 1;  %Turn on REES
-
 
 lpv_on = 1; %Turn on legacy PV
 %% Turning incentives and other financial tools on/off
@@ -51,11 +50,12 @@ import_limit = .8;
 %% Adding paths
 %%%YALMIP Master Path
 addpath(genpath('H:\Matlab_Paths\YALMIP-master'))
+addpath(genpath('C:\Program Files\MATLAB\YALMIP-master'))
 
 %%%CPLEX Path
-addpath(genpath('C:\Program Files\IBM\ILOG\CPLEX_Studio128\cplex\matlab\x64_win64'))
+addpath(genpath('C:\Program Files\IBM\ILOG\CPLEX_Studio1263\cplex\matlab\x64_win64'))
 
-%%%DERopt paths
+%%%DERopt paths (rjf computer)
 addpath(genpath('H:\_Tools_\DERopt\Design'))
 addpath(genpath('H:\_Tools_\DERopt\Input_Data'))
 addpath(genpath('H:\_Tools_\DERopt\Load_Processing'))
@@ -64,22 +64,35 @@ addpath(genpath('H:\_Tools_\DERopt\Problem_Formulation_Single_Node'))
 addpath(genpath('H:\_Tools_\DERopt\Techno_Economic'))
 addpath(genpath('H:\_Tools_\DERopt\Utilities'))
 
+%%% DERopt paths (cyc computer)
+addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Design'))
+addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Input_Data'))
+addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Load_Processing'))
+addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Post_Processing'))
+addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Problem_Formulation_Single_Node'))
+addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Techno_Economic'))
+addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Utilities'))
+
 %%%Specific project path
-% addpath('H:\_Research_\CEC_OVMG\DERopt')
+addpath('H:\_Research_\CEC_OVMG\DERopt')
 
 %%%SGIP CO2 Signal
 addpath('H:\Data\CPUC_SGIP_Signal')
+addpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Data')
 
-%%%CO2 Signal Path
+%%% CO2 Signal Path
 addpath('H:\Data\Emission_Factors')
+addpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Data\Emission_Factors')
 
 %% Loading building demand
 
 %%%Loading Data
-dt = load('H:\Data\UCI\Campus_Loads_2014_2019.mat');
+%dt = load('H:\Data\UCI\Campus_Loads_2014_2019.mat');
+dt = load('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Data\Campus_Loads_2014_2019.mat');
 
 heat = dt.loads.heating;
 time = dt.loads.time;
+
 if chiller_plant_opt
     elec = dt.loads.elec;
     cool = dt.loads.cooling;
@@ -130,7 +143,6 @@ fprintf('Took %.2f seconds \n', elapsed)
 %% General Equality Constraints
 fprintf('%s: General Equalities.', datestr(now,'HH:MM:SS'))
 tic
-
 if onoff_model
     opt_gen_equalities %%%Does not include NEM and wholesale in elec equality constraint
 else
@@ -197,6 +209,14 @@ tic
 opt_h2_production
 elapsed = toc;
 fprintf('Took %.2f seconds \n', elapsed)
+
+%% rSOC Constraints
+fprintf('%s: rSOC Constraints.', datestr(now,'HH:MM:SS'))
+tic
+opt_rsoc
+elapsed = toc;
+fprintf('Took %.2f seconds \n',elapsed)
+
 %% Optimize
 fprintf('%s: Optimizing \n....', datestr(now,'HH:MM:SS'))
 opt
@@ -206,6 +226,5 @@ finish = datetime('now') ; totalelapsed = toc(startsim)
 
 %% Variable Conversion
 variable_values
-
 %% System Evaluaiton
-uci_evaluation
+uci_evaluation 
