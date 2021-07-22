@@ -64,6 +64,14 @@ addpath(genpath('H:\_Tools_\DERopt\Problem_Formulation_Single_Node'))
 addpath(genpath('H:\_Tools_\DERopt\Techno_Economic'))
 addpath(genpath('H:\_Tools_\DERopt\Utilities'))
 
+addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\Research\PhD\DERopt\DERopt-master\Design'))
+addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\Research\PhD\DERopt\DERopt-master\Input_Data'))
+addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\Research\PhD\DERopt\DERopt-master\Load_Processing'))
+addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\Research\PhD\DERopt\DERopt-master\Post_Processing'))
+addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\Research\PhD\DERopt\DERopt-master\Problem_Formulation_Single_Node'))
+addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\Research\PhD\DERopt\DERopt-master\Techno_Economic'))
+addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\Research\PhD\DERopt\DERopt-master\Utilities'))
+
 %%%Specific project path
 % addpath('H:\_Research_\CEC_OVMG\DERopt')
 
