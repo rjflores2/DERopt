@@ -14,7 +14,7 @@ chiller_plant_opt = 0;
 island = 0;
 
 %%%Toggles NEM/Wholesale export on/off
-export_on = 1;
+export_on = 0;
 
 
 %% Renewable biogas Constarints
@@ -171,6 +171,7 @@ tic
 opt_gen_inequalities
 elapsed = toc;
 fprintf('Took %.2f seconds \n', elapsed)
+
 %% Heat Recovery Inequality Constraints
 fprintf('%s: Heat Recovery Inequalities. ', datestr(now,'HH:MM:SS'))
 tic
@@ -223,6 +224,7 @@ tic
 opt_h2_production
 elapsed = toc;
 fprintf('Took %.2f seconds \n', elapsed)
+
 %% Optimize
 fprintf('%s: Optimizing \n....', datestr(now,'HH:MM:SS'))
 opt

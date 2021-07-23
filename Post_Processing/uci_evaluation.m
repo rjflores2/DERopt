@@ -11,6 +11,12 @@ elec_frac = [sum(var_util.import) sum(var_pv.pv_elec ) sum(var_ldg.ldg_elec) sum
 
 close all
 
+%%Electric Demand
+figure 
+hold on
+plot(time,(elec).*e_adjust./1000,'LineWidth',2)
+plot(time,(elec).*e_adjust./1000,'LineWidth',2)
+
 %% Gas turbine/NGCC Operation
 figure 
 hold on
@@ -44,11 +50,11 @@ hold off
 
 
 %% Loads
-figure
-hold on
-plot(time,(e_adjust).*(elec + el_eff.*var_el.el_prod),'LineWidth',2)
-plot(time,e_adjust.*elec,'LineWidth',2)
-hold off
+% figure
+% hold on
+% plot(time,(e_adjust).*(elec + el_eff.*var_el.el_prod + ),'LineWidth',2)
+% plot(time,e_adjust.*elec,'LineWidth',2)
+% hold off
 
 
 figure 

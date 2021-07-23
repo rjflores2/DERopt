@@ -109,16 +109,17 @@ if isempty(pv_v) == 0
          %%%Clearing temporary variables
          clear temp_cf1 temp_cf2
     else
-        var_pv.pv_nem = [];
+        var_pv.pv_nem = zeros(T,1);
     end
     
     %%%PV Cost
 %     mod_val = 0.7
 %     mod_val*pv_cap
 %      mod_val*(pv_v(1)*M*cap_mod.pv - cap_scalar.pv)
-    Objective=Objective ...
+    Objective = Objective ...
         + sum(M*pv_mthly_debt'.*pv_cap_mod.*var_pv.pv_adopt)... %%%PV Capital Cost ($/kW installed)
-        + pv_v(3)*(sum(sum(day_multi.*(var_pv.pv_elec + var_pv.pv_nem)))); %%%PV O&M Cost ($/kWh generated)
+        + pv_v(3)*(sum(sum(day_multi.*(var_pv.pv_elec)))) ... %%%PV O&M Cost ($/kWh generated)    
+        + pv_v(3)*(sum(sum(day_multi.*(var_pv.pv_nem)))); %%%PV O&M Cost ($/kWh generated)
 %         + pv_v(3)*(sum(sum(repmat(day_multi,1,K).*(var_pv.pv_elec + var_pv.pv_nem + pv_wholesale))) ); %%%PV O&M Cost ($/kWh generated)
 
     %%% Allow for adoption of Renewable paired storage when enabled (REES)
@@ -282,9 +283,9 @@ if ~isempty(el_v)
         for ii = 1:size(h2es_v,2)
             %%%Electrolyzer Cost Functions
             Objective = Objective...
-                + sum(M.*h2es_mthly_debt.*var_el.el_adopt) ... %%%Capital Cost
-                + sum(sum(var_h2es.h2es_chrg).*el_v(2,:)) ... %%%Charging Cost
-                + sum(sum(var_h2es.h2es_dchrg).*el_v(3,:)); %%%Discharging Cost
+                + sum(M.*h2es_mthly_debt.*var_h2es.h2es_adopt) ... %%%Capital Cost
+                + sum(sum(var_h2es.h2es_chrg).*h2es_v(2,:)) ... %%%Charging Cost
+                + sum(sum(var_h2es.h2es_dchrg).*h2es_v(3,:)); %%%Discharging Cost
         end
         
         h2_chrg_eff = 1 - h2es_v(8,:);
@@ -381,6 +382,8 @@ if ~isempty(dg_legacy)
         else
             var_ldg.ldg_elec_ramp = [];
         end
+    else
+        var_ldg.ldg_elec_ramp = [];
     end
 else
     var_ldg.ldg_elec = zeros(T,1);

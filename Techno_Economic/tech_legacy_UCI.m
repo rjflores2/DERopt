@@ -26,13 +26,14 @@ f2 = 2.056635913250589e+03;
 q1 = 1.165836640310779;
 q2 = 65.443426383939470;
 
-dg_legacy = [0.026; 14500; 6000; 0.01; 0.01; 0.52;f1; f2; q1; q2; 60*24*3];
+dg_legacy = [0.026; 14500; 13000; 0.01; 0.01; 0.52;f1; f2; q1; q2; 60*24*3];
+% dg_legacy = [0.026; 14500; 6000; 0.01; 0.01; 0.52;f1; f2; q1; q2; 60*24*3];
 
 %%%Costs assocaited with cycling the gas turbine
 %%% Cost to turn on the engine - 1 ($/start) - taken from 75% percentile of cold starts
 %%% Cost to change engine power - 2 ($/kWh difference) - Also taken from 75% percentile
 dg_legacy_cyc = [101*19; 0.74*15*(15-6)/((2*15000+6000)/4)];
-
+% dg_legacy_cyc = [];
 %  top_f = [f1 f2];
 %     top_q = [q1 q2];
 % dg_legacy = [];

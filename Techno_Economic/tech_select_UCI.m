@@ -57,7 +57,7 @@ somah = [2600];
 ees_v=[830; 0.001; 0.001; 0.1; 0.95; 0.25; 0.25; .90; .90; .995];
 %ees_v=[600; 0.001; 0.001; 0.1; 0.95; 0.25; 0.25; 1; 1; .995]; %Testing with 100% RTE
 % ees_v=[100; 0.001; 0.001; 0.1; 0.95; 0.25; 0.25; .90; .90; .995];
-
+ees_v = [];
 
 %%%How pv capital cost is modified for different types of buildings
 ees_cap_mod = [575/830 %%%Commercial/industrial
@@ -89,8 +89,11 @@ non_res_rates = [1 2];
 % ees_cap_mod = [ees_cap_mod ees_cap_mod];
 % ees_fin = [ees_fin ees_fin];
 % rees_fin = [rees_fin rees_fin];
-
-ees_cap=ees_v(1);
+if ~isempty(ees_v)
+    ees_cap=ees_v(1);
+else
+    ees_cap = [];
+end
 
 %% Generic Electrolyzer & Hydrogen Storage
 %%% Generic electrolyzer

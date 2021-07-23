@@ -63,7 +63,7 @@ if utility_exists == 1
 end
 
 %% Net Energy Metering
-if strcmp(class(var_pv.pv_nem),'sdpvar') || strcmp(class(var_rees.rees_dchrg_nem),'sdpvar') %%%If NEM related decision variables exist
+if (strcmp(class(var_pv.pv_nem),'sdpvar') || strcmp(class(var_rees.rees_dchrg_nem),'sdpvar')) && strcmp(class(var_pv.pv_nem),'sdpvar') %%%If NEM related decision variables exist
 %     for k=1:K
         %%%Current Utility Rate
         index=find(ismember(rate_labels,rate(1)));
@@ -86,19 +86,19 @@ if ~isempty(h2_fuel_forced_fraction) && ~isempty(el_v)
 end
 
 %% Gas Turbine Fuel Input Limit - Hydrogen
-if ~isempty(h2_fuel_forced_fraction) && ~isempty(el_v)
+if ~isempty(h2_fuel_limit)
     Constraints = [Constraints
-        (h2_fuel_limit.*(sum(var_ldg.ldg_fuel,2) +  sum(var_ldg.ldg_rfuel,2)) <= (1 - h2_fuel_limit).*(sum(var_ldg.ldg_hfuel,2))):'H2 Fuel Limit in GT'];   
+        ((1 - h2_fuel_limit).*var_ldg.ldg_hfuel <= h2_fuel_limit.*(var_ldg.ldg_fuel + var_ldg.ldg_rfuel + var_ldg.ldg_hfuel)):'H2 Fuel Limit in GT'];   
 end
 
 %% CO2 limit
 if ~isempty(co2_lim)
     Constraints = [Constraints
-        sum(var_util.import.*co2_import) ... %%%CO2 from imports
+       ( sum(var_util.import.*co2_import) ... %%%CO2 from imports
         + co2_ng*(sum(sum(var_ldg.ldg_fuel)) + sum(sum(var_ldg.db_fire)) + sum(sum(var_boil.boil_fuel)))... %%%CO2 from NG combustion
         + co2_rng*(sum(sum(var_ldg.ldg_rfuel)) + sum(sum(var_ldg.db_rfire)) + sum(sum(var_boil.boil_rfuel))) ...
         <= ...
-        co2_lim*5.6548e+06];
+        co2_lim*5.6548e+06):'CO2 Limit'];
 end
 
 %% Renewable biogas limit
