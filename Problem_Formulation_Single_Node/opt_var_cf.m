@@ -348,10 +348,11 @@ if ~isempty(dg_legacy)
     %%% (Time Instances) / On/Off length
     %     (dg_legacy(end,i)/t_step)
     %     ldg_off=binvar(ceil(length(time)/(dg_legacy(end,i)/t_step)),K,'full');
-    
+    var_ldg.ldg_off = [];
+        
     %%%If hydrogen production is an option
     if ~isempty(el_v)
-      var_ldg.ldg_hfuel = sdpvar(T,size(dg_legacy,2),'full');
+        var_ldg.ldg_hfuel = sdpvar(T,size(dg_legacy,2),'full');
     else
         var_ldg.ldg_hfuel = zeros(T,1);
     end
@@ -362,9 +363,28 @@ if ~isempty(dg_legacy)
             + sum(var_ldg.ldg_fuel(:,ii))*ng_cost ...
             + sum(var_ldg.ldg_rfuel(:,ii))*rng_cost;
     end
+    
+    
+    %%%If including cycling costs
+    if ~isempty(dg_legacy_cyc)
+        %%%Only consider if on/off behavior is allowed
+        if ~isempty(var_ldg.ldg_off)
+            %%%Fill in later
+        end
+        
+        %%%Ramping costs
+        if dg_legacy_cyc(2,:) > 0 %%%Only include if cycling costs is nonzero
+            var_ldg.ldg_elec_ramp = sdpvar(T - 1,size(dg_legacy,2),'full');
+                        
+            Objective=Objective ...
+                + sum(sum(var_ldg.ldg_elec_ramp).*dg_legacy_cyc(2,:));
+        else
+            var_ldg.ldg_elec_ramp = [];
+        end
+    end
 else
     var_ldg.ldg_elec = zeros(T,1);
-        var_ldg.ldg_hfuel = zeros(T,1);
+    var_ldg.ldg_hfuel = zeros(T,1);
     var_ldg.ldg_fuel = [];
     var_ldg.ldg_off = [];
     

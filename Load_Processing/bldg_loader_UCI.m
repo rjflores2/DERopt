@@ -24,7 +24,7 @@ datetimev=datevec(time);
 
 %%% change IDX to a specific month to allow for faster testing %%%
 
-idx = (datetimev(:,1) == 2018 & datetimev(:,2) == 7);
+idx = (datetimev(:,1) == year_idx & datetimev(:,2) == month_idx);
 % idx = (datetimev(:,1) == 2018);
 elec = elec(idx);
 heat = heat(idx);
@@ -95,7 +95,7 @@ co2_rng=co2_ng*0.2;
 day_multi = ones(size(elec));
 
 %% Loading SGIP CO2 Signal
-sgip_signal_hour = xlsread('hourly_resolved.xlsx');
+sgip_signal_hour = xlsread('hourly_resolved.csv');
 
 %%%Mannually adjusting SGIP time signal to fit with current UCI Data
 delta = time(1) - sgip_signal_hour(1);

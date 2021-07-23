@@ -18,14 +18,17 @@ export_on = 1;
 
 
 %% Renewable biogas Constarints
-biogas_limit = 144E6; %kWh
+biogas_limit = 144E6; %kWh biofuel available per year
 
 %% Carbon Related Constraints
 %%%Required fuel input
-h2_fuel_fraction = 0.1; %%%Energy fuel requirements
+h2_fuel_forced_fraction = []; %%%Energy fuel requirements
+
+%%%H2 fuel limit in legacy generator
+h2_fuel_limit = 0.1; %%%Fuel limit on an energy basis
 
 %%%CO2 Limit
-co2_lim = 1;
+co2_lim = [];
 %% Turning technologies on/off (opt_var_cf.m and tech_select.m)
 pv_on = 1;        %Turn on PV
 ees_on = 1;       %Turn on EES/REES
@@ -37,7 +40,10 @@ lpv_on = 1; %Turn on legacy PV
 sgip_on = 0;
 
 %% PV (opt_pv.m)
-pv_maxarea = 1; %%% Limits maximum PV size, based on initially solar PV panel
+%%%maxpv is maximum capacity that can be installed. If includes different
+%%%orientations, set maxpv to row vector: for example maxpv =
+%%%[max_north_capacity  max_east/west_capacity  max_flat_capacity  max_south_capacity]
+maxpv = 25000; %%%Maxpv 
 toolittle_pv = 0; %%% Forces solar PV adoption - value is defined by toolittle_pv value - kW
 curtail = 0; %%%Allows curtailment is = 1
 %% EES (opt_ees.m & opt_rees.m)
@@ -92,8 +98,8 @@ addpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Data
 %% Loading building demand
 
 %%%Loading Data
-%dt = load('H:\Data\UCI\Campus_Loads_2014_2019.mat');
-dt = load('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Data\Campus_Loads_2014_2019.mat');
+dt = load('H:\Data\UCI\Campus_Loads_2014_2019.mat');
+% dt = load('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Data\Campus_Loads_2014_2019.mat');
 
 heat = dt.loads.heating;
 time = dt.loads.time;
@@ -109,11 +115,14 @@ end
 dc_exist = 1;
 rate = {'TOU8'};
 low_income = 0;
-maxpv = 100000./.2;
 sgip_pbi = 1;
 res_units = 0;
 
 %% Formatting Building Data
+%%%Values to filter data by
+year_idx = 2018;
+month_idx = 7;
+
 bldg_loader_UCI
 
 %% Utility Data
@@ -122,7 +131,7 @@ utility_UCI
 
 %%%Placeholder natural gas cost
 ng_cost = 0.5/29.3; %$/kWh --> Converted from $/therm to $/kWh, 29.3 kWh / 1 Therm
-rng_cost = ng_cost*10;
+rng_cost = ng_cost*2;
 %% Tech Parameters/Costs
 %%%Technology Parameters
 tech_select_UCI

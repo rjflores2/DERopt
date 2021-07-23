@@ -175,7 +175,13 @@ if ~isempty(el_v)
         end
         
         %%%Electrolyzer examination
-        el_scale_factor = (sum(elec)./0.33*h2_fuel_fraction)/length(elec)*e_adjust;
+        %%%Generating a h2 fuel fraction when this does not exist
+        if ~isempty(h2_fuel_forced_fraction)
+            el_scale_factor = (sum(elec)./0.33*h2_fuel_forced_fraction)/length(elec)*e_adjust;
+        else
+            el_scale_factor = (sum(elec)./0.33*0.1)/length(elec)*e_adjust;
+        end
+        
         if el_scale_factor >= 28000
             el_scale_factor = 2800
         end

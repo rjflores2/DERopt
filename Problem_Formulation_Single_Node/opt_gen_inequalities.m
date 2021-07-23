@@ -79,15 +79,17 @@ if strcmp(class(var_pv.pv_nem),'sdpvar') || strcmp(class(var_rees.rees_dchrg_nem
 %     end
 end
 
-%% Gas Turbine Fuel Input Constraint - Hydrogen
-% h2_fuel_fraction = 0;
-if h2_fuel_fraction > 0 && ~isempty(el_v)
+%% Gas Turbine Forced Fuel Input Constraint - Hydrogen
+if ~isempty(h2_fuel_forced_fraction) && ~isempty(el_v)
     Constraints = [Constraints
-        (h2_fuel_fraction.*(sum(var_ldg.ldg_fuel,2) +  sum(var_ldg.ldg_rfuel,2)) <= (1 - h2_fuel_fraction).*(sum(var_ldg.ldg_hfuel,2))):'H2 Fuel Requirement'];   
+        (h2_fuel_forced_fraction.*(sum(var_ldg.ldg_fuel,2) +  sum(var_ldg.ldg_rfuel,2)) <= (1 - h2_fuel_forced_fraction).*(sum(var_ldg.ldg_hfuel,2))):'Forced H2 Fuel Requirement'];   
 end
 
-% Constraints = [Constraints
-%     sum(var_ldg.ldg_elec) <= 9.6e6];
+%% Gas Turbine Fuel Input Limit - Hydrogen
+if ~isempty(h2_fuel_forced_fraction) && ~isempty(el_v)
+    Constraints = [Constraints
+        (h2_fuel_limit.*(sum(var_ldg.ldg_fuel,2) +  sum(var_ldg.ldg_rfuel,2)) <= (1 - h2_fuel_limit).*(sum(var_ldg.ldg_hfuel,2))):'H2 Fuel Limit in GT'];   
+end
 
 %% CO2 limit
 if ~isempty(co2_lim)
@@ -101,6 +103,8 @@ end
 
 %% Renewable biogas limit
 if ~isempty(biogas_limit)
+    %%%(length(endpts)/12) term prorates available biogas to the simulation
+    %%%period
     Constraints = [Constraints
-    (sum(var_ldg.ldg_rfuel  + var_boil.boil_rfuel + var_ldg.db_rfire) <= biogas_limit):'Renewable biogas limit'];
+    (sum(var_ldg.ldg_rfuel  + var_boil.boil_rfuel + var_ldg.db_rfire) <= biogas_limit*(length(endpts)/12)):'Renewable biogas limit'];
 end

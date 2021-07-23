@@ -41,6 +41,7 @@ var_ldg.ldg_elec = value(var_ldg.ldg_elec);
 var_ldg.ldg_fuel = value(var_ldg.ldg_fuel);
 var_ldg.ldg_rfuel = value(var_ldg.ldg_rfuel);
 var_ldg.ldg_hfuel = value(var_ldg.ldg_hfuel);
+var_ldg.ldg_elec_ramp = value(var_ldg.ldg_elec_ramp);
 
 %% Bottoming Cycle
 var_lbot.lbot_elec = value(var_lbot.lbot_elec);
