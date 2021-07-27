@@ -25,5 +25,5 @@ end
 %% Chemical ennergy conversion balance - Hydrogen
 if ~isempty(el_v)
     Constraints = [Constraints
-       (sum(var_el.el_prod,2) + sum(var_h2es.h2es_dchrg,2) == sum(var_ldg.ldg_hfuel,2) + sum(var_ldg.db_hfire,2) + sum(var_boil.boil_hfuel,2) + sum(var_h2es.h2es_chrg,2)):'Hydrogen Balance'];
+       (sum(var_rel.rel_prod,2) + sum(var_el.el_prod,2) + sum(var_h2es.h2es_dchrg,2) == sum(var_ldg.ldg_hfuel,2) + sum(var_ldg.db_hfire,2) + sum(var_boil.boil_hfuel,2) + sum(var_h2es.h2es_chrg,2)):'Hydrogen Balance'];
 end

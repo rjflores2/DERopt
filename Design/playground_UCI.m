@@ -45,7 +45,7 @@ lpv_on = 1; %Turn on legacy PV
 sgip_on = 0;
 
 %% Throughput requirement - DOE H2 Integration
-h2_charging_rec = 1000; %Required throughput per day
+h2_charging_rec = 30000; %Required throughput per day
 
 %% PV (opt_pv.m)
 %%%maxpv is maximum capacity that can be installed. If includes different

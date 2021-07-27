@@ -29,6 +29,10 @@ var_ees.ees_soc = value(var_ees.ees_soc);
 var_el.el_adopt = value(var_el.el_adopt);
 var_el.el_prod = value(var_el.el_prod);
 
+%% H2 Production - Renewable Electrolyzer
+var_rel.rel_adopt = value(var_rel.rel_adopt);
+var_rel.rel_prod = value(var_rel.rel_prod);
+
 %% H2 Production - Storage
 var_h2es.h2es_adopt = value(var_h2es.h2es_adopt);
 var_h2es.h2es_chrg = value(var_h2es.h2es_chrg);

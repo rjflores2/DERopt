@@ -139,6 +139,7 @@ adopted.pv = var_pv.pv_adopt;
 adopted.ees = var_ees.ees_adopt;
 adopted.rees =var_rees.rees_adopt;
 adopted.el = var_el.el_adopt;
+adopted.rel = var_rel.rel_adopt;
 adopted.h2es = var_h2es.h2es_adopt;
 adopted
 
