@@ -117,7 +117,7 @@ if isempty(pv_v) == 0
 %     mod_val*pv_cap
 %      mod_val*(pv_v(1)*M*cap_mod.pv - cap_scalar.pv)
     Objective = Objective ...
-        + sum((0.25)*M*pv_mthly_debt'.*pv_cap_mod.*var_pv.pv_adopt)... %%%PV Capital Cost ($/kW installed)
+        + sum(M*pv_mthly_debt'.*pv_cap_mod.*var_pv.pv_adopt)... %%%PV Capital Cost ($/kW installed)
         + pv_v(3)*(sum(sum(day_multi.*(var_pv.pv_elec)))) ... %%%PV O&M Cost ($/kWh generated)    
         + pv_v(3)*(sum(sum(day_multi.*(var_pv.pv_nem)))); %%%PV O&M Cost ($/kWh generated)
 %         + pv_v(3)*(sum(sum(repmat(day_multi,1,K).*(var_pv.pv_elec + var_pv.pv_nem + pv_wholesale))) ); %%%PV O&M Cost ($/kWh generated)
@@ -296,12 +296,72 @@ if ~isempty(el_v)
     end
     
 else
+     var_el.el_adopt = 0;
     var_el.el_prod = zeros(T,1);
     var_h2es.h2es_chrg = zeros(T,1);
     var_h2es.h2es_dchrg = zeros(T,1);
     el_eff = zeros(T,1);
 end
-
+%% Renewable Electrolyzer
+if ~isempty(rel_v)
+    
+    %%%Electrolyzer efficiency
+    rel_eff = ones(T,size(rel_v,2));
+    for ii = 1:size(rel_v,2)
+        rel_eff(:,ii) = (1/rel_v(3,ii)).*rel_eff(:,ii);
+    end    
+    
+    %%%Adoption technologies
+    var_rel.rel_adopt = sdpvar(1,size(rel_v,2),'full');
+    %%%Electrolyzer production
+    var_rel.rel_prod = sdpvar(T,size(rel_v,2),'full');
+    
+    for ii = 1:size(rel_v,2)
+        %%%Electrolyzer Cost Functions
+        Objective = Objective...
+            + sum(M.*rel_mthly_debt.*var_rel.rel_adopt) ... %%%Capital Cost
+            + sum(sum(var_rel.rel_prod).*rel_v(2,:)); %%%VO&M
+    end
+    
+    
+    
+    if isempty(el_v) && ~isempty(h2es_v)
+        %%%Clearing prior values
+        var_h2es.h2es_chrg = [];
+        var_h2es.h2es_dchrg = [];
+        %%%H2 Storage
+        %%%Adopted EES Size
+        var_h2es.h2es_adopt = sdpvar(1,size(h2es_v,2),'full');
+        %var_ees.ees_adopt = semivar(1,K,'full');
+        %%%EES Charging
+        var_h2es.h2es_chrg = sdpvar(T,size(h2es_v,2),'full');
+        %%%EES discharging
+        var_h2es.h2es_dchrg = sdpvar(T,size(h2es_v,2),'full');
+        
+        %%%EES Operational State Binary Variables
+        var_h2es.h2es_bin = binvar(T,size(h2es_v,2),'full');
+        
+        %%%EES SOC
+        var_h2es.h2es_soc = sdpvar(T,size(h2es_v,2),'full');
+        for ii = 1:size(h2es_v,2)
+            %%%Electrolyzer Cost Functions
+            Objective = Objective...
+                + sum(M.*h2es_mthly_debt.*var_h2es.h2es_adopt) ... %%%Capital Cost
+                + sum(sum(var_h2es.h2es_chrg).*h2es_v(2,:)) ... %%%Charging Cost
+                + sum(sum(var_h2es.h2es_dchrg).*h2es_v(3,:)); %%%Discharging Cost
+        end
+        
+        h2_chrg_eff = 1 - h2es_v(8,:);
+    end
+    
+else
+    var_rel.rel_adopt = 0;
+    var_rel.rel_prod = zeros(T,1);
+    var_h2es.h2es_chrg = zeros(T,1);
+    var_h2es.h2es_dchrg = zeros(T,1);
+    el_eff = zeros(T,1);
+end
+%% Renewable Electrolyze
 %% Legacy Technologies
 %% Legacy PV
 %%%Only need to add variables if new PV is not considered
@@ -584,4 +644,6 @@ end
 %%%poorly conceived problem
 if ~isempty(elec_dump)
     var_dump.elec_dump = sdpvar(T,1,'full');
+else
+    var_dump.elec_dump = zeros(T,1);
 end
