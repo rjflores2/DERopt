@@ -30,7 +30,7 @@ biogas_limit = 144E6; %kWh biofuel available per year
 h2_fuel_forced_fraction = []; %%%Energy fuel requirements
 
 %%%H2 fuel limit in legacy generator
-h2_fuel_limit = 0.1; %%%Fuel limit on an energy basis - should be 0.1
+h2_fuel_limit = [];%0.1; %%%Fuel limit on an energy basis - should be 0.1
 
 %%%CO2 Limit
 co2_lim = [];%3.75e+07*1;
@@ -203,6 +203,12 @@ fprintf('Took %.2f seconds \n', elapsed)
 fprintf('%s: EES Constraints.', datestr(now,'HH:MM:SS'))
 tic
 opt_ees
+elapsed = toc;
+fprintf('Took %.2f seconds \n', elapsed)
+%% Legacy EES Constraints
+fprintf('%s: Legacy EES Constraints.', datestr(now,'HH:MM:SS'))
+tic
+opt_ees_legacy
 elapsed = toc;
 fprintf('Took %.2f seconds \n', elapsed)
 %% Legacy VC Constraints

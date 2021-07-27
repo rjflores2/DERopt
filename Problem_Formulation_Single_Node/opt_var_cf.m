@@ -482,6 +482,28 @@ else
     var_vc.generic_cool = zeros(T,1);
 end
 
+
+%% Legacy EES
+if ~isempty(ees_legacy)
+    %%%EES Charging
+    var_lees.ees_chrg = sdpvar(T,size(ees_v,2),'full');
+    %%%EES discharging
+    var_lees.ees_dchrg = sdpvar(T,size(ees_v,2),'full');
+    %%%EES SOC
+    var_lees.ees_soc = sdpvar(T,size(ees_v,2),'full');
+    
+    for ii = 1:size(ees_legacy,2)
+        %%%EES Cost Functions
+        Objective = Objective...
+            + ees_v(2,ii)*sum(sum(day_multi.*var_lees.ees_chrg(:,ii))) ...%%%Charging O&M
+            + ees_v(3,ii)*sum(sum(day_multi.*var_lees.ees_dchrg(:,ii)));%%%Discharging O&M
+    end
+else
+    var_lees.ees_chrg = zeros(T,1);
+    var_lees.ees_dchrg = zeros(T,1);
+    var_lees.ees_soc = zeros(T,1);
+end
+   
 %% Legacy Cold TES
 if ~isempty(cool) && sum(cool) >0 && ~isempty(tes_legacy)
     %%%TES Energy Storage Vector

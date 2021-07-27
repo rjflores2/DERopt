@@ -88,6 +88,20 @@ vc_legacy = [vc_v1 vc_v2 vc_v3 vc_v4 vc_v5 vc_v6 vc_v7];
 
 
 %  vc_legacy = [];
+
+%% Electrical Energy Storage
+%%%[Capacity (kWh) [1]
+%%% Charge O&M ($/kWh) [2]
+%%% Discharge O&M ($/kWh) [3]
+%%% Minimum state of charge [4]
+%%% Maximum state of charge [5]
+%%% Maximum charge rate (kWh per 15 minute/m^3 storage) [6]
+%%% Maximum discharge rate(kWh per 15 minute/m^3 storage) [7]
+%%% Charging efficiency [8]
+%%% Discharging efficieny [9]
+%%% State of charge holdover [10]
+ees_legacy = [1000; 0.001; 0.001; 0.1; 0.95; 0.25; 0.25; .90; .90; .995];
+
 %% Thermal Energy Storage Vector - Initial charge is inserted later
 %%%[Capacity (kWh) [1]
 %%% Charge O&M ($/kWh) [2]

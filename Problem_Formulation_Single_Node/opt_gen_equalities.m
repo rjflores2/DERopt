@@ -3,9 +3,9 @@
 %%For  all timesteps t
 %Vectorized
 Constraints = [Constraints
-    (sum(var_util.import,2) + sum(var_pv.pv_elec,2) + sum(var_ees.ees_dchrg,2) + sum(var_rees.rees_dchrg,2) + sum(var_ldg.ldg_elec,2) + sum(var_lbot.lbot_elec,2) ... %%%Production
+    (sum(var_util.import,2) + sum(var_pv.pv_elec,2) + sum(var_ees.ees_dchrg,2) + sum(var_lees.ees_dchrg,2) + sum(var_rees.rees_dchrg,2) + sum(var_ldg.ldg_elec,2) + sum(var_lbot.lbot_elec,2) ... %%%Production
     ==...
-    elec + sum(var_ees.ees_chrg,2) + var_vc.generic_cool./4  + sum(var_lvc.lvc_cool.*vc_cop,2) + sum(el_eff.*var_el.el_prod,2) + sum(h2_chrg_eff.*var_h2es.h2es_chrg,2) + var_dump.elec_dump):'Electricity Balance']; %%%Demand
+    elec + sum(var_ees.ees_chrg,2) + sum(var_lees.ees_chrg,2) + var_vc.generic_cool./4  + sum(var_lvc.lvc_cool.*vc_cop,2) + sum(el_eff.*var_el.el_prod,2) + sum(h2_chrg_eff.*var_h2es.h2es_chrg,2) + var_dump.elec_dump):'Electricity Balance']; %%%Demand
 
 %% Heat Balance
 if ~isempty(heat) && sum(heat>0)>0

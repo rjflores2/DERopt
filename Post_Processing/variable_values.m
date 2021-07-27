@@ -58,6 +58,12 @@ var_boil.boil_fuel = value(var_boil.boil_fuel);
 var_boil.boil_rfuel = value(var_boil.boil_rfuel);
 var_boil.boil_hfuel = value(var_boil.boil_hfuel);
 
+%% EES
+if ~isempty(ees_legacy)
+    var_lees.ees_chrg = value(var_lees.ees_chrg);
+    var_lees.ees_dchrg = value(var_lees.ees_dchrg);
+    var_lees.ees_soc = value(var_lees.ees_soc);
+end
 %% Chillers
 var_lvc.lvc_cool = value(var_lvc.lvc_cool);
 var_lvc.lvc_op = value(var_lvc.lvc_op);
