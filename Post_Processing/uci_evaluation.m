@@ -37,6 +37,9 @@ hold on
 plot(time,(e_adjust).*(el_eff.*var_el.el_prod),'LineWidth',2)
 hold off
 
+%% Figure properties
+xlim_range = [time(1) time(end)];
+xlim_range = [737249 737256];
 %% loads
 close all
 f1 = figure;
@@ -51,7 +54,7 @@ p1 = area(time,plot_data);
 a1 = gca
 a1.XTick = [round(time(1)) + 0.5 :1: round(time(end))-0.5];
 datetick('x','ddd','KeepTicks')
-xlim([time(1) time(end)])
+xlim([xlim_range])
 legend('Elec Load','EES Charging','Electrolyzer','H_2 Storage Compression','Dump')
 box on
 grid on
@@ -66,10 +69,13 @@ plot_data = e_adjust.*[var_ldg.ldg_fuel ...
 
 p2 = area(time,plot_data)
 a2 = gca
+ a2.FontSize = 16;
+ a2.YLabel.String = 'GT Fuel Input (MW)';
+ a2.YLabel.FontSize = 20;
 
 a2.XTick = [round(time(1)) + 0.5 :1: round(time(end))-0.5];
 datetick('x','ddd','KeepTicks')
-xlim([time(1) time(end)])
+xlim([xlim_range])
 box on
 grid on
 legend('NG','RNG','H_2')
@@ -86,16 +92,24 @@ plot_data = e_adjust.*[var_ldg.ldg_elec ...
     var_rees.rees_dchrg ...
     var_util.import]./1000;
 
+plot_data = e_adjust.*[var_ldg.ldg_elec ...
+    var_lbot.lbot_elec ...
+         var_rees.rees_dchrg... 
+         var_pv.pv_elec]./1000;
+
 p3 = area(time,plot_data)
 a3 = gca
-    
+ a3.FontSize = 16;
+ a3.YLabel.String = 'Electricity (MW)';
+ a3.YLabel.FontSize = 20;
 a3.XTick = [round(time(1)) + 0.5 :1: round(time(end))-0.5];
 datetick('x','ddd','KeepTicks')
-xlim([time(1) time(end)])
+xlim([xlim_range])
 box on
 grid on
-legend('GT','ST','PV','EES','REES','Imports')
+legend('GT','ST','Storage','PV')
 % a1.xtick = 1
+set(gcf, 'Position',  [-1500, -150, 700, 300])
 hold off
 
 %% Solar Operation
@@ -108,10 +122,13 @@ plot_data = e_adjust.*[var_pv.pv_elec ...
 p4 = area(time,plot_data)
 plot(time,((sum(pv_legacy(2,:)))*solar + (sum(var_pv.pv_adopt))*solar)./1000,'Color',[0 0 0],'LineWidth',2)
 a4 = gca
+ a4.FontSize = 16;
+ a4.YLabel.String = 'Solar Utilization (MW)';
+ a4.YLabel.FontSize = 20;
     
 a4.XTick = [round(time(1)) + 0.5 :1: round(time(end))-0.5];
 datetick('x','ddd','KeepTicks')
-xlim([time(1) time(end)])
+xlim([xlim_range])
 box on
 grid on
 legend('To Load','NEM','To REES','Solar Potential')

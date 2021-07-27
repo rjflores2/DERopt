@@ -296,6 +296,7 @@ if ~isempty(el_v)
     end
     
 else
+     var_el.el_adopt = 0;
     var_el.el_prod = zeros(T,1);
     var_h2es.h2es_chrg = zeros(T,1);
     var_h2es.h2es_dchrg = zeros(T,1);
@@ -354,6 +355,7 @@ if ~isempty(rel_v)
     end
     
 else
+    var_rel.rel_adopt = 0;
     var_rel.rel_prod = zeros(T,1);
     var_h2es.h2es_chrg = zeros(T,1);
     var_h2es.h2es_dchrg = zeros(T,1);
@@ -620,4 +622,6 @@ end
 %%%poorly conceived problem
 if ~isempty(elec_dump)
     var_dump.elec_dump = sdpvar(T,1,'full');
+else
+    var_dump.elec_dump = zeros(T,1);
 end
