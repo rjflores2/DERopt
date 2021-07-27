@@ -77,7 +77,11 @@ if ~isempty(pv_v)
             %%% Solar PV Examination
             %%%Maximum PV estimated by either reaching net zero electrical energy
             %%%or installing maximum capacity
-            pv_scale_factor = min([sum(elec(:,i))./(0.2*8760) maxpv(i)]);
+            if ~isempty(maxpv)
+                pv_scale_factor = min([sum(elec(:,i)).*(12/length(endpts))./(0.2*8760) maxpv(i)]);
+            else
+                pv_scale_factor = min([sum(elec(:,i))./(0.2*8760)]);
+            end
             if pv_scale_factor > 1000
                 pv_scale_factor = 1000;
             end
@@ -122,10 +126,14 @@ if ~isempty(ees_v)
                 tr = tax_rates(2);
             end
             
-            %%% Solar PV Examination
+          %%% Solar PV Examination
             %%%Maximum PV estimated by either reaching net zero electrical energy
             %%%or installing maximum capacity
-            pv_scale_factor = min([sum(elec(:,i))./(0.2*8760) maxpv(i)]);
+            if ~isempty(maxpv)
+                pv_scale_factor = min([sum(elec(:,i)).*(12/length(endpts))./(0.2*8760) maxpv(i)]);
+            else
+                pv_scale_factor = min([sum(elec(:,i))./(0.2*8760)]);
+            end
             if pv_scale_factor > 1000
                 pv_scale_factor = 1000;
             end
@@ -183,7 +191,7 @@ if ~isempty(el_v)
         end
         
         if el_scale_factor >= 28000
-            el_scale_factor = 2800
+            el_scale_factor = 28000
         end
         %%% Scaling Factor
         if ~low_income(i)

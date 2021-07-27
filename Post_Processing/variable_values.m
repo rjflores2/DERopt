@@ -61,3 +61,6 @@ var_boil.boil_hfuel = value(var_boil.boil_hfuel);
 %% Chillers
 var_lvc.lvc_cool = value(var_lvc.lvc_cool);
 var_lvc.lvc_op = value(var_lvc.lvc_op);
+
+%% Dump variables
+var_dump.elec_dump = value(var_dump.elec_dump);

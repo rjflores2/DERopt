@@ -57,7 +57,7 @@ somah = [2600];
 ees_v=[830; 0.001; 0.001; 0.1; 0.95; 0.25; 0.25; .90; .90; .995];
 %ees_v=[600; 0.001; 0.001; 0.1; 0.95; 0.25; 0.25; 1; 1; .995]; %Testing with 100% RTE
 % ees_v=[100; 0.001; 0.001; 0.1; 0.95; 0.25; 0.25; .90; .90; .995];
-ees_v = [];
+% ees_v = [];
 
 %%%How pv capital cost is modified for different types of buildings
 ees_cap_mod = [575/830 %%%Commercial/industrial
@@ -101,6 +101,8 @@ end
 %%% (2) Variable O&M ($/kWh H2 produced)
 %%% (3) Electrolyzer efficiency (kWh H2/kWh elec)
 el_v = [2100; 0.01; 0.6];
+% el_v = [1; 0.01; .99];
+% el_v = [1; 0.01; .6];
 
 %%%Financial Aspects - Electrolyzer
 el_fin = [-0.02; ... %%%Scaling linear factor - Based on CA Roadmap - 2k H2 per day vs. 20k H2 per day

@@ -117,7 +117,7 @@ if isempty(pv_v) == 0
 %     mod_val*pv_cap
 %      mod_val*(pv_v(1)*M*cap_mod.pv - cap_scalar.pv)
     Objective = Objective ...
-        + sum(M*pv_mthly_debt'.*pv_cap_mod.*var_pv.pv_adopt)... %%%PV Capital Cost ($/kW installed)
+        + sum((0.25)*M*pv_mthly_debt'.*pv_cap_mod.*var_pv.pv_adopt)... %%%PV Capital Cost ($/kW installed)
         + pv_v(3)*(sum(sum(day_multi.*(var_pv.pv_elec)))) ... %%%PV O&M Cost ($/kWh generated)    
         + pv_v(3)*(sum(sum(day_multi.*(var_pv.pv_nem)))); %%%PV O&M Cost ($/kWh generated)
 %         + pv_v(3)*(sum(sum(repmat(day_multi,1,K).*(var_pv.pv_elec + var_pv.pv_nem + pv_wholesale))) ); %%%PV O&M Cost ($/kWh generated)
@@ -278,6 +278,10 @@ if ~isempty(el_v)
         var_h2es.h2es_chrg = sdpvar(T,size(h2es_v,2),'full');
         %%%EES discharging
         var_h2es.h2es_dchrg = sdpvar(T,size(h2es_v,2),'full');
+        
+        %%%EES Operational State Binary Variables
+        var_h2es.h2es_bin = binvar(T,size(h2es_v,2),'full');
+        
         %%%EES SOC
         var_h2es.h2es_soc = sdpvar(T,size(h2es_v,2),'full');
         for ii = 1:size(h2es_v,2)
@@ -548,4 +552,14 @@ else
     var_lvc.lvc_op = 0;
     var_lvc.lvc_cool = zeros(T,1);
     vc_cop = 0;
+end
+
+%%
+%%
+%%
+%% Dump Variables
+%%%These variables should always be zero and are nonzero when you ahve a
+%%%poorly conceived problem
+if ~isempty(elec_dump)
+    var_dump.elec_dump = sdpvar(T,1,'full');
 end

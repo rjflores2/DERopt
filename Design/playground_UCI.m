@@ -10,25 +10,30 @@ opt_now_yalmip = 0; %YALMIP
 
 %%%Optimize chiller plant operation
 chiller_plant_opt = 0;
+
+%% Dummy Variables
+elec_dump = 0; %%%Variable to "dump" electricity
+
 %% Island operation (opt_nem.m) 
 island = 0;
 
-%%%Toggles NEM/Wholesale export on/off
+%%%Toggles NEM/Wholesale export (1 = on, 0 = off)
 export_on = 0;
 
+%% Carbon Related Constraints
 
-%% Renewable biogas Constarints
+%%%Available biogas/renewable gas per year (biogas limit is prorated in the model to the
+%%%simulation period)
 biogas_limit = 144E6; %kWh biofuel available per year
 
-%% Carbon Related Constraints
 %%%Required fuel input
 h2_fuel_forced_fraction = []; %%%Energy fuel requirements
 
 %%%H2 fuel limit in legacy generator
-h2_fuel_limit = 0.1; %%%Fuel limit on an energy basis
+h2_fuel_limit = 0.1; %%%Fuel limit on an energy basis - should be 0.1
 
 %%%CO2 Limit
-co2_lim = [];
+co2_lim = [];%3.75e+07*1;
 %% Turning technologies on/off (opt_var_cf.m and tech_select.m)
 pv_on = 1;        %Turn on PV
 ees_on = 1;       %Turn on EES/REES
@@ -39,11 +44,14 @@ lpv_on = 1; %Turn on legacy PV
 %% Turning incentives and other financial tools on/off
 sgip_on = 0;
 
+%% Throughput requirement - DOE H2 Integration
+h2_charging_rec = 1000; %Required throughput per day
+
 %% PV (opt_pv.m)
 %%%maxpv is maximum capacity that can be installed. If includes different
 %%%orientations, set maxpv to row vector: for example maxpv =
 %%%[max_north_capacity  max_east/west_capacity  max_flat_capacity  max_south_capacity]
-maxpv = 25000; %%%Maxpv 
+maxpv = [];% 250000; %%%Maxpv 
 toolittle_pv = 0; %%% Forces solar PV adoption - value is defined by toolittle_pv value - kW
 curtail = 0; %%%Allows curtailment is = 1
 %% EES (opt_ees.m & opt_rees.m)
@@ -121,7 +129,7 @@ res_units = 0;
 %% Formatting Building Data
 %%%Values to filter data by
 year_idx = 2018;
-month_idx = 7;
+month_idx = [7];
 
 bldg_loader_UCI
 
