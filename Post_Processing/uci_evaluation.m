@@ -134,6 +134,43 @@ grid on
 legend('To Load','NEM','To REES','Solar Potential')
 % a1.xtick = 1
 hold off
+
+%% LEgacy Battery Operation
+close all
+f5 = figure
+subplot(2,1,1)
+hold on
+plot_data_1 = var_lees.ees_chrg.*e_adjust;
+plot_data_2 = -var_lees.ees_dchrg.*e_adjust;
+
+p5_1 = area(time,plot_data_1)
+p5_2 = area(time,plot_data_2)
+a5 = gca
+ a5.FontSize = 16;
+ a5.YLabel.String = 'Legacy EES Power (kW)';
+ a5.YLabel.FontSize = 20;
+a5.XTick = [round(time(1)) + 0.5 :1: round(time(end))-0.5];
+a5.XTickLabels={};
+xlim([xlim_range])
+    
+a5.XTick = [];
+box on
+grid on
+hold off
+subplot(2,1,2)
+plot_data_1 = var_lees.ees_soc;
+p5_3 = area(time,plot_data_1)
+a5 = gca
+ a5.FontSize = 16;
+ a5.YLabel.String = 'Legacy EES SOC (kWh)';
+ a5.YLabel.FontSize = 20;
+a5.XTick = [round(time(1)) + 0.5 :1: round(time(end))-0.5];
+datetick('x','ddd','KeepTicks')
+xlim([xlim_range])
+box on
+grid on
+
+set(gcf, 'Position',  [-1500, -150, 1000, 750])
 %% CO2 production
 co2_emissions = [sum(var_util.import.*co2_import)
  co2_ng*(sum(sum(var_ldg.ldg_fuel)) + sum(sum(var_ldg.db_fire)) + sum(sum(var_boil.boil_fuel)))

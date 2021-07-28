@@ -30,12 +30,14 @@ pv_fin = [-0.4648; ... %%%Scaling linear factor - Based on Lazards cost of elect
 % pv_cap_mod = [pv_cap_mod pv_cap_mod];
 
 
-
-pv_cap=pv_v(1,:);
+if ~isempty(pv_v)
+    pv_cap=pv_v(1,:);
+else
+    pv_cap = 0;
+end
 %%%Solar on multifamily affordable homes (SOMAH)
 somah = [2600];
 
-% pv_v = [];
 %% Electrical Energy Storage
 %%% (1) Capital Cost ($/kWh installed)
 %%% (2) Charge O&M ($/kWh charged)
@@ -160,3 +162,10 @@ end
 if ~ees_on
     ees_v =[];
 end
+
+
+pv_v = [];
+ees_v = [];
+el_v = [];
+h2es_v = [];
+rel_v = [];

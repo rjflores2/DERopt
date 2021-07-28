@@ -296,8 +296,11 @@ if ~isempty(el_v)
     end
     
 else
-     var_el.el_adopt = 0;
+    h2_chrg_eff = 0;
+    var_el.el_adopt = 0;
     var_el.el_prod = zeros(T,1);
+    var_h2es.h2es_adopt = 0;
+    var_h2es.h2es_soc = zeros(T,1);
     var_h2es.h2es_chrg = zeros(T,1);
     var_h2es.h2es_dchrg = zeros(T,1);
     el_eff = zeros(T,1);
@@ -380,7 +383,7 @@ if isempty(pv_legacy) == 0 && sum(pv_legacy(2,:)) > 0 &&  isempty(pv_v)
                 + sum(sum(-day_multi.*export_price(:,index).*var_pv.pv_nem)); %%%NEM Revenue Cost
         
     else
-        var_pv.pv_nem = [];
+        var_pv.pv_nem=zeros(T,1);
     end
     
     %%%PV Generation to meet building demand (kWh)
@@ -546,17 +549,17 @@ end
 %% Legacy EES
 if ~isempty(ees_legacy)
     %%%EES Charging
-    var_lees.ees_chrg = sdpvar(T,size(ees_v,2),'full');
+    var_lees.ees_chrg = sdpvar(T,size(ees_legacy,2),'full');
     %%%EES discharging
-    var_lees.ees_dchrg = sdpvar(T,size(ees_v,2),'full');
+    var_lees.ees_dchrg = sdpvar(T,size(ees_legacy,2),'full');
     %%%EES SOC
-    var_lees.ees_soc = sdpvar(T,size(ees_v,2),'full');
+    var_lees.ees_soc = sdpvar(T,size(ees_legacy,2),'full');
     
     for ii = 1:size(ees_legacy,2)
         %%%EES Cost Functions
         Objective = Objective...
-            + ees_v(2,ii)*sum(sum(day_multi.*var_lees.ees_chrg(:,ii))) ...%%%Charging O&M
-            + ees_v(3,ii)*sum(sum(day_multi.*var_lees.ees_dchrg(:,ii)));%%%Discharging O&M
+            + ees_legacy(2,ii)*sum(sum(day_multi.*var_lees.ees_chrg(:,ii))) ...%%%Charging O&M
+            + ees_legacy(3,ii)*sum(sum(day_multi.*var_lees.ees_dchrg(:,ii)));%%%Discharging O&M
     end
 else
     var_lees.ees_chrg = zeros(T,1);

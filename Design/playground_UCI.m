@@ -24,7 +24,7 @@ export_on = 0;
 
 %%%Available biogas/renewable gas per year (biogas limit is prorated in the model to the
 %%%simulation period)
-biogas_limit = 144E6; %kWh biofuel available per year
+biogas_limit = [];%144E6; %kWh biofuel available per year
 
 %%%Required fuel input
 h2_fuel_forced_fraction = []; %%%Energy fuel requirements
