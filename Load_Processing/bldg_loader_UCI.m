@@ -24,7 +24,8 @@ datetimev=datevec(time);
 
 %%% change IDX to a specific month to allow for faster testing %%%
 
-idx = (datetimev(:,1) == 2018 & datetimev(:,2) == 7);
+% idx = (datetimev(:,1) == year_idx & datetimev(:,2) == month_idx);
+idx = (datetimev(:,1) == year_idx & ismember(datetimev(:,2),month_idx));
 % idx = (datetimev(:,1) == 2018);
 elec = elec(idx);
 heat = heat(idx);

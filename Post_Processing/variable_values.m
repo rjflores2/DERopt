@@ -29,6 +29,10 @@ var_ees.ees_soc = value(var_ees.ees_soc);
 var_el.el_adopt = value(var_el.el_adopt);
 var_el.el_prod = value(var_el.el_prod);
 
+%% H2 Production - Renewable Electrolyzer
+var_rel.rel_adopt = value(var_rel.rel_adopt);
+var_rel.rel_prod = value(var_rel.rel_prod);
+
 %% H2 Production - Storage
 var_h2es.h2es_adopt = value(var_h2es.h2es_adopt);
 var_h2es.h2es_chrg = value(var_h2es.h2es_chrg);
@@ -41,6 +45,7 @@ var_ldg.ldg_elec = value(var_ldg.ldg_elec);
 var_ldg.ldg_fuel = value(var_ldg.ldg_fuel);
 var_ldg.ldg_rfuel = value(var_ldg.ldg_rfuel);
 var_ldg.ldg_hfuel = value(var_ldg.ldg_hfuel);
+var_ldg.ldg_elec_ramp = value(var_ldg.ldg_elec_ramp);
 
 %% Bottoming Cycle
 var_lbot.lbot_elec = value(var_lbot.lbot_elec);
@@ -57,6 +62,15 @@ var_boil.boil_fuel = value(var_boil.boil_fuel);
 var_boil.boil_rfuel = value(var_boil.boil_rfuel);
 var_boil.boil_hfuel = value(var_boil.boil_hfuel);
 
+%% EES
+if ~isempty(ees_legacy)
+    var_lees.ees_chrg = value(var_lees.ees_chrg);
+    var_lees.ees_dchrg = value(var_lees.ees_dchrg);
+    var_lees.ees_soc = value(var_lees.ees_soc);
+end
 %% Chillers
 var_lvc.lvc_cool = value(var_lvc.lvc_cool);
 var_lvc.lvc_op = value(var_lvc.lvc_op);
+
+%% Dump variables
+var_dump.elec_dump = value(var_dump.elec_dump);

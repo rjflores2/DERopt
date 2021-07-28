@@ -16,7 +16,7 @@ if ~isempty(cool) && sum(cool) > 0  && isempty(vc_legacy)
                 fn = j*lgth;
             end
             Constraints=[Constraints
-                (1/e_adjust).*vc_legacy(3,i)*vc_legacy(4,i).*var_lvc.lvc_op(j,i) <= var_lvc.lvc_cool(st:fn,i) <= (1/e_adjust).*vc_legacy(3,i).*var_lvc.lvc_op(j,i)];         %%% VC Min/Max output
+                ((1/e_adjust).*vc_legacy(3,i)*vc_legacy(4,i).*var_lvc.lvc_op(j,i) <= var_lvc.lvc_cool(st:fn,i) <= (1/e_adjust).*vc_legacy(3,i).*var_lvc.lvc_op(j,i)):'VC Min/Max Output'];         %%% VC Min/Max output
             %         vc_op(2:length(elec),i)-vc_op(1:length(elec)-1,i)<=vc_start(2:length(elec),i)];%%% VC Startup
         end
     end

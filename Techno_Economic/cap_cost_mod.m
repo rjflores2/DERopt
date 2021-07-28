@@ -51,6 +51,16 @@ if ~isempty(el_v)
     end
 end
 
+%%%Renewable Generic Electrolyzer
+if ~isempty(rel_v)
+    for ii=1:size(rel_v,2)
+        rel_mthly_debt(ii,1)=rel_v(1,ii)*((1-equity)*(interest*(1+interest)^(period*12))...
+            /((1+interest)^(period*12)-1)+...%%%Money to pay back bank
+            req_return_on*(equity)*(required_return*(1+required_return)^(period*12))...
+            /((1+required_return)^(period*12)-1));
+    end
+end
+
 %%%Generic Hydrogen energy storage
 if ~isempty(h2es_v)
     for ii=1:size(h2es_v,2)
@@ -77,7 +87,11 @@ if ~isempty(pv_v)
             %%% Solar PV Examination
             %%%Maximum PV estimated by either reaching net zero electrical energy
             %%%or installing maximum capacity
-            pv_scale_factor = min([sum(elec(:,i))./(0.2*8760) maxpv(i)]);
+            if ~isempty(maxpv)
+                pv_scale_factor = min([sum(elec(:,i)).*(12/length(endpts))./(0.2*8760) maxpv(i)]);
+            else
+                pv_scale_factor = min([sum(elec(:,i))./(0.2*8760)]);
+            end
             if pv_scale_factor > 1000
                 pv_scale_factor = 1000;
             end
@@ -122,10 +136,14 @@ if ~isempty(ees_v)
                 tr = tax_rates(2);
             end
             
-            %%% Solar PV Examination
+          %%% Solar PV Examination
             %%%Maximum PV estimated by either reaching net zero electrical energy
             %%%or installing maximum capacity
-            pv_scale_factor = min([sum(elec(:,i))./(0.2*8760) maxpv(i)]);
+            if ~isempty(maxpv)
+                pv_scale_factor = min([sum(elec(:,i)).*(12/length(endpts))./(0.2*8760) maxpv(i)]);
+            else
+                pv_scale_factor = min([sum(elec(:,i))./(0.2*8760)]);
+            end
             if pv_scale_factor > 1000
                 pv_scale_factor = 1000;
             end
@@ -175,9 +193,15 @@ if ~isempty(el_v)
         end
         
         %%%Electrolyzer examination
-        el_scale_factor = (sum(elec)./0.33*h2_fuel_fraction)/length(elec)*e_adjust;
+        %%%Generating a h2 fuel fraction when this does not exist
+        if ~isempty(h2_fuel_forced_fraction)
+            el_scale_factor = (sum(elec)./0.33*h2_fuel_forced_fraction)/length(elec)*e_adjust;
+        else
+            el_scale_factor = (sum(elec)./0.33*0.1)/length(elec)*e_adjust;
+        end
+        
         if el_scale_factor >= 28000
-            el_scale_factor = 2800
+            el_scale_factor = 28000
         end
         %%% Scaling Factor
         if ~low_income(i)
@@ -194,6 +218,46 @@ if ~isempty(el_v)
                     el_cap_mod(i,ii) = cap_cost_scaling(tr,el_v(:,ii),el_fin(:,ii),el_scale_factor,debt,discount_rate);
         else
          end
+        
+    end
+end
+%% Renewable Electrolyzer
+if ~isempty(rel_v)
+    rel_cap_mod = [];
+    for i = 1:size(elec,2)
+        %%%Applicable tax rate
+        if strcmp(rate{i},'R1')
+            tr = tax_rates(1);
+        else
+            tr = tax_rates(2);
+        end
+        
+        %%%Electrolyzer examination
+        %%%Generating a h2 fuel fraction when this does not exist
+        if ~isempty(h2_fuel_forced_fraction)
+            rel_scale_factor = (sum(elec)./0.33*h2_fuel_forced_fraction)/length(elec)*e_adjust;
+        else
+            rel_scale_factor = (sum(elec)./0.33*0.1)/length(elec)*e_adjust;
+        end
+        
+        if rel_scale_factor >= 28000
+            rel_scale_factor = 28000
+        end
+        %%% Scaling Factor
+        if ~low_income(i)
+            %%%Decrease in cost due to scale
+            rel_scale_factor = rel_scale_factor*rel_fin(1,ii);
+            
+            %%%Adjsuted PV Costs
+            debt =12.*ones(10,1).*(rel_v(1,ii) + rel_scale_factor)*((1-equity)*(interest*(1+interest)^(period*12))...
+                /((1+interest)^(period*12)-1)+...%%%Money to pay back bank
+                req_return_on*(equity)*(required_return*(1+required_return)^(period*12))...
+                /((1+required_return)^(period*12)-1));
+            
+            
+            rel_cap_mod(i,ii) = cap_cost_scaling(tr,rel_v(:,ii),rel_fin(:,ii),rel_scale_factor,debt,discount_rate);
+        else
+        end
         
     end
 end

@@ -30,12 +30,14 @@ pv_fin = [-0.4648; ... %%%Scaling linear factor - Based on Lazards cost of elect
 % pv_cap_mod = [pv_cap_mod pv_cap_mod];
 
 
-
-pv_cap=pv_v(1,:);
+if ~isempty(pv_v)
+    pv_cap=pv_v(1,:);
+else
+    pv_cap = 0;
+end
 %%%Solar on multifamily affordable homes (SOMAH)
 somah = [2600];
 
-% pv_v = [];
 %% Electrical Energy Storage
 %%% (1) Capital Cost ($/kWh installed)
 %%% (2) Charge O&M ($/kWh charged)
@@ -57,7 +59,7 @@ somah = [2600];
 ees_v=[830; 0.001; 0.001; 0.1; 0.95; 0.25; 0.25; .90; .90; .995];
 %ees_v=[600; 0.001; 0.001; 0.1; 0.95; 0.25; 0.25; 1; 1; .995]; %Testing with 100% RTE
 % ees_v=[100; 0.001; 0.001; 0.1; 0.95; 0.25; 0.25; .90; .90; .995];
-
+% ees_v = [];
 
 %%%How pv capital cost is modified for different types of buildings
 ees_cap_mod = [575/830 %%%Commercial/industrial
@@ -89,8 +91,11 @@ non_res_rates = [1 2];
 % ees_cap_mod = [ees_cap_mod ees_cap_mod];
 % ees_fin = [ees_fin ees_fin];
 % rees_fin = [rees_fin rees_fin];
-
-ees_cap=ees_v(1);
+if ~isempty(ees_v)
+    ees_cap=ees_v(1);
+else
+    ees_cap = [];
+end
 
 %% Generic Electrolyzer & Hydrogen Storage
 %%% Generic electrolyzer
@@ -98,7 +103,9 @@ ees_cap=ees_v(1);
 %%% (2) Variable O&M ($/kWh H2 produced)
 %%% (3) Electrolyzer efficiency (kWh H2/kWh elec)
 el_v = [2100; 0.01; 0.6];
-
+% el_v = [1; 0.01; .99];
+% el_v = [1; 0.01; .6];
+el_v = [];
 %%%Financial Aspects - Electrolyzer
 el_fin = [-0.02; ... %%%Scaling linear factor - Based on CA Roadmap - 2k H2 per day vs. 20k H2 per day
     5; ... %%%MACRS Schedule
@@ -119,6 +126,7 @@ h2es_v = [20;0.001;0.001;0.01;1;1;1;0.95;1;1];
 
 % el_v = []
 % h2es_v = [];
+
 %% Reversible electroyzer
 %%% (1) Captail Cost ($/kW H2 produced)
 %%% (2) Variable O&M ($/kWh H2 produced)
@@ -129,6 +137,19 @@ rsoc_v = [500*.12/12;0.01;0.7;0.6;1.5];
 
 %%%Dummy variable for reversible SOC capital cost
 rsoc_mthly_debt = rsoc_v(1);
+
+%% Renewable Electrolyzer (rel)
+%%% Generic electrolyzer
+%%% (1) Captail Cost ($/kW H2 produced)
+%%% (2) Variable O&M ($/kWh H2 produced)
+%%% (3) Electrolyzer efficiency (kWh H2/kWh elec)
+rel_v = [2100; 0.01; 0.6];
+
+%%%Financial Aspects - Electrolyzer
+rel_fin = [-0.02; ... %%%Scaling linear factor - Based on CA Roadmap - 2k H2 per day vs. 20k H2 per day
+    5; ... %%%MACRS Schedule
+    1]; ... %%%ITC Benefit
+
 %% Building space
 %%%[space available for PV (m^2)
 %%%Cooling loop input (C)
@@ -153,3 +174,10 @@ end
 if ~ees_on
     ees_v =[];
 end
+
+
+pv_v = [];
+ees_v = [];
+el_v = [];
+h2es_v = [];
+rel_v = [];

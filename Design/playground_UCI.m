@@ -10,18 +10,30 @@ opt_now_yalmip = 0; %YALMIP
 
 %%%Optimize chiller plant operation
 chiller_plant_opt = 0;
+
+%% Dummy Variables
+elec_dump = []; %%%Variable to "dump" electricity
+
 %% Island operation (opt_nem.m) 
 island = 0;
 
-%%%Toggles NEM/Wholesale export on/off
-export_on = 1;
+%%%Toggles NEM/Wholesale export (1 = on, 0 = off)
+export_on = 0;
 
 %% Carbon Related Constraints
+
+%%%Available biogas/renewable gas per year (biogas limit is prorated in the model to the
+%%%simulation period)
+biogas_limit = [];%144E6; %kWh biofuel available per year
+
 %%%Required fuel input
-h2_fuel_fraction = 0.1; %%%Energy fuel requirements
+h2_fuel_forced_fraction = []; %%%Energy fuel requirements
+
+%%%H2 fuel limit in legacy generator
+h2_fuel_limit = [];%0.1; %%%Fuel limit on an energy basis - should be 0.1
 
 %%%CO2 Limit
-co2_lim = 1;
+co2_lim = [];%1.2220e+07*0.5;
 %% Turning technologies on/off (opt_var_cf.m and tech_select.m)
 pv_on = 1;        %Turn on PV
 ees_on = 1;       %Turn on EES
@@ -31,8 +43,14 @@ lpv_on = 1; %Turn on legacy PV
 %% Turning incentives and other financial tools on/off
 sgip_on = 0;
 
+%% Throughput requirement - DOE H2 Integration
+h2_charging_rec = []; %Required throughput per day
+
 %% PV (opt_pv.m)
-pv_maxarea = 1; %%% Limits maximum PV size, based on initially solar PV panel
+%%%maxpv is maximum capacity that can be installed. If includes different
+%%%orientations, set maxpv to row vector: for example maxpv =
+%%%[max_north_capacity  max_east/west_capacity  max_flat_capacity  max_south_capacity]
+maxpv = [];% 250000; %%%Maxpv 
 toolittle_pv = 0; %%% Forces solar PV adoption - value is defined by toolittle_pv value - kW
 curtail = 0; %%%Allows curtailment is = 1
 %% EES (opt_ees.m & opt_rees.m)
@@ -49,11 +67,13 @@ import_limit = .8;
 
 %% Adding paths
 %%%YALMIP Master Path
-addpath(genpath('H:\Matlab_Paths\YALMIP-master'))
-addpath(genpath('C:\Program Files\MATLAB\YALMIP-master'))
+addpath(genpath('H:\Matlab_Paths\YALMIP-master')) %rjf path
+addpath(genpath('C:\Program Files\MATLAB\YALMIP-master')) %cyc path
 
 %%%CPLEX Path
-addpath(genpath('C:\Program Files\IBM\ILOG\CPLEX_Studio1263\cplex\matlab\x64_win64'))
+addpath(genpath('C:\Program Files\IBM\ILOG\CPLEX_Studio128\cplex\matlab\x64_win64')) %rjf path
+addpath(genpath('C:\Program Files\IBM\ILOG\CPLEX_Studio1263\cplex\matlab\x64_win64')) %cyc path
+
 
 %%%DERopt paths (rjf computer)
 addpath(genpath('H:\_Tools_\DERopt\Design'))
@@ -105,11 +125,14 @@ end
 dc_exist = 1;
 rate = {'TOU8'};
 low_income = 0;
-maxpv = 100000./.2;
 sgip_pbi = 1;
 res_units = 0;
 
 %% Formatting Building Data
+%%%Values to filter data by
+year_idx = 2018;
+month_idx = [7];
+
 bldg_loader_UCI
 
 %% Utility Data
@@ -118,7 +141,7 @@ utility_UCI
 
 %%%Placeholder natural gas cost
 ng_cost = 0.5/29.3; %$/kWh --> Converted from $/therm to $/kWh, 29.3 kWh / 1 Therm
-rng_cost = ng_cost*10;
+rng_cost = ng_cost*2;
 %% Tech Parameters/Costs
 %%%Technology Parameters
 tech_select_UCI
@@ -157,6 +180,7 @@ tic
 opt_gen_inequalities
 elapsed = toc;
 fprintf('Took %.2f seconds \n', elapsed)
+
 %% Heat Recovery Inequality Constraints
 fprintf('%s: Heat Recovery Inequalities. ', datestr(now,'HH:MM:SS'))
 tic
@@ -180,6 +204,12 @@ fprintf('Took %.2f seconds \n', elapsed)
 fprintf('%s: EES Constraints.', datestr(now,'HH:MM:SS'))
 tic
 opt_ees
+elapsed = toc;
+fprintf('Took %.2f seconds \n', elapsed)
+%% Legacy EES Constraints
+fprintf('%s: Legacy EES Constraints.', datestr(now,'HH:MM:SS'))
+tic
+opt_ees_legacy
 elapsed = toc;
 fprintf('Took %.2f seconds \n', elapsed)
 %% Legacy VC Constraints
@@ -216,6 +246,7 @@ tic
 opt_rsoc
 elapsed = toc;
 fprintf('Took %.2f seconds \n',elapsed)
+
 
 %% Optimize
 fprintf('%s: Optimizing \n....', datestr(now,'HH:MM:SS'))

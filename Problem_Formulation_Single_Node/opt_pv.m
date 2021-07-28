@@ -3,11 +3,11 @@ if ~isempty(pv_v) || (~isempty(pv_legacy) && sum(pv_legacy(2,:)) > 0)
     %% PV Energy balance when curtailment is allowed
     if curtail
         Constraints = [Constraints
-            (var_pv.pv_elec + var_pv.pv_nem + sum(var_rees.rees_chrg,2) <= (sum(pv_legacy(2,:))/e_adjust)*solar + (sum(var_pv.pv_adopt))/e_adjust*solar) :'PV Energy Balance'];
+            (var_pv.pv_elec + var_pv.pv_nem + sum(var_rees.rees_chrg,2) + sum(rel_eff.*var_rel.rel_prod,2) <= (sum(pv_legacy(2,:))/e_adjust)*solar + (sum(var_pv.pv_adopt))/e_adjust*solar) :'PV Energy Balance'];
 %         Constraints = [Constraints, (pv_wholesale + pv_elec + pv_nem + rees_chrg <= repmat(solar,1,K).*repmat(pv_adopt,T,1)):'PV Energy Balance'];
     else
          Constraints = [Constraints
-            (var_pv.pv_elec + var_pv.pv_nem + sum(var_rees.rees_chrg,2) == (sum(pv_legacy(2,:))/e_adjust)*solar + (sum(var_pv.pv_adopt))/e_adjust*solar) :'PV Energy Balance'];
+            (var_pv.pv_elec + var_pv.pv_nem + sum(var_rees.rees_chrg,2) + sum(var_rel.rel_prod,2)  == (sum(pv_legacy(2,:))/e_adjust)*solar + (sum(var_pv.pv_adopt))/e_adjust*solar) :'PV Energy Balance'];
 %         Constraints = [Constraints, (pv_wholesale + pv_elec + pv_nem + rees_chrg == repmat(solar,1,K).*repmat(pv_adopt,T,1)):'PV Energy Balance'];
     end
     %% Min PV to adopt: Forces 3 kW Adopted
@@ -18,12 +18,11 @@ if ~isempty(pv_v) || (~isempty(pv_legacy) && sum(pv_legacy(2,:)) > 0)
 %         end
     end
     
-    %% Max PV to adopt (area constrained)
-    if pv_maxarea
-%         maxpv = [1296.193592	220.6164316	17.50637663	209.7896814	227.3885864	489.2995255	58.08934062	198.0385724	251.1221256	573.4781479	1552.421324	646.664299	305.9307368	1010.926181	8.639640818	801.0892088	612.9386393	58.4017605	446.1910585	149.054028	36.89108013	15.02661503	45.03358088	50.34471206	110.9415728	40.88830777	142.2994536	341.1152646	1436.337133	14.54546726	61.91076427];
-%        maxpv = maxpv(1:length(pv_adopt));
-%         maxpv = maxpv(1:size(elec,2));        
-        Constraints = [Constraints, (sum(var_pv.pv_adopt) <= maxpv'):'Mav PV area'];
+    %% Max PV to adopt (capacity constrained)
+    if ~isempty(maxpv)    
+        Constraints = [Constraints
+            (var_pv.pv_adopt' <= maxpv'):'Mav PV Capacity'];  
+%         Constraints = [Constraints, (sum(var_pv.pv_adopt) <= maxpv'):'Mav PV Capacity'];
     end
     
     %% Don't curtail for residential
