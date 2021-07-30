@@ -88,14 +88,15 @@ hold on
 plot_data = e_adjust.*[var_ldg.ldg_elec ...
     var_lbot.lbot_elec ...
     var_pv.pv_elec ...
+    var_rsoc.rsoc_elec...
     var_ees.ees_dchrg ...
     var_rees.rees_dchrg ...
     var_util.import]./1000;
 
-plot_data = e_adjust.*[var_ldg.ldg_elec ...
-    var_lbot.lbot_elec ...
-         var_rees.rees_dchrg... 
-         var_pv.pv_elec]./1000;
+% plot_data = e_adjust.*[var_ldg.ldg_elec ...
+%     var_lbot.lbot_elec ...
+%          var_rees.rees_dchrg... 
+%          var_pv.pv_elec]./1000;
 
 p3 = area(time,plot_data)
 a3 = gca
@@ -104,12 +105,12 @@ a3 = gca
  a3.YLabel.FontSize = 20;
 a3.XTick = [round(time(1)) + 0.5 :1: round(time(end))-0.5];
 datetick('x','ddd','KeepTicks')
-xlim([xlim_range])
+% xlim([xlim_range])
 box on
 grid on
-legend('GT','ST','Storage','PV')
+legend('GT','ST','PV','rSOC')
 % a1.xtick = 1
-set(gcf, 'Position',  [-1500, -150, 700, 300])
+set(gcf, 'Position',  [-0, -0, 700, 300])
 hold off
 
 %% Solar Operation
@@ -195,8 +196,14 @@ adopted.rees =var_rees.rees_adopt;
 adopted.el = var_el.el_adopt;
 adopted.rel = var_rel.rel_adopt;
 adopted.h2es = var_h2es.h2es_adopt;
+adopted.rsoc = var_rsoc.rsoc_adopt;
 adopted
 
 
 %% H2 Energy Balance
-h2_e_balance = [sum(var_el.el_prod,2) sum(var_el.el_prod,2)  sum(var_h2es.h2es_dchrg,2)  sum(var_ldg.ldg_hfuel,2)  sum(var_ldg.db_hfire,2)  sum(var_boil.boil_hfuel,2)  sum(var_h2es.h2es_chrg,2)];
+h2_e_balance = [sum(var_el.el_prod,2) sum(var_el.el_prod,2)  sum(var_h2es.h2es_dchrg,2) sum(var_rsoc.rsoc_prod,2) ...
+    sum(var_ldg.ldg_hfuel,2)  sum(var_ldg.db_hfire,2)  sum(var_boil.boil_hfuel,2)  sum(var_h2es.h2es_chrg,2) sum(rsoc_v(3).*var_rsoc.rsoc_elec,2)];
+
+%% rSOC Operation
+rSOC_ops = [var_rsoc.rsoc_prod var_rsoc.rsoc_elec]; 
+rsoc_double_duty = find(rSOC_ops(:,1)>0 & rSOC_ops(:,2)>0)

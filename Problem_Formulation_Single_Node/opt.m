@@ -22,6 +22,11 @@ if opt_now==1
     tic
     %     [x, fval, exitflag, output, lambda] = cplexlp(model.f, model.Aineq, model.bineq, model.Aeq, model.beq, lb, ub, [], options);
     [x, fval, exitflag, output] = cplexmilp(model.f, model.Aineq, model.bineq, model.Aeq, model.beq, [],[],[],lb,ub,model.ctype,[],options);
+   
+    if exitflag == -2
+        output
+        break
+    end
     elapsed = toc;
     fprintf('CPLEX took %.2f seconds \n', elapsed)
 

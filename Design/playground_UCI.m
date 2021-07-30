@@ -121,6 +121,9 @@ else
     cool = [];
 end
 
+%% troubleshooting
+tblshoot = 0;
+
 %% Placeholders
 dc_exist = 1;
 rate = {'TOU8'};
@@ -131,7 +134,7 @@ res_units = 0;
 %% Formatting Building Data
 %%%Values to filter data by
 year_idx = 2018;
-month_idx = [7];
+month_idx = [7 8 9];
 
 bldg_loader_UCI
 

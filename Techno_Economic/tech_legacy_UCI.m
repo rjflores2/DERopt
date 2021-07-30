@@ -1,5 +1,5 @@
 %% Legacy Technologies
-
+if tblshoot ~= 1
 %% Legacy PV
 if lpv_on
     %%%[O&M ($/kWh)  -  1
@@ -123,7 +123,18 @@ tes_legacy = [99010; %1
     .95; %8
     .95; %9
     .999]; %10
-
+else
+    %% Filling holes
+    pv_legacy=[];
+    dg_legacy = [];
+    bot_legacy = [];
+    hr_legacy = [];
+    db_legacy = [];
+    boil_legacy = [];
+    vc_legacy = [];
+    ees_legacy = [];
+    tes_legacy = [];
+end
 % tes_legacy = [];
 %% Campus Properties
 %%%[Available area for solar

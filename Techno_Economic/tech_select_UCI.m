@@ -1,4 +1,5 @@
 %% Technology Selection
+
 %% Utility
 utility_exists=1;
 
@@ -123,6 +124,7 @@ el_fin = [-0.02; ... %%%Scaling linear factor - Based on CA Roadmap - 2k H2 per 
 %%% (9) Discharging efficiency
 %%% (10) State of charge holdover
 h2es_v = [20;0.001;0.001;0.01;1;1;1;0.95;1;1];
+h2es_v = [0.00001;0.001;0.001;0.01;1;1;1;0.95;1;1];
 
 % el_v = []
 % h2es_v = [];
@@ -134,6 +136,7 @@ h2es_v = [20;0.001;0.001;0.01;1;1;1;0.95;1;1];
 %%% (4) Fuel Cell Efficiency (kWh elec/kWh H2)
 %%% (5) Ratio of electrolyzer electricity in to fuel cell capacity (kW electrolyzer input / kW fuel cell output
 rsoc_v = [500*.12/12;0.01;0.7;0.6;1.5];
+% rsoc_v = [10*.12/12;0.01;1;1;1.5];
 
 %%%Dummy variable for reversible SOC capital cost
 rsoc_mthly_debt = rsoc_v(1);
@@ -179,5 +182,4 @@ end
 pv_v = [];
 ees_v = [];
 el_v = [];
-h2es_v = [];
 rel_v = [];

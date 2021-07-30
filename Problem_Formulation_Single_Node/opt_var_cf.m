@@ -270,41 +270,46 @@ if ~isempty(el_v)
             + sum(sum(var_el.el_prod).*el_v(2,:)); %%%VO&M
     end
 
-    if ~isempty(h2es_v)
-        %%%H2 Storage
-        %%%Adopted EES Size
-        var_h2es.h2es_adopt = sdpvar(1,size(h2es_v,2),'full');
-        %var_ees.ees_adopt = semivar(1,K,'full');
-        %%%EES Charging
-        var_h2es.h2es_chrg = sdpvar(T,size(h2es_v,2),'full');
-        %%%EES discharging
-        var_h2es.h2es_dchrg = sdpvar(T,size(h2es_v,2),'full');
-        
-        %%%EES Operational State Binary Variables
-        var_h2es.h2es_bin = binvar(T,size(h2es_v,2),'full');
-        
-        %%%EES SOC
-        var_h2es.h2es_soc = sdpvar(T,size(h2es_v,2),'full');
-        for ii = 1:size(h2es_v,2)
-            %%%Electrolyzer Cost Functions
-            Objective = Objective...
-                + sum(M.*h2es_mthly_debt.*var_h2es.h2es_adopt) ... %%%Capital Cost
-                + sum(sum(var_h2es.h2es_chrg).*h2es_v(2,:)) ... %%%Charging Cost
-                + sum(sum(var_h2es.h2es_dchrg).*h2es_v(3,:)); %%%Discharging Cost
-        end
-        
-        h2_chrg_eff = 1 - h2es_v(8,:);
-    end
+    
 
 else
     h2_chrg_eff = 0;
     var_el.el_adopt = 0;
     var_el.el_prod = zeros(T,1);
+    el_eff = zeros(T,1);
+end
+
+%% H2ES
+if ~isempty(h2es_v) && (~isempty(el_v) || ~isempty(rel_v) || ~isempty(rsoc_v))
+    %%%H2 Storage
+    %%%Adopted EES Size
+    var_h2es.h2es_adopt = sdpvar(1,size(h2es_v,2),'full');
+    %var_ees.ees_adopt = semivar(1,K,'full');
+    %%%EES Charging
+    var_h2es.h2es_chrg = sdpvar(T,size(h2es_v,2),'full');
+    %%%EES discharging
+    var_h2es.h2es_dchrg = sdpvar(T,size(h2es_v,2),'full');
+    
+    %%%EES Operational State Binary Variables
+    var_h2es.h2es_bin = binvar(T,size(h2es_v,2),'full');
+    
+    %%%EES SOC
+    var_h2es.h2es_soc = sdpvar(T,size(h2es_v,2),'full');
+    for ii = 1:size(h2es_v,2)
+        %%%Electrolyzer Cost Functions
+        Objective = Objective...
+            + sum(M.*h2es_mthly_debt.*var_h2es.h2es_adopt) ... %%%Capital Cost
+            + sum(sum(var_h2es.h2es_chrg).*h2es_v(2,:)) ... %%%Charging Cost
+            + sum(sum(var_h2es.h2es_dchrg).*h2es_v(3,:)); %%%Discharging Cost
+    end
+    
+    h2_chrg_eff = 1 - h2es_v(8,:);
+else
+    
     var_h2es.h2es_adopt = 0;
     var_h2es.h2es_soc = zeros(T,1);
     var_h2es.h2es_chrg = zeros(T,1);
     var_h2es.h2es_dchrg = zeros(T,1);
-    el_eff = zeros(T,1);
 end
 
 %% Reversible SOC
@@ -316,6 +321,10 @@ if ~isempty(rsoc_v)
     var_rsoc.rsoc_prod = sdpvar(T,size(rsoc_v,2),'full');
     %%%RSOC Electricity
     var_rsoc.rsoc_elec = sdpvar(T,size(rsoc_v,2),'full');
+    %%%rSOC Operational State
+%     var_rsoc.rsoc_op = binvar(T,size(rsoc_v,2),'full');
+    
+    rsoc_elec_eff = rsoc_v(3);
     
     for ii = 1:size(rsoc_v,2)
         %%%Electrolyzer Cost Functions
@@ -327,6 +336,7 @@ if ~isempty(rsoc_v)
 else
     var_rsoc.rsoc_prod = zeros(T,1);
     var_rsoc.rsoc_elec = zeros(T,1);
+    rsoc_elec_eff = 1;
 end
 
 %% Renewable Electrolyzer
@@ -365,7 +375,7 @@ if ~isempty(rel_v)
         %%%EES discharging
         var_h2es.h2es_dchrg = sdpvar(T,size(h2es_v,2),'full');
         
-        %%%EES Operational State Binary Variables
+        %%%H2ES Operational State Binary Variables
         var_h2es.h2es_bin = binvar(T,size(h2es_v,2),'full');
         
         %%%EES SOC
@@ -384,8 +394,6 @@ if ~isempty(rel_v)
 else
     var_rel.rel_adopt = 0;
     var_rel.rel_prod = zeros(T,1);
-    var_h2es.h2es_chrg = zeros(T,1);
-    var_h2es.h2es_dchrg = zeros(T,1);
     el_eff = zeros(T,1);
 end
 %% Renewable Electrolyze
@@ -444,7 +452,7 @@ if ~isempty(dg_legacy)
     var_ldg.ldg_off = [];
         
     %%%If hydrogen production is an option
-    if ~isempty(el_v)
+    if ~isempty(el_v) || ~isempty(rel_v) || ~isempty(rsoc_v)
         var_ldg.ldg_hfuel = sdpvar(T,size(dg_legacy,2),'full');
     else
         var_ldg.ldg_hfuel = zeros(T,1);
@@ -538,7 +546,7 @@ else
     var_ldg.hr_heat = zeros(T,1);
     var_ldg.db_fire = zeros(T,1);
     var_ldg.db_rfire = zeros(T,1);
-    var_ldg.db_hfire = [];
+    var_ldg.db_hfire = zeros(T,1);
 end
 %% Legacy boiler
 if ~isempty(boil_legacy)
