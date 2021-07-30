@@ -136,7 +136,7 @@ legend('To Load','NEM','To REES','Solar Potential')
 hold off
 
 %% LEgacy Battery Operation
-close all
+%close all
 f5 = figure
 subplot(2,1,1)
 hold on
@@ -180,7 +180,7 @@ co2_emissions = [sum(var_util.import.*co2_import)
  
  %% Biogas use / fuel uses
  
-biogas_utilization = sum(var_ldg.ldg_rfuel  + var_boil.boil_rfuel + var_ldg.db_rfire)/(biogas_limit*(length(endpts)/12))
+biogas_utilization = sum(var_ldg.ldg_rfuel  + var_boil.boil_rfuel + var_ldg.db_rfire)./(biogas_limit*(length(endpts)/12))
 
 gt_fuel_source = sum([var_ldg.ldg_fuel ...
     var_ldg.ldg_rfuel ...
