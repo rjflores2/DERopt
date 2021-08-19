@@ -80,6 +80,14 @@ else
     var_util.midpeak_dc=zeros(midpeak_count,1);
 end
 
+%% General export
+if gen_export_on
+    var_util.gen_export = sdpvar(T,1,'full');
+    Objective =  Objective ...
+         + -sum(var_util.gen_export.*export_price);
+else
+    var_util.gen_export = zeros(T,1);
+end
 
 %% Technologies That Can Be Adopted at Each Building Energy Hub
 %% Solar PV

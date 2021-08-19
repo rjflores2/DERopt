@@ -1,12 +1,37 @@
 %% Loading Utility Info
+%% Current utility rates
+if uci_rate == 1
+    uci_energy_charge = 0.11; %$/kWh
+    dc_nontou = 9.16; %$/kW - facility related demand charge
+    dc_on = 0;
+    dc_mid = 0;
+    
+    import_price = uci_energy_charge.*ones(length(elec),1);
+    if export_on
+        export_price = import_price - 0.02;
+    else
+        export_price = zeros(length(elec),1);
+    end
+    
+elseif uci_rate == 2
+    dc_nontou = 9.16; %$/kW - facility related demand charge
+    import_price = ones(length(elec),1);
+    for ii = 1:length(time)
+        if datetimev(ii,4) >= 16 && datetimev(ii,4) < 21
+            import_price(ii,1) = 0.3;
+        elseif datetimev(ii,4) >= 21 || datetimev(ii,4) < 7
+            import_price(ii,1) = 0.06;
+        else
+            import_price(ii,1) = 0.03;
+        end
+    end
+    if export_on
+        export_price = import_price - 0.02;
+    else
+        export_price = zeros(length(elec),1);
+    end
+end
 
-uci_energy_charge = 0.11; %$/kWh
-dc_nontou = 9.16; %$/kW - facility related demand charge
-dc_on = 0;
-dc_mid = 0;
-
-import_price = uci_energy_charge.*ones(length(elec),1);
-export_price = zeros(length(elec),1);
 
 onpeak_count = 0;
 midpeak_count = 0;

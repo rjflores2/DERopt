@@ -11,6 +11,11 @@ opt_now_yalmip = 0; %YALMIP
 %%%Optimize chiller plant operation
 chiller_plant_opt = 0;
 
+%%%Electric rates for UCI
+%%% 1: current rates
+%%% 2: Simplified TOU Rates
+uci_rate = 1;
+
 %% Dummy Variables
 elec_dump = []; %%%Variable to "dump" electricity
 
@@ -18,18 +23,24 @@ elec_dump = []; %%%Variable to "dump" electricity
 island = 0;
 
 %%%Toggles NEM/Wholesale export (1 = on, 0 = off)
-export_on = 0;
+export_on = 1; %%%Tied to PV and REES export under current utility rates (opt_PV, opt_ees)
+
+%%%General export
+gen_export_on = 1; %%%Placed a "general export" capability in the general electrical energy equality system (opt_gen_equalities)
 
 %% Carbon Related Constraints
 
 %%%Available biogas/renewable gas per year (biogas limit is prorated in the model to the
 %%%simulation period)
+%%%Used in opt_gen_inequalities
 biogas_limit = [];%144E6; %kWh biofuel available per year
 
 %%%Required fuel input
+%%%Used in opt_gen_inequalities
 h2_fuel_forced_fraction = []; %%%Energy fuel requirements
 
 %%%H2 fuel limit in legacy generator
+%%%Used in opt_gen_inequalities
 h2_fuel_limit = [];%0.1; %%%Fuel limit on an energy basis - should be 0.1
 
 %%%CO2 Limit
