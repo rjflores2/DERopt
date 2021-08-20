@@ -24,16 +24,17 @@ export_on = 0;
 
 %%%Available biogas/renewable gas per year (biogas limit is prorated in the model to the
 %%%simulation period)
-biogas_limit = [];%144E6; %kWh biofuel available per year
+biogas_limit = 144E6; %kWh biofuel available per year
 
 %%%Required fuel input
 h2_fuel_forced_fraction = []; %%%Energy fuel requirements
 
 %%%H2 fuel limit in legacy generator
-h2_fuel_limit = [];%0.1; %%%Fuel limit on an energy basis - should be 0.1
+h2_fuel_limit = 0.1;%[];%0.15; %%%Fuel limit on an energy basis - should be 0.1
 
 %%%CO2 Limit
-co2_lim = [];%1.2220e+07*0.5;
+% For a complete year in 2018, CO2 emission is 1.3365E8 lbs.
+co2_lim = 35785283.5020413*(1-80/100);%10735500;%[];%3.5785e+07;%1.2220e+07*0.5;
 %% Turning technologies on/off (opt_var_cf.m and tech_select.m)
 pv_on = 1;        %Turn on PV
 ees_on = 1;       %Turn on EES
@@ -262,3 +263,28 @@ finish = datetime('now') ; totalelapsed = toc(startsim)
 variable_values
 %% System Evaluaiton
 uci_evaluation 
+
+%% Check Simultaneous Charging/Discharging and Fuel/Electricity Production
+% Electrical Energy Storage (EES)
+if (var_ees.ees_adopt > 0)
+    ees_ops = [var_ees.ees_chrg var_ees.ees_dchrg];
+    ees_double_duty = find(ees_ops(:,1) > 0 & ees_ops(:,2) > 0)
+end
+
+% Renewable Electricial Energy Storage (REES)
+if (var_rees.rees_adopt > 0)
+    rees_ops = [var_rees.rees_chrg var_rees.rees_dchrg];
+    rees_double_duty = find(rees_ops(:,1) > 0 & rees_ops(:,2) > 0)
+end
+
+% Hydrogen energy Storage (H2ES)
+if (var_h2es.h2es_adopt > 0)
+    h2es_ops = [var_h2es.h2es_chrg var_h2es.h2es_dchrg];
+    h2es_double_duty = find(h2es_ops(:,1) > 0 & h2es_ops(:,2) > 0)
+end
+
+% Reversible Solid Oxide Cell (RSOC)
+if (var_rsoc.rsoc_adopt > 0)
+    rSOC_ops = [var_rsoc.rsoc_prod var_rsoc.rsoc_elec]; 
+    rsoc_double_duty = find(rSOC_ops(:,1) > 0 & rSOC_ops(:,2) > 0) 
+end

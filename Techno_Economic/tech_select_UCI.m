@@ -130,12 +130,15 @@ h2es_v = [0.00001;0.001;0.001;0.01;1;1;1;0.95;1;1];
 % h2es_v = [];
 
 %% Reversible electroyzer
-%%% (1) Captail Cost ($/kW H2 produced)
+% Source:
+% https://www.hydrogen.energy.gov/pdfs/review20/fc332_wei_2020_o.pdf -
+% Slide 26
+%%% (1) Capital Cost ($/kW H2 produced)
 %%% (2) Variable O&M ($/kWh H2 produced)
 %%% (3) Electrolyzer efficiency (kWh H2/kWh elec)
 %%% (4) Fuel Cell Efficiency (kWh elec/kWh H2)
 %%% (5) Ratio of electrolyzer electricity in to fuel cell capacity (kW electrolyzer input / kW fuel cell output
-rsoc_v = [500*.12/12;0.01;0.7;0.6;1.5];
+rsoc_v = [1120*.12/12;0.02;0.83;0.53;1.816];
 % rsoc_v = [10*.12/12;0.01;1;1;1.5];
 
 %%%Dummy variable for reversible SOC capital cost
@@ -179,7 +182,7 @@ if ~ees_on
 end
 
 
-pv_v = [];
-ees_v = [];
-el_v = [];
-rel_v = [];
+% pv_v = [];
+% ees_v = [];
+% el_v = [];
+% rel_v = [];
