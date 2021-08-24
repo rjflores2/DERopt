@@ -322,7 +322,7 @@ if ~isempty(rsoc_v)
     %%%RSOC Electricity
     var_rsoc.rsoc_elec = sdpvar(T,size(rsoc_v,2),'full');
     %%%rSOC Operational State
-%     var_rsoc.rsoc_op = binvar(T,size(rsoc_v,2),'full');
+    var_rsoc.rsoc_bin = binvar(T,size(rsoc_v,2),'full');
     
     rsoc_elec_eff = rsoc_v(3);
     

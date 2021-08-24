@@ -138,7 +138,9 @@ h2es_v = [0.00001;0.001;0.001;0.01;1;1;1;0.95;1;1];
 %%% (3) Electrolyzer efficiency (kWh H2/kWh elec)
 %%% (4) Fuel Cell Efficiency (kWh elec/kWh H2)
 %%% (5) Ratio of electrolyzer electricity in to fuel cell capacity (kW electrolyzer input / kW fuel cell output
-rsoc_v = [1120*.12/12;0.02;0.83;0.53;1.816];
+%%% (6) Minimum load fraction 
+
+rsoc_v = [1120*.12/12; 0.02; 0.83; 0.53; 1.816; 0.01];
 % rsoc_v = [10*.12/12;0.01;1;1;1.5];
 
 %%%Dummy variable for reversible SOC capital cost
