@@ -6,7 +6,7 @@ var_util.import = value(var_util.import);
 var_util.nontou_dc = value(var_util.nontou_dc);
 var_util.onpeak_dc = value(var_util.onpeak_dc);
 var_util.midpeak_dc = value(var_util.midpeak_dc);
-
+var_util.gen_export = value(var_util.gen_export);
 %% Solar Variables
 var_pv.pv_adopt = value(var_pv.pv_adopt);
 var_pv.pv_elec = value(var_pv.pv_elec);

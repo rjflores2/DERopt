@@ -131,3 +131,6 @@ tes_legacy = [99010; %1
 %%% Cooling loop output (C)
 %%% Building cooling side (C)]
 camp_prop=[200000; 10; 18; 15];
+%% Rewriting campus properties as facility properties
+%%% 1: local max power
+fac_prop = [50000];

@@ -128,3 +128,10 @@ else
     end
 end
 
+%% Loading LMP Data
+load Santiago_LMP_Summary
+%%%Shifting LMP start date around
+vector(:,1) = vector(:,1) -365;
+%%%Extracting LMP Export
+lmp_uci = interp1(vector(:,1),vector(:,2),time)./1000;
+lmp_uci = lmp_uci + (lmp_uci - mean(lmp_uci))*0;

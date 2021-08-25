@@ -83,6 +83,7 @@ end
 %% General export
 if gen_export_on
     var_util.gen_export = sdpvar(T,1,'full');
+    var_util.import_state = binvar(T,1,'full');
     Objective =  Objective ...
          + -sum(var_util.gen_export.*export_price);
 else

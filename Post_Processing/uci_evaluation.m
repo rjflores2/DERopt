@@ -173,15 +173,15 @@ grid on
 set(gcf, 'Position',  [-1500, -150, 1000, 750])
 %% CO2 production
 co2_emissions = [sum(var_util.import.*co2_import)
- co2_ng*(sum(sum(var_ldg.ldg_fuel)) + sum(sum(var_ldg.db_fire)) + sum(sum(var_boil.boil_fuel)))
- co2_rng*(sum(sum(var_ldg.ldg_rfuel)) + sum(sum(var_ldg.db_rfire)) + sum(sum(var_boil.boil_rfuel)))]
- 
- sum(co2_emissions)/3.7401e+07
- 
- %% Biogas use / fuel uses
- 
-biogas_utilization = sum(var_ldg.ldg_rfuel  + var_boil.boil_rfuel + var_ldg.db_rfire)/(biogas_limit*(length(endpts)/12))
+    co2_ng*(sum(sum(var_ldg.ldg_fuel)) + sum(sum(var_ldg.db_fire)) + sum(sum(var_boil.boil_fuel)))
+    co2_rng*(sum(sum(var_ldg.ldg_rfuel)) + sum(sum(var_ldg.db_rfire)) + sum(sum(var_boil.boil_rfuel)))]
 
+sum(co2_emissions)/1.2363e7
+
+%% Biogas use / fuel uses
+if ~isempty(biogas_limit)
+    biogas_utilization = sum(var_ldg.ldg_rfuel  + var_boil.boil_rfuel + var_ldg.db_rfire)/(biogas_limit*(length(endpts)/12))
+end
 gt_fuel_source = sum([var_ldg.ldg_fuel ...
     var_ldg.ldg_rfuel ...
     var_ldg.ldg_hfuel])./sum(sum([var_ldg.ldg_fuel ...
@@ -197,6 +197,7 @@ adopted.rel = var_rel.rel_adopt;
 adopted.h2es = var_h2es.h2es_adopt;
 adopted
 
-
+%% charge/discharge double checl
+db_check.import_export = find(var_util.import > 0 & var_util.gen_export >0)
 %% H2 Energy Balance
 h2_e_balance = [sum(var_el.el_prod,2) sum(var_el.el_prod,2)  sum(var_h2es.h2es_dchrg,2)  sum(var_ldg.ldg_hfuel,2)  sum(var_ldg.db_hfire,2)  sum(var_boil.boil_hfuel,2)  sum(var_h2es.h2es_chrg,2)];

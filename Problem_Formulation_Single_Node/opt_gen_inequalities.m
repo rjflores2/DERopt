@@ -79,6 +79,14 @@ if (strcmp(class(var_pv.pv_nem),'sdpvar') || strcmp(class(var_rees.rees_dchrg_ne
 %     end
 end
 
+%% General import / export limits
+if gen_export_on || export_on
+    Constraints = [Constraints
+        (var_util.gen_export <= (1 - var_util.import_state) .*fac_prop(1)./e_adjust):'General Export Limits'
+        (var_util.import  <= var_util.import_state .*fac_prop(1)./e_adjust):'General Import Limits'];
+%     + var_pv.pv_nem + var_rees.rees_dchrg_nem
+end
+
 %% Gas Turbine Forced Fuel Input Constraint - Hydrogen
 if ~isempty(h2_fuel_forced_fraction) && ~isempty(el_v)
     Constraints = [Constraints

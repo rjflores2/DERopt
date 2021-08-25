@@ -14,7 +14,7 @@ chiller_plant_opt = 0;
 %%%Electric rates for UCI
 %%% 1: current rates
 %%% 2: Simplified TOU Rates
-uci_rate = 1;
+uci_rate = 2;
 
 %% Dummy Variables
 elec_dump = []; %%%Variable to "dump" electricity
@@ -50,7 +50,6 @@ pv_on = 1;        %Turn on PV
 ees_on = 1;       %Turn on EES/REES
 rees_on = 1;  %Turn on REES
 
-
 lpv_on = 1; %Turn on legacy PV
 %% Turning incentives and other financial tools on/off
 sgip_on = 0;
@@ -62,7 +61,7 @@ h2_charging_rec = []; %Required throughput per day
 %%%maxpv is maximum capacity that can be installed. If includes different
 %%%orientations, set maxpv to row vector: for example maxpv =
 %%%[max_north_capacity  max_east/west_capacity  max_flat_capacity  max_south_capacity]
-maxpv = [];% 250000; %%%Maxpv 
+maxpv = [40000];% 250000; %%%Maxpv 
 toolittle_pv = 0; %%% Forces solar PV adoption - value is defined by toolittle_pv value - kW
 curtail = 0; %%%Allows curtailment is = 1
 %% EES (opt_ees.m & opt_rees.m)
@@ -94,6 +93,7 @@ addpath(genpath('H:\_Tools_\DERopt\Post_Processing'))
 addpath(genpath('H:\_Tools_\DERopt\Problem_Formulation_Single_Node'))
 addpath(genpath('H:\_Tools_\DERopt\Techno_Economic'))
 addpath(genpath('H:\_Tools_\DERopt\Utilities'))
+addpath(genpath('H:\_Tools_\DERopt\Data'))
 
 addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Design'))
 addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Input_Data'))
@@ -140,14 +140,14 @@ res_units = 0;
 %% Formatting Building Data
 %%%Values to filter data by
 year_idx = 2018;
-month_idx = [7];
+month_idx = [7 12];
 
 bldg_loader_UCI
 
 %% Utility Data
 %%%Loading Utility Data and Generating Energy Charge Vectors
 utility_UCI
-
+% export_price = export_price*0;
 %%%Placeholder natural gas cost
 ng_cost = 0.5/29.3; %$/kWh --> Converted from $/therm to $/kWh, 29.3 kWh / 1 Therm
 rng_cost = ng_cost*2;
@@ -201,6 +201,12 @@ fprintf('Took %.2f seconds \n', elapsed)
 fprintf('%s: Legacy DG Constraints. ', datestr(now,'HH:MM:SS'))
 tic
 opt_dg_legacy
+elapsed = toc;
+fprintf('Took %.2f seconds \n', elapsed)
+%% Legacy ST Constraints
+fprintf('%s: Legacy ST Constraints. ', datestr(now,'HH:MM:SS'))
+tic
+opt_bot_legacy
 elapsed = toc;
 fprintf('Took %.2f seconds \n', elapsed)
 %% Solar PV Constraints
