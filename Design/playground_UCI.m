@@ -44,7 +44,8 @@ h2_fuel_forced_fraction = []; %%%Energy fuel requirements
 h2_fuel_limit = [];%0.1; %%%Fuel limit on an energy basis - should be 0.1
 
 %%%CO2 Limit
-co2_lim = [];%1.2220e+07*0.5;
+co2_lim = [2.3853e+07*.5];%1.2220e+07*0.5;
+% co2_lim = [ 0*1.2363e+07];%1.2220e+07*0.5;
 %% Turning technologies on/off (opt_var_cf.m and tech_select.m)
 pv_on = 1;        %Turn on PV
 ees_on = 1;       %Turn on EES/REES
@@ -61,7 +62,7 @@ h2_charging_rec = []; %Required throughput per day
 %%%maxpv is maximum capacity that can be installed. If includes different
 %%%orientations, set maxpv to row vector: for example maxpv =
 %%%[max_north_capacity  max_east/west_capacity  max_flat_capacity  max_south_capacity]
-maxpv = [40000];% 250000; %%%Maxpv 
+maxpv = [];% 250000; %%%Maxpv 
 toolittle_pv = 0; %%% Forces solar PV adoption - value is defined by toolittle_pv value - kW
 curtail = 0; %%%Allows curtailment is = 1
 %% EES (opt_ees.m & opt_rees.m)
@@ -141,6 +142,7 @@ res_units = 0;
 %%%Values to filter data by
 year_idx = 2018;
 month_idx = [7 12];
+% month_idx = [7];
 
 bldg_loader_UCI
 

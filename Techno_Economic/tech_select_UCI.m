@@ -105,7 +105,7 @@ end
 el_v = [2100; 0.01; 0.6];
 % el_v = [1; 0.01; .99];
 % el_v = [1; 0.01; .6];
-el_v = [];
+
 %%%Financial Aspects - Electrolyzer
 el_fin = [-0.02; ... %%%Scaling linear factor - Based on CA Roadmap - 2k H2 per day vs. 20k H2 per day
     5; ... %%%MACRS Schedule

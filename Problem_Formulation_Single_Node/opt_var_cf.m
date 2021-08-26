@@ -428,7 +428,7 @@ if ~isempty(dg_legacy)
     var_ldg.ldg_off = [];
         
     %%%If hydrogen production is an option
-    if ~isempty(el_v)
+    if ~isempty(el_v) || ~isempty(rel_v)
         var_ldg.ldg_hfuel = sdpvar(T,size(dg_legacy,2),'full');
     else
         var_ldg.ldg_hfuel = zeros(T,1);
@@ -499,7 +499,7 @@ if ~isempty(dg_legacy) && ~isempty(hr_legacy)
         var_ldg.db_rfire=sdpvar(length(elec),size(db_legacy,2),'full');
         
         %%%If hydrogen production is an option
-        if ~isempty(el_v)
+        if ~isempty(el_v) || ~isempty(rel_v)
             var_ldg.db_hfire = sdpvar(T,size(dg_legacy,2),'full');
         else
             var_ldg.db_hfire = zeros(T,1);
@@ -531,7 +531,7 @@ if ~isempty(boil_legacy)
     var_boil.boil_rfuel = sdpvar(length(elec),size(boil_legacy,2),'full');
     
     %%%If hydrogen production is an option
-    if ~isempty(el_v)
+    if ~isempty(el_v) || ~isempty(rel_v)
         var_boil.boil_hfuel = sdpvar(T,size(dg_legacy,2),'full');
     else
         var_boil.boil_hfuel = zeros(T,1);
