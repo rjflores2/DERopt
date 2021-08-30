@@ -10,15 +10,15 @@ if ~isempty(rsoc_v)
             'rSOC electricity Production'
         (-var_rsoc.rsoc_adopt*(rsoc_v(7)/e_adjust/rsoc_v(5)) <= var_rsoc.rsoc_prod(2:size(var_rsoc.rsoc_prod,1)) - ...
             var_rsoc.rsoc_prod(1:size(var_rsoc.rsoc_prod,1) - 1) <= var_rsoc.rsoc_adopt*(rsoc_v(7)/e_adjust/rsoc_v(5))):...
-            'rSOC hydrogen Production' ];
-    
+            'rSOC hydrogen Production'
+        (var_rsoc.rsoc_elec(:,ii) <= var_rsoc.rsoc_bin(:,ii)*10000):'RSOC Elec Op State'
+        (var_rsoc.rsoc_prod(:,ii) <= (1 - var_rsoc.rsoc_bin(:,ii))*10000):'H2ES Op State'];
     
     %%% START RJF deactivated constraints
     
          %%%%Try running w/out these constraints. If operational state
          %%%%requirements are violated, introduce 'RSOC Elec Op State' & 'H2ES Op State' Only
-%         (var_rsoc.rsoc_elec(:,ii) <= var_rsoc.rsoc_bin(:,ii)*10000):'RSOC Elec Op State'
-%         (var_rsoc.rsoc_prod(:,ii) <= (1 - var_rsoc.rsoc_bin(:,ii))*10000):'H2ES Op State'
+       
 %     
 %         (-(1-var_rsoc.rsoc_bin)*1000 + var_rsoc.rsoc_adopt*rsoc_v(6) <= var_rsoc.rsoc_elec):'rSOC min load elec'
 %         (-var_rsoc.rsoc_bin*1000 + var_rsoc.rsoc_adopt*rsoc_v(6) <= var_rsoc.rsoc_prod):'rSOC min load prod'

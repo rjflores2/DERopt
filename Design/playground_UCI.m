@@ -285,6 +285,8 @@ end
 
 % Reversible Solid Oxide Cell (RSOC)
 if (var_rsoc.rsoc_adopt > 0)
-    rSOC_ops = [var_rsoc.rsoc_prod var_rsoc.rsoc_elec]; 
+    rSOC_ops = [var_rsoc.rsoc_prod var_rsoc.rsoc_elec];    
+   % rsoc_double_duty = find(rSOC_ops(:,1) > 0.01 & rSOC_ops(:,2) > 0.01)
+
     rsoc_double_duty = find(rSOC_ops(:,1) > 0 & rSOC_ops(:,2) > 0) 
 end
