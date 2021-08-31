@@ -44,8 +44,13 @@ h2_fuel_forced_fraction = []; %%%Energy fuel requirements
 h2_fuel_limit = [];%0.1; %%%Fuel limit on an energy basis - should be 0.1
 
 %%%CO2 Limit
-co2_lim = [2.3853e+07*.15];%1.2220e+07*0.5;
+co2_lim = [2.3853e+07*.0];%1.2220e+07*0.5;
 % co2_lim = [ 0*1.2363e+07];%1.2220e+07*0.5;
+co2_lim = [];
+%% Vehicle/transportation demand
+%%%Turning H2 station on/off
+hrs_on = 0;
+
 %% Turning technologies on/off (opt_var_cf.m and tech_select.m)
 pv_on = 1;        %Turn on PV
 ees_on = 1;       %Turn on EES/REES

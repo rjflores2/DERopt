@@ -135,3 +135,18 @@ vector(:,1) = vector(:,1) -365;
 %%%Extracting LMP Export
 lmp_uci = interp1(vector(:,1),vector(:,2),time)./1000;
 lmp_uci = lmp_uci + (lmp_uci - mean(lmp_uci))*0;
+
+%% Loading HRS data
+if hrs_on
+    load hrs_vector
+    
+    hrs_tm = datevec(hrs_vector(:,1));
+    hrs_vector(:,1) = hrs_vector(:,1) + time(1);
+    %%%Updating HRS to the current year
+%     hrs_tm(:,1) = datetimev(1,1);
+%     hrs_vector(:,1) = datenum(hrs_tm);
+    
+    
+    hrs_demand = interp1(hrs_vector(:,1),hrs_vector(:,2),time);
+    
+end

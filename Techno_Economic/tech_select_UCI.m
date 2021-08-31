@@ -138,6 +138,18 @@ rel_fin = [-0.02; ... %%%Scaling linear factor - Based on CA Roadmap - 2k H2 per
     5; ... %%%MACRS Schedule
     1]; ... %%%ITC Benefit
 
+%% H2 Fueling Station - Transportation
+if hrs_on
+    %%%H2 fueling supply equipment
+    %%% (1) Capital Cost ($ installed)
+    %%% (2) Compression efficiency
+    %%% (3) O&M
+    %%% (4) Competing H2 cost ($/kWh
+   hrs_v  = [2000000; .95; 0.01; 10/121*3.6];
+    
+    
+end
+
 %% Building space
 %%%[space available for PV (m^2)
 %%%Cooling loop input (C)

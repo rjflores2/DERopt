@@ -20,6 +20,16 @@ end
 %%% Heat output for elec output - 9
 %%% Zero for heat output per elec output - 10
 %%% Minimum on/off time in minutes - 11
+
+%%%Taurus Coefficients
+f1 = 2.318;
+f2 = 1.1370e+03;
+
+q1 = 1.4027;
+q2 = -35.8337;
+dg_legacy = [0.026; 9000; 5000; 0.01; 0.01; 0.52;f1; f2; q1; q2; 60*24*3];
+
+%%% Titan Cofficients
 f1 = 2.2337;
 f2 = 2.056635913250589e+03;
 

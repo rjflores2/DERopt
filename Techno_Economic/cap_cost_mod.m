@@ -71,6 +71,15 @@ if ~isempty(h2es_v)
     end
 end
 
+
+%%%Hydrogen fueling station
+if hrs_on
+    hrs_mthly_debt = hrs_v(1)*((1-equity)*(interest*(1+interest)^(period*12))...
+        /((1+interest)^(period*12)-1)+...%%%Money to pay back bank
+        req_return_on*(equity)*(required_return*(1+required_return)^(period*12))...
+        /((1+required_return)^(period*12)-1));
+end
+
 %% Calculating cost scalars for various technologies
 %% Solar PV
 if ~isempty(pv_v)

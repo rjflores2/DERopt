@@ -39,6 +39,10 @@ var_h2es.h2es_chrg = value(var_h2es.h2es_chrg);
 var_h2es.h2es_dchrg = value(var_h2es.h2es_dchrg);
 var_h2es.h2es_soc = value(var_h2es.h2es_soc);
 
+%% HRS Station
+var_hrs.hrs_supply_adopt = value(var_hrs.hrs_supply_adopt);
+var_hrs.hrs_tube = value(var_hrs.hrs_tube);
+var_hrs.hrs_supply = value(var_hrs.hrs_supply);
 %% Legacy technologies %%
 %% DG - Topping Cycle
 var_ldg.ldg_elec = value(var_ldg.ldg_elec);

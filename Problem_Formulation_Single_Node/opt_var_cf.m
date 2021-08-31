@@ -373,6 +373,30 @@ else
     var_h2es.h2es_dchrg = zeros(T,1);
     el_eff = zeros(T,1);
 end
+
+%% HRS equipment
+if hrs_on
+    %%%Adopt hrs supply equipment?
+    var_hrs.hrs_supply_adopt = binvar(1,1,'full');
+    
+    %%%HRS Supply from a tube trailer
+    var_hrs.hrs_tube = sdpvar(T,1,'full');
+    
+    %%%HRS Supply from CP H2
+    var_hrs.hrs_supply = sdpvar(T,1,'full');
+    
+    Objective = Objective ...
+        + M*hrs_mthly_debt*var_hrs.hrs_supply_adopt ...
+        + sum(var_hrs.hrs_supply)*hrs_v(3) ...
+        + sum(var_hrs.hrs_tube)*hrs_v(4);
+    
+        hrs_chrg_eff = 1 - hrs_v(2);
+else
+    var_hrs.hrs_supply_adopt = 0;
+    var_hrs.hrs_tube = zeros(T,1);
+    var_hrs.hrs_supply = zeros(T,1);
+    hrs_chrg_eff = 1;
+end
 %% Renewable Electrolyze
 %% Legacy Technologies
 %% Legacy PV
