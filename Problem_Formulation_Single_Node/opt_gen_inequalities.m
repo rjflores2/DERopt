@@ -63,7 +63,8 @@ if utility_exists == 1
 end
 
 %% Net Energy Metering
-if (strcmp(class(var_pv.pv_nem),'sdpvar') || strcmp(class(var_rees.rees_dchrg_nem),'sdpvar')) && strcmp(class(var_pv.pv_nem),'sdpvar') %%%If NEM related decision variables exist
+if export_on
+% if (strcmp(class(var_pv.pv_nem),'sdpvar') || strcmp(class(var_rees.rees_dchrg_nem),'sdpvar')) && strcmp(class(var_pv.pv_nem),'sdpvar') %%%If NEM related decision variables exist
 %     for k=1:K
         %%%Current Utility Rate
         index=find(ismember(rate_labels,rate(1)));
@@ -102,11 +103,13 @@ end
 %% CO2 limit
 if ~isempty(co2_lim)
     Constraints = [Constraints
-       ( sum(var_util.import.*co2_import) ... %%%CO2 from imports
+        ( sum(var_util.import.*co2_import) ... %%%CO2 from imports
         + co2_ng*(sum(sum(var_ldg.ldg_fuel)) + sum(sum(var_ldg.db_fire)) + sum(sum(var_boil.boil_fuel)))... %%%CO2 from NG combustion
-        + co2_rng*(sum(sum(var_ldg.ldg_rfuel)) + sum(sum(var_ldg.db_rfire)) + sum(sum(var_boil.boil_rfuel))) ...
+        + co2_rng*(sum(sum(var_ldg.ldg_rfuel)) + sum(sum(var_ldg.db_rfire)) + sum(sum(var_boil.boil_rfuel))) ... %%%CO2 from rNG combustion
+        + sum(var_pp.pp_elec_export.*co2_import) ...%%%Imports at a power plant
         <= ...
-        co2_lim):'CO2 Limit'];
+        sum(var_pp.pp_elec_import.*co2_import) ...%%%Exports at a power plant
+        + co2_lim):'CO2 Limit'];
 end
 
 %% Renewable biogas limit

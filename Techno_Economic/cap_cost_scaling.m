@@ -50,3 +50,5 @@ cost_scale = npv_cost/tech_v(1);
 if cost_scale < 0
     cost_scale = 0;
 end
+cashflow
+cost_scale

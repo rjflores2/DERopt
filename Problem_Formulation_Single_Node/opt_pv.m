@@ -19,7 +19,7 @@ if ~isempty(pv_v) || (~isempty(pv_legacy) && sum(pv_legacy(2,:)) > 0)
     end
     
     %% Max PV to adopt (capacity constrained)
-    if ~isempty(maxpv)    
+    if ~isempty(maxpv) && ~isempty(pv_v) 
         Constraints = [Constraints
             (var_pv.pv_adopt' <= maxpv'):'Mav PV Capacity'];  
 %         Constraints = [Constraints, (sum(var_pv.pv_adopt) <= maxpv'):'Mav PV Capacity'];

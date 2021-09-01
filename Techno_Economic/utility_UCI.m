@@ -24,7 +24,7 @@ elseif uci_rate == 2
     dc_mid = 0;
     
     import_price = uci_energy_charge.*ones(length(elec),1);
-    if export_on
+    if export_on || gen_export_on
         export_price = lmp_uci;
     else
         export_price = zeros(length(elec),1);
@@ -38,7 +38,7 @@ elseif uci_rate == 3
     dc_mid = 0;
     import_price = lmp_uci + 0.2;
    
-     if export_on
+     if export_on || gen_export_on
         export_price = lmp_uci;
     else
         export_price = zeros(length(elec),1);

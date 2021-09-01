@@ -80,6 +80,28 @@ if hrs_on
         /((1+required_return)^(period*12)-1));
 end
 
+%%%Utility Scale Solar
+if ~isempty(utilpv_v)
+    for ii=1:size(utilpv_v,2)
+        utilpv_mthly_debt(ii,1)=utilpv_v(1,ii)*((1-equity)*(interest*(1+interest)^(period*12))...
+            /((1+interest)^(period*12)-1)+...%%%Money to pay back bank
+            req_return_on*(equity)*(required_return*(1+required_return)^(period*12))...
+            /((1+required_return)^(period*12)-1));
+    end
+end
+
+%%%Utility Battery Storage
+if ~isempty(util_ees_v)
+    for ii=1:size(util_ees_v,2)
+        util_ees_mthly_debt(ii,1)=util_ees_v(1,ii)*((1-equity)*(interest*(1+interest)^(period*12))...
+            /((1+interest)^(period*12)-1)+...%%%Money to pay back bank
+            req_return_on*(equity)*(required_return*(1+required_return)^(period*12))...
+            /((1+required_return)^(period*12)-1));
+    end
+end
+
+
+
 %% Calculating cost scalars for various technologies
 %% Solar PV
 if ~isempty(pv_v)
@@ -132,6 +154,8 @@ if ~isempty(pv_v)
         end
     end
 end
+
+%% Calculating cost scalars for various technologies
 
 %% EES
 if ~isempty(ees_v)
@@ -268,5 +292,107 @@ if ~isempty(rel_v)
         else
         end
         
+    end
+end
+%% Utility Scale Solar PV
+if ~isempty(utilpv_v)
+    utilpv_cap_mod = [];
+    for i = 1:size(elec,2)
+        for ii = 1:size(utilpv_v,2)
+            %%%Applicable tax rate
+            if strcmp(rate{i},'R1')
+                tr = tax_rates(1);
+            else
+                tr = tax_rates(2);
+            end
+            
+            %%% Solar PV Examination
+            %%%Maximum PV estimated by either reaching net zero electrical energy
+            %%%or installing maximum capacity
+           % if ~isempty(maxpv)
+           %     pv_scale_factor = min([sum(elec(:,i)).*(12/length(endpts))./(0.2*8760) maxpv(i)]);
+           % else
+           %     pv_scale_factor = min([sum(elec(:,i))./(0.2*8760)]);
+           % end
+           % if pv_scale_factor > 1000
+           %     pv_scale_factor = 1000;
+           % end
+            
+%             pv_scale_factor = pv_scale_factor.*ones(1,size(pv_v,2));
+            
+            %%%Scaling Factor
+            %%%If is low income
+            if low_income(i) ~= 1
+%                 for ii = 1:length(pv_scale_factor)
+                    %%%Decrease in cost due to scale
+                    utilpv_scale_factor = utilpv_fin(1,ii);
+                    
+                    %%%Adjsuted utilpv Costs
+                    debt =12.*ones(10,1).*(utilpv_v(1,ii))*((1-equity)*(interest*(1+interest)^(period*12))...
+                        /((1+interest)^(period*12)-1)+...%%%Money to pay back bank
+                        req_return_on*(equity)*(required_return*(1+required_return)^(period*12))...
+                        /((1+required_return)^(period*12)-1));
+                    
+                    utilpv_cap_mod(i,ii) = cap_cost_scaling(tr,utilpv_v(:,ii),utilpv_fin(:,ii),utilpv_scale_factor,debt,discount_rate);
+                    
+                    
+%                 end
+                %%%If is low income
+            else
+                utilpv_cap_mod(i,ii) = 1 - somah/utilpv_v(1,ii);
+            end
+            
+        end
+    end
+end
+%% Utility Scale Battery Storage
+if ~isempty(util_ees_v)
+    util_ees_cap_mod = [];
+    for i = 1:size(elec,2)
+        for ii = 1:size(util_ees_v,2)
+            %%%Applicable tax rate
+            if strcmp(rate{i},'R1')
+                tr = tax_rates(1);
+            else
+                tr = tax_rates(2);
+            end
+            
+            %%% Solar PV Examination
+            %%%Maximum PV estimated by either reaching net zero electrical energy
+            %%%or installing maximum capacity
+           % if ~isempty(maxpv)
+           %     pv_scale_factor = min([sum(elec(:,i)).*(12/length(endpts))./(0.2*8760) maxpv(i)]);
+           % else
+           %     pv_scale_factor = min([sum(elec(:,i))./(0.2*8760)]);
+           % end
+           % if pv_scale_factor > 1000
+           %     pv_scale_factor = 1000;
+           % end
+            
+%             pv_scale_factor = pv_scale_factor.*ones(1,size(pv_v,2));
+            
+            %%%Scaling Factor
+            %%%If is low income
+            if low_income(i) ~= 1
+%                 for ii = 1:length(pv_scale_factor)
+                    %%%Decrease in cost due to scale
+                    util_ees_scale_factor = util_ees_fin(1,ii);
+                    
+                    %%%Adjsuted utilpv Costs
+                    debt =12.*ones(10,1).*(util_ees_v(1,ii))*((1-equity)*(interest*(1+interest)^(period*12))...
+                        /((1+interest)^(period*12)-1)+...%%%Money to pay back bank
+                        req_return_on*(equity)*(required_return*(1+required_return)^(period*12))...
+                        /((1+required_return)^(period*12)-1));
+                    
+                    util_ees_cap_mod(i,ii) = cap_cost_scaling(tr,util_ees_v(:,ii),util_ees_fin(:,ii),util_ees_scale_factor,debt,discount_rate);
+                    
+                    
+%                 end
+                %%%If is low income
+            else
+                util_ees_cap_mod(i,ii) = 1 - somah/util_ees_v(1,ii);
+            end
+            
+        end
     end
 end
