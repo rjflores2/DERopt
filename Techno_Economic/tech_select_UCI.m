@@ -202,7 +202,7 @@ if hrs_on
     %%% (2) Compression efficiency
     %%% (3) O&M
     %%% (4) Competing H2 cost ($/kWh
-    hrs_v  = [2000000; .95; 0.01; 10/121*3.6];
+    hrs_v  = [300000000; .95; 0.01; 11/121*3.6];
     
 else
     hrs_v = [];
