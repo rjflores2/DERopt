@@ -13,23 +13,65 @@ chiller_plant_opt = 0;
 
 %% Dummy Variables
 elec_dump = []; %%%Variable to "dump" electricity
+%% Adoptable technologies toggles (opt_var_cf.m and tech_select.m)
+pv_on = 1;        %Turn on PV
+ees_on = 1;       %Turn on EES/REES
+rees_on = 1;  %Turn on REES
+
+%%%Community/Utility Scale systems
+util_solar_on = 1;
+util_ees_on = 1;
+
+%%%Hydrogen technologies
+el_on = 1; %Turn on generic electrolyer
+rel_on = 1; %Turn on renewable tied electrolyzer
+h2es_on = 1; %Hydrogen energy storage
+hrs_on = 0; %Turn on hydrogen fueling station
+
+%% Legacy System Toggles
+lpv_on = 1; %Turn on legacy PV
+lees_on = 1; %Legacy EES
+ltes_on = 1; %Legacy EES
+
+ldg_on = 1; %Turn on legacy GT
+lbot_on = 1; %Turn on legacy bottoming cycle / Steam turbine
+lhr_on = 1; %Legacy HR
+ldb_on = 1; %Legacy Duct Burner
+lboil_on = 1; %Legacy boilers
 
 %% Island operation (opt_nem.m) 
+
+%%%Electric rates for UCI
+%%% 1: current rate, which does not value export
+%%% 2: current import rate + LMP export rate
+%%% 3: LMP Rate + 0.2 and LMP Export
+uci_rate = 3;
+
 island = 0;
 
 %%%Toggles NEM/Wholesale export (1 = on, 0 = off)
-export_on = 0;
+export_on = 0; %%%Tied to PV and REES export under current utility rates (opt_PV, opt_ees)
 
-%% Carbon Related Constraints
+%%%General export
+gen_export_on = 1; %%%Placed a "general export" capability in the general electrical energy equality system (opt_gen_equalities)
+
+%% Carbon Related Toggles
 
 %%%Available biogas/renewable gas per year (biogas limit is prorated in the model to the
 %%%simulation period)
+<<<<<<< HEAD
 biogas_limit = 144E6; %kWh biofuel available per year
+=======
+%%%Used in opt_gen_inequalities
+biogas_limit = [144E6];%144E6; %kWh biofuel available per year
+>>>>>>> master
 
 %%%Required fuel input
+%%%Used in opt_gen_inequalities
 h2_fuel_forced_fraction = []; %%%Energy fuel requirements
 
 %%%H2 fuel limit in legacy generator
+<<<<<<< HEAD
 h2_fuel_limit = 0.1;%[];%0.15; %%%Fuel limit on an energy basis - should be 0.1
 
 %%%CO2 Limit
@@ -41,21 +83,39 @@ ees_on = 1;       %Turn on EES
 rees_on = 1;  %Turn on REES
 
 lpv_on = 1; %Turn on legacy PV
+=======
+%%%Used in opt_gen_inequalities
+h2_fuel_limit = [];%0.1; %%%Fuel limit on an energy basis - should be 0.1
+
+%%%CO2 Limit
+co2_lim = [2.3862e+07*.3];%1.2220e+07*0.5;
+co2_lim = [1.2051e+07*0.6];
+co2_lim = [8.83E+06];
+co2_lim = [2.3862e+07*.3];%1.2220e+07*0.5;
+% co2_lim = [ 0*1.2363e+07];%1.2220e+07*0.5;
+% co2_lim = [];
+
+>>>>>>> master
 %% Turning incentives and other financial tools on/off
 sgip_on = 0;
 
 %% Throughput requirement - DOE H2 Integration
 h2_charging_rec = []; %Required throughput per day
 
+%% Legacy GT Options
+%%%Gas turbine cycling costs
+dg_legacy_cyc = 1;
+
+%%%Shut off legacy generator option
+ldg_off = 0;
 %% PV (opt_pv.m)
 %%%maxpv is maximum capacity that can be installed. If includes different
 %%%orientations, set maxpv to row vector: for example maxpv =
 %%%[max_north_capacity  max_east/west_capacity  max_flat_capacity  max_south_capacity]
-maxpv = [];% 250000; %%%Maxpv 
+maxpv = [30000];% ; %%%Maxpv 
 toolittle_pv = 0; %%% Forces solar PV adoption - value is defined by toolittle_pv value - kW
 curtail = 0; %%%Allows curtailment is = 1
 %% EES (opt_ees.m & opt_rees.m)
-ees_onoff = 0;  %%% Avoid simultaneous Charge and Discharge (xd & xc binaries)
 toolittle_storage = 1; %%%Forces EES adoption - 13.5 kWh
 socc = 0; % SOC constraint: for each individual ees and rees, final SOC >= Initial SOC
 
@@ -63,7 +123,7 @@ socc = 0; % SOC constraint: for each individual ees and rees, final SOC >= Initi
 %%% On/Off Grid Import Limit 
 grid_import_on = 0;
 %%%Limit on grid import power  
-import_limit = .8;
+import_limit = .6;
 
 
 %% Adding paths
@@ -83,6 +143,7 @@ addpath(genpath('H:\_Tools_\DERopt\Post_Processing'))
 addpath(genpath('H:\_Tools_\DERopt\Problem_Formulation_Single_Node'))
 addpath(genpath('H:\_Tools_\DERopt\Techno_Economic'))
 addpath(genpath('H:\_Tools_\DERopt\Utilities'))
+addpath(genpath('H:\_Tools_\DERopt\Data'))
 
 %%% DERopt paths (cyc home computer)
 addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Design'))
@@ -145,14 +206,19 @@ res_units = 0;
 %% Formatting Building Data
 %%%Values to filter data by
 year_idx = 2018;
+<<<<<<< HEAD
 month_idx = [7 8 9];
+=======
+month_idx = [7 12];
+% month_idx = [7];
+>>>>>>> master
 
 bldg_loader_UCI
 
 %% Utility Data
 %%%Loading Utility Data and Generating Energy Charge Vectors
 utility_UCI
-
+% export_price = export_price*0;
 %%%Placeholder natural gas cost
 ng_cost = 0.5/29.3; %$/kWh --> Converted from $/therm to $/kWh, 29.3 kWh / 1 Therm
 rng_cost = ng_cost*2;
@@ -207,6 +273,12 @@ tic
 opt_dg_legacy
 elapsed = toc;
 fprintf('Took %.2f seconds \n', elapsed)
+%% Legacy ST Constraints
+fprintf('%s: Legacy ST Constraints. ', datestr(now,'HH:MM:SS'))
+tic
+opt_bot_legacy
+elapsed = toc;
+fprintf('Took %.2f seconds \n', elapsed)
 %% Solar PV Constraints
 fprintf('%s: PV Constraints.', datestr(now,'HH:MM:SS'))
 tic
@@ -253,6 +325,7 @@ tic
 opt_h2_production
 elapsed = toc;
 fprintf('Took %.2f seconds \n', elapsed)
+<<<<<<< HEAD
 
 %% rSOC Constraints
 fprintf('%s: rSOC Constraints.', datestr(now,'HH:MM:SS'))
@@ -262,6 +335,20 @@ elapsed = toc;
 fprintf('Took %.2f seconds \n',elapsed)
 
 
+=======
+%% Utility Solar
+fprintf('%s: Utility Scale Solar Constraints.', datestr(now,'HH:MM:SS'))
+tic
+opt_utility_pv
+elapsed = toc;
+fprintf('Took %.2f seconds \n', elapsed)
+%% Utility EES Storage
+fprintf('%s: Utility Scale Battery Storage Constraints.', datestr(now,'HH:MM:SS'))
+tic
+opt_utility_ees
+elapsed = toc;
+fprintf('Took %.2f seconds \n', elapsed)
+>>>>>>> master
 %% Optimize
 fprintf('%s: Optimizing \n....', datestr(now,'HH:MM:SS'))
 opt

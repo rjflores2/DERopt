@@ -4,7 +4,8 @@ if ~isempty(el_v) || ~isempty(rel_v) || ~isempty(rsoc_v)
             Constraints = [Constraints
                 (0 <= var_el.el_prod(:,i)  <= var_el.el_adopt(i).*(1/e_adjust)):'Electrolyzer Min/Max Output']; %%%Production is limited by adopted capacity
         end
-    elseif  ~isempty(rel_v)
+    end
+    if  ~isempty(rel_v)
         for i = 1:size(rel_v,2)
             Constraints = [Constraints
                 (0 <= var_rel.rel_prod(:,i)  <= var_rel.rel_adopt(i).*(1/e_adjust)):'Renewable Electrolyzer Min/Max Output']; %%%Production is limited by adopted capacity

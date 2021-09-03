@@ -7,7 +7,7 @@ if ~isempty(pv_v) || (~isempty(pv_legacy) && sum(pv_legacy(2,:)) > 0)
 %         Constraints = [Constraints, (pv_wholesale + pv_elec + pv_nem + rees_chrg <= repmat(solar,1,K).*repmat(pv_adopt,T,1)):'PV Energy Balance'];
     else
          Constraints = [Constraints
-            (var_pv.pv_elec + var_pv.pv_nem + sum(var_rees.rees_chrg,2) + sum(var_rel.rel_prod,2)  == (sum(pv_legacy(2,:))/e_adjust)*solar + (sum(var_pv.pv_adopt))/e_adjust*solar) :'PV Energy Balance'];
+            (var_pv.pv_elec + var_pv.pv_nem + sum(var_rees.rees_chrg,2) + sum(rel_eff.*var_rel.rel_prod,2)  == (sum(pv_legacy(2,:))/e_adjust)*solar + (sum(var_pv.pv_adopt))/e_adjust*solar) :'PV Energy Balance'];
 %         Constraints = [Constraints, (pv_wholesale + pv_elec + pv_nem + rees_chrg == repmat(solar,1,K).*repmat(pv_adopt,T,1)):'PV Energy Balance'];
     end
     %% Min PV to adopt: Forces 3 kW Adopted
@@ -19,7 +19,7 @@ if ~isempty(pv_v) || (~isempty(pv_legacy) && sum(pv_legacy(2,:)) > 0)
     end
     
     %% Max PV to adopt (capacity constrained)
-    if ~isempty(maxpv)    
+    if ~isempty(maxpv) && ~isempty(pv_v) 
         Constraints = [Constraints
             (var_pv.pv_adopt' <= maxpv'):'Mav PV Capacity'];  
 %         Constraints = [Constraints, (sum(var_pv.pv_adopt) <= maxpv'):'Mav PV Capacity'];

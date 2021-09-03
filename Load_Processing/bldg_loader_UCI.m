@@ -74,17 +74,23 @@ solar = interp1(norm_slr(:,1),norm_slr(:,2),time);
 
 %%%Grid emission factors
 grid_co2 = xlsread('grid_co2_factors.xlsx');
-
-% grid_co2(:,1) = grid_co2(:,1) - (grid_co2(1) - year(time(1)));
+yr_shift = 12;
+grid_co2(:,1) = grid_co2(:,1) - yr_shift;
+co2_time = datenum(grid_co2(:,1:6));
+% % grid_co2(:,1) = grid_co2(:,1) - (grid_co2(1) - year(time(1)));
+% % co2_time = datenum(grid_co2(:,1:6));
+% co2_time = [];
+% co2_time(1) = time(1);
+% for ii = 2:size(grid_co2,1)
+%     co2_time(ii,1) = co2_time(ii-1) + 1/24;
+% end
+% 
+% co2_time_vec = datevec(co2_time);
+% co2_time_vec(:,1) = co2_time_vec(:,1) - yr_shift;
 % co2_time = datenum(grid_co2(:,1:6));
-co2_time = [];
-co2_time(1) = time(1);
-for ii = 2:size(grid_co2,1)
-    co2_time(ii,1) = co2_time(ii-1) + 1/24;
-end
-
-%%%Grid emissions
+% %%%Grid emissions
 co2_import = interp1(co2_time,grid_co2(:,7),time)*2.205; %tonne/MWh * 2.205 lb/kWh / tonne/MWh
+co2_import(isnan(co2_import)) = nanmean(co2_import);
 
 %%%CO2 rates for NG combustion
 co2_ng=12.74272*(1/29.3071);%%%(lb CO2/therm methane)*(therm/kWh)
@@ -128,3 +134,44 @@ else
     end
 end
 
+%% Loading LMP Data
+load Santiago_LMP_Summary
+%%%Shifting LMP start date around
+vector(:,1) = vector(:,1) -365;
+%%%Extracting LMP Export
+lmp_uci = interp1(vector(:,1),vector(:,2),time)./1000;
+lmp_uci = lmp_uci + (lmp_uci - mean(lmp_uci))*0;
+
+%% Loading Utility LMP Data and solar profiles
+if util_solar_on
+    load Schindlr_LMP_Summary
+    
+    %%%Shifting LMP start date around
+    vector(:,1) = vector(:,1) -365;
+    %%%Extracting LMP Export
+    lmp_util = interp1(vector(:,1),vector(:,2),time)./1000;
+    lmp_util = lmp_util + (lmp_util - mean(lmp_util))*0;
+    
+    
+    solar_util = xlsread('Five_Points_Tracking.xlsx')./1000;
+    solar_util_tm = datenum([year(time(1)) 1 1 0 0 0]);
+    for ii = 2:8760
+        solar_util_tm(ii,1) = solar_util_tm(ii-1,1) + 1/24;
+    end
+    solar_util = interp1(solar_util_tm,solar_util,time);
+    solar_util(isnan(solar_util)) = 0;
+end
+%% Loading HRS data
+if hrs_on
+    load hrs_vector
+    
+    hrs_tm = datevec(hrs_vector(:,1));
+    hrs_vector(:,1) = hrs_vector(:,1) + time(1);
+    %%%Updating HRS to the current year
+%     hrs_tm(:,1) = datetimev(1,1);
+%     hrs_vector(:,1) = datenum(hrs_tm);
+    
+    
+    hrs_demand = interp1(hrs_vector(:,1),hrs_vector(:,2),time);
+    
+end

@@ -80,6 +80,15 @@ else
     var_util.midpeak_dc=zeros(midpeak_count,1);
 end
 
+%% General export
+if gen_export_on
+    var_util.gen_export = sdpvar(T,1,'full');
+    var_util.import_state = binvar(T,1,'full');
+    Objective =  Objective ...
+         + -sum(var_util.gen_export.*export_price);
+else
+    var_util.gen_export = zeros(T,1);
+end
 
 %% Technologies That Can Be Adopted at Each Building Energy Hub
 %% Solar PV
@@ -185,6 +194,59 @@ else
     var_rees.rees_soc=zeros(T,1);
 end
 toc
+%% Energy products exported from a power plant
+if util_solar_on || util_ees_on
+    var_pp.pp_elec_export = sdpvar(T,1,'full');
+    var_pp.pp_elec_import = sdpvar(T,1,'full');
+    
+    Objective = Objective ...
+        + sum((-lmp_util).*var_pp.pp_elec_export) ...
+        + sum((lmp_util + 0.015).*var_pp.pp_elec_import);
+else
+    var_pp.pp_elec_export = zeros(T,1);
+    var_pp.pp_elec_import = zeros(T,1);
+end
+%% Community Scale Solar
+if ~isempty(utilpv_v)
+    %%% Adopted Utility Scale PV
+    var_utilpv.util_pv_adopt = sdpvar(1,size(utilpv_v,2),'full');
+    %%% Electricity generated and sent to the grid
+    var_utilpv.util_pv_elec = sdpvar(T,size(utilpv_v,2),'full');
+    for ii = 1:size(utilpv_v,2)
+        Objective = Objective ...
+            + sum(M.*utilpv_cap_mod(ii).*utilpv_mthly_debt(ii).*var_utilpv.util_pv_adopt(ii)) ...
+            + sum((utilpv_v(3,ii)).*var_utilpv.util_pv_elec);
+    end
+    
+    
+else
+    var_utilpv.util_pv_adopt = 0;
+    var_utilpv.util_pv_elec = zeros(T,1);
+end
+%% Community Scale Storage
+if ~isempty(util_ees_v)
+    %%%Adopted utility scale EES
+    var_util_ees.ees_adopt = sdpvar(1,size(util_ees_v,2),'full');
+    %%% Adopted EES SOC
+    var_util_ees.ees_soc = sdpvar(T,size(util_ees_v,2),'full');
+    %%% Adopted EES Charging
+    var_util_ees.ees_chrg = sdpvar(T,size(util_ees_v,2),'full');
+    %%% Adopted EES Discharging
+    var_util_ees.ees_dchrg = sdpvar(T,size(util_ees_v,2),'full');
+    
+    for ii = 1:size(util_ees_v,2)
+        Objective = Objective ...
+            + sum(M*util_ees_cap_mod(ii)*util_ees_mthly_debt(ii)*var_util_ees.ees_adopt(ii)) ...
+            + sum( var_util_ees.ees_chrg(:,ii))*util_ees_v(2,ii) ...
+            + sum( var_util_ees.ees_dchrg(:,ii))*util_ees_v(3,ii);
+    end
+    
+else
+    var_util_ees.ees_adopt = 0;
+    var_util_ees.ees_soc = 0;
+    var_util_ees.ees_chrg = zeros(T,1);
+    var_util_ees.ees_dchrg = zeros(T,1);
+end
 %% Electrical Energy Storage
 if isempty(ees_v) == 0
     
@@ -395,6 +457,31 @@ else
     var_rel.rel_adopt = 0;
     var_rel.rel_prod = zeros(T,1);
     el_eff = zeros(T,1);
+rel_eff = 0;
+end
+
+%% HRS equipment
+if hrs_on
+    %%%Adopt hrs supply equipment?
+    var_hrs.hrs_supply_adopt = binvar(1,1,'full');
+    
+    %%%HRS Supply from a tube trailer
+    var_hrs.hrs_tube = sdpvar(T,1,'full');
+    
+    %%%HRS Supply from CP H2
+    var_hrs.hrs_supply = sdpvar(T,1,'full');
+    
+    Objective = Objective ...
+        + M*hrs_mthly_debt*var_hrs.hrs_supply_adopt ...
+        + sum(var_hrs.hrs_supply)*hrs_v(3) ...
+        + sum(var_hrs.hrs_tube)*hrs_v(4);
+    
+        hrs_chrg_eff = 1 - hrs_v(2);
+else
+    var_hrs.hrs_supply_adopt = 0;
+    var_hrs.hrs_tube = zeros(T,1);
+    var_hrs.hrs_supply = zeros(T,1);
+    hrs_chrg_eff = 1;
 end
 %% Renewable Electrolyze
 
@@ -452,7 +539,11 @@ if ~isempty(dg_legacy)
     var_ldg.ldg_off = [];
         
     %%%If hydrogen production is an option
+<<<<<<< HEAD
     if ~isempty(el_v) || ~isempty(rel_v) || ~isempty(rsoc_v)
+=======
+    if ~isempty(el_v) || ~isempty(rel_v)
+>>>>>>> master
         var_ldg.ldg_hfuel = sdpvar(T,size(dg_legacy,2),'full');
     else
         var_ldg.ldg_hfuel = zeros(T,1);
@@ -465,7 +556,6 @@ if ~isempty(dg_legacy)
             + sum(var_ldg.ldg_rfuel(:,ii))*rng_cost;
     end
     
-    
     %%%If including cycling costs
     if ~isempty(dg_legacy_cyc)
         %%%Only consider if on/off behavior is allowed
@@ -474,7 +564,7 @@ if ~isempty(dg_legacy)
         end
         
         %%%Ramping costs
-        if dg_legacy_cyc(2,:) > 0 %%%Only include if cycling costs is nonzero
+        if ~isempty(dg_legacy_cyc) && dg_legacy_cyc(2,:) > 0 %%%Only include if cycling costs is nonzero
             var_ldg.ldg_elec_ramp = sdpvar(T - 1,size(dg_legacy,2),'full');
                         
             Objective=Objective ...
@@ -485,12 +575,23 @@ if ~isempty(dg_legacy)
     else
         var_ldg.ldg_elec_ramp = [];
     end
+    
+    
+    %%%If abandon GT is possible
+    if ldg_off
+        var_ldg.ldg_off = binvar(1,size(dg_legacy,2),'full');
+    else
+        var_ldg.ldg_off = zeros(1,size(dg_legacy,2));
+    end
+        
 else
     var_ldg.ldg_elec = zeros(T,1);
+    var_ldg.ldg_rfuel = zeros(T,1);
     var_ldg.ldg_hfuel = zeros(T,1);
     var_ldg.ldg_fuel = [];
     var_ldg.ldg_off = [];
-    
+    var_ldg.ldg_off = 1;
+    var_ldg.ldg_elec_ramp = [];
 end
 %% Legacy bottoming systems
 %%%Bottoming generator is any electricity producing device that operates
@@ -523,7 +624,7 @@ if ~isempty(dg_legacy) && ~isempty(hr_legacy)
         var_ldg.db_rfire=sdpvar(length(elec),size(db_legacy,2),'full');
         
         %%%If hydrogen production is an option
-        if ~isempty(el_v)
+        if ~isempty(el_v) || ~isempty(rel_v)
             var_ldg.db_hfire = sdpvar(T,size(dg_legacy,2),'full');
         else
             var_ldg.db_hfire = zeros(T,1);
@@ -546,7 +647,11 @@ else
     var_ldg.hr_heat = zeros(T,1);
     var_ldg.db_fire = zeros(T,1);
     var_ldg.db_rfire = zeros(T,1);
+<<<<<<< HEAD
     var_ldg.db_hfire = zeros(T,1);
+=======
+        var_ldg.db_hfire = zeros(T,1);
+>>>>>>> master
 end
 %% Legacy boiler
 if ~isempty(boil_legacy)
@@ -555,8 +660,8 @@ if ~isempty(boil_legacy)
     var_boil.boil_rfuel = sdpvar(length(elec),size(boil_legacy,2),'full');
     
     %%%If hydrogen production is an option
-    if ~isempty(el_v)
-        var_boil.boil_hfuel = sdpvar(T,size(dg_legacy,2),'full');
+    if ~isempty(el_v) || ~isempty(rel_v)
+        var_boil.boil_hfuel = sdpvar(T,size(boil_legacy,2),'full');
     else
         var_boil.boil_hfuel = zeros(T,1);
     end

@@ -6,11 +6,25 @@ var_util.import = value(var_util.import);
 var_util.nontou_dc = value(var_util.nontou_dc);
 var_util.onpeak_dc = value(var_util.onpeak_dc);
 var_util.midpeak_dc = value(var_util.midpeak_dc);
-
+var_util.gen_export = value(var_util.gen_export);
 %% Solar Variables
 var_pv.pv_adopt = value(var_pv.pv_adopt);
 var_pv.pv_elec = value(var_pv.pv_elec);
 var_pv.pv_nem = value(var_pv.pv_nem);
+
+%% Power Plant Energy Trading
+var_pp.pp_elec_export = value(var_pp.pp_elec_export);
+var_pp.pp_elec_import = value(var_pp.pp_elec_import);
+
+%% Utility Solar Variables
+var_utilpv.util_pv_adopt = value(var_utilpv.util_pv_adopt);
+var_utilpv.util_pv_elec = value(var_utilpv.util_pv_elec);
+
+%% Utility Battery Storage
+var_util_ees.ees_adopt = value(var_util_ees.ees_adopt);
+var_util_ees.ees_soc = value(var_util_ees.ees_soc);
+var_util_ees.ees_chrg = value(var_util_ees.ees_chrg);
+var_util_ees.ees_dchrg = value(var_util_ees.ees_dchrg);
 
 %% Renewable Electrical Energy Storage
 var_rees.rees_adopt = value(var_rees.rees_adopt);
@@ -39,11 +53,18 @@ var_h2es.h2es_chrg = value(var_h2es.h2es_chrg);
 var_h2es.h2es_dchrg = value(var_h2es.h2es_dchrg);
 var_h2es.h2es_soc = value(var_h2es.h2es_soc);
 
+<<<<<<< HEAD
 %% Reversible SOC
 var_rsoc.rsoc_adopt = value(var_rsoc.rsoc_adopt);
 var_rsoc.rsoc_prod = value(var_rsoc.rsoc_prod );
 var_rsoc.rsoc_elec = value(var_rsoc.rsoc_elec);
 % var_rsoc.rsoc_op = value(var_rsoc.rsoc_op);
+=======
+%% HRS Station
+var_hrs.hrs_supply_adopt = value(var_hrs.hrs_supply_adopt);
+var_hrs.hrs_tube = value(var_hrs.hrs_tube);
+var_hrs.hrs_supply = value(var_hrs.hrs_supply);
+>>>>>>> master
 %% Legacy technologies %%
 %% DG - Topping Cycle
 var_ldg.ldg_elec = value(var_ldg.ldg_elec);
@@ -51,7 +72,7 @@ var_ldg.ldg_fuel = value(var_ldg.ldg_fuel);
 var_ldg.ldg_rfuel = value(var_ldg.ldg_rfuel);
 var_ldg.ldg_hfuel = value(var_ldg.ldg_hfuel);
 var_ldg.ldg_elec_ramp = value(var_ldg.ldg_elec_ramp);
-
+var_ldg.ldg_off = value(var_ldg.ldg_off);
 %% Bottoming Cycle
 var_lbot.lbot_elec = value(var_lbot.lbot_elec);
 var_lbot.lbot_on = value(var_lbot.lbot_on);
