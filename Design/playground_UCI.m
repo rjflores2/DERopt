@@ -59,43 +59,28 @@ gen_export_on = 1; %%%Placed a "general export" capability in the general electr
 
 %%%Available biogas/renewable gas per year (biogas limit is prorated in the model to the
 %%%simulation period)
-<<<<<<< HEAD
-biogas_limit = 144E6; %kWh biofuel available per year
-=======
 %%%Used in opt_gen_inequalities
 biogas_limit = [144E6];%144E6; %kWh biofuel available per year
->>>>>>> master
 
 %%%Required fuel input
 %%%Used in opt_gen_inequalities
 h2_fuel_forced_fraction = []; %%%Energy fuel requirements
 
 %%%H2 fuel limit in legacy generator
-<<<<<<< HEAD
 h2_fuel_limit = 0.1;%[];%0.15; %%%Fuel limit on an energy basis - should be 0.1
 
 %%%CO2 Limit
 % For a complete year in 2018, CO2 emission is 1.3365E8 lbs.
-co2_lim = 35785283.5020413*(1-80/100);%10735500;%[];%3.5785e+07;%1.2220e+07*0.5;
+% co2_lim = 35785283.5020413*(1-80/100);%10735500;%[];%3.5785e+07;%1.2220e+07*0.5;
 %% Turning technologies on/off (opt_var_cf.m and tech_select.m)
-pv_on = 1;        %Turn on PV
-ees_on = 1;       %Turn on EES
-rees_on = 1;  %Turn on REES
-
-lpv_on = 1; %Turn on legacy PV
-=======
-%%%Used in opt_gen_inequalities
-h2_fuel_limit = [];%0.1; %%%Fuel limit on an energy basis - should be 0.1
-
 %%%CO2 Limit
-co2_lim = [2.3862e+07*.3];%1.2220e+07*0.5;
-co2_lim = [1.2051e+07*0.6];
-co2_lim = [8.83E+06];
+% co2_lim = [2.3862e+07*.3];%1.2220e+07*0.5;
+% co2_lim = [1.2051e+07*0.6];
+% co2_lim = [8.83E+06];
 co2_lim = [2.3862e+07*.3];%1.2220e+07*0.5;
 % co2_lim = [ 0*1.2363e+07];%1.2220e+07*0.5;
 % co2_lim = [];
 
->>>>>>> master
 %% Turning incentives and other financial tools on/off
 sgip_on = 0;
 
@@ -206,12 +191,8 @@ res_units = 0;
 %% Formatting Building Data
 %%%Values to filter data by
 year_idx = 2018;
-<<<<<<< HEAD
-month_idx = [7 8 9];
-=======
 month_idx = [7 12];
 % month_idx = [7];
->>>>>>> master
 
 bldg_loader_UCI
 
@@ -325,7 +306,6 @@ tic
 opt_h2_production
 elapsed = toc;
 fprintf('Took %.2f seconds \n', elapsed)
-<<<<<<< HEAD
 
 %% rSOC Constraints
 fprintf('%s: rSOC Constraints.', datestr(now,'HH:MM:SS'))
@@ -334,8 +314,6 @@ opt_rsoc
 elapsed = toc;
 fprintf('Took %.2f seconds \n',elapsed)
 
-
-=======
 %% Utility Solar
 fprintf('%s: Utility Scale Solar Constraints.', datestr(now,'HH:MM:SS'))
 tic
@@ -348,7 +326,6 @@ tic
 opt_utility_ees
 elapsed = toc;
 fprintf('Took %.2f seconds \n', elapsed)
->>>>>>> master
 %% Optimize
 fprintf('%s: Optimizing \n....', datestr(now,'HH:MM:SS'))
 opt

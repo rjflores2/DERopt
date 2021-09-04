@@ -177,22 +177,6 @@ xlim_range = [737249 737256];
 % set(gcf, 'Position',  [-1500, -150, 1000, 750]);
 %% CO2 production
 co2_emissions = [sum(var_util.import.*co2_import)
-<<<<<<< HEAD
- co2_ng*(sum(sum(var_ldg.ldg_fuel)) + sum(sum(var_ldg.db_fire)) + sum(sum(var_boil.boil_fuel)))
- co2_rng*(sum(sum(var_ldg.ldg_rfuel)) + sum(sum(var_ldg.db_rfire)) + sum(sum(var_boil.boil_rfuel)))];
- 
- sum(co2_emissions)/3.7401e+07;
- 
- %% Biogas use / fuel uses
- 
-% biogas_utilization = sum(var_ldg.ldg_rfuel  + var_boil.boil_rfuel + var_ldg.db_rfire)./(biogas_limit*(length(endpts)/12));
-% 
-% gt_fuel_source = sum([var_ldg.ldg_fuel ...
-%     var_ldg.ldg_rfuel ...
-%     var_ldg.ldg_hfuel])./sum(sum([var_ldg.ldg_fuel ...
-%     var_ldg.ldg_rfuel ...
-%     var_ldg.ldg_hfuel]));
-=======
     co2_ng*(sum(sum(var_ldg.ldg_fuel)) + sum(sum(var_ldg.db_fire)) + sum(sum(var_boil.boil_fuel)))
     co2_rng*(sum(sum(var_ldg.ldg_rfuel)) + sum(sum(var_ldg.db_rfire)) + sum(sum(var_boil.boil_rfuel)))]
 
@@ -207,7 +191,7 @@ gt_fuel_source = sum([var_ldg.ldg_fuel ...
     var_ldg.ldg_hfuel])./sum(sum([var_ldg.ldg_fuel ...
     var_ldg.ldg_rfuel ...
     var_ldg.ldg_hfuel]))
->>>>>>> master
+
 %% Adopted technologies
 
 adopted.pv = var_pv.pv_adopt;
@@ -222,8 +206,7 @@ adopted
 %% charge/discharge double checl
 db_check.import_export = find(var_util.import > 0 & var_util.gen_export >0)
 %% H2 Energy Balance
-<<<<<<< HEAD
-h2_e_balance = [sum(var_el.el_prod,2) sum(var_el.el_prod,2)  sum(var_h2es.h2es_dchrg,2) sum(var_rsoc.rsoc_prod,2) ...
+ h2_e_balance = [sum(var_rel.rel_prod,2) sum(var_el.el_prod,2)  sum(var_h2es.h2es_dchrg,2) sum(var_rsoc.rsoc_prod,2) ...
     sum(var_ldg.ldg_hfuel,2)  sum(var_ldg.db_hfire,2)  sum(var_boil.boil_hfuel,2)  sum(var_h2es.h2es_chrg,2) sum(var_rsoc.rsoc_elec./rsoc_v(4),2)];
 
 %% cyc Plots
@@ -304,6 +287,3 @@ plot(time, var_rsoc.rsoc_prod)
 % a5.XTick = [round(time(1)) + 0.5 :1: round(time(end))-0.5];
 % 
 % set(gcf, 'Position',  [-1500, -150, 1000, 750])
-=======
-h2_e_balance = [sum(var_rel.rel_prod,2) sum(var_el.el_prod,2)  sum(var_h2es.h2es_dchrg,2)  sum(var_ldg.ldg_hfuel,2)  sum(var_ldg.db_hfire,2)  sum(var_boil.boil_hfuel,2)  sum(var_h2es.h2es_chrg,2)];
->>>>>>> master

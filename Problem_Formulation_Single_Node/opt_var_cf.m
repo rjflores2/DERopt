@@ -539,11 +539,7 @@ if ~isempty(dg_legacy)
     var_ldg.ldg_off = [];
         
     %%%If hydrogen production is an option
-<<<<<<< HEAD
     if ~isempty(el_v) || ~isempty(rel_v) || ~isempty(rsoc_v)
-=======
-    if ~isempty(el_v) || ~isempty(rel_v)
->>>>>>> master
         var_ldg.ldg_hfuel = sdpvar(T,size(dg_legacy,2),'full');
     else
         var_ldg.ldg_hfuel = zeros(T,1);
@@ -647,11 +643,7 @@ else
     var_ldg.hr_heat = zeros(T,1);
     var_ldg.db_fire = zeros(T,1);
     var_ldg.db_rfire = zeros(T,1);
-<<<<<<< HEAD
     var_ldg.db_hfire = zeros(T,1);
-=======
-        var_ldg.db_hfire = zeros(T,1);
->>>>>>> master
 end
 %% Legacy boiler
 if ~isempty(boil_legacy)

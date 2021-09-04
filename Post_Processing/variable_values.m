@@ -53,18 +53,17 @@ var_h2es.h2es_chrg = value(var_h2es.h2es_chrg);
 var_h2es.h2es_dchrg = value(var_h2es.h2es_dchrg);
 var_h2es.h2es_soc = value(var_h2es.h2es_soc);
 
-<<<<<<< HEAD
 %% Reversible SOC
 var_rsoc.rsoc_adopt = value(var_rsoc.rsoc_adopt);
 var_rsoc.rsoc_prod = value(var_rsoc.rsoc_prod );
 var_rsoc.rsoc_elec = value(var_rsoc.rsoc_elec);
 % var_rsoc.rsoc_op = value(var_rsoc.rsoc_op);
-=======
+
 %% HRS Station
 var_hrs.hrs_supply_adopt = value(var_hrs.hrs_supply_adopt);
 var_hrs.hrs_tube = value(var_hrs.hrs_tube);
 var_hrs.hrs_supply = value(var_hrs.hrs_supply);
->>>>>>> master
+
 %% Legacy technologies %%
 %% DG - Topping Cycle
 var_ldg.ldg_elec = value(var_ldg.ldg_elec);

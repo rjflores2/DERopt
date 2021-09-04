@@ -1,5 +1,5 @@
 %% Legacy Technologies
-if tblshoot ~= 1
+
 %% Legacy PV
 if lpv_on
     %%%[O&M ($/kWh)  -  1
@@ -140,41 +140,6 @@ else
     ees_legacy = [];
 end
 %% Thermal Energy Storage Vector - Initial charge is inserted later
-<<<<<<< HEAD
-%%%[Capacity (kWh) [1]
-%%% Charge O&M ($/kWh) [2]
-%%% Discharge O&M ($/kWh) [3]
-%%% Minimum state of charge [4]
-%%% Maximum state of charge [5]
-%%% Maximum charge rate (kWh per 15 minute/m^3 storage) [6]
-%%% Maximum discharge rate(kWh per 15 minute/m^3 storage) [7]
-%%% Charging efficiency [8]
-%%% Discharging efficieny [9]
-%%% State of charge holdover [10]
-tes_legacy = [99010; %1
-    0.0005; %2
-    0.0005; %3
-    .05; %4
-    .95; %5
-    .5; %6
-    .5; %7
-    .95; %8
-    .95; %9
-    .999]; %10
-else
-    %% Filling holes
-    pv_legacy=[];
-    dg_legacy = [];
-    bot_legacy = [];
-    hr_legacy = [];
-    db_legacy = [];
-    boil_legacy = [];
-    vc_legacy = [];
-    ees_legacy = [];
-    tes_legacy = [];
-end
-% tes_legacy = [];
-=======
 if ltes_on
     %%%[Capacity (kWh) [1]
     %%% Charge O&M ($/kWh) [2]
@@ -199,7 +164,7 @@ if ltes_on
 else
     tes_legacy = [];
 end
->>>>>>> master
+
 %% Campus Properties
 %%%[Available area for solar
 %%% Cooling loop input (C)

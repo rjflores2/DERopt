@@ -4,33 +4,6 @@
 utility_exists=1;
 
 %% Solar PV
-<<<<<<< HEAD
-%%% Cap cost ($/kW)
-%%% Efficiency / Conversion Percent at 1 kW/m^2
-%%% O&M ($/kWh generated)
-
-%pv_v=[3500; 0.2 ; 0.001];
-
-pv_v=[3000; 0.2 ; 0.001];
-
-
-%%%How pv capital cost is modified for different types of buildings
-pv_cap_mod = [2/2.65 %%%Commercial/industrial
-    2.65/2.65]; %%%Residential
-
-%%%Financial Aspects - Solar PV
-pv_fin = [-0.4648; ... %%%Scaling linear factor - Based on Lazards cost of electricity
-    5; ... %%%MACRS Schedule
-    1]; ... %%%ITC Benefit
-    
-% pv_fin = [-0.4648; ... %%%Scaling linear factor - Based on Lazards cost of electricity
-%     0; ... %%%MACRS Schedule
-%     0]; ... %%%ITC Benefit
-    
-% pv_v = [pv_v pv_v];
-% pv_fin = [pv_fin pv_fin];
-% pv_cap_mod = [pv_cap_mod pv_cap_mod];
-=======
 if pv_on
     %%% Cap cost ($/kW)
     %%% Efficiency / Conversion Percent at 1 kW/m^2
@@ -83,7 +56,6 @@ if util_solar_on
         5; ... %%%MACRS Schedule
         1]; ... %%%ITC Benefit
 else
->>>>>>> master
 
 utilpv_v = [];
 end
@@ -173,57 +145,6 @@ else
     rees_v = [];
 end
 
-<<<<<<< HEAD
-%% Generic Electrolyzer & Hydrogen Storage
-%%% Generic electrolyzer
-%%% (1) Captail Cost ($/kW H2 produced)
-%%% (2) Variable O&M ($/kWh H2 produced)
-%%% (3) Electrolyzer efficiency (kWh H2/kWh elec)
-el_v = [2100; 0.01; 0.6];
-% el_v = [1; 0.01; .99];
-% el_v = [1; 0.01; .6];
-el_v = [];
-%%%Financial Aspects - Electrolyzer
-el_fin = [-0.02; ... %%%Scaling linear factor - Based on CA Roadmap - 2k H2 per day vs. 20k H2 per day
-    5; ... %%%MACRS Schedule
-    1]; ... %%%ITC Benefit
-
-%%%Hydrogen energy storage
-%%% (1) Capital Cost ($/kWh installed)
-%%% (2) Charge O&M ($/kWh charged)
-%%% (3) Discharge O&M ($/kWh discharged)
-%%% (4) Minimum state of charge
-%%% (5) Maximum state of charge
-%%% (6) Maximum charge rate (% Capacity/hr)
-%%% (7) Maximum discharge rate (% Capacity/hr)
-%%% (8) Charging efficiency
-%%% (9) Discharging efficiency
-%%% (10) State of charge holdover
-h2es_v = [20;0.001;0.001;0.01;1;1;1;0.95;1;1];
-h2es_v = [0.00001;0.001;0.001;0.01;1;1;1;0.95;1;1];
-
-% el_v = []
-% h2es_v = [];
-
-%% Reversible electroyzer
-% Source:
-% https://www.hydrogen.energy.gov/pdfs/review20/fc332_wei_2020_o.pdf -
-% Slide 26
-%%% (1) Capital Cost ($/kW H2 produced)
-%%% (2) Variable O&M ($/kWh H2 produced)
-%%% (3) Electrolyzer efficiency (kWh H2/kWh elec)
-%%% (4) Fuel Cell Efficiency (kWh elec/kWh H2)
-%%% (5) Ratio of electrolyzer electricity in to fuel cell capacity (kW electrolyzer input / kW fuel cell output
-%%% (6) Minimum load fraction 
-%%% (7) Ramp Limit
-
-rsoc_v = [1120*.12/12; 0.02; 0.83; 0.53; 1.816; 0.1; 0.1];
-% rsoc_v = [10*.12/12;0.01;1;1;1.5];
-
-%%%Dummy variable for reversible SOC capital cost
-rsoc_mthly_debt = rsoc_v(1);
-
-=======
 %% Generic Electrolyzer
 if el_on
     %%% Generic electrolyzer
@@ -260,7 +181,25 @@ if h2es_on
 else
     h2es_v = [];
 end
->>>>>>> master
+
+%% Reversible electroyzer
+% Source:
+% https://www.hydrogen.energy.gov/pdfs/review20/fc332_wei_2020_o.pdf -
+% Slide 26
+%%% (1) Capital Cost ($/kW H2 produced)
+%%% (2) Variable O&M ($/kWh H2 produced)
+%%% (3) Electrolyzer efficiency (kWh H2/kWh elec)
+%%% (4) Fuel Cell Efficiency (kWh elec/kWh H2)
+%%% (5) Ratio of electrolyzer electricity in to fuel cell capacity (kW electrolyzer input / kW fuel cell output
+%%% (6) Minimum load fraction 
+%%% (7) Ramp Limit
+
+rsoc_v = [1120*.12/12; 0.02; 0.83; 0.53; 1.816; 0.1; 0.1];
+% rsoc_v = [10*.12/12;0.01;1;1;1.5];
+
+%%%Dummy variable for reversible SOC capital cost
+rsoc_mthly_debt = rsoc_v(1);
+
 %% Renewable Electrolyzer (rel)
 if rel_on
     %%% Generic electrolyzer
@@ -318,8 +257,5 @@ end
 % pv_v = [];
 % ees_v = [];
 % el_v = [];
-<<<<<<< HEAD
-=======
 % h2es_v = [];
->>>>>>> master
 % rel_v = [];
