@@ -141,7 +141,8 @@ if isempty(pv_v) == 0
         var_rees.rees_chrg=sdpvar(T,size(ees_v,2),'full');
         %%%REES discharging
         var_rees.rees_dchrg=sdpvar(T,size(ees_v,2),'full');
-        
+        %%% REES Operational State
+        var_rees.rees_bin = binvar(T, size(ees_v,2),'full');
         %%%REES SOC
         var_rees.rees_soc=sdpvar(T,size(ees_v,2),'full');
         %%%REES Cost Functions 
@@ -257,6 +258,8 @@ if isempty(ees_v) == 0
     var_ees.ees_chrg=sdpvar(T,size(ees_v,2),'full');
     %%%EES discharging
     var_ees.ees_dchrg=sdpvar(T,size(ees_v,2),'full');
+    %%%EES operational state
+    var_ees.ees_bin = sdpvar(T,size(ees_v,2),'full');
     %%%EES SOC
     var_ees.ees_soc=sdpvar(T,size(ees_v,2),'full');
     

@@ -17,6 +17,7 @@ elec_dump = []; %%%Variable to "dump" electricity
 pv_on = 1;        %Turn on PV
 ees_on = 1;       %Turn on EES/REES
 rees_on = 1;  %Turn on REES
+rees_op_state = 1; % Turn on REES constraint
 
 %%%Community/Utility Scale systems
 util_solar_on = 1;
@@ -77,7 +78,7 @@ h2_fuel_limit = 0.1;%[];%0.15; %%%Fuel limit on an energy basis - should be 0.1
 % co2_lim = [2.3862e+07*.3];%1.2220e+07*0.5;
 % co2_lim = [1.2051e+07*0.6];
 % co2_lim = [8.83E+06];
-co2_lim = [2.3862e+07*.3];%1.2220e+07*0.5;
+co2_lim = [];%[2.3862e+07*.3];%1.2220e+07*0.5;
 % co2_lim = [ 0*1.2363e+07];%1.2220e+07*0.5;
 % co2_lim = [];
 
