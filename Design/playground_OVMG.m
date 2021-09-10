@@ -43,56 +43,78 @@ addpath(genpath('H:\Matlab_Paths\YALMIP-master'))
 addpath(genpath('C:\Program Files\IBM\ILOG\CPLEX_Studio128\cplex\matlab\x64_win64'))
 
 %%%Source of URBANopt Results
-addpath('H:\_Research_\CEC_OVMG\URBANopt\UO_Results')
-addpath('H:\_Research_\CEC_OVMG\URBANopt')
+addpath('H:\_Research_\CEC_OVMG\URBANopt\UO_Results_0.5.x')
 
 %%%DERopt paths
 addpath(genpath('H:\_Tools_\DERopt'))
 
-%%%Specific project path
-addpath('H:\_Research_\CEC_OVMG\DERopt')
+%%% Building UO Object PAth
+addpath('H:\_Research_\CEC_OVMG\URBANopt\UO_Processing')
 
-%%%SGIP CO2 Signal
-addpath('H:\Data\CPUC_SGIP_Signal')
+%% Loading/seperating building demand
 
-%%%Emission Factors
-addpath('H:\Data\Emission_Factors')
-
-%% Loading building demand
-
+fprintf('%s: Loading UO Data.', datestr(now,'HH:MM:SS'))
+tic
 %%%Loading Data
-dt = load('H:\_Research_\CEC_OVMG\URBANopt\UO_Results\UES_Sc1\Sc1_0_Baseline.mat');
+load('H:\_Research_\CEC_OVMG\URBANopt\UO_Results_0.5.x\0_baseline.mat');
 
-%%%Pulling out load data
-elec = dt.loads_fac;
-gas = dt.gas_fac;
-elec_o = elec;
-% return
-%%
+elapsed = toc;
+fprintf('Took %.2f seconds \n', elapsed)
+
+%% Extracting UO Data
+elec = [];
+gas = [];
+bldg_name = [];
+for ii = 1:length(bldg)
+    elec(:,ii) = bldg(ii).elec_loads.Total;
+    gas(:,ii) = bldg(ii).gas_loads.Total;
+    bldg_name{ii,1} = bldg(ii).name;
+end
+    
 %%%Reading dc_exist and rate info
-[ri_num,ri_txt] = xlsread('bldg_rate_info.xlsx');
+[ri_num,ri_txt] = xlsread('bldg_rate_info_update.xlsx');
 
 dc_exist = ri_num; %%%DC Exist - 1 = yes, 0 = no
 rate = ri_txt(2:end,2); %%%Rate info for each building
 
 %%%Low income properties
-low_income = xlsread('OV_Low_Income_Properties.xlsx');
+[~,low_income_names] = xlsread('OV_Affordable_Housing.xlsx');
 
-%%%Estimating residential units
-res_units = floor(cell2mat(dt.bldg_info(:,6))./1100);
+%%%Low income Building IDs
+low_income_idx = zeros(size(low_income_names));
+%%%Residential Units
+res_units = zeros(length(bldg),1);
+%%%maximum PV Area
+maxpv = zeros(length(bldg),1);
+%%%Low income buildings
+low_income = zeros(length(bldg),1);
 
-for ii = 1:size(dt.bldg_info,1)
-    if not(cellfun('isempty',strfind({'Multifamily (2 to 4 units)'},char(dt.bldg_info(ii,3))))) || ...
-            not(cellfun('isempty',strfind({'Single-Family'},char(dt.bldg_info(ii,3)))))
-        res_units(ii) = res_units(ii);
-    else
-        res_units(ii) = 0;
+
+%%%Is the building residential?
+is_residential = zeros(length(bldg),1);
+
+for ii = 1:length(bldg)
+    %%%Building Index for low income properties
+    if sum(strcmp(bldg(ii).name,low_income_names))
+        low_income_idx(find(strcmp(bldg(ii).name,low_income_names) == 1)) = str2num(bldg(ii).id);
+        low_income(ii) = 1;
     end
+    %%%Residential Units
+    if strcmp(bldg(ii).type,'MFm') || strcmp(bldg(ii).type,'Single-Family Detached') || strcmp(bldg(ii).type,'Residential')
+        if ~isempty(bldg(ii).units)
+            res_units(ii) = bldg(ii).units;
+        else
+            res_units(ii) = round(bldg(ii).footprint/1200);
+        end
+        %%%Building is residential
+        is_residential(ii) = 1;
+    end
+    %%%Maximum Area Available for Solar PV (m^2)
+    maxpv(ii) = bldg(ii).roof_area./10.76; %10.76 ft^2 per m^2
 end
 
-%%% maximum PV
-maxpv = cell2mat(dt.bldg_info(:,4))./10.76*0.2*.7;
 
+%% Reducing scope for testing
 bldg_ind = [306];
 
 % elec = [elec_o(:,bldg_ind)];
@@ -102,18 +124,18 @@ bldg_ind = [306];
 % res_units = res_units(bldg_ind);
 
 bldg_ind = find(res_units==0);
-
-bldg_ind = 1;
-% return
-% bldg_ind = [1:160];
-bldg_name = dt.bldg_info(bldg_ind,:);
-elec = elec(:,bldg_ind);
-elec_o = elec_o(:,bldg_ind);
-dc_exist = dc_exist(bldg_ind);
-rate = rate(bldg_ind);
-low_income = low_income(bldg_ind);
-res_units = res_units(bldg_ind);
-maxpv = maxpv(bldg_ind);
+bldg_ind = [];
+if ~isempty(bldg_ind)
+    % return
+    % bldg_ind = [1:160];
+    elec = elec(:,bldg_ind);
+%     elec_o = elec_o(:,bldg_ind);
+    dc_exist = dc_exist(bldg_ind);
+    rate = rate(bldg_ind);
+    low_income = low_income(bldg_ind);
+    res_units = res_units(bldg_ind);
+    maxpv = maxpv(bldg_ind);
+end
 sgip_pbi = strcmp(rate,'TOU8') + strcmp(rate,'GS1');
 
 % return
@@ -135,7 +157,7 @@ req_return_on = 1;
 
 %%%Capital cost mofificaitons
 cap_cost_mod
-
+return
 %% DERopt
 %% Setting up variables and cost function
 fprintf('%s: Objective Function.', datestr(now,'HH:MM:SS'))

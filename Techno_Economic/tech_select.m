@@ -99,3 +99,8 @@ end
 %% Placeholders
 
 el_v = [];
+rel_v = [];
+h2es_v = [];
+utilpv_v = [];
+util_ees_v = [];
+hrs_on = [];
