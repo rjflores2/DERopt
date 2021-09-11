@@ -11,16 +11,16 @@ if opt_now==1
     ub=inf(size(lb));
     elapsed = toc;
     fprintf('Model Export took %.2f seconds \n', elapsed)
-  
+    
     options = cplexoptimset;
     options.Display='on';
-%     options.MaxTime = 2*3600;
-options.MaxNodes = 100;
-
+    %     options.MaxTime = 2*3600;
+    options.MaxNodes = 100;
+    
     
     fprintf('%s Starting CPLEX Solver \n', datestr(now,'HH:MM:SS'))
     tic
-%     [x, fval, exitflag, output, lambda] = cplexlp(model.f, model.Aineq, model.bineq, model.Aeq, model.beq, lb, ub, [], options);
+    %     [x, fval, exitflag, output, lambda] = cplexlp(model.f, model.Aineq, model.bineq, model.Aeq, model.beq, lb, ub, [], options);
     [x, fval, exitflag, output] = cplexmilp(model.f, model.Aineq, model.bineq, model.Aeq, model.beq, [],[],[],lb,ub,model.ctype,[],options);
     elapsed = toc;
     fprintf('CPLEX took %.2f seconds \n', elapsed)
@@ -39,86 +39,6 @@ options.MaxNodes = 100;
     % Recovering data and assigning to the YALMIP variables
     assign(recover(recoverymodel.used_variables),x)
     
-    
-    %%% evaluating performance of the model
-    %%%Utility values
-    import = value(import);
-%     nontou_dc = value(nontou_dc);
-%     onpeak_dc = value(onpeak_dc);
-%     midpeak_dc = value(midpeak_dc);
-    
-    %%%Solar PV values
-    pv_elec = value(pv_elec);
-    pv_adopt = value(pv_adopt)
-    pv_nem = value(pv_nem);
-%     pv_wholesale = value(pv_wholesale);
-    
-    %%%EES Values
-    ees_adopt = value(ees_adopt);
-    ees_soc = value(ees_soc);
-    ees_chrg = value(ees_chrg);
-    ees_dchrg = value(ees_dchrg);
-    
-    %%%REES Values
-    rees_adopt = value(rees_adopt);
-    rees_soc = value(rees_soc);
-    rees_chrg = value(rees_chrg);
-    rees_dchrg = value(rees_dchrg);
-    rees_dchrg_nem = value(rees_dchrg_nem);
-    
-    %%%SGIP values
-    if exist('sgip_ees_pbi') || isempty(sgip_ees_pbi)
-        sgip_ees_pbi = value(sgip_ees_pbi);
-    else
-        sgip_ees_pbi = [0;0;0];
-    end
-    
-    if exist('sgip_ees_npbi') && ~isempty(sgip_ees_npbi)
-        sgip_ees_npbi = value(sgip_ees_npbi);
-    else
-        sgip_ees_npbi = 0;
-    end
-    
-    if exist('sgip_ees_npbi_equity') && ~isempty(sgip_ees_npbi_equity)
-        sgip_ees_npbi_equity = value(sgip_ees_npbi_equity);
-    else
-        sgip_ees_npbi_equity=0;
-    end
-    
-%     dc_count = 1;
-%     
-%     energy_cost = [];
-%     for i = 1:size(import,2)
-%          %%%Find the applicable utility rate
-%         index=find(ismember(rate_labels,rate(i)));
-%         
-%         energy_cost(i,1) = import(:,i)'*import_price(:,index);
-%         
-%         %%% if demand charges exist
-%         if dc_exist(i) == 1
-%             for ii = 1:length(endpts)
-%                 if ii == 1
-%                     start = 1;
-%                     finish = endpts(ii);
-%                 else
-%                     start = endpts(ii-1) + 1;
-%                     finish = endpts(ii);
-%                 end
-%                 
-%                 check_nontou_dc(ii,dc_count) = max(import(start:finish,i));
-%                 check_onpeak_dc(ii,dc_count) = max(import(start:finish,i).*onpeak_index(start:finish));
-%                 check_midpeak_dc(ii,dc_count) = max(import(start:finish,i).*midpeak_index(start:finish));
-%                 
-% %                 if sum(import(start:finish,i).*onpeak_index(start:finish)) > 0
-% %                     figure
-% %                     plot(import(start:finish,i).*onpeak_index(start:finish))
-% %                 end
-%                 
-%                 
-%             end
-%             dc_count = dc_count + 1;
-%         end
-%     end
 end
 % check_nontou_dc - nontou_dc;
 %% Optimize thru YALMIP

@@ -3,4 +3,4 @@
 %%For each building k, all timesteps t
 %Vectorized
 Constraints = [Constraints
-    (import + pv_elec + ees_dchrg + rees_dchrg + ldg_elec == elec + ees_chrg):'BLDG Electricity Balance'];
+    (var_util.import + var_pv.pv_elec + var_ees.ees_dchrg + var_rees.rees_dchrg == elec + var_ees.ees_chrg):'BLDG Electricity Balance'];

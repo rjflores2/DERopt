@@ -7,6 +7,9 @@ load 'solar_sna.mat'
 %%% Time Step
 t_step = 60;
 
+%%%Demand Charge Adjustment
+e_adjust = 60/t_step;
+
 time = [];
 time = ([2019 1 1 0 0 0]);
 %%%Generating all time steps
@@ -59,10 +62,12 @@ downselection = 1;
 
 %%%If downselecting to representative weeks
 if downselection == 1
-    
+    elec_filtered = [];
+    day_multi_filtered = [];
+    time_filtered = [];
     tic
-%     for bldg_idx = 2:size(elec,2)
-%         bldg_idx
+    %     for bldg_idx = 2:size(elec,2)
+    %         bldg_idx
     parfor bldg_idx = 1:size(elec,2)
         week_load = [];
         time_dwslct = [];

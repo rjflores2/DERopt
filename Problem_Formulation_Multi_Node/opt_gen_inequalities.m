@@ -15,10 +15,10 @@ if utility_exists == 1
             for i=1:length(endpts) %i counts months 
                 if i==1 % for January
                     Constraints=[Constraints
-                        (import(1:endpts(1),ii).*e_adjust <= nontou_dc(i,dc_count)):'Non TOU DC January'];
+                        (var_util.import(1:endpts(1),ii).*e_adjust <= var_util.nontou_dc(i,dc_count)):'Non TOU DC January'];
                 else % for all other months 
                     Constraints=[Constraints
-                        (import(endpts(i-1)+1:endpts(i),ii).*e_adjust <= nontou_dc(i,dc_count)):'Non TOU DC'];
+                        (var_util.import(endpts(i-1)+1:endpts(i),ii).*e_adjust <= var_util.nontou_dc(i,dc_count)):'Non TOU DC'];
                 end
             end
             %% TOU On-Peak & Mid-Peak Demand Chargers
@@ -42,7 +42,7 @@ if utility_exists == 1
                     
                     %%%Setting Cosntraints
                     Constraints=[Constraints
-                        (import(on_index,ii).*e_adjust <= onpeak_dc(on_dc_count,dc_count)):'TOU DC Onpeak'];
+                        (var_util.import(on_index,ii).*e_adjust <= var_util.onpeak_dc(on_dc_count,dc_count)):'TOU DC Onpeak'];
                     
                     %%%Advancing on peak counter
                     on_dc_count = on_dc_count + 1;
@@ -55,7 +55,7 @@ if utility_exists == 1
                     
                     %%%Setting Cosntraints
                     Constraints=[Constraints
-                        (import(mid_index,ii).*e_adjust <= midpeak_dc(mid_dc_count,dc_count)):'TOU DC Midpeak'];
+                        (var_util.import(mid_index,ii).*e_adjust <= var_util.midpeak_dc(mid_dc_count,dc_count)):'TOU DC Midpeak'];
                                         
                     %%%Advancing on peak counter
                     mid_dc_count = mid_dc_count + 1;
@@ -69,17 +69,17 @@ if utility_exists == 1
 end
 
 %% Net Energy Metering
-if strcmp(class(pv_nem),'sdpvar') || strcmp(class(rees_dchrg_nem),'sdpvar') %%%If NEM related decision variables exist
+if strcmp(class(var_pv.pv_nem),'sdpvar') || strcmp(class(var_rees.rees_dchrg_nem),'sdpvar') %%%If NEM related decision variables exist
     for k=1:K
         %%%Current Utility Rate
         index=find(ismember(rate_labels,rate(k)));
         
         Constraints = [Constraints
-            (export_price(:,index)'*(rees_dchrg_nem(:,k)+pv_nem(:,k)) <= import_price(:,index)'*import(:,k)):'NEM Credits < Import Cost'];
+            (export_price(:,index)'*(var_rees.rees_dchrg_nem(:,k) + var_pv.pv_nem(:,k)) <= import_price(:,index)'*var_util.import(:,k)):'NEM Credits < Import Cost'];
         
         
         Constraints = [Constraints
-            (sum(rees_dchrg_nem(:,k)+pv_nem(:,k)) <= sum(import(:,k))):'NEM Energy < Import Energy'];
+            (sum(var_rees.rees_dchrg_nem(:,k) + var_pv.pv_nem(:,k)) <= sum(var_util.import(:,k))):'NEM Energy < Import Energy'];
         
 
     end

@@ -33,6 +33,8 @@ socc = 0; % SOC constraint: for each individual ees and rees, final SOC >= Initi
 grid_import_on = 0;
 %%%Limit on grid import power  
 import_limit = .8;
+%%%Can export back to the grid
+export_on = 1;
 
 
 %% Adding paths
@@ -69,6 +71,8 @@ for ii = 1:length(bldg)
     elec(:,ii) = bldg(ii).elec_loads.Total;
     gas(:,ii) = bldg(ii).gas_loads.Total;
     bldg_name{ii,1} = bldg(ii).name;
+    bldg_id{ii,1} = bldg(ii).id;
+    bldg_type{ii,1} = bldg(ii).type;
 end
     
 %%%Reading dc_exist and rate info
@@ -101,7 +105,7 @@ for ii = 1:length(bldg)
     end
     %%%Residential Units
     if strcmp(bldg(ii).type,'MFm') || strcmp(bldg(ii).type,'Single-Family Detached') || strcmp(bldg(ii).type,'Residential')
-        if ~isempty(bldg(ii).units)
+        if ~isempty(bldg(ii).units) && bldg(ii).units > 0
             res_units(ii) = bldg(ii).units;
         else
             res_units(ii) = round(bldg(ii).footprint/1200);
@@ -124,7 +128,8 @@ bldg_ind = [306];
 % res_units = res_units(bldg_ind);
 
 bldg_ind = find(res_units==0);
-bldg_ind = [];
+bldg_ind = [1];
+bldg_ind = [1 27 92 95 96 97 100 174 204 231 246 282 302 305];
 if ~isempty(bldg_ind)
     % return
     % bldg_ind = [1:160];
@@ -157,7 +162,7 @@ req_return_on = 1;
 
 %%%Capital cost mofificaitons
 cap_cost_mod
-return
+
 %% DERopt
 %% Setting up variables and cost function
 fprintf('%s: Objective Function.', datestr(now,'HH:MM:SS'))
@@ -208,6 +213,8 @@ return
 %% Timer
 finish = datetime('now') ; totalelapsed = toc(startsim)
 
+%% Extract Variables
+variable_values_multi_node
 %% YALMIP Conversions
 import=value(import);
 if sum(dc_exist) > 0

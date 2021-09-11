@@ -98,9 +98,15 @@ end
 
 %% Placeholders
 
+%%%Technologies avaialable at a single node
 el_v = [];
 rel_v = [];
 h2es_v = [];
 utilpv_v = [];
 util_ees_v = [];
 hrs_on = [];
+
+%%%Legacy technologies available at a single node
+pv_legacy = []; 
+dg_legacy = [];
+hr_legacy = [];

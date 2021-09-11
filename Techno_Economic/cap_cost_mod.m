@@ -104,6 +104,7 @@ end
 
 %% Calculating cost scalars for various technologies
 %% Solar PV
+pv_cap_mod = [];
 if ~isempty(pv_v)
     pv_cap_mod = [];
     for i = 1:size(elec,2)
@@ -158,6 +159,8 @@ end
 %% Calculating cost scalars for various technologies
 
 %% EES
+rees_cap_mod = [];
+ees_cap_mod = [];
 if ~isempty(ees_v)
     ees_cap_mod = [];
     for i = 1:size(elec,2)
@@ -190,27 +193,21 @@ if ~isempty(ees_v)
             
             %%%Scaling Factor
             %%%If is low income
-            if ~low_income(i)
-                
-                %%%Decrease in cost due to scale
-                ees_scale_factor = ees_scale_factor*ees_fin(1,ii);
-                
-                %%%Adjsuted PV Costs
-                debt=12.*ones(10,1).*(ees_v(1,ii) + ees_scale_factor)*((1-equity)*(interest*(1+interest)^(period*12))...
-                    /((1+interest)^(period*12)-1)+...%%%Money to pay back bank
-                    req_return_on*(equity)*(required_return*(1+required_return)^(period*12))...
-                    /((1+required_return)^(period*12)-1));
-                
-                ees_cap_mod(i,ii) = cap_cost_scaling(tr,ees_v(:,ii),ees_fin(:,ii),ees_scale_factor,debt,discount_rate);
-                
-                if ~isempty(pv_v) && rees_on == 1
-                    rees_cap_mod(i,ii) = cap_cost_scaling(tr,ees_v(:,ii),rees_fin(:,ii),ees_scale_factor,debt,discount_rate);
-                end
-                
-                %%%If is low income
-            else
-                
+            %%%Decrease in cost due to scale
+            ees_scale_factor = ees_scale_factor*ees_fin(1,ii);
+            
+            %%%Adjsuted PV Costs
+            debt=12.*ones(10,1).*(ees_v(1,ii) + ees_scale_factor)*((1-equity)*(interest*(1+interest)^(period*12))...
+                /((1+interest)^(period*12)-1)+...%%%Money to pay back bank
+                req_return_on*(equity)*(required_return*(1+required_return)^(period*12))...
+                /((1+required_return)^(period*12)-1));
+            
+            ees_cap_mod(i,ii) = cap_cost_scaling(tr,ees_v(:,ii),ees_fin(:,ii),ees_scale_factor,debt,discount_rate);
+            
+            if ~isempty(pv_v) && rees_on == 1
+                rees_cap_mod(i,ii) = cap_cost_scaling(tr,ees_v(:,ii),rees_fin(:,ii),ees_scale_factor,debt,discount_rate);
             end
+            
         end
     end
 end

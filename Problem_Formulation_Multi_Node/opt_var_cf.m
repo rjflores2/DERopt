@@ -1,28 +1,31 @@
 %% Declaring decision variables and setting up cost function
 yalmip('clear')
+clear var_util var_pv var_ees var_rees var_sgip
 Constraints=[];
 
 T = length(time);     %t-th time interval from 1...T
 K = size(elec,2);     %k-kth building from 
 M = length(endpts);   %# of months in the simulation
 
-% Objective = [];
-
 %% Utility Electricity
-if isempty(utility_exists) == 0
+if utility_exists
     %%%Electrical Import Variables
-    import=sdpvar(T,K,'full');
+    var_util.import=sdpvar(T,K,'full');
     
     %%%Demand Charge Variables
     %%%Only creating variables for # of months and number of applicable
     %%%rates, as defined with the binary dc_on input
     if sum(dc_exist)>0
         %%%Non TOU DC
-        nontou_dc=sdpvar(M,sum(dc_exist),'full');
+        var_util.nontou_dc=sdpvar(M,sum(dc_exist),'full');
         
         %%%On Peak/ Mid Peak TOU DC
-        onpeak_dc=sdpvar(onpeak_count,sum(dc_exist),'full');
-        midpeak_dc=sdpvar(midpeak_count,sum(dc_exist),'full');
+        var_util.onpeak_dc=sdpvar(onpeak_count,sum(dc_exist),'full');
+        var_util.midpeak_dc=sdpvar(midpeak_count,sum(dc_exist),'full');
+    else
+        var_util.nontou_dc = 0;
+        var_util.onpeak_dc = 0;
+        var_util.midpeak_dc = 0;
     end
     
     %%% Cost of Imports + Demand Charges
@@ -40,7 +43,7 @@ if isempty(utility_exists) == 0
     end
     
     %%%Import Energy charges
-    Objective = sum(sum(import.*temp_cf));
+    Objective = sum(sum(var_util.import.*temp_cf));
 
     %%%Clearing temporary cost function matrix
     clear temp_cf
@@ -51,9 +54,9 @@ if isempty(utility_exists) == 0
             index=find(ismember(rate_labels,rate(i)));
             
             Objective =  Objective ...
-                + sum(dc_nontou(index)*nontou_dc(:,dc_count))... %%%non TOU DC
-                + sum(dc_on(index)*onpeak_dc(:,dc_count)) ... %%%On Peak DC
-                + sum(dc_mid(index)*midpeak_dc(:,dc_count)); %%%Mid Peak DC
+                + sum(dc_nontou(index)*var_util.nontou_dc(:,dc_count))... %%%non TOU DC
+                + sum(dc_on(index)*var_util.onpeak_dc(:,dc_count)) ... %%%On Peak DC
+                + sum(dc_mid(index)*var_util.midpeak_dc(:,dc_count)); %%%Mid Peak DC
             %%% Utility_import * Demand_charge_rate
             
             %%%Index of DCs
@@ -63,14 +66,14 @@ if isempty(utility_exists) == 0
     
 else
     %%%Electrical Import Variables
-    import=zeros(T,K);
+    var_util.import=zeros(T,K);
     
     %%%Non TOU DC
-    nontou_dc=zeros(M,sum(dc_exist));
+    var_util.nontou_dc=zeros(M,sum(dc_exist));
     
     %%%On Peak/ Mid Peak TOU DC
-    onpeak_dc=zeros(onpeak_count,sum(dc_exist));
-    midpeak_dc=zeros(midpeak_count,sum(dc_exist));
+    var_util.onpeak_dc=zeros(onpeak_count,sum(dc_exist));
+    var_util.midpeak_dc=zeros(midpeak_count,sum(dc_exist));
 end
 
 
@@ -79,16 +82,16 @@ end
 if isempty(pv_v) == 0
     
     %%%PV Generation to meet building demand (kWh)
-    pv_elec = sdpvar(T,K,'full'); %%% PV Production sent to the building
+    var_pv.pv_elec = sdpvar(T,K,'full'); %%% PV Production sent to the building
     
     %%%Size of installed System (kW)
-    pv_adopt= sdpvar(1,K,'full'); %%%PV Size
+    var_pv.pv_adopt= sdpvar(1,K,'full'); %%%PV Size
     
     if island == 0 && export_on == 1  %If grid tied, then include NEM and wholesale export
         
         %%% Variables that exist when grid tied
-        pv_nem = sdpvar(T,K,'full'); %%% PV Production exported w/ NEM
-%         pv_wholesale = sdpvar(T,K,'full'); %%% PV Production exported under NEM rates
+        var_pv.pv_nem = sdpvar(T,K,'full'); %%% PV Production exported w/ NEM
+        %         var_pv.pv_wholesale = sdpvar(T,K,'full'); %%% PV Production exported under NEM rates
         
         %%%PV Export - NEM (kWh)
         temp_cf1 = zeros(size(elec));
@@ -97,55 +100,52 @@ if isempty(pv_v) == 0
             %%%Utility rates for building k
             index=find(ismember(rate_labels,rate(k)));
             
-            %%%Filling in temp cost function arrays 
+            %%%Filling in temp cost function arrays
             temp_cf1(:,k) = -day_multi.*export_price(:,index);
-%             temp_cf2(:,k) = -day_multi.*ex_wholesale;
+            %             temp_cf2(:,k) = -day_multi.*ex_wholesale;
             
         end
-
+        
         %%%Adding values to the cost function
-         Objective = Objective...
-             + sum(sum(temp_cf1.*pv_nem)); %%%NEM Revenue Cost
-%              + sum(sum(temp_cf2.*pv_wholesale)); %%%Wholesale Revenue
-         
-         %%%Clearing temporary variables
-         clear temp_cf1 temp_cf2
+        Objective = Objective...
+            + sum(sum(temp_cf1.*var_pv.pv_nem)); %%%NEM Revenue Cost
+        %              + sum(sum(temp_cf2.*pv_wholesale)); %%%Wholesale Revenue
+        
+        %%%Clearing temporary variables
+        clear temp_cf1 temp_cf2
     else
         pv_nem = [];
     end
     
     %%%PV Cost
-%     mod_val = 0.7
-%     mod_val*pv_cap
-%      mod_val*(pv_v(1)*M*cap_mod.pv - cap_scalar.pv)
     Objective=Objective ...
-        + sum(M*pv_mthly_debt.*pv_cap_mod'.*pv_adopt)... %%%PV Capital Cost ($/kW installed)
-        + pv_v(3)*(sum(sum(repmat(day_multi,1,K).*(pv_elec + pv_nem)))); %%%PV O&M Cost ($/kWh generated)
+        + sum(M*pv_mthly_debt.*pv_cap_mod'.*var_pv.pv_adopt)... %%%PV Capital Cost ($/kW installed)
+        + pv_v(3)*(sum(sum(repmat(day_multi,1,K).*(var_pv.pv_elec + var_pv.pv_nem)))); %%%PV O&M Cost ($/kWh generated)
 %         + pv_v(3)*(sum(sum(repmat(day_multi,1,K).*(pv_elec + pv_nem + pv_wholesale))) ); %%%PV O&M Cost ($/kWh generated)
 
     %%% Allow for adoption of Renewable paired storage when enabled (REES)
     if isempty(ees_v) == 0 && rees_on == 1
         
         %%%Adopted REES Size
-        rees_adopt= sdpvar(1,K,'full');
+        var_rees.rees_adopt= sdpvar(1,K,'full');
         %rees_adopt= semivar(1,K,'full');
         %%%REES Charging
-        rees_chrg=sdpvar(T,K,'full');
+        var_rees.rees_chrg=sdpvar(T,K,'full');
         %%%REES discharging
-        rees_dchrg=sdpvar(T,K,'full');
+        var_rees.rees_dchrg=sdpvar(T,K,'full');
         
         %%%REES SOC
-        rees_soc=sdpvar(T,K,'full');
+        var_rees.rees_soc=sdpvar(T,K,'full');
         %%%REES Cost Functions        
         Objective = Objective...
-            + sum(ees_v(1)*M.*rees_cap_mod'.*rees_adopt) ...%%%Capital Cost
-            + ees_v(2)*sum(sum(repmat(day_multi,1,K).*rees_chrg))... %%%Charging O&M
-            + ees_v(3)*(sum(sum(repmat(day_multi,1,K).*(rees_dchrg))));%%%Discharging O&M
+            + sum(ees_v(1)*M.*rees_cap_mod'.*var_rees.rees_adopt) ...%%%Capital Cost
+            + ees_v(2)*sum(sum(repmat(day_multi,1,K).*var_rees.rees_chrg))... %%%Charging O&M
+            + ees_v(3)*(sum(sum(repmat(day_multi,1,K).*(var_rees.rees_dchrg))));%%%Discharging O&M
         
         if island ~= 1 % If not islanded, AEC can export NEM and wholesale for revenue
             %%%REES NEM Export
             %%%REES discharging to grid
-            rees_dchrg_nem=sdpvar(T,K,'full');
+            var_rees.rees_dchrg_nem=sdpvar(T,K,'full');
             
             %%%Creating temp variables            
             temp_cf = zeros(size(elec));
@@ -159,96 +159,95 @@ if isempty(pv_v) == 0
             end
             %%% Setting objective function
             Objective = Objective...
-                + sum(sum(temp_cf.*rees_dchrg_nem));
+                + sum(sum(temp_cf.*var_rees.rees_dchrg_nem));
             
         else
             rees_dchrg_nem=zeros(T,K);
         end
     else
-        rees_adopt=zeros(1,K);
-        rees_chrg=zeros(T,K);
-        rees_dchrg=zeros(T,K);
-        rees_dchrg_nem=zeros(T,K);
-        rees_soc=zeros(T,K);
+        var_rees.rees_adopt=zeros(1,K);
+        var_rees.rees_chrg=zeros(T,K);
+        var_rees.rees_dchrg=zeros(T,K);
+        var_rees.rees_dchrg_nem=zeros(T,K);
+        var_rees.rees_soc=zeros(T,K);
     end
     
 else
-    pv_adopt=zeros([1 K]);
-    pv_elec=zeros([T K]);
-    pv_nem=zeros([T K]);
-    pv_wholesale=zeros([T K]);
-    rees_adopt=zeros(1,K);
-    rees_chrg=zeros(T,K);
-    rees_dchrg=zeros(T,K);
-    rees_dchrg_nem=zeros(T,K);
-    rees_soc=zeros(T,K);
+    var_pv.pv_adopt=zeros([1 K]);
+    var_pv.pv_elec=zeros([T K]);
+    var_pv.pv_nem=zeros([T K]);
+    var_pv.pv_wholesale=zeros([T K]);
+    var_rees.rees_adopt=zeros(1,K);
+    var_rees.rees_chrg=zeros(T,K);
+    var_rees.rees_dchrg=zeros(T,K);
+    var_rees.rees_dchrg_nem=zeros(T,K);
+    var_rees.rees_soc=zeros(T,K);
 end
 toc
 %% Electrical Energy Storage
 if isempty(ees_v) == 0
     
     %%%Adopted EES Size
-    ees_adopt= sdpvar(1,K,'full');
+    var_ees.ees_adopt= sdpvar(1,K,'full');
     %ees_adopt = semivar(1,K,'full');
     %%%EES Charging
-    ees_chrg=sdpvar(T,K,'full');
+    var_ees.ees_chrg=sdpvar(T,K,'full');
     %%%EES discharging
-    ees_dchrg=sdpvar(T,K,'full');
+    var_ees.ees_dchrg=sdpvar(T,K,'full');
     %%%EES SOC
-    ees_soc=sdpvar(T,K,'full');
+    var_ees.ees_soc=sdpvar(T,K,'full');
     
     %%%EES Cost Functions
     Objective = Objective...
-        + sum(ees_v(1)*M.*ees_cap_mod'.*ees_adopt) ...%%%Capital Cost
-        + ees_v(2)*sum(sum(repmat(day_multi,1,K).*ees_chrg)) ...%%%Charging O&M
-        + ees_v(3)*sum(sum(repmat(day_multi,1,K).*ees_dchrg));%%%Discharging O&M
+        + sum(ees_v(1)*M.*ees_cap_mod'.* var_ees.ees_adopt) ...%%%Capital Cost
+        + ees_v(2)*sum(sum(repmat(day_multi,1,K).* var_ees.ees_chrg)) ...%%%Charging O&M
+        + ees_v(3)*sum(sum(repmat(day_multi,1,K).* var_ees.ees_dchrg));%%%Discharging O&M
     
     %%%SGIP rates
     if sgip_on
         %%%Residential Credits
-        sgip_ees_npbi = sdpvar(1,sum((res_units>0).*(~low_income>0)),'full');
+        var_sgip.sgip_ees_npbi = sdpvar(1,sum((res_units>0).*(~low_income>0)),'full');
         %%%Residential Equity Credits
-        sgip_ees_npbi_equity = sdpvar(1,sum(low_income>0),'full');
+        var_sgip.sgip_ees_npbi_equity = sdpvar(1,sum(low_income>0),'full');
         
         Objective = Objective ...
-            - sum(sgip(3)*M*sgip_ees_npbi) ...
-            - sum(sgip(4)*M*sgip_ees_npbi_equity);
+            - sum(sgip(3)*M*var_sgip.sgip_ees_npbi) ...
+            - sum(sgip(4)*M*var_sgip.sgip_ees_npbi_equity);
         
         if sum(sgip_pbi)>0
             %%% Performance based incentives
-            sgip_ees_pbi = sdpvar(3,sum(sgip_pbi),'full');
+            var_sgip.sgip_ees_pbi = sdpvar(3,sum(sgip_pbi),'full');
             
             Objective = Objective ...
-                - sum(sgip(2)*M*sgip_ees_pbi(1,:)) ...
-                - sum(sgip(2)*0.5*M*sgip_ees_pbi(2,:)) ...
-                - sum(sgip(2)*0.25*M*sgip_ees_pbi(3,:));
+                - sum(sgip(2)*M*var_sgip.sgip_ees_pbi(1,:)) ...
+                - sum(sgip(2)*0.5*M*var_sgip.sgip_ees_pbi(2,:)) ...
+                - sum(sgip(2)*0.25*M*var_sgip.sgip_ees_pbi(3,:));
         else
-            sgip_ees_pbi = zeros(3,1);
+            var_sgip.sgip_ees_pbi = zeros(3,1);
         end
     else
-        sgip_ees_pbi = zeros(3,1);
-        sgip_ees_npbi = 0;
-        sgip_ees_npbi_equity = 0;
+        var_sgip.sgip_ees_pbi = zeros(3,1);
+        var_sgip.sgip_ees_npbi = 0;
+        var_sgip.sgip_ees_npbi_equity = 0;
     end
     
 else
-    ees_adopt=zeros(1,K);
-    ees_soc=zeros(T,K);
-    ees_chrg=zeros(T,K);
-    ees_dchrg=zeros(T,K);
+    var_ees.ees_adopt=zeros(1,K);
+    var_ees.ees_soc=zeros(T,K);
+    var_ees.ees_chrg=zeros(T,K);
+    var_ees.ees_dchrg=zeros(T,K);
 end
 toc
 
 %% Legacy Technologies
 %% Generic DG
-
 %% Legacy PV
 %%%Only need to add variables if new PV is not considered
 if isempty(pv_legacy) == 0 && isempty(pv_v) == 1
     
     if island == 0 && export_on == 1 %If grid tied, then include NEM and wholesale export
         %%% Variables that exist when grid tied
-        pv_nem = sdpvar(T,K,'full'); %%% PV Production exported w/ NEM
+        var_pv.pv_nem = sdpvar(T,K,'full'); %%% PV Production exported w/ NEM
         for k = 1:K
             %%%Utility rates for building k
             index=find(ismember(rate_labels,rate(k)));
@@ -258,69 +257,17 @@ if isempty(pv_legacy) == 0 && isempty(pv_v) == 1
                 + sum(sum(-day_multi.*export_price(:,index).*pv_nem)); %%%NEM Revenue Cost
         end
     else
-        pv_nem = [];
+        var_pv.pv_nem = [];
     end
     
     %%%PV Generation to meet building demand (kWh)
-    pv_elec = sdpvar(T,K,'full'); %%% PV Production sent to the building
+    var_pv.pv_elec = sdpvar(T,K,'full'); %%% PV Production sent to the building
     
     %%%Operating Costs
     Objective=Objective ...
-        + pv_v(3)*(sum(sum(repmat(day_multi,1,K).*(pv_elec + pv_nem))));
+        + pv_v(3)*(sum(sum(repmat(day_multi,1,K).*(var_pv.pv_elec + var_pv.pv_nem))));
     
 elseif isempty(pv_legacy) == 1
     %%%If Legacy PV does not exist, then make the existing pv value zero
     pv_legacy = zeros(2,K);
-end
-
-%% Legacy DG
-if ~isempty(dg_legacy)
-    %%%DG Electrical Output
-    ldg_elec = sdpvar(T,K,'full');
-    %%%DG Fuel Input
-    ldg_fuel = sdpvar(T,K,'full');
-    %%%DG Fuel Input
-    ldg_rfuel = sdpvar(T,K,'full');
-    %%%DG On/Off State - Number of variables is equal to:
-    %%% (Time Instances) / On/Off length
-    %     (dg_legacy(end,i)/t_step)
-    %     ldg_off=binvar(ceil(length(time)/(dg_legacy(end,i)/t_step)),K,'full');
-    
-    for ii = 1:K
-        Objective=Objective ...
-            + sum(ldg_elec(:,ii))*dg_legacy(1,ii) ...
-            + sum(ldg_fuel(:,ii))*ng_cost ...
-            + sum(ldg_rfuel(:,ii))*ng_cost;
-    end
-else
-    ldg_elec = [];
-    ldg_fuel = [];
-    ldg_off = [];
-    
-end
-
-%% Legacy Heat recovery
-if ~isempty(dg_legacy) && ~isempty(hr_legacy)
-    %%%Heat recovery output
-    hr_heat=sdpvar(length(elec),1,'full');
-    
-    %%%If duct burner or HR heating source is available
-    if ~isempty(db_legacy)
-        %%%Duct burner - Conventional
-        db_fire=sdpvar(length(elec),1,'full');
-        %%%Duct burner - Renewable
-        db_rfire=sdpvar(length(elec),1,'full');
-        
-        %%%Duct burner and renewable duct burner
-        Objective=Objective+db_fire'*((db(1)+ng_cost)*ones(length(time),1))+...
-            db_rfire'*((db(1)+rng_cost)*ones(length(time),1));
-    else
-        db_fire = [];
-        db_rfire = [];
-    end
-    
-else
-    hr_heat = [];
-    db_fire = [];
-    db_rfire = [];
 end
