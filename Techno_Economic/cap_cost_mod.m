@@ -100,7 +100,30 @@ if ~isempty(util_ees_v)
     end
 end
 
-
+%% Converting incentives to reductions in debt payments
+if ~isempty(sgip)
+    
+    %%%Adjsut SGIP benefits if they are larger than the capital cost
+    sgip(sgip(1:4) > ees_v(1)) = ees_v(1);
+    
+    %%%Large storage benefit
+     sgip_mthly_benefit(1)=sgip(2)*((1-equity)*(interest*(1+interest)^(period*12))...
+            /((1+interest)^(period*12)-1)+...%%%Money to pay back bank
+            req_return_on*(equity)*(required_return*(1+required_return)^(period*12))...
+            /((1+required_return)^(period*12)-1));        
+        
+    %%%Residential storage benefit
+     sgip_mthly_benefit(2)=sgip(3)*((1-equity)*(interest*(1+interest)^(period*12))...
+            /((1+interest)^(period*12)-1)+...%%%Money to pay back bank
+            req_return_on*(equity)*(required_return*(1+required_return)^(period*12))...
+            /((1+required_return)^(period*12)-1));        
+        
+    %%% Equity storage benefit
+     sgip_mthly_benefit(3)=sgip(4)*((1-equity)*(interest*(1+interest)^(period*12))...
+            /((1+interest)^(period*12)-1)+...%%%Money to pay back bank
+            req_return_on*(equity)*(required_return*(1+required_return)^(period*12))...
+            /((1+required_return)^(period*12)-1));
+end
 
 %% Calculating cost scalars for various technologies
 %% Solar PV

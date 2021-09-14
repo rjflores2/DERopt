@@ -138,7 +138,7 @@ if isempty(pv_v) == 0
         var_rees.rees_soc=sdpvar(T,K,'full');
         %%%REES Cost Functions        
         Objective = Objective...
-            + sum(ees_v(1)*M.*rees_cap_mod'.*var_rees.rees_adopt) ...%%%Capital Cost
+            + sum(rees_mthly_debt*M.*rees_cap_mod'.*var_rees.rees_adopt) ...%%%Capital Cost
             + ees_v(2)*sum(sum(repmat(day_multi,1,K).*var_rees.rees_chrg))... %%%Charging O&M
             + ees_v(3)*(sum(sum(repmat(day_multi,1,K).*(var_rees.rees_dchrg))));%%%Discharging O&M
         
@@ -162,7 +162,7 @@ if isempty(pv_v) == 0
                 + sum(sum(temp_cf.*var_rees.rees_dchrg_nem));
             
         else
-            rees_dchrg_nem=zeros(T,K);
+             var_rees.rees_dchrg_nem=zeros(T,K);
         end
     else
         var_rees.rees_adopt=zeros(1,K);
@@ -199,7 +199,7 @@ if isempty(ees_v) == 0
     
     %%%EES Cost Functions
     Objective = Objective...
-        + sum(ees_v(1)*M.*ees_cap_mod'.* var_ees.ees_adopt) ...%%%Capital Cost
+        + sum(ees_mthly_debt*M.*ees_cap_mod'.* var_ees.ees_adopt) ...%%%Capital Cost
         + ees_v(2)*sum(sum(repmat(day_multi,1,K).* var_ees.ees_chrg)) ...%%%Charging O&M
         + ees_v(3)*sum(sum(repmat(day_multi,1,K).* var_ees.ees_dchrg));%%%Discharging O&M
     
@@ -211,17 +211,17 @@ if isempty(ees_v) == 0
         var_sgip.sgip_ees_npbi_equity = sdpvar(1,sum(low_income>0),'full');
         
         Objective = Objective ...
-            - sum(sgip(3)*M*var_sgip.sgip_ees_npbi) ...
-            - sum(sgip(4)*M*var_sgip.sgip_ees_npbi_equity);
+            - sum(sgip_mthly_benefit(2)*M*var_sgip.sgip_ees_npbi) ...
+            - sum(sgip_mthly_benefit(3)*M*var_sgip.sgip_ees_npbi_equity);
         
         if sum(sgip_pbi)>0
             %%% Performance based incentives
             var_sgip.sgip_ees_pbi = sdpvar(3,sum(sgip_pbi),'full');
             
             Objective = Objective ...
-                - sum(sgip(2)*M*var_sgip.sgip_ees_pbi(1,:)) ...
-                - sum(sgip(2)*0.5*M*var_sgip.sgip_ees_pbi(2,:)) ...
-                - sum(sgip(2)*0.25*M*var_sgip.sgip_ees_pbi(3,:));
+                - sum(sgip_mthly_benefit(1)*M*var_sgip.sgip_ees_pbi(1,:)) ...
+                - sum(sgip_mthly_benefit(1)*0.5*M*var_sgip.sgip_ees_pbi(2,:)) ...
+                - sum(sgip_mthly_benefit(1)*0.25*M*var_sgip.sgip_ees_pbi(3,:));
         else
             var_sgip.sgip_ees_pbi = zeros(3,1);
         end
@@ -236,6 +236,9 @@ else
     var_ees.ees_soc=zeros(T,K);
     var_ees.ees_chrg=zeros(T,K);
     var_ees.ees_dchrg=zeros(T,K);
+    var_sgip.sgip_ees_pbi = zeros(3,1);
+    var_sgip.sgip_ees_npbi = 0;
+    var_sgip.sgip_ees_npbi_equity = 0;
 end
 toc
 
@@ -248,14 +251,22 @@ if isempty(pv_legacy) == 0 && isempty(pv_v) == 1
     if island == 0 && export_on == 1 %If grid tied, then include NEM and wholesale export
         %%% Variables that exist when grid tied
         var_pv.pv_nem = sdpvar(T,K,'full'); %%% PV Production exported w/ NEM
+        %%%PV Export - NEM (kWh)
+        temp_cf1 = zeros(size(elec));
+        tempc_f2 = zeros(size(elec));
         for k = 1:K
             %%%Utility rates for building k
             index=find(ismember(rate_labels,rate(k)));
             
-            %%%Adding values to the cost function
-            Objective = Objective...
-                + sum(sum(-day_multi.*export_price(:,index).*pv_nem)); %%%NEM Revenue Cost
+            %%%Filling in temp cost function arrays
+            temp_cf1(:,k) = -day_multi.*export_price(:,index);
+            %             temp_cf2(:,k) = -day_multi.*ex_wholesale;
+            
         end
+       %%%Adding values to the cost function
+        Objective = Objective...
+            + sum(sum(temp_cf1.*var_pv.pv_nem)); %%%NEM Revenue Cost
+         clear temp_cf1 temp_cf2
     else
         var_pv.pv_nem = [];
     end
@@ -265,9 +276,77 @@ if isempty(pv_legacy) == 0 && isempty(pv_v) == 1
     
     %%%Operating Costs
     Objective=Objective ...
-        + pv_v(3)*(sum(sum(repmat(day_multi,1,K).*(var_pv.pv_elec + var_pv.pv_nem))));
+        + pv_legacy(1)*(sum(sum(repmat(day_multi,1,K).*(var_pv.pv_elec + var_pv.pv_nem))));
     
-elseif isempty(pv_legacy) == 1
-    %%%If Legacy PV does not exist, then make the existing pv value zero
-    pv_legacy = zeros(2,K);
+end
+
+%% Legacy EES
+if lees_on
+    
+    %ees_adopt = semivar(1,K,'full');
+    %%%EES Charging
+    var_lees.ees_chrg = sdpvar(T,K,'full');
+    %%%EES discharging
+    var_lees.ees_dchrg = sdpvar(T,K,'full');
+    %%%EES SOC
+    var_lees.ees_soc = sdpvar(T,K,'full');
+    
+    %%%EES Cost Functions
+    Objective = Objective...
+        + ees_legacy(1)*sum(sum(repmat(day_multi,1,K).* var_lees.ees_chrg)) ...%%%Charging O&M
+        + ees_legacy(2)*sum(sum(repmat(day_multi,1,K).* var_lees.ees_dchrg));%%%Discharging O&M
+    
+else
+    
+    var_lees.ees_soc=zeros(T,K);
+    var_lees.ees_chrg=zeros(T,K);
+    var_lees.ees_dchrg=zeros(T,K);
+end
+
+%% Legacy REES
+if lrees_on
+    
+    %ees_adopt = semivar(1,K,'full');
+    %%%EES Charging
+    var_lrees.rees_chrg = sdpvar(T,K,'full');
+    %%%EES discharging
+    var_lrees.rees_dchrg = sdpvar(T,K,'full');
+    %%%EES SOC
+    var_lrees.rees_soc = sdpvar(T,K,'full');
+    
+    %%%EES Cost Functions
+    Objective = Objective...
+        + rees_legacy(1)*sum(sum(repmat(day_multi,1,K).* var_lrees.rees_chrg)) ...%%%Charging O&M
+        + rees_legacy(2)*sum(sum(repmat(day_multi,1,K).* var_lrees.rees_dchrg));%%%Discharging O&M
+    
+    
+    if island ~= 1 % If not islanded, AEC can export NEM and wholesale for revenue
+        %%%REES NEM Export
+        %%%REES discharging to grid
+        var_lrees.rees_dchrg_nem = sdpvar(T,K,'full');
+        
+        %%%Creating temp variables
+        temp_cf = zeros(size(elec));
+        
+        for k = 1:K
+            %%%Applicable utility rate
+            index=find(ismember(rate_labels,rate(k)));
+            
+            temp_cf(:,k) = day_multi.*(rees_legacy(2) - export_price(:,index));
+            
+        end
+        %%% Setting objective function
+        Objective = Objective...
+            + sum(sum(temp_cf.*var_lrees.rees_dchrg_nem));
+        
+    else
+        var_lrees.rees_dchrg_nem = zeros(T,K);
+    end
+    
+else
+    
+    var_lrees.rees_soc=zeros(T,K);
+    var_lrees.rees_chrg=zeros(T,K);
+    var_lrees.rees_dchrg=zeros(T,K);
+    var_lrees.rees_dchrg_nem=zeros(T,K);
 end

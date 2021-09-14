@@ -16,8 +16,16 @@ pv_on = 1;        %Turn on PV
 ees_on = 1;       %Turn on EES/REES
 rees_on = 1;  %Turn on REES
 
+%% Legacy technologies
+lpv_on = 0;
+lees_on = 0;
+lrees_on = 0;
+
+%% Downselection of building energy data?
+downselection = 0;
+
 %% Turning incentives and other financial tools on/off
-sgip_on = 1;
+sgip_on = 0;
 
 %% PV (opt_pv.m)
 pv_maxarea = 1; %%% Limits maximum PV size, based on initially solar PV panel
@@ -160,6 +168,9 @@ req_return_on = 1;
 %%%Technology Capital Costs
 % tech_payment
 
+%%%Exsiting Technologies 
+tech_legacy_OVMG
+
 %%%Capital cost mofificaitons
 cap_cost_mod
 
@@ -206,70 +217,41 @@ opt_incentives
 elapsed = toc;
 fprintf('Took %.2f seconds \n', elapsed)
 
+%% Legacy Storage Technologies
+fprintf('%s: Legacy EES/REES Constraints.', datestr(now,'HH:MM:SS'))
+tic
+opt_legacy_ees
+elapsed = toc;
+fprintf('Took %.2f seconds \n', elapsed)
 %% Optimize
 fprintf('%s: Optimizing \n....', datestr(now,'HH:MM:SS'))
 opt
-return
+
 %% Timer
 finish = datetime('now') ; totalelapsed = toc(startsim)
 
 %% Extract Variables
 variable_values_multi_node
-%% YALMIP Conversions
-import=value(import);
-if sum(dc_exist) > 0
-    onpeak_dc=value(onpeak_dc);
-    midpeak_dc=value(midpeak_dc);
-    nontou_dc=value(nontou_dc);
+
+%%
+clc
+for ii = 11%:size(elec,2)
+    adopted_tech = round([var_pv.pv_adopt(ii) var_ees.ees_adopt(ii) + var_rees.rees_adopt(ii)],1);
+    operatons = [];
+    operatons = [elec(:,ii) ...
+        var_util.import(:,ii) ...
+        var_pv.pv_elec(:,ii) ...
+        var_pv.pv_nem(:,ii)...
+        var_ees.ees_chrg(:,ii)+var_rees.rees_chrg(:,ii)...
+        var_ees.ees_dchrg(:,ii)+var_rees.rees_dchrg(:,ii)...
+        var_rees.rees_dchrg_nem(:,ii) ...
+        var_ees.ees_soc(:,ii) + var_rees.rees_soc(:,ii)];
+        
+    
 end
 
-if isempty(pv_v) == 0
-    pv_adopt=value(pv_adopt);
-    pv_elec=value(pv_elec);
-    pv_nem = value(pv_nem);
-    pv_wholesale = value(pv_wholesale);
-end
-
-if isempty(ees_v) == 0
-    ees_adopt = value(ees_adopt);
-    ees_soc = value(ees_soc);
-    ees_dchrg = value(ees_dchrg);
-    ees_chrg = value(ees_chrg);
-else
-    ees_adopt=zeros(1,K);
-end
-
-if isempty(ees_v) == 0 & rees_exist == 1
-    rees_adopt = value(rees_adopt);
-    rees_soc = value(rees_soc);
-    rees_dchrg = value(rees_dchrg);
-    rees_dchrg_nem = value(rees_dchrg_nem);
-    rees_chrg = value(rees_chrg);
-else
-    rees_adopt=zeros(1,K);
-end
-
-Objective = value(Objective);
-
-if island == 0 % If not an island 
-    if nopv == 0 % If there's solar 
-        pv_nem_revenue=sum(value(pv_nem_revenue));
-        pv_w_revenue=sum(value(pv_w_revenue));
-        if noees == 0; % And EES/RESS
-            rees_revenue=sum(value(rees_revenue));
-        else %Or no EES 
-            rees_revenue=0;
-        end 
-    else %If there's no solar 
-        if noees == 1 % And no EES/REES
-            rees_revenue=0;
-        else  % or EES/REES 
-            rees_revenue=sum(value(rees_revenue));
-        end 
-        pv_nem_revenue=0;
-        pv_w_revenue=0;
-    end 
-end 
+%% UCI Post Processing
+OVMG_Evaluation
 
 %% Close all
 close all

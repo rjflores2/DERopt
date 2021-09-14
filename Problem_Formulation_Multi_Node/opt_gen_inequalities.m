@@ -76,11 +76,9 @@ if strcmp(class(var_pv.pv_nem),'sdpvar') || strcmp(class(var_rees.rees_dchrg_nem
         
         Constraints = [Constraints
             (export_price(:,index)'*(var_rees.rees_dchrg_nem(:,k) + var_pv.pv_nem(:,k)) <= import_price(:,index)'*var_util.import(:,k)):'NEM Credits < Import Cost'];
-        
-        
+                
         Constraints = [Constraints
             (sum(var_rees.rees_dchrg_nem(:,k) + var_pv.pv_nem(:,k)) <= sum(var_util.import(:,k))):'NEM Energy < Import Energy'];
         
-
     end
 end

@@ -3,7 +3,7 @@
 %% Legacy PV
 if lpv_on
     %%%[O&M ($/kWh)  -  1
-    %%%  PW Capacity (kW)] - 2
+    %%%  PV Capacity (kW)] - 2
     pv_legacy = [0.001; 4000];
 else
     pv_legacy=[];

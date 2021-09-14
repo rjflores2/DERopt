@@ -58,8 +58,6 @@ sgip_signal = sgip_signal(ind(1):ind(1)+8760-1,:);
 clustering.weekdays = weekday(time);
 clustering.months = month(time);
 
-downselection = 1;
-
 %%%If downselecting to representative weeks
 if downselection == 1
     elec_filtered = [];
@@ -191,28 +189,31 @@ if downselection == 1
             
         end
     end
+    %% Resetting values according to filtered data
     
+    %%%Resetting electrical data
+    legacy.elec = elec;
+    legacy.time = time;
+    
+    %%%Electrical/time/and day_multi values
+    elec = elec_filtered;
+    time = time_filtered(:,1);
+    day_multi = day_multi_filtered(:,1);
+    
+    %%%Solar/sgip values
+    legacy.solar = solar;
+    legacy.sgip_signal = sgip_signal;
+    
+    solar = solar_filtered.*mean(solar)./mean(solar_filtered);
+    sgip_signal = [time sgip_filtered.*mean(solar)./mean(sgip_signal(:,2))];
+else
+    
+    day_multi = ones(size(elec,1),1);
 end
 
 
 
-%% Resetting values according to filtered data
 
-%%%Resetting electrical data
-legacy.elec = elec;
-legacy.time = time;
-
-%%%Electrical/time/and day_multi values
-elec = elec_filtered;
-time = time_filtered(:,1);
-day_multi = day_multi_filtered(:,1);
-
-%%%Solar/sgip values
-legacy.solar = solar;
-legacy.sgip_signal = sgip_signal;
-
-solar = solar_filtered.*mean(solar)./mean(solar_filtered);
-sgip_signal = [time sgip_filtered.*mean(solar)./mean(sgip_signal(:,2))];
 
 %% Recreating endpts
 %%%Date vectors for all time stamps
