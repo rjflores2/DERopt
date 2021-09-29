@@ -119,3 +119,9 @@ export_price = [gen_tou_ex res_tou_ex];
 
 %% Rate Labels 
 rate_labels = {'GS1','TOU8','R1','R2','R3'};
+
+
+%% ESA/CARE Info
+care_energy_rebate = 0.3; %%%Rebate assocaited with CARE rates
+% care_nbc_rebate = 0.3;
+load esa_defs

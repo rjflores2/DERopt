@@ -19,8 +19,8 @@ ees_on = 1;       %Turn on EES/REES
 rees_on = 1;  %Turn on REES
 
 %%%Community/Utility Scale systems
-util_solar_on = 1;
-util_ees_on = 1;
+util_solar_on = 0;
+util_ees_on = 0;
 
 %%%Hydrogen technologies
 el_on = 1; %Turn on generic electrolyer

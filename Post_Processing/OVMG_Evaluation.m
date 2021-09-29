@@ -35,3 +35,17 @@ for ii = 1:K
     ovmg_evaluation.to_building(5,ii) = sum(var_ees.ees_dchrg(:,ii));
     ovmg_evaluation.to_building(6,ii) = sum(var_lees.ees_dchrg(:,ii));
 end
+
+%% Transformer Loadings
+%%% Determining active power
+xfmr_power = [];
+for ii = 1:length(t_rating)
+    %%%Buildings connected to the current transformer
+        idx = find(t_map == ii);
+        
+        xfmr_power.active(:,ii) = sum(var_util.import(:,idx),2) - sum(var_pv.pv_nem(:,idx),2) - sum(var_rees.rees_dchrg_nem(:,idx),2);
+        xfmr_power.reactive(:,ii) = sum(elec(:,idx).*repmat(tan(acos(pf(idx))),length(elec),1),2);
+        xfmr_power.apparent(:,ii) = sqrt(xfmr_power.active(:,ii).^2 + xfmr_power.reactive(:,ii).^2);
+        xfmr_power.apparent_pu(:,ii) = xfmr_power.apparent(:,ii)./t_rating(ii);
+        
+end

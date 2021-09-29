@@ -63,6 +63,7 @@ if downselection == 1
     elec_filtered = [];
     day_multi_filtered = [];
     time_filtered = [];
+    lighting_filtered = [];
     tic
     %     for bldg_idx = 2:size(elec,2)
     %         bldg_idx

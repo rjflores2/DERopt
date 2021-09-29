@@ -34,6 +34,14 @@ var_lrees.rees_dchrg = value(var_lrees.rees_dchrg);
 var_lrees.rees_soc = value(var_lrees.rees_soc);
 var_lrees.rees_dchrg_nem = value(var_lrees.rees_dchrg_nem);
 
+%% Resiliency Values
+ var_resiliency.pv_elec =value( var_resiliency.pv_elec );
+ var_resiliency.ees_chrg = value(var_resiliency.ees_chrg);
+ var_resiliency.ees_dchrg = value(var_resiliency.ees_dchrg);
+ var_resiliency.ees_soc = value(var_resiliency.ees_soc);
+ 
+ %% Transformer Values
+ var_xfmr.Pinj = value(var_xfmr.Pinj);
 %% SGIP values
 if ~isempty(var_sgip.sgip_ees_pbi)
     var_sgip.sgip_ees_pbi = value(var_sgip.sgip_ees_pbi);

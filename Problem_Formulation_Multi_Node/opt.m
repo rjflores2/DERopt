@@ -5,9 +5,10 @@ if opt_now==1
     % Export Model YALMIP -> CPLEX
     tic
     [model,recoverymodel,diagnostic,internalmodel] = export(Constraints,Objective,sdpsettings('solver','cplex'));
-        
+    
     %%%Setting lower/upper bounds for all variables
-    lb=zeros(size(model.f));
+    %     lb=zeros(size(model.f));
+    lb=[];
     ub=inf(size(lb));
     elapsed = toc;
     fprintf('Model Export took %.2f seconds \n', elapsed)

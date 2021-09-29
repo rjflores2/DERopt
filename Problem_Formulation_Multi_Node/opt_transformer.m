@@ -1,3 +1,4 @@
+
 N = length(bus);  %n-th node from 1...N
 T = length(time); %t-th time interval from 1...T
 

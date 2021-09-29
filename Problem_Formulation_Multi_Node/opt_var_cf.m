@@ -35,11 +35,14 @@ if utility_exists
     temp_cf = zeros(size(elec));
     
     for i=1:K %%%Going through all buildings
+        
+        %%%Specify ESA eligible tenant fraction
+        esa_frac = sum(apartment_types(K,1:2))/sum(apartment_types(K,:));
         %%%Find the applicable utility rate
         index=find(ismember(rate_labels,rate(i)));
         
         %%%Specifying cost function
-        temp_cf(:,i) = day_multi.*import_price(:,index);
+        temp_cf(:,i) = day_multi.*import_price(:,index).*(1-care_energy_rebate*esa_frac);
     end
     
     %%%Import Energy charges
@@ -89,6 +92,9 @@ if isempty(pv_v) == 0
     
     if island == 0 && export_on == 1  %If grid tied, then include NEM and wholesale export
         
+        %%%Specify ESA eligible tenant fraction
+        esa_frac = sum(apartment_types(K,1:2))/sum(apartment_types(K,:));
+        
         %%% Variables that exist when grid tied
         var_pv.pv_nem = sdpvar(T,K,'full'); %%% PV Production exported w/ NEM
         %         var_pv.pv_wholesale = sdpvar(T,K,'full'); %%% PV Production exported under NEM rates
@@ -101,7 +107,7 @@ if isempty(pv_v) == 0
             index=find(ismember(rate_labels,rate(k)));
             
             %%%Filling in temp cost function arrays
-            temp_cf1(:,k) = -day_multi.*export_price(:,index);
+            temp_cf1(:,k) = -day_multi.*export_price(:,index).*(1-care_energy_rebate*esa_frac);
             %             temp_cf2(:,k) = -day_multi.*ex_wholesale;
             
         end
@@ -154,7 +160,10 @@ if isempty(pv_v) == 0
                 %%%Applicable utility rate
                 index=find(ismember(rate_labels,rate(k)));
                 
-                temp_cf(:,k) = day_multi.*(ees_v(3) - export_price(:,index));
+                %%%Specify ESA eligible tenant fraction
+                esa_frac = sum(apartment_types(K,1:2))/sum(apartment_types(K,:));
+                
+                temp_cf(:,k) = day_multi.*(ees_v(3) - export_price(:,index).*(1-care_energy_rebate*esa_frac));
                
             end
             %%% Setting objective function
@@ -255,15 +264,17 @@ if isempty(pv_legacy) == 0 && isempty(pv_v) == 1
         temp_cf1 = zeros(size(elec));
         tempc_f2 = zeros(size(elec));
         for k = 1:K
+            %%%Specify ESA eligible tenant fraction
+            esa_frac = sum(apartment_types(K,1:2))/sum(apartment_types(K,:));
             %%%Utility rates for building k
             index=find(ismember(rate_labels,rate(k)));
             
             %%%Filling in temp cost function arrays
-            temp_cf1(:,k) = -day_multi.*export_price(:,index);
+            temp_cf1(:,k) = -day_multi.*export_price(:,index).*(1-care_energy_rebate*esa_frac);
             %             temp_cf2(:,k) = -day_multi.*ex_wholesale;
             
         end
-       %%%Adding values to the cost function
+        %%%Adding values to the cost function
         Objective = Objective...
             + sum(sum(temp_cf1.*var_pv.pv_nem)); %%%NEM Revenue Cost
          clear temp_cf1 temp_cf2
@@ -328,11 +339,13 @@ if lrees_on
         %%%Creating temp variables
         temp_cf = zeros(size(elec));
         
-        for k = 1:K
+        for k = 1:K  
+        %%%Specify ESA eligible tenant fraction
+        esa_frac = sum(apartment_types(K,1:2))/sum(apartment_types(K,:));
             %%%Applicable utility rate
             index=find(ismember(rate_labels,rate(k)));
             
-            temp_cf(:,k) = day_multi.*(rees_legacy(2) - export_price(:,index));
+            temp_cf(:,k) = day_multi.*(rees_legacy(2) - export_price(:,index).*(1-care_energy_rebate*esa_frac));
             
         end
         %%% Setting objective function
@@ -350,3 +363,17 @@ else
     var_lrees.rees_dchrg=zeros(T,K);
     var_lrees.rees_dchrg_nem=zeros(T,K);
 end
+
+%% Electrical Infrastructure Constraints
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%% LDN Transformers %%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if xfmr_on
+    %%%Real Power
+    var_xfmr.Pinj = sdpvar(T,length(t_rating),'full'); %kW
+    %%%Reactive Power
+    %  var_xfmr.Qinj = sdpvar(T,length(t_map),'full'); %kVAR
+else
+     var_xfmr.Pinj = 0
+end
+
