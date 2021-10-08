@@ -208,6 +208,16 @@ else
     hrs_v = [];
 end
 
+%% Pipeline injection
+if h2_inject_on
+    %%%H2 injection - linear fit for capital costs
+    %%% (1) Capital Cost Intercept
+    %%% (2) Capital Cost Slope
+    h2_inject_v = [3213860
+        37.6];
+else
+    h2_inject_v = [];
+end
 %% Building space
 %%%[space available for PV (m^2)
 %%%Cooling loop input (C)

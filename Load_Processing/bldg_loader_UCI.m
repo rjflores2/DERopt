@@ -25,7 +25,12 @@ datetimev=datevec(time);
 %%% change IDX to a specific month to allow for faster testing %%%
 
 % idx = (datetimev(:,1) == year_idx & datetimev(:,2) == month_idx);
-idx = (datetimev(:,1) == year_idx & ismember(datetimev(:,2),month_idx));
+if ~isempty(year_idx) && ~isempty(month_idx)
+    idx = (datetimev(:,1) == year_idx & ismember(datetimev(:,2),month_idx));
+elseif ~isempty(year_idx) 
+    idx = (datetimev(:,1) == year_idx);
+end
+
 % idx = (datetimev(:,1) == 2018);
 elec = elec(idx);
 heat = heat(idx);
@@ -74,7 +79,7 @@ solar = interp1(norm_slr(:,1),norm_slr(:,2),time);
 
 %%%Grid emission factors
 grid_co2 = xlsread('grid_co2_factors.xlsx');
-yr_shift = 12;
+yr_shift = 12 + (year_idx(1) - 2018);
 grid_co2(:,1) = grid_co2(:,1) - yr_shift;
 co2_time = datenum(grid_co2(:,1:6));
 % % grid_co2(:,1) = grid_co2(:,1) - (grid_co2(1) - year(time(1)));

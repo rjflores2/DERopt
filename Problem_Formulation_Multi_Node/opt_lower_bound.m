@@ -43,10 +43,14 @@ if isempty(ees_v) == 0
         (0 <= var_ees.ees_dchrg):'EES Discharging >= 0'
         (0 <= var_ees.ees_soc):'EES SOC >= 0'];
     if sgip_on
+%         Constraints = [Constraints
+%             (0 <= var_sgip.sgip_ees_pbi):'SGIP PBI >=0'
+%             (0 <= var_sgip.sgip_ees_npbi_equity):'SGIP Equity >=0'
+%             (0 <= var_sgip.sgip_ees_npbi):'SGIP NonPBI >=0'];
         Constraints = [Constraints
-            (0 <= var_sgip.sgip_ees_pbi):'SGIP PBI >=0'
-            (0 <= var_sgip.sgip_ees_npbi_equity):'SGIP Equity >=0'
-            (0 <= var_sgip.sgip_ees_npbi):'SGIP NonPBI >=0'];
+            (0 <= var_sgip.sgip_ees_pbi)
+            (0 <= var_sgip.sgip_ees_npbi_equity)
+            (0 <= var_sgip.sgip_ees_npbi)];
     end
 end
 %% Legacy PV

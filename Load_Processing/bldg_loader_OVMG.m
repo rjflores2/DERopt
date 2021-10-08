@@ -264,6 +264,10 @@ else
     end
 end
 
+%% Shutdown parallel pool
+poolobj = gcp('nocreate')
+delete(poolobj)
+
 %% Old Code
 do_not_run = 131231;
 

@@ -11,7 +11,15 @@ elec_frac = [sum(var_util.import) sum(var_pv.pv_elec ) sum(var_ldg.ldg_elec) sum
 
 close all
 
-
+%% Biogas use / fuel uses
+if ~isempty(biogas_limit)
+    biogas_utilization = sum(var_ldg.ldg_rfuel  + var_boil.boil_rfuel + var_ldg.db_rfire)/(biogas_limit*(length(endpts)/12))
+end
+gt_fuel_source = sum([var_ldg.ldg_fuel ...
+    var_ldg.ldg_rfuel ...
+    var_ldg.ldg_hfuel])./sum(sum([var_ldg.ldg_fuel ...
+    var_ldg.ldg_rfuel ...
+    var_ldg.ldg_hfuel]))
 %% PV Production
 figure 
 hold on
@@ -83,21 +91,24 @@ legend('NG','RNG','H_2')
 hold off
 
 %% Generation
+close all
 f3 = figure
 hold on
-plot_data = e_adjust.*[var_ldg.ldg_elec ...
+
+biogas_frac = sum(var_ldg.ldg_rfuel)./sum(var_ldg.ldg_fuel + var_ldg.ldg_rfuel + var_ldg.ldg_hfuel)
+con_frac = sum(var_ldg.ldg_fuel)./sum(var_ldg.ldg_fuel + var_ldg.ldg_rfuel + var_ldg.ldg_hfuel)
+
+plot_data = [];
+plot_data = e_adjust.*[var_ldg.ldg_elec.*con_frac ...
+    var_ldg.ldg_elec.*biogas_frac ...
+    var_ldg.ldg_elec.*(var_ldg.ldg_hfuel./(var_ldg.ldg_fuel + var_ldg.ldg_rfuel + var_ldg.ldg_hfuel)) ...
     var_lbot.lbot_elec ...
+    var_rees.rees_dchrg + var_ees.ees_dchrg + var_lees.ees_dchrg...
     var_pv.pv_elec ...
-    var_ees.ees_dchrg ...
-    var_rees.rees_dchrg ...
     var_util.import]./1000;
 
-plot_data = e_adjust.*[var_ldg.ldg_elec ...
-    var_lbot.lbot_elec ...
-         var_rees.rees_dchrg... 
-         var_pv.pv_elec]./1000;
-
 p3 = area(time,plot_data)
+plot(time,e_adjust.*elec./1000,'LineWidth',2,'Color',[0 0 0])
 a3 = gca
  a3.FontSize = 16;
  a3.YLabel.String = 'Electricity (MW)';
@@ -107,11 +118,32 @@ datetick('x','ddd','KeepTicks')
 xlim([xlim_range])
 box on
 grid on
-legend('GT','ST','Storage','PV')
+legend('GT - NG','GT - rNG','GT - H_2','ST','Storage','PV','Import')
 % a1.xtick = 1
 set(gcf, 'Position',  [-1500, -150, 700, 300])
 hold off
 
+%% Load
+close all
+f4 = figure
+
+plot_data = [];
+plot_data = e_adjust.*[elec ...
+    sum(var_ees.ees_chrg,2) + sum(var_lees.ees_chrg,2) ...
+    sum(el_eff.*var_el.el_prod,2) ...
+    sum(h2_chrg_eff.*var_h2es.h2es_chrg,2) ...
+    var_util.gen_export...
+    var_hrs.hrs_supply.*hrs_chrg_eff]./1000;
+p4 = area(time,plot_data)
+a4 = gca
+ a4.FontSize = 16;
+ a4.YLabel.String = 'Electricity (MW)';
+ a4.YLabel.FontSize = 20;
+a4.XTick = [round(time(1)) + 0.5 :1: round(time(end))-0.5];
+datetick('x','ddd','KeepTicks')
+xlim([xlim_range])
+box on
+grid on
 %% Solar Operation
 f4 = figure
 hold on
@@ -176,17 +208,9 @@ co2_emissions = [sum(var_util.import.*co2_import)
     co2_ng*(sum(sum(var_ldg.ldg_fuel)) + sum(sum(var_ldg.db_fire)) + sum(sum(var_boil.boil_fuel)))
     co2_rng*(sum(sum(var_ldg.ldg_rfuel)) + sum(sum(var_ldg.db_rfire)) + sum(sum(var_boil.boil_rfuel)))]
 
-sum(co2_emissions)/1.2363e7
+sum(co2_emissions)
 
-%% Biogas use / fuel uses
-if ~isempty(biogas_limit)
-    biogas_utilization = sum(var_ldg.ldg_rfuel  + var_boil.boil_rfuel + var_ldg.db_rfire)/(biogas_limit*(length(endpts)/12))
-end
-gt_fuel_source = sum([var_ldg.ldg_fuel ...
-    var_ldg.ldg_rfuel ...
-    var_ldg.ldg_hfuel])./sum(sum([var_ldg.ldg_fuel ...
-    var_ldg.ldg_rfuel ...
-    var_ldg.ldg_hfuel]))
+
 %% Adopted technologies
 
 adopted.pv = var_pv.pv_adopt;

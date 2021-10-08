@@ -451,6 +451,27 @@ else
     var_hrs.hrs_supply = zeros(T,1);
     hrs_chrg_eff = 1;
 end
+
+%% H2 Pipeline Injection
+if h2_inject_on
+    %%%Adopt HRS Equipment
+    var_h2_inject.h2_inject_adopt = binvar(1,1,'full');
+    %%%Size of adopted HRS Equipment
+    var_h2_inject.h2_inject_size = sdpvar(1,1,'full');
+    %%%Injected Hydrogen
+    var_h2_inject.h2_inject = sdpvar(T,1,'full');
+    
+    
+     Objective = Objective ...
+       + M*h2_inject_mthly_debt(1)*var_h2_inject.h2_inject_adopt ...
+       + M*h2_inject_mthly_debt(2)*var_h2_inject.h2_inject_size ...
+       - 100.*ng_inject.*sum(var_h2_inject.h2_inject);
+else
+    var_h2_inject.h2_inject = zeros(T,1);
+    var_h2_inject.h2_inject_size = 0;
+    var_h2_inject.h2_inject_adopt = 0;
+end
+    
 %% Renewable Electrolyze
 %% Legacy Technologies
 %% Legacy PV

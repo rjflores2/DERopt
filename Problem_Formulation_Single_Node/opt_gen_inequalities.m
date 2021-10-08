@@ -95,7 +95,7 @@ if ~isempty(h2_fuel_forced_fraction) && ~isempty(el_v)
 end
 
 %% Gas Turbine Fuel Input Limit - Hydrogen
-if ~isempty(h2_fuel_limit)
+if ~isempty(h2_fuel_limit) && ldg_on
     Constraints = [Constraints
         ((1 - h2_fuel_limit).*var_ldg.ldg_hfuel <= h2_fuel_limit.*(var_ldg.ldg_fuel + var_ldg.ldg_rfuel + var_ldg.ldg_hfuel)):'H2 Fuel Limit in GT'];   
 end
@@ -109,6 +109,7 @@ if ~isempty(co2_lim)
         + sum(var_pp.pp_elec_export.*co2_import) ...%%%Imports at a power plant
         <= ...
         sum(var_pp.pp_elec_import.*co2_import) ...%%%Exports at a power plant
+        + co2_ng*sum(var_h2_inject.h2_inject) ... %%%H2 Pipeline Injection
         + co2_lim):'CO2 Limit'];
 end
 

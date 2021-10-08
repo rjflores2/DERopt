@@ -100,6 +100,15 @@ if ~isempty(util_ees_v)
     end
 end
 
+%%%H2 Pipeline Injeciton
+if ~isempty(h2_inject_v)
+    for ii = 1:size(h2_inject_v)
+        h2_inject_mthly_debt(ii) = h2_inject_v(ii)*((1-equity)*(interest*(1+interest)^(period*12))...
+            /((1+interest)^(period*12)-1)+...%%%Money to pay back bank
+            req_return_on*(equity)*(required_return*(1+required_return)^(period*12))...
+            /((1+required_return)^(period*12)-1));
+    end
+end
 %% Converting incentives to reductions in debt payments
 if ~isempty(sgip)
     

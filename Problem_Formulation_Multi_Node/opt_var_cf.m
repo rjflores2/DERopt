@@ -37,12 +37,21 @@ if utility_exists
     for i=1:K %%%Going through all buildings
         
         %%%Specify ESA eligible tenant fraction
-        esa_frac = sum(apartment_types(K,1:2))/sum(apartment_types(K,:));
+        esa_frac = sum(apartment_types(i,1:2))/sum(apartment_types(i,:));
+        if ~esa_on
+            esa_frac = 0;
+        end
+        
         %%%Find the applicable utility rate
         index=find(ismember(rate_labels,rate(i)));
         
         %%%Specifying cost function
         temp_cf(:,i) = day_multi.*import_price(:,index).*(1-care_energy_rebate*esa_frac);
+        temp_cf(:,i) = day_multi.*import_price(:,index);
+%         temp_cf2(:,i) = day_multi.*import_price(:,index);
+%                 
+%         temp_cf3(:,i) = day_multi.*export_price(:,index).*(1-care_energy_rebate*esa_frac);
+%         temp_cf4(:,i) = day_multi.*export_price(:,index);
     end
     
     %%%Import Energy charges
@@ -92,9 +101,7 @@ if isempty(pv_v) == 0
     
     if island == 0 && export_on == 1  %If grid tied, then include NEM and wholesale export
         
-        %%%Specify ESA eligible tenant fraction
-        esa_frac = sum(apartment_types(K,1:2))/sum(apartment_types(K,:));
-        
+       
         %%% Variables that exist when grid tied
         var_pv.pv_nem = sdpvar(T,K,'full'); %%% PV Production exported w/ NEM
         %         var_pv.pv_wholesale = sdpvar(T,K,'full'); %%% PV Production exported under NEM rates
@@ -105,9 +112,15 @@ if isempty(pv_v) == 0
         for k = 1:K
             %%%Utility rates for building k
             index=find(ismember(rate_labels,rate(k)));
-            
+             %%%Specify ESA eligible tenant fraction
+        esa_frac = sum(apartment_types(k,1:2))/sum(apartment_types(k,:));
+        
+        if ~esa_on
+            esa_frac = 0;
+        end
             %%%Filling in temp cost function arrays
             temp_cf1(:,k) = -day_multi.*export_price(:,index).*(1-care_energy_rebate*esa_frac);
+            temp_cf1(:,k) = -day_multi.*export_price(:,index);
             %             temp_cf2(:,k) = -day_multi.*ex_wholesale;
             
         end
@@ -161,9 +174,16 @@ if isempty(pv_v) == 0
                 index=find(ismember(rate_labels,rate(k)));
                 
                 %%%Specify ESA eligible tenant fraction
-                esa_frac = sum(apartment_types(K,1:2))/sum(apartment_types(K,:));
+                esa_frac = sum(apartment_types(i,1:2))/sum(apartment_types(i,:));
+         %%%Specify ESA eligible tenant fraction
+        esa_frac = sum(apartment_types(i,1:2))/sum(apartment_types(i,:));
+        
+        if ~esa_on
+            esa_frac = 0;
+        end
                 
                 temp_cf(:,k) = day_multi.*(ees_v(3) - export_price(:,index).*(1-care_energy_rebate*esa_frac));
+                temp_cf(:,k) = day_multi.*(ees_v(3) - export_price(:,index));
                
             end
             %%% Setting objective function
@@ -265,12 +285,19 @@ if isempty(pv_legacy) == 0 && isempty(pv_v) == 1
         tempc_f2 = zeros(size(elec));
         for k = 1:K
             %%%Specify ESA eligible tenant fraction
-            esa_frac = sum(apartment_types(K,1:2))/sum(apartment_types(K,:));
+            esa_frac = sum(apartment_types(i,1:2))/sum(apartment_types(i,:));
+         %%%Specify ESA eligible tenant fraction
+        esa_frac = sum(apartment_types(i,1:2))/sum(apartment_types(i,:));
+        
+        if ~esa_on
+            esa_frac = 0;
+        end
             %%%Utility rates for building k
             index=find(ismember(rate_labels,rate(k)));
             
             %%%Filling in temp cost function arrays
             temp_cf1(:,k) = -day_multi.*export_price(:,index).*(1-care_energy_rebate*esa_frac);
+            temp_cf1(:,k) = -day_multi.*export_price(:,index);
             %             temp_cf2(:,k) = -day_multi.*ex_wholesale;
             
         end
@@ -341,11 +368,18 @@ if lrees_on
         
         for k = 1:K  
         %%%Specify ESA eligible tenant fraction
-        esa_frac = sum(apartment_types(K,1:2))/sum(apartment_types(K,:));
+        esa_frac = sum(apartment_types(i,1:2))/sum(apartment_types(i,:));
+         %%%Specify ESA eligible tenant fraction
+        esa_frac = sum(apartment_types(i,1:2))/sum(apartment_types(i,:));
+        
+        if ~esa_on
+            esa_frac = 0;
+        end
             %%%Applicable utility rate
             index=find(ismember(rate_labels,rate(k)));
             
             temp_cf(:,k) = day_multi.*(rees_legacy(2) - export_price(:,index).*(1-care_energy_rebate*esa_frac));
+            temp_cf(:,k) = day_multi.*(rees_legacy(2) - export_price(:,index));
             
         end
         %%% Setting objective function

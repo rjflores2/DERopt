@@ -1,43 +1,51 @@
 %% Playground file for OVMG Project
 clear all; close all; clc ; started_at = datetime('now'); startsim = tic;
 
+% %%
 %% Parameters
 
 %%% opt.m parameters
-%%%Choose optimizaiton solver 
+%%%Choose optimizaiton solver
 opt_now = 1; %CPLEX
 opt_now_yalmip = 0; %YALMIP
 
 %% Downselection of building energy data?
-downselection = 1;
-
+downselection = 0;
+pv_on = 1;
+ees_on = 1;
+rees_on = 1;
+lpv_on = 0;
+lees_on = 0;
+lrees_on = 0;
 %% Turning technologies on/off (opt_var_cf.m and tech_select.m)
-if downselection == 0
-    pv_on = 0;        %Turn on PV
-    ees_on = 0;       %Turn on EES/REES
-    rees_on = 0;  %Turn on REES
-else
-    pv_on = 1;
-    ees_on = 1;
-    rees_on = 1;
-end
-%% Legacy technologies
-if downselection == 0
-    lpv_on = 1;
-    lees_on = 0;
-    lrees_on = 1;
-else
-    lpv_on = 0;
-    lees_on = 0;
-    lrees_on = 0;
-end
+% if downselection == 0
+%     pv_on = 0;        %Turn on PV
+%     ees_on = 0;       %Turn on EES/REES
+%     rees_on = 0;  %Turn on REES
+% else
+%     pv_on = 1;
+%     ees_on = 1;
+%     rees_on = 1;
+% end Legacy technologies
+% if downselection == 0
+%     lpv_on = 1;
+%     lees_on = 0;
+%     lrees_on = 1;
+% else
+%     lpv_on = 0;
+%     lees_on = 0;
+%     lrees_on = 0;
+% end
+
+%% ESA On/Off (opt_var_cf)
+esa_on = 0;
 
 %% Include Critical Loads
 crit_tier = []; %%%Residential Critical Load Requirements (Load Tier)
 crit_tier_com = 0.15; %%%Commercial Critical Load Requirements (% of load)
 
 %% Turning incentives and other financial tools on/off
-sgip_on = 0;
+sgip_on = 1;
 
 %% PV (opt_pv.m)
 pv_maxarea = 1; %%% Limits maximum PV size, based on initially solar PV panel
@@ -143,6 +151,9 @@ for ii = 1:length(bldg)
     end
     %%%Maximum Area Available for Solar PV (m^2)
     maxpv(ii) = bldg(ii).roof_area./10.76; %10.76 ft^2 per m^2
+    
+    
+    %%%
 end
 
 
@@ -197,7 +208,7 @@ req_return_on = 1;
 
 %%%Exsiting Technologies 
 tech_legacy_OVMG
-
+% low_income = 1;
 %%%Capital cost mofificaitons
 cap_cost_mod
 
@@ -293,22 +304,22 @@ finish = datetime('now') ; totalelapsed = toc(startsim)
 variable_values_multi_node
 
 %%
-clc
-for ii = 11%:size(elec,2)
-    adopted_tech = round([var_pv.pv_adopt(ii) var_ees.ees_adopt(ii) + var_rees.rees_adopt(ii)],1);
-    operatons = [];
-    operatons = [elec(:,ii) ...
-        var_util.import(:,ii) ...
-        var_pv.pv_elec(:,ii) ...
-        var_pv.pv_nem(:,ii)...
-        var_ees.ees_chrg(:,ii)+var_rees.rees_chrg(:,ii)...
-        var_ees.ees_dchrg(:,ii)+var_rees.rees_dchrg(:,ii)...
-        var_rees.rees_dchrg_nem(:,ii) ...
-        var_ees.ees_soc(:,ii) + var_rees.rees_soc(:,ii)];
-        
-    
-end
-
+% clc
+% for ii = 11%:size(elec,2)
+%     adopted_tech = round([var_pv.pv_adopt(ii) var_ees.ees_adopt(ii) + var_rees.rees_adopt(ii)],1);
+%     operatons = [];
+%     operatons = [elec(:,ii) ...
+%         var_util.import(:,ii) ...
+%         var_pv.pv_elec(:,ii) ...
+%         var_pv.pv_nem(:,ii)...
+%         var_ees.ees_chrg(:,ii)+var_rees.rees_chrg(:,ii)...
+%         var_ees.ees_dchrg(:,ii)+var_rees.rees_dchrg(:,ii)...
+%         var_rees.rees_dchrg_nem(:,ii) ...
+%         var_ees.ees_soc(:,ii) + var_rees.rees_soc(:,ii)];
+%         
+%     
+% end
+% return
 %% Utility Costs
 OVMG_updated_utility_costs
 % 

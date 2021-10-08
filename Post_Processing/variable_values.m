@@ -57,6 +57,12 @@ var_h2es.h2es_soc = value(var_h2es.h2es_soc);
 var_hrs.hrs_supply_adopt = value(var_hrs.hrs_supply_adopt);
 var_hrs.hrs_tube = value(var_hrs.hrs_tube);
 var_hrs.hrs_supply = value(var_hrs.hrs_supply);
+
+%% H2 Pipeline Injection
+var_h2_inject.h2_inject_adopt = value(var_h2_inject.h2_inject_adopt);
+var_h2_inject.h2_inject_size = value(var_h2_inject.h2_inject_size);
+var_h2_inject.h2_inject = value(var_h2_inject.h2_inject);
+
 %% Legacy technologies %%
 %% DG - Topping Cycle
 var_ldg.ldg_elec = value(var_ldg.ldg_elec);
