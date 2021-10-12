@@ -19,7 +19,7 @@ ees_on = 1;       %Turn on EES/REES
 rees_on = 1;  %Turn on REES
 
 %%%Community/Utility Scale systems
-util_solar_on = 0;
+util_solar_on = 1;
 util_ees_on = 0;
 
 %%%Hydrogen technologies
@@ -33,19 +33,22 @@ lpv_on = 1; %Turn on legacy PV
 lees_on = 1; %Legacy EES
 ltes_on = 1; %Legacy TES
 
-ldg_on = 0; %Turn on legacy GT
-lbot_on = 0; %Turn on legacy bottoming cycle / Steam turbine
-lhr_on = 0; %Legacy HR
-ldb_on = 0; %Legacy Duct Burner
+ldg_on = 1; %Turn on legacy GT
+lbot_on = 1; %Turn on legacy bottoming cycle / Steam turbine
+lhr_on = 1; %Legacy HR
+ldb_on = 1; %Legacy Duct Burner
 lboil_on = 1; %Legacy boilers
 
+%% Utility PV Solar
+util_pv_wheel = 0; %General Wheeling Capabilities
+util_pv_wheel_lts = 1; %Wheeling for long term storage
 %% Island operation (opt_nem.m) 
 
 %%%Electric rates for UCI
 %%% 1: current rate, which does not value export
 %%% 2: current import rate + LMP export rate
 %%% 3: LMP Rate + 0.2 and LMP Export
-uci_rate = 2;
+uci_rate = 3;
 
 island = 0;
 
@@ -88,7 +91,10 @@ co2_lim = 4.6802e+07*0.2;
 % co2_lim = [1.0314e+07]*0.2; %4
 % co2_lim = [ 1.1700e+07]*0.25; %10
 
-co2_lim = [];
+co2_lim = [1.0509e+07]*0.15;
+co2_lim = 4.5880e+07*0.15;
+co2_lim = [ 1.1910e+07]*0.15;
+% co2_lim = [];
 %% Turning incentives and other financial tools on/off
 sgip_on = 0;
 
@@ -185,17 +191,23 @@ res_units = 0;
 year_idx = 2018;
 % month_idx = [10];
 month_idx = [1 4 7 10];
-month_idx = [7];
+
+month_idx = [9];
+% month_idx = [1];
 % month_idx = [];
 bldg_loader_UCI
 
+mean(solar)
+mean(elec)
+mean(heat)
+% return
 %% Utility Data
 %%%Loading Utility Data and Generating Energy Charge Vectors
 utility_UCI
 % export_price = export_price*0;
 %%%Placeholder natural gas cost
 ng_cost = 0.5/29.3; %$/kWh --> Converted from $/therm to $/kWh, 29.3 kWh / 1 Therm
-rng_cost = ng_cost*2;
+rng_cost = 3/29.3;
 ng_inject = 0.3/29.3; %$/kWh --> Converted from $/therm to $/kWh, 29.3 kWh / 1 Therm
 %% Tech Parameters/Costs
 %%%Technology Parameters
@@ -221,7 +233,6 @@ fprintf('Took %.2f seconds \n', elapsed)
 %% General Equality Constraints
 fprintf('%s: General Equalities.', datestr(now,'HH:MM:SS'))
 tic
-
 if onoff_model
     opt_gen_equalities %%%Does not include NEM and wholesale in elec equality constraint
 else
@@ -332,4 +343,4 @@ finish = datetime('now') ; totalelapsed = toc(startsim)
 variable_values
 
 %% System Evaluaiton
-uci_evaluation
+% uci_evaluation

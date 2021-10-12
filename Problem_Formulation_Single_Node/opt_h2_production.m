@@ -2,13 +2,13 @@ if ~isempty(el_v) || ~isempty(rel_v)
     if ~isempty(el_v)
         for i = 1:size(el_v,2)
             Constraints = [Constraints
-                (0 <= var_el.el_prod(:,i)  <= var_el.el_adopt(i).*(1/e_adjust)):'Electrolyzer Min/Max Output']; %%%Production is limited by adopted capacity
+                (0 <= var_el.el_prod(:,i) + var_el.el_prod_wheel(:,i)   <= var_el.el_adopt(i).*(1/e_adjust)):'Electrolyzer Min/Max Output']; %%%Production is limited by adopted capacity
         end
     end
     if  ~isempty(rel_v)
         for i = 1:size(rel_v,2)
             Constraints = [Constraints
-                (0 <= var_rel.rel_prod(:,i)  <= var_rel.rel_adopt(i).*(1/e_adjust)):'Renewable Electrolyzer Min/Max Output']; %%%Production is limited by adopted capacity
+                (0 <= var_rel.rel_prod(:,i) + var_rel.rel_prod_wheel(:,i) <= var_rel.rel_adopt(i).*(1/e_adjust)):'Renewable Electrolyzer Min/Max Output']; %%%Production is limited by adopted capacity
         end
     end
     

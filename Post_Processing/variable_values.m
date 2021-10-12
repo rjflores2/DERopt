@@ -15,6 +15,9 @@ var_pv.pv_nem = value(var_pv.pv_nem);
 %% Power Plant Energy Trading
 var_pp.pp_elec_export = value(var_pp.pp_elec_export);
 var_pp.pp_elec_import = value(var_pp.pp_elec_import);
+var_pp.pp_elec_wheel = value(var_pp.pp_elec_wheel);
+var_pp.pp_elec_wheel_lts = value(var_pp.pp_elec_wheel_lts);
+var_pp.import_state = value(var_pp.import_state);
 
 %% Utility Solar Variables
 var_utilpv.util_pv_adopt = value(var_utilpv.util_pv_adopt);
@@ -46,6 +49,7 @@ var_el.el_prod = value(var_el.el_prod);
 %% H2 Production - Renewable Electrolyzer
 var_rel.rel_adopt = value(var_rel.rel_adopt);
 var_rel.rel_prod = value(var_rel.rel_prod);
+var_rel.rel_prod_wheel = value(var_rel.rel_prod_wheel);
 
 %% H2 Production - Storage
 var_h2es.h2es_adopt = value(var_h2es.h2es_adopt);

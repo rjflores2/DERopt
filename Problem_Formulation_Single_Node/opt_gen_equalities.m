@@ -3,7 +3,7 @@
 %%For  all timesteps t
 %Vectorized
 Constraints = [Constraints
-    (sum(var_util.import,2) + sum(var_pv.pv_elec,2) + sum(var_ees.ees_dchrg,2) + sum(var_lees.ees_dchrg,2) + sum(var_rees.rees_dchrg,2) + sum(var_ldg.ldg_elec,2) + sum(var_lbot.lbot_elec,2) ... %%%Production
+    (sum(var_util.import,2) + sum(var_pv.pv_elec,2) + sum(var_ees.ees_dchrg,2) + sum(var_lees.ees_dchrg,2) + sum(var_rees.rees_dchrg,2) + sum(var_ldg.ldg_elec,2) + sum(var_lbot.lbot_elec,2) + sum(var_pp.pp_elec_wheel,2)... %%%Production
     ==...
     elec + sum(var_ees.ees_chrg,2) + sum(var_lees.ees_chrg,2) + var_vc.generic_cool./4  + sum(var_lvc.lvc_cool.*vc_cop,2) + sum(el_eff.*var_el.el_prod,2) + sum(h2_chrg_eff.*var_h2es.h2es_chrg,2) + var_util.gen_export + var_hrs.hrs_supply.*hrs_chrg_eff + var_dump.elec_dump):'Electricity Balance']; %%%Demand
 
@@ -25,7 +25,7 @@ end
 %% Chemical ennergy conversion balance - Hydrogen
 if ~isempty(el_v) || ~isempty(rel_v)
     Constraints = [Constraints
-       (sum(var_rel.rel_prod,2) + sum(var_el.el_prod,2) + sum(var_h2es.h2es_dchrg,2) == sum(var_ldg.ldg_hfuel,2) + sum(var_ldg.db_hfire,2) + sum(var_boil.boil_hfuel,2) + sum(var_h2es.h2es_chrg,2) + var_hrs.hrs_supply + var_h2_inject.h2_inject):'Hydrogen Balance'];
+       (sum(var_rel.rel_prod,2) + sum(var_el.el_prod,2) + sum(var_rel.rel_prod_wheel,2) + sum(var_el.el_prod_wheel,2) + sum(var_h2es.h2es_dchrg,2) == sum(var_ldg.ldg_hfuel,2) + sum(var_ldg.db_hfire,2) + sum(var_boil.boil_hfuel,2) + sum(var_h2es.h2es_chrg,2) + var_hrs.hrs_supply + var_h2_inject.h2_inject):'Hydrogen Balance'];
 end
 
 %% H2 Transportation
@@ -38,5 +38,10 @@ end
 %% POWERPLANTS
 if util_solar_on || util_ees_on
     Constraints = [Constraints
-        (sum(var_pp.pp_elec_import,2) + sum(var_util_ees.ees_dchrg,2) + sum(var_utilpv.util_pv_elec,2) == sum(var_pp.pp_elec_export,2) + sum(var_util_ees.ees_chrg,2)):'PP Electricity Balance'];
+        (sum(var_pp.pp_elec_import,2) + sum(var_util_ees.ees_dchrg,2) + sum(var_utilpv.util_pv_elec,2) == sum(var_pp.pp_elec_wheel,2) + sum(var_pp.pp_elec_wheel_lts,2) + sum(var_pp.pp_elec_export,2) + sum(var_util_ees.ees_chrg,2)):'PP Electricity Balance'];
+    
+    if util_pv_wheel_lts
+        Constraints = [Constraints
+            (sum(el_eff.*var_el.el_prod_wheel,2) + sum(el_eff.*var_rel.rel_prod_wheel,2) == sum(var_pp.pp_elec_wheel_lts,2)):'PP to LTS Wheeling Electricity Balance'];
+    end
 end

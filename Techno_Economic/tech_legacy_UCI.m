@@ -39,6 +39,7 @@ if ldg_on
     
     dg_legacy = [0.026; 14500; 13000; 0.01; 0.01; 0.52;f1; f2; q1; q2; 60*24*3];
     dg_legacy = [0.026; 14500; 6000; 0.01; 0.01; 0.52;f1; f2; q1; q2; 60*24*3];
+    dg_legacy = [0.006; 14500; 6000; 0.01; 0.01; 0.52;f1; f2; q1; q2; 60*24*3];
     
     %%%Costs assocaited with cycling the gas turbine
     %%% Cost to turn on the engine - 1 ($/start) - taken from 75% percentile of cold starts

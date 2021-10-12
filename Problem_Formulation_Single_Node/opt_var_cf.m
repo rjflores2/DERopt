@@ -196,15 +196,34 @@ end
 toc
 %% Energy products exported from a power plant
 if util_solar_on || util_ees_on
-    var_pp.pp_elec_export = sdpvar(T,1,'full');
-    var_pp.pp_elec_import = sdpvar(T,1,'full');
+    var_pp.pp_elec_export = sdpvar(T,1,'full'); %%%Export from the power plant
+    var_pp.pp_elec_import = sdpvar(T,1,'full'); %%%Import at the power plant
+    var_pp.import_state = binvar(T,1,'full'); %%%Import State
+    
+    %%%General wheeling potential
+    if util_pv_wheel
+        var_pp.pp_elec_wheel = sdpvar(T,1,'full');
+    else
+        var_pp.pp_elec_wheel = zeros(T,1);
+    end
+    
+    %%%Wheeling for long term storage
+    if util_pv_wheel_lts
+        var_pp.pp_elec_wheel_lts = sdpvar(T,1,'full');
+    else
+        var_pp.pp_elec_wheel_lts = zeros(T,1);
+    end
+    
     
     Objective = Objective ...
         + sum((-lmp_util).*var_pp.pp_elec_export) ...
-        + sum((lmp_util + 0.015).*var_pp.pp_elec_import);
+        + sum((lmp_util + 0.015).*var_pp.pp_elec_import) ...
+        + sum((0.02).*(var_pp.pp_elec_wheel + pp_elec_wheel_lts));
 else
     var_pp.pp_elec_export = zeros(T,1);
     var_pp.pp_elec_import = zeros(T,1);
+    var_pp.pp_elec_wheel = zeros(T,1);
+    var_pp.pp_elec_wheel_lts = zeros(T,1);
 end
 %% Community Scale Solar
 if ~isempty(utilpv_v)
@@ -324,11 +343,17 @@ if ~isempty(el_v)
     %%%Electrolyzer production
     var_el.el_prod = sdpvar(T,size(el_v,2),'full');
     
+    if util_pv_wheel_lts
+        var_el.el_prod_wheel = sdpvar(T,size(el_v,2),'full');
+    else
+        var_el.el_prod_wheel = zeros(T,size(el_v,2));
+    end
+    
     for ii = 1:size(el_v,2)
         %%%Electrolyzer Cost Functions
         Objective = Objective...
             + sum(M.*el_mthly_debt.*var_el.el_adopt) ... %%%Capital Cost
-            + sum(sum(var_el.el_prod).*el_v(2,:)); %%%VO&M
+            + sum(sum(var_el.el_prod + var_el.el_prod_wheel).*el_v(2,:)); %%%VO&M
     end
     
     if ~isempty(h2es_v)
@@ -361,6 +386,7 @@ else
     h2_chrg_eff = 0;
     var_el.el_adopt = 0;
     var_el.el_prod = zeros(T,1);
+    var_el.el_prod_wheel = zeros(T,1);
     var_h2es.h2es_adopt = 0;
     var_h2es.h2es_soc = zeros(T,1);
     var_h2es.h2es_chrg = zeros(T,1);
@@ -375,17 +401,23 @@ if ~isempty(rel_v)
     for ii = 1:size(rel_v,2)
         rel_eff(:,ii) = (1/rel_v(3,ii)).*rel_eff(:,ii);
     end    
-    
+         
     %%%Adoption technologies
     var_rel.rel_adopt = sdpvar(1,size(rel_v,2),'full');
     %%%Electrolyzer production
     var_rel.rel_prod = sdpvar(T,size(rel_v,2),'full');
     
+    if util_pv_wheel_lts
+        var_rel.rel_prod_wheel = sdpvar(T,size(el_v,2),'full');
+    else
+        var_rel.rel_prod_wheel = zeros(T,size(el_v,2));
+    end
+    
     for ii = 1:size(rel_v,2)
         %%%Electrolyzer Cost Functions
         Objective = Objective...
             + sum(M.*rel_mthly_debt.*var_rel.rel_adopt) ... %%%Capital Cost
-            + sum(sum(var_rel.rel_prod).*rel_v(2,:)); %%%VO&M
+            + sum(sum(var_rel.rel_prod + var_rel.rel_prod_wheel).*rel_v(2,:)); %%%VO&M
     end
     
     
@@ -422,6 +454,7 @@ if ~isempty(rel_v)
 else
     var_rel.rel_adopt = 0;
     var_rel.rel_prod = zeros(T,1);
+    var_rel.rel_prod_wheel = zeros(T,1);
     var_h2es.h2es_chrg = zeros(T,1);
     var_h2es.h2es_dchrg = zeros(T,1);
     el_eff = zeros(T,1);
@@ -465,7 +498,7 @@ if h2_inject_on
      Objective = Objective ...
        + M*h2_inject_mthly_debt(1)*var_h2_inject.h2_inject_adopt ...
        + M*h2_inject_mthly_debt(2)*var_h2_inject.h2_inject_size ...
-       - 100.*ng_inject.*sum(var_h2_inject.h2_inject);
+       - ng_inject.*sum(var_h2_inject.h2_inject);
 else
     var_h2_inject.h2_inject = zeros(T,1);
     var_h2_inject.h2_inject_size = 0;
