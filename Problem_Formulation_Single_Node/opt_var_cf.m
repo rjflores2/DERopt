@@ -224,7 +224,7 @@ else
     var_pp.pp_elec_import = zeros(T,1);
     var_pp.pp_elec_wheel = zeros(T,1);
     var_pp.pp_elec_wheel_lts = zeros(T,1);
-end
+end%test
 %% Community Scale Solar
 if ~isempty(utilpv_v)
     %%% Adopted Utility Scale PV
