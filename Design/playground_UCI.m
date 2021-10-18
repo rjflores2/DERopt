@@ -77,7 +77,7 @@ h2_fuel_forced_fraction = []; %%%Energy fuel requirements
 h2_fuel_limit = [0.1];%0.1; %%%Fuel limit on an energy basis - should be 0.1
 
 %%%CO2 Limit
-co2_lim = [4.5893e+07]; %%%Baseline emissions for 2018, 4 month economic dispatch
+co2_lim = [4.5893e+07].*0.75; %%%Baseline emissions for 2018, 4 month economic dispatch
 
 %% Turning incentives and other financial tools on/off
 sgip_on = 0;
@@ -191,7 +191,8 @@ utility_UCI
 % export_price = export_price*0;
 %%%Placeholder natural gas cost
 ng_cost = 0.5/29.3; %$/kWh --> Converted from $/therm to $/kWh, 29.3 kWh / 1 Therm
-rng_cost = 3/29.3;
+% rng_cost = 3/29.3;
+rng_cost = 2.*ng_cost;
 rng_storage_cost = 0.2/29.3;
 ng_inject = 1/29.3; %$/kWh --> Converted from $/therm to $/kWh, 29.3 kWh / 1 Therm
 %% Tech Parameters/Costs
