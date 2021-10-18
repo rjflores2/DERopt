@@ -19,15 +19,15 @@ ees_on = 1;       %Turn on EES/REES
 rees_on = 1;  %Turn on REES
 
 %%%Community/Utility Scale systems
-util_solar_on = 1;
+util_solar_on = 0;
 util_ees_on = 0;
 
 %%%Hydrogen technologies
 el_on = 1; %Turn on generic electrolyer
 rel_on = 1; %Turn on renewable tied electrolyzer
 h2es_on = 1; %Hydrogen energy storage
-hrs_on = 1; %Turn on hydrogen fueling station
-h2_inject_on = 1; %Turn on H2 injection into pipeline
+hrs_on = 0; %Turn on hydrogen fueling station
+h2_inject_on = 0; %Turn on H2 injection into pipeline
 %% Legacy System Toggles
 lpv_on = 1; %Turn on legacy PV 
 lees_on = 1; %Legacy EES
@@ -41,14 +41,14 @@ lboil_on = 1; %Legacy boilers
 
 %% Utility PV Solar
 util_pv_wheel = 0; %General Wheeling Capabilities
-util_pv_wheel_lts = 1; %Wheeling for long term storage
+util_pv_wheel_lts = 0; %Wheeling for long term storage
 %% Island operation (opt_nem.m) 
 
 %%%Electric rates for UCI
 %%% 1: current rate, which does not value export
 %%% 2: current import rate + LMP export rate
 %%% 3: LMP Rate + 0.2 and LMP Export
-uci_rate = 3;
+uci_rate = 1;
 
 island = 0;
 
@@ -56,7 +56,7 @@ island = 0;
 export_on = 0; %%%Tied to PV and REES export under current utility rates (opt_PV, opt_ees)
 
 %%%General export
-gen_export_on = 1; %%%Placed a "general export" capability in the general electrical energy equality system (opt_gen_equalities)
+gen_export_on = 0; %%%Placed a "general export" capability in the general electrical energy equality system (opt_gen_equalities)
 
 %% Carbon Related Toggles
 
@@ -65,6 +65,7 @@ gen_export_on = 1; %%%Placed a "general export" capability in the general electr
 %%%Used in opt_gen_inequalities
 biogas_limit = [144E6];%144E6; %kWh biofuel available per year
 biogas_limit = [144E7];%144E6; %kWh biofuel available per year
+biogas_limit = [491265*293.1]; %%%kWh - biofuel availabe per year - based on Matt Gudorff emails/pptx
 % biogas_limit = [10];%144E6; %kWh biofuel available per year
 
 %%%Required fuel input
@@ -73,30 +74,10 @@ h2_fuel_forced_fraction = []; %%%Energy fuel requirements
 
 %%%H2 fuel limit in legacy generator
 %%%Used in opt_gen_inequalities
-h2_fuel_limit = [];%0.1; %%%Fuel limit on an energy basis - should be 0.1
+h2_fuel_limit = [0.1];%0.1; %%%Fuel limit on an energy basis - should be 0.1
 
 %%%CO2 Limit
-co2_lim = [2.3862e+07*.3];%1.2220e+07*0.5;
-co2_lim = [1.2051e+07*0.6];
-co2_lim = [8.83E+06];
-co2_lim = [2.3862e+07*.3];%1.2220e+07*0.5;
-% co2_lim = [ 0*1.2363e+07];%1.2220e+07*0.5;
-co2_lim =  1.3423e+08.*0.5; %%% 2018 CO2 Limit
-co2_lim = 4.6802e+07*0.25;
-% co2_lim = 4.4804e+07*0.5;
-co2_lim = [2.2429e+07]*0.25;
-co2_lim = 4.6802e+07*0.2;
-
-% co2_lim = [1.1769e+07]*0.25; %1
-% co2_lim = [1.0505e+07]*0.2; %7
-% co2_lim = [1.0314e+07]*0.2; %4
-% co2_lim = [ 1.1700e+07]*0.25; %10
-
-co2_lim = [1.0509e+07]*0.15;
-co2_lim = 4.5880e+07*0.15;
-co2_lim = [1.1910e+07]*0.3;
-% co2_lim = [1.1424e+07]*0.15;
-% co2_lim = [];
+co2_lim = [4.5893e+07]; %%%Baseline emissions for 2018, 4 month economic dispatch
 
 %% Turning incentives and other financial tools on/off
 sgip_on = 0;
@@ -195,7 +176,7 @@ year_idx = 2018;
 % month_idx = [10];
 month_idx = [1 4 7 10];
 
-month_idx = [9];
+% month_idx = [9];
 % month_idx = [1];
 % month_idx = [];
 bldg_loader_UCI
@@ -347,4 +328,4 @@ finish = datetime('now') ; totalelapsed = toc(startsim)
 variable_values
 
 %% System Evaluaiton
-% uci_evaluation
+uci_evaluation_2
