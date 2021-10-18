@@ -11,12 +11,14 @@ opt_now_yalmip = 0; %YALMIP
 
 %% Downselection of building energy data?
 downselection = 0;
-pv_on = 1;
-ees_on = 1;
-rees_on = 1;
-lpv_on = 0;
-lees_on = 0;
-lrees_on = 0;
+pv_on = 0;
+ees_on = 0;
+rees_on = 0;
+lpv_on = 1;
+lees_on = 1;
+lrees_on = 1;
+
+sgip_on = 0;
 %% Turning technologies on/off (opt_var_cf.m and tech_select.m)
 % if downselection == 0
 %     pv_on = 0;        %Turn on PV
@@ -38,14 +40,14 @@ lrees_on = 0;
 % end
 
 %% ESA On/Off (opt_var_cf)
-esa_on = 0;
+esa_on = 1; %Building RAtes are Adjusted for CARE Rates
 
 %% Include Critical Loads
 crit_tier = []; %%%Residential Critical Load Requirements (Load Tier)
 crit_tier_com = 0.15; %%%Commercial Critical Load Requirements (% of load)
 
 %% Turning incentives and other financial tools on/off
-sgip_on = 1;
+% sgip_on = 1;
 
 %% PV (opt_pv.m)
 pv_maxarea = 1; %%% Limits maximum PV size, based on initially solar PV panel
@@ -82,13 +84,21 @@ addpath(genpath('C:\Program Files\IBM\ILOG\CPLEX_Studio128\cplex\matlab\x64_win6
 addpath('H:\_Research_\CEC_OVMG\URBANopt\UO_Results_0.5.x')
 
 %%%DERopt paths
-addpath(genpath('H:\_Tools_\DERopt'))
+addpath(genpath('H:\_Tools_\DERopt\Data'))
+addpath(genpath('H:\_Tools_\DERopt\Design'))
+addpath(genpath('H:\_Tools_\DERopt\Input_Data'))
+addpath(genpath('H:\_Tools_\DERopt\Load_Processing'))
+addpath(genpath('H:\_Tools_\DERopt\Post_Processing'))
+addpath(genpath('H:\_Tools_\DERopt\Problem_Formulation_Multi_Node'))
+addpath(genpath('H:\_Tools_\DERopt\Techno_Economic'))
+addpath(genpath('H:\_Tools_\DERopt\Utilities'))
 
 %%% Building UO Object Path
 addpath('H:\_Research_\CEC_OVMG\URBANopt\UO_Processing')
 
 %%%UO Utility Files
 addpath(genpath('H:\_Research_\CEC_OVMG\Rates'))
+
 %% Loading/seperating building demand
 
 fprintf('%s: Loading UO Data.', datestr(now,'HH:MM:SS'))
@@ -171,6 +181,7 @@ bldg_ind = [1];
 bldg_ind = [1 27 92 95 96 97 100 174 204 231 246 282 302 305];
 bldg_ind = [301:317];
 bldg_ind = [];
+% bldg_ind = 3;
 if ~isempty(bldg_ind)
     % return
     % bldg_ind = [1:160];

@@ -46,9 +46,12 @@ end
 
 f3 = figure;
 hold on
-if ~exist('var_pp')
-    if  ~isfield('var_pp','pp_elec_wheel')
+if exist('var_pp')
+    if  ~isfield(var_pp,'pp_elec_wheel')
         var_pp.pp_elec_wheel = zeros(size(elec));
+    end
+    if  ~isfield(var_pp,'pp_elec_wheel_lts')
+        var_pp.pp_elec_wheel_lts = zeros(size(elec));
     end
 end
 plot_data = [];
@@ -81,7 +84,7 @@ datetick('x','ddd','KeepTicks')
 xlim([x_lim_range])
 box on
 grid on
-legend('GT - NG','GT - rNG','GT - H_2','ST','PV to Load','EES Discharge','Import','Wheeled')
+legend('GT - NG','GT - rNG','GT - H_2','ST','PV to Load','EES Discharge','Import','Wheeled','Wheeled-H_2')
 % a1.xtick = 1
 set(gcf, 'Position',  [-1500, -150, 900, 400])
 xlim([x_lim_range])
@@ -164,7 +167,7 @@ f6 = figure;
 
 if ~exist('var_h2_inject')
     if  ~isfield('var_h2_inject','h2_inject')
-        ar_h2_inject.h2_inject = zeros(size(elec));
+        var_h2_inject.h2_inject = zeros(size(elec));
     end
 end
 hold on

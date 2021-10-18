@@ -218,7 +218,7 @@ if util_solar_on || util_ees_on
     Objective = Objective ...
         + sum((-lmp_util).*var_pp.pp_elec_export) ...
         + sum((lmp_util + 0.015).*var_pp.pp_elec_import) ...
-        + sum((0.02).*(var_pp.pp_elec_wheel + pp_elec_wheel_lts));
+        + sum((0.02).*(var_pp.pp_elec_wheel + var_pp.pp_elec_wheel_lts));
 else
     var_pp.pp_elec_export = zeros(T,1);
     var_pp.pp_elec_import = zeros(T,1);
@@ -493,16 +493,20 @@ if h2_inject_on
     var_h2_inject.h2_inject_size = sdpvar(1,1,'full');
     %%%Injected Hydrogen
     var_h2_inject.h2_inject = sdpvar(T,1,'full');
+    %%%Stored Hydrogen
+    var_h2_inject.h2_store = sdpvar(T,1,'full');
     
     
      Objective = Objective ...
        + M*h2_inject_mthly_debt(1)*var_h2_inject.h2_inject_adopt ...
        + M*h2_inject_mthly_debt(2)*var_h2_inject.h2_inject_size ...
-       - ng_inject.*sum(var_h2_inject.h2_inject);
+       - ng_inject.*sum(var_h2_inject.h2_inject) ...
+       + rng_storage_cost.*sum(var_h2_inject.h2_store);
 else
     var_h2_inject.h2_inject = zeros(T,1);
     var_h2_inject.h2_inject_size = 0;
     var_h2_inject.h2_inject_adopt = 0;
+    var_h2_inject.h2_store = zeros(T,1);
 end
     
 %% Renewable Electrolyze
@@ -553,6 +557,12 @@ if ~isempty(dg_legacy)
     var_ldg.ldg_fuel = sdpvar(T,size(dg_legacy,2),'full');
     %%%DG Fuel Input
     var_ldg.ldg_rfuel = sdpvar(T,size(dg_legacy,2),'full');
+    %%%DG Fuel that has been stored in the pipeline
+    if h2_inject_on
+    var_ldg.ldg_sfuel = sdpvar(T,size(dg_legacy,2),'full');
+    else
+       var_ldg.ldg_sfuel = zeros(T,1);
+    end
     %%%DG On/Off State - Number of variables is equal to:
     %%% (Time Instances) / On/Off length
     %     (dg_legacy(end,i)/t_step)
@@ -605,6 +615,7 @@ else
     var_ldg.ldg_elec = zeros(T,1);
     var_ldg.ldg_rfuel = zeros(T,1);
     var_ldg.ldg_hfuel = zeros(T,1);
+    var_ldg.ldg_sfuel = zeros(T,1);
     var_ldg.ldg_fuel = [];
     var_ldg.ldg_off = [];
     var_ldg.ldg_off = 1;

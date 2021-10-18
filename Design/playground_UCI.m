@@ -29,7 +29,7 @@ h2es_on = 1; %Hydrogen energy storage
 hrs_on = 1; %Turn on hydrogen fueling station
 h2_inject_on = 1; %Turn on H2 injection into pipeline
 %% Legacy System Toggles
-lpv_on = 1; %Turn on legacy PV
+lpv_on = 1; %Turn on legacy PV 
 lees_on = 1; %Legacy EES
 ltes_on = 1; %Legacy TES
 
@@ -65,6 +65,7 @@ gen_export_on = 1; %%%Placed a "general export" capability in the general electr
 %%%Used in opt_gen_inequalities
 biogas_limit = [144E6];%144E6; %kWh biofuel available per year
 biogas_limit = [144E7];%144E6; %kWh biofuel available per year
+% biogas_limit = [10];%144E6; %kWh biofuel available per year
 
 %%%Required fuel input
 %%%Used in opt_gen_inequalities
@@ -72,7 +73,7 @@ h2_fuel_forced_fraction = []; %%%Energy fuel requirements
 
 %%%H2 fuel limit in legacy generator
 %%%Used in opt_gen_inequalities
-h2_fuel_limit = [0.1];%0.1; %%%Fuel limit on an energy basis - should be 0.1
+h2_fuel_limit = [];%0.1; %%%Fuel limit on an energy basis - should be 0.1
 
 %%%CO2 Limit
 co2_lim = [2.3862e+07*.3];%1.2220e+07*0.5;
@@ -93,8 +94,10 @@ co2_lim = 4.6802e+07*0.2;
 
 co2_lim = [1.0509e+07]*0.15;
 co2_lim = 4.5880e+07*0.15;
-co2_lim = [ 1.1910e+07]*0.15;
+co2_lim = [1.1910e+07]*0.3;
+% co2_lim = [1.1424e+07]*0.15;
 % co2_lim = [];
+
 %% Turning incentives and other financial tools on/off
 sgip_on = 0;
 
@@ -208,7 +211,8 @@ utility_UCI
 %%%Placeholder natural gas cost
 ng_cost = 0.5/29.3; %$/kWh --> Converted from $/therm to $/kWh, 29.3 kWh / 1 Therm
 rng_cost = 3/29.3;
-ng_inject = 0.3/29.3; %$/kWh --> Converted from $/therm to $/kWh, 29.3 kWh / 1 Therm
+rng_storage_cost = 0.2/29.3;
+ng_inject = 1/29.3; %$/kWh --> Converted from $/therm to $/kWh, 29.3 kWh / 1 Therm
 %% Tech Parameters/Costs
 %%%Technology Parameters
 tech_select_UCI

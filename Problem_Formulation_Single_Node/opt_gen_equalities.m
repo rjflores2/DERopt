@@ -25,7 +25,7 @@ end
 %% Chemical ennergy conversion balance - Hydrogen
 if ~isempty(el_v) || ~isempty(rel_v)
     Constraints = [Constraints
-       (sum(var_rel.rel_prod,2) + sum(var_el.el_prod,2) + sum(var_rel.rel_prod_wheel,2) + sum(var_el.el_prod_wheel,2) + sum(var_h2es.h2es_dchrg,2) == sum(var_ldg.ldg_hfuel,2) + sum(var_ldg.db_hfire,2) + sum(var_boil.boil_hfuel,2) + sum(var_h2es.h2es_chrg,2) + var_hrs.hrs_supply + var_h2_inject.h2_inject):'Hydrogen Balance'];
+       (sum(var_rel.rel_prod,2) + sum(var_el.el_prod,2) + sum(var_rel.rel_prod_wheel,2) + sum(var_el.el_prod_wheel,2) + sum(var_h2es.h2es_dchrg,2) == sum(var_ldg.ldg_hfuel,2) + sum(var_ldg.db_hfire,2) + sum(var_boil.boil_hfuel,2) + sum(var_h2es.h2es_chrg,2) + var_hrs.hrs_supply + var_h2_inject.h2_inject + var_h2_inject.h2_store):'Hydrogen Balance'];
 end
 
 %% H2 Transportation

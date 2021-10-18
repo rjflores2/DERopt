@@ -2,10 +2,10 @@
 if ~isempty(pv_v) || ~isempty(pv_legacy)
     %% PV Energy balance when curtailment is allowed
     if curtail
-        Constraints = [Constraints, (var_pv.pv_elec + var_pv.pv_nem + var_rees.rees_chrg + var_lrees.rees_chrg <= (1/e_adjust).*repmat(solar,1,K).*(repmat(pv_legacy_cap,T,1) + repmat(var_pv.pv_adopt,T,1))):'PV Energy Balance'];
+        Constraints = [Constraints, (var_pv.pv_elec + var_pv.pv_nem + var_rees.rees_chrg + var_lrees.rees_chrg <= (1/e_adjust).*repmat(solar,1,K).*(repmat(pv_legacy_cap,T,1) + repmat(var_pv.pv_adopt,T,1))):'PV Energy Balance - <='];
 %         Constraints = [Constraints, (pv_wholesale + pv_elec + pv_nem + rees_chrg <= repmat(solar,1,K).*repmat(pv_adopt,T,1)):'PV Energy Balance'];
     else
-        Constraints = [Constraints, (var_pv.pv_elec + var_pv.pv_nem + var_rees.rees_chrg + var_lrees.rees_chrg == (1/e_adjust).*repmat(solar,1,K).*(repmat(pv_legacy_cap,T,1) + repmat(var_pv.pv_adopt,T,1))):'PV Energy Balance'];
+        Constraints = [Constraints, (var_pv.pv_elec + var_pv.pv_nem + var_rees.rees_chrg + var_lrees.rees_chrg == (1/e_adjust).*repmat(solar,1,K).*(repmat(pv_legacy_cap,T,1) + repmat(var_pv.pv_adopt,T,1))):'PV Energy Balance - =='];
 %         Constraints = [Constraints, (pv_wholesale + pv_elec + pv_nem + rees_chrg == repmat(solar,1,K).*repmat(pv_adopt,T,1)):'PV Energy Balance'];
     end
     %% Min PV to adopt: Forces 3 kW Adopted
