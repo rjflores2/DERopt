@@ -11,14 +11,19 @@ opt_now_yalmip = 0; %YALMIP
 
 %% Downselection of building energy data?
 downselection = 0;
-pv_on = 0;
-ees_on = 0;
-rees_on = 0;
-lpv_on = 1;
-lees_on = 1;
-lrees_on = 1;
+if downselection == 1
+    sz_on = 1;
+else
+    sz_on = 0;
+end
+pv_on = sz_on;
+ees_on = sz_on;
+rees_on = sz_on;
+lpv_on = 1-sz_on;
+lees_on = 1-sz_on;
+lrees_on = 1-sz_on;
 
-sgip_on = 0;
+sgip_on = sz_on;
 %% Turning technologies on/off (opt_var_cf.m and tech_select.m)
 % if downselection == 0
 %     pv_on = 0;        %Turn on PV
@@ -314,6 +319,11 @@ finish = datetime('now') ; totalelapsed = toc(startsim)
 %% Extract Variables
 variable_values_multi_node
 
+
+%% Saving variables if decisions are made during design stage
+if  downselection == 1
+    save('temp','var_pv','var_ees','var_rees','pv_cap_mod','rees_cap_mod','ees_cap_mod','var_sgip')
+end
 %%
 % clc
 % for ii = 11%:size(elec,2)
