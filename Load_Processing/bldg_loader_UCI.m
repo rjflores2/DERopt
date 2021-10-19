@@ -107,7 +107,7 @@ co2_rng=co2_ng*0.2;
 day_multi = ones(size(elec));
 
 %% Loading SGIP CO2 Signal
-sgip_signal_hour = xlsread('hourly_resolved.csv');
+sgip_signal_hour = xlsread('hourly_resolved.xlsx');
 
 %%%Mannually adjusting SGIP time signal to fit with current UCI Data
 delta = time(1) - sgip_signal_hour(1);
