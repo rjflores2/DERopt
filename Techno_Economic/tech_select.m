@@ -49,6 +49,7 @@ if ees_on
     %ees_v=[300; 0.001; 0.001; 0.1; 0.95; 0.25; 0.25; .95; .95; .995];
     %ees_v=[500; 0.001; 0.001; 0.1; 0.95; 0.25; 0.25; .95; .95; .995];
     ees_v=[830; 0.001; 0.001; 0.1; 0.95; 0.25; 0.25; .90; .90; .995];
+    ees_v=[830; 0.001; 0.001; 0.1; 0.95; 0.5; 0.5; .90; .90; .9999];
     %ees_v=[600; 0.001; 0.001; 0.1; 0.95; 0.25; 0.25; 1; 1; .995]; %Testing with 100% RTE
     
     ees_cap=ees_v(1);
@@ -64,6 +65,15 @@ if ees_on
         
     %%%Financial Aspects - EES
     rees_fin = [-0.4648;... %%%Scaling linear factor - Based on Lazards cost of electricity
+        5; ... %%%MACRS Schedule
+        0]; ... %%%ITC Benefit
+        
+    ees_fin = [-0.1306;... %%%Scaling linear factor - Based on Lazards cost of electricity
+        7; ... %%%MACRS Schedule
+        0]; ... %%%ITC Benefit
+        
+    %%%Financial Aspects - EES
+    rees_fin = [-0.1306;... %%%Scaling linear factor - Based on Lazards cost of electricity
         5; ... %%%MACRS Schedule
         1]; ... %%%ITC Benefit
 else

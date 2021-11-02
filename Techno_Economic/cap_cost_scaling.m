@@ -33,16 +33,16 @@ elseif fin_v(2) == 7
 else
     macrs = zeros(size(macrs5));
 end
-macrs
+
 %% ITC
-itc = (tech_v(1) + scale_factor)*tr*fin_v(3)
+itc = (tech_v(1) + scale_factor)*tr*fin_v(3);
 
 %% Cashflows
 cashflow = debt - macrs;
 cashflow(1) = cashflow(1) - itc;
 
 %%%Adjsuted Cost
-npv_cost = pvvar(cashflow,discount_rate)
+npv_cost = pvvar(cashflow,discount_rate);
 
 %% Cost Scaling
 cost_scale = npv_cost/tech_v(1);
@@ -50,5 +50,5 @@ cost_scale = npv_cost/tech_v(1);
 if cost_scale < 0
     cost_scale = 0;
 end
-cashflow
-cost_scale
+% cashflow
+% cost_scale

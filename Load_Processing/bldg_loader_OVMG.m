@@ -68,6 +68,7 @@ if downselection == 1
     %     for bldg_idx = 2:size(elec,2)
     %         bldg_idx
     parfor bldg_idx = 1:size(elec,2)
+%     for bldg_idx = 1:size(elec,2)
         week_load = [];
         time_dwslct = [];
             day_multi = [];

@@ -24,10 +24,12 @@ if isempty(ees_v) == 0 && sgip_on
         elseif res_units(k)>0 && ~low_income(k)
             Constraints = [Constraints; (var_sgip.sgip_ees_npbi(ind_r) <= (var_ees.ees_adopt(k) + var_rees.rees_adopt(k))):'SGIP system limit'];
             Constraints = [Constraints; (ees_v(7)*(var_sgip.sgip_ees_npbi(ind_r)) <= 5*res_units(k)):'SGIP nonPBI residential unity limit'];
+            Constraints = [Constraints; ((52*size(elec,1)/8760)*var_sgip.sgip_ees_npbi(ind_r) <= sum(var_ees.ees_dchrg(:,k) + var_rees.rees_dchrg(:,k) + var_rees.rees_dchrg_nem(:,k))):'SGIP nonPBI Cycling Requirement'];
             ind_r = ind_r + 1;
         elseif low_income(k)
             Constraints = [Constraints; (var_sgip.sgip_ees_npbi_equity(ind_re) <= (var_ees.ees_adopt(k) + var_rees.rees_adopt(k))):'SGIP system limit'];
             Constraints = [Constraints; (ees_v(7)*(var_sgip.sgip_ees_npbi_equity(ind_re)) <= 5*res_units(k)):'SGIP nonPBI residential unity limit'];
+            Constraints = [Constraints; ((52*size(elec,1)/8760)*var_sgip.sgip_ees_npbi_equity(ind_re) <= sum(var_ees.ees_dchrg(:,k) + var_rees.rees_dchrg(:,k) + var_rees.rees_dchrg_nem(:,k))):'SGIP nonPBI Cycling Requirement'];
             ind_re = ind_re + 1;
         end
     end

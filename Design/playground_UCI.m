@@ -19,15 +19,15 @@ ees_on = 1;       %Turn on EES/REES
 rees_on = 1;  %Turn on REES
 
 %%%Community/Utility Scale systems
-util_solar_on = 0;
-util_ees_on = 0;
+util_solar_on = 1;
+util_ees_on = 1;
 
 %%%Hydrogen technologies
 el_on = 1; %Turn on generic electrolyer
 rel_on = 1; %Turn on renewable tied electrolyzer
 h2es_on = 1; %Hydrogen energy storage
 hrs_on = 0; %Turn on hydrogen fueling station
-h2_inject_on = 0; %Turn on H2 injection into pipeline
+h2_inject_on = 1; %Turn on H2 injection into pipeline
 %% Legacy System Toggles
 lpv_on = 1; %Turn on legacy PV 
 lees_on = 1; %Legacy EES
@@ -41,14 +41,14 @@ lboil_on = 1; %Legacy boilers
 
 %% Utility PV Solar
 util_pv_wheel = 0; %General Wheeling Capabilities
-util_pv_wheel_lts = 0; %Wheeling for long term storage
+util_pv_wheel_lts = 1; %Wheeling for long term storage
 %% Island operation (opt_nem.m) 
 
 %%%Electric rates for UCI
 %%% 1: current rate, which does not value export
 %%% 2: current import rate + LMP export rate
 %%% 3: LMP Rate + 0.2 and LMP Export
-uci_rate = 1;
+uci_rate = 3;
 
 island = 0;
 
@@ -56,7 +56,7 @@ island = 0;
 export_on = 0; %%%Tied to PV and REES export under current utility rates (opt_PV, opt_ees)
 
 %%%General export
-gen_export_on = 0; %%%Placed a "general export" capability in the general electrical energy equality system (opt_gen_equalities)
+gen_export_on = 1; %%%Placed a "general export" capability in the general electrical energy equality system (opt_gen_equalities)
 
 %% Carbon Related Toggles
 
@@ -66,6 +66,7 @@ gen_export_on = 0; %%%Placed a "general export" capability in the general electr
 biogas_limit = [144E6];%144E6; %kWh biofuel available per year
 biogas_limit = [144E7];%144E6; %kWh biofuel available per year
 biogas_limit = [491265*293.1]; %%%kWh - biofuel availabe per year - based on Matt Gudorff emails/pptx
+biogas_limit = [0]; %%%kWh - biofuel availabe per year - based on Matt Gudorff emails/pptx
 % biogas_limit = [10];%144E6; %kWh biofuel available per year
 
 %%%Required fuel input
@@ -74,11 +75,11 @@ h2_fuel_forced_fraction = []; %%%Energy fuel requirements
 
 %%%H2 fuel limit in legacy generator
 %%%Used in opt_gen_inequalities
-h2_fuel_limit = [0.1];%0.1; %%%Fuel limit on an energy basis - should be 0.1
+h2_fuel_limit = [];%0.1; %%%Fuel limit on an energy basis - should be 0.1
 
 %%%CO2 Limit
-co2_lim = [4.5893e+07].*0.375; %%%Baseline emissions for 2018, 4 month economic dispatch
-
+co2_lim = [4.5893e+07].*0.25; %%%Baseline emissions for 2018, 4 month economic dispatch
+co2_lim = [2.5144e+7]*0.75;
 %% Turning incentives and other financial tools on/off
 sgip_on = 0;
 
@@ -163,28 +164,37 @@ else
     cool = [];
 end
 
-%% Placeholders
+%%% Placeholders
 dc_exist = 1;
 rate = {'TOU8'};
 low_income = 0;
 sgip_pbi = 1;
 res_units = 0;
 
-%% Formatting Building Data
+%%% Formatting Building Data
 %%%Values to filter data by
 year_idx = 2018;
 % month_idx = [10];
 month_idx = [1 4 7 10];
+month_idx = [2 9];
 
 % month_idx = [9];
 % month_idx = [1];
 % month_idx = [];
 bldg_loader_UCI
 
-mean(solar)
-mean(elec)
-mean(heat)
-% return
+
+ mean(solar)
+ mean(elec)*4/1000
+mean(heat)*4/1000
+
+% for ii = 1:12
+% avgs_uci(ii,1) = mean(solar(stpts(ii):endpts(ii)));
+% avgs_uci(ii,2) = mean(elec(stpts(ii):endpts(ii)))*4/1000;
+% avgs_uci(ii,3) = mean(heat(stpts(ii):endpts(ii)))*4/1000;
+% end
+% avgs_uci
+
 %% Utility Data
 %%%Loading Utility Data and Generating Energy Charge Vectors
 utility_UCI

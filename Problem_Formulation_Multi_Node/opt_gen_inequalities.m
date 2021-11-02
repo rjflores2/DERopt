@@ -69,7 +69,7 @@ if utility_exists == 1
 end
 
 %% Net Energy Metering
-if strcmp(class(var_pv.pv_nem),'sdpvar') || strcmp(class(var_rees.rees_dchrg_nem),'sdpvar') %%%If NEM related decision variables exist
+if lpv_on || lrees_on || strcmp(class(var_pv.pv_nem),'sdpvar') || strcmp(class(var_rees.rees_dchrg_nem),'sdpvar') %%%If NEM related decision variables exist
     for k=1:K
         %%%Current Utility Rate
         index=find(ismember(rate_labels,rate(k)));
