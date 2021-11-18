@@ -78,3 +78,16 @@ if lrees_on
         (0 <= var_lrees.rees_dchrg_nem):'LREES Discharging >= 0'
         (0 <= var_lrees.rees_soc):'LREES SOC >= 0'];
 end
+%% Resiliency
+if ~isempty(crit_load_lvl) && crit_load_lvl >0
+    if ~isempty(pv_v) || ~isempty(pv_legacy)
+        Constraints = [Constraints
+            (0 <= var_resiliency.pv_elec):'PV Reseliency >= 0'];
+    end
+    if lees_on || lrees_on || ~isempty(ees_v)
+        Constraints = [Constraints
+            (0 <= var_resiliency.ees_chrg):'EES Reseliency Chrg >=0'
+            (0 <= var_resiliency.ees_dchrg):'EES Reseliency Dchrg >=0'
+            (0 <= var_resiliency.ees_soc):'EES Reseliency SOC >= 0'];
+    end
+end

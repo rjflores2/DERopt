@@ -89,7 +89,7 @@ if gen_export_on || export_on
 end
 
 %% Power Plant import/export limits
-if util_solar_on || util_ees_on
+if util_ees_on && util_pp_import
     Constraints = [Constraints
     (var_pp.pp_elec_import <= var_pp.import_state.*1e6):'Power Plant Import State'
     (var_pp.pp_elec_export + var_pp.pp_elec_wheel + var_pp.pp_elec_wheel_lts <= (1 - var_pp.import_state).*1e6):'Power Plant Export State'];

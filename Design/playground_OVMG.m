@@ -86,6 +86,9 @@ esa_on = 1; %Building RAtes are Adjusted for CARE Rates
 crit_tier = []; %%%Residential Critical Load Requirements (Load Tier)
 crit_tier_com = 0.15; %%%Commercial Critical Load Requirements (% of load)
 
+%% Critical Load Level
+crit_load_lvl = 6;
+
 %% Turning incentives and other financial tools on/off
 % sgip_on = 1;
 
@@ -146,12 +149,19 @@ tic
 %%%Loading Data
 sc_txt = 'H:\_Research_\CEC_OVMG\URBANopt\UO_Results_0.5.x\UES_2b';
 load(strcat(sc_txt,'.mat'));
+% bldg = bldg(1:50);
 bldg_base = bldg;
 compare = load('H:\_Research_\CEC_OVMG\URBANopt\UO_Results_0.5.x\UES_2b.mat');
 elapsed = toc;
 fprintf('Took %.2f seconds \n', elapsed)
 bldg_rec = [];
 
+%% Loading Critical Loads
+if crit_load_lvl > 0
+    elec_resiliency_full = xlsread('H:\_Research_\CEC_OVMG\URBANopt\Resiliency\UES_2a_Crit_Loads.xlsx',strcat('Crit_Load_',num2str(crit_load_lvl)));
+else
+    elec_resiliency_full = [];
+end
 %% Loops
 st_idx = [1 51 101 151 201 251 301];
 end_idx = [50 100 150 200 250 300 317];
@@ -159,8 +169,13 @@ end_idx = [50 100 150 200 250 300 317];
 % st_idx = [1 6 11];
 % end_idx = [5 10 15];
 
-% st_idx = 1
-% end_idx = 5
+st_idx = [1 11 21 31 41];
+end_idx = [10 20 30 40 50];
+
+
+st_idx = [1:20:311];
+end_idx = st_idx + 19;
+end_idx(end) = 317;
 
 adopted.pv = [];
 adopted.rees = [];
@@ -263,7 +278,9 @@ for sim_idx = 1:length(st_idx)
         % return
         % bldg_ind = [1:160];
         elec = elec(:,bldg_ind);
-        
+        if crit_load_lvl > 0
+            elec_res = elec_resiliency_full(:,bldg_ind);
+        end
         %     elec_o = elec_o(:,bldg_ind);
         dc_exist = dc_exist(bldg_ind);
         rate = rate(bldg_ind);
@@ -278,8 +295,6 @@ for sim_idx = 1:length(st_idx)
     %% Formatting Building Data
     bldg_loader_OVMG
     
-    %% Pulling crirical loads
-    critical_loads_OVMG
     
     %% Utility Data
     %%%Loading Utility Data and Generating Energy Charge Vectors
@@ -383,6 +398,7 @@ for sim_idx = 1:length(st_idx)
         fprintf('Took %.2f seconds \n', elapsed)
         %% Optimize
         fprintf('%s: Optimizing \n....', datestr(now,'HH:MM:SS'))
+        WHATS_THE_CRITICAL_LOAD = crit_load_lvl
         opt
         
         %% Timer
@@ -448,7 +464,14 @@ end
 OVMG_updated_utility_costs
 %% Saving Data
 bldg = bldg_base;
-save(strcat(sc_txt,'_DER'),'bldg')
+
+if isempty(crit_load_lvl) || crit_load_lvl == 0
+    save_here = 1
+    save(strcat(sc_txt,'_DdER'),'bldg')
+else
+    save_here = 2
+    save(strcat(sc_txt,'_DdER_Crit_Load_',num2str(crit_load_lvl)),'bldg')
+end
 
 return
 
@@ -534,7 +557,12 @@ if ~testing
             
         end
         
-        
-        save(strcat(sc_txt,'_DER'),'bldg')
+        if isempty(crit_load_lvl) || crit_load_lvl == 0
+            save_here = 1
+            save(strcat(sc_txt,'_DER'),'bldg')
+        else
+            save_here = 2
+            save(strcat(sc_txt,'_DER_Crit_Load_',num2str(crit_load_lvl)),'bldg')
+        end
     end
 end

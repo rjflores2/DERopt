@@ -196,9 +196,21 @@ end
 toc
 %% Energy products exported from a power plant
 if util_solar_on || util_ees_on
-    var_pp.pp_elec_export = sdpvar(T,1,'full'); %%%Export from the power plant
-    var_pp.pp_elec_import = sdpvar(T,1,'full'); %%%Import at the power plant
-    var_pp.import_state = binvar(T,1,'full'); %%%Import State
+    
+    if util_pp_export
+        var_pp.pp_elec_export = sdpvar(T,1,'full'); %%%Export from the power plant
+    else
+        var_pp.pp_elec_export = zeros(T,1);
+    end
+    
+    %%%Can the power plant import power at the local node??
+    if util_pp_import
+        var_pp.pp_elec_import = sdpvar(T,1,'full'); %%%Import at the power plant
+        var_pp.import_state = binvar(T,1,'full'); %%%Import State
+    else
+        var_pp.pp_elec_import =   zeros(T,1);
+        var_pp.import_state = zeros(T,1);
+    end
     
     %%%General wheeling potential
     if util_pv_wheel

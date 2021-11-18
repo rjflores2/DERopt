@@ -67,6 +67,7 @@ var_hrs.hrs_supply = value(var_hrs.hrs_supply);
 var_h2_inject.h2_inject_adopt = value(var_h2_inject.h2_inject_adopt);
 var_h2_inject.h2_inject_size = value(var_h2_inject.h2_inject_size);
 var_h2_inject.h2_inject = value(var_h2_inject.h2_inject);
+var_h2_inject.h2_store = value(var_h2_inject.h2_store);
 
 %% Legacy technologies %%
 %% DG - Topping Cycle

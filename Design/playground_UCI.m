@@ -19,15 +19,15 @@ ees_on = 1;       %Turn on EES/REES
 rees_on = 1;  %Turn on REES
 
 %%%Community/Utility Scale systems
-util_solar_on = 1;
-util_ees_on = 1;
+util_solar_on = 0;
+util_ees_on = 0;
 
 %%%Hydrogen technologies
 el_on = 1; %Turn on generic electrolyer
 rel_on = 1; %Turn on renewable tied electrolyzer
 h2es_on = 1; %Hydrogen energy storage
 hrs_on = 0; %Turn on hydrogen fueling station
-h2_inject_on = 1; %Turn on H2 injection into pipeline
+h2_inject_on = 0; %Turn on H2 injection into pipeline
 %% Legacy System Toggles
 lpv_on = 1; %Turn on legacy PV 
 lees_on = 1; %Legacy EES
@@ -41,14 +41,16 @@ lboil_on = 1; %Legacy boilers
 
 %% Utility PV Solar
 util_pv_wheel = 0; %General Wheeling Capabilities
-util_pv_wheel_lts = 1; %Wheeling for long term storage
+util_pv_wheel_lts = 0; %Wheeling for long term storage
+util_pp_import = 0; %Can import power at power plant node
+util_pp_export = 0; %Can import power at power plant node
 %% Island operation (opt_nem.m) 
 
 %%%Electric rates for UCI
 %%% 1: current rate, which does not value export
 %%% 2: current import rate + LMP export rate
 %%% 3: LMP Rate + 0.2 and LMP Export
-uci_rate = 3;
+uci_rate = 1;
 
 island = 0;
 
@@ -66,7 +68,7 @@ gen_export_on = 1; %%%Placed a "general export" capability in the general electr
 biogas_limit = [144E6];%144E6; %kWh biofuel available per year
 biogas_limit = [144E7];%144E6; %kWh biofuel available per year
 biogas_limit = [491265*293.1]; %%%kWh - biofuel availabe per year - based on Matt Gudorff emails/pptx
-biogas_limit = [0]; %%%kWh - biofuel availabe per year - based on Matt Gudorff emails/pptx
+% biogas_limit = [491265*2931]; %%%kWh - biofuel availabe per year - based on Matt Gudorff emails/pptx
 % biogas_limit = [10];%144E6; %kWh biofuel available per year
 
 %%%Required fuel input
@@ -79,7 +81,10 @@ h2_fuel_limit = [];%0.1; %%%Fuel limit on an energy basis - should be 0.1
 
 %%%CO2 Limit
 co2_lim = [4.5893e+07].*0.25; %%%Baseline emissions for 2018, 4 month economic dispatch
-co2_lim = [2.5144e+7]*0.75;
+co2_lim = [2.1562e+07].*0.01;
+co2_lim = [2.1551e+07].*0.36;
+
+co2_lim = [2.1550e+07].*(1-.725);
 %% Turning incentives and other financial tools on/off
 sgip_on = 0;
 
@@ -128,32 +133,31 @@ addpath(genpath('H:\_Tools_\DERopt\Problem_Formulation_Single_Node'))
 addpath(genpath('H:\_Tools_\DERopt\Techno_Economic'))
 addpath(genpath('H:\_Tools_\DERopt\Utilities'))
 addpath(genpath('H:\_Tools_\DERopt\Data'))
-
 %%%cyc PC Paths
-addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Design'))
-addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Input_Data'))
-addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Load_Processing'))
-addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Post_Processing'))
-addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Problem_Formulation_Single_Node'))
-addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Techno_Economic'))
-addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Utilities'))
-
-%%%cyc Office Paths
-addpath(genpath('C:\Users\cyc\OneDrive - University of California - Irvine\DERopt (Office)\Design'))
-addpath(genpath('C:\Users\cyc\OneDrive - University of California - Irvine\DERopt (Office)\Input_Data'))
-addpath(genpath('C:\Users\cyc\OneDrive - University of California - Irvine\DERopt (Office)\Load_Processing'))
-addpath(genpath('C:\Users\cyc\OneDrive - University of California - Irvine\DERopt (Office)\Post_Processing'))
-addpath(genpath('C:\Users\cyc\OneDrive - University of California - Irvine\DERopt (Office)\Problem_Formulation_Single_Node'))
-addpath(genpath('C:\Users\cyc\OneDrive - University of California - Irvine\DERopt (Office)\Techno_Economic'))
-addpath(genpath('C:\Users\cyc\OneDrive - University of California - Irvine\DERopt (Office)\Utilities'))
+% addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Design'))
+% addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Input_Data'))
+% addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Load_Processing'))
+% addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Post_Processing'))
+% addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Problem_Formulation_Single_Node'))
+% addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Techno_Economic'))
+% addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Utilities'))
+% 
+% %%%cyc Office Paths
+% addpath(genpath('C:\Users\cyc\OneDrive - University of California - Irvine\DERopt (Office)\Design'))
+% addpath(genpath('C:\Users\cyc\OneDrive - University of California - Irvine\DERopt (Office)\Input_Data'))
+% addpath(genpath('C:\Users\cyc\OneDrive - University of California - Irvine\DERopt (Office)\Load_Processing'))
+% addpath(genpath('C:\Users\cyc\OneDrive - University of California - Irvine\DERopt (Office)\Post_Processing'))
+% addpath(genpath('C:\Users\cyc\OneDrive - University of California - Irvine\DERopt (Office)\Problem_Formulation_Single_Node'))
+% addpath(genpath('C:\Users\cyc\OneDrive - University of California - Irvine\DERopt (Office)\Techno_Economic'))
+% addpath(genpath('C:\Users\cyc\OneDrive - University of California - Irvine\DERopt (Office)\Utilities'))
 
 %%%Specific project path
 % addpath('H:\_Research_\CEC_OVMG\DERopt')
 
 %%%SGIP CO2 Signal
 addpath('H:\Data\CPUC_SGIP_Signal')
-addpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Data')
-addpath('C:\Users\cyc\OneDrive - University of California - Irvine\DERopt (Office)\Data')
+% addpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Data')
+% addpath('C:\Users\cyc\OneDrive - University of California - Irvine\DERopt (Office)\Data')
 
 %%%CO2 Signal Path
 addpath('H:\Data\Emission_Factors')
@@ -161,11 +165,10 @@ addpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Data
 addpath('C:\Users\cyc\OneDrive - University of California - Irvine\DERopt (Office)\Data\Emission_Factors')
 
 %% Loading building demand
-
 %%%Loading Data
-%dt = load('H:\Data\UCI\Campus_Loads_2014_2019.mat');
+dt = load('H:\Data\UCI\Campus_Loads_2014_2019.mat');
 %dt = load('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Data\Campus_Loads_2014_2019.mat');
-dt = load('C:\Users\cyc\OneDrive - University of California - Irvine\DERopt (Office)\Data\Campus_Loads_2014_2019.mat');
+% dt = load('C:\Users\cyc\OneDrive - University of California - Irvine\DERopt (Office)\Data\Campus_Loads_2014_2019.mat');
 
 heat = dt.loads.heating;
 time = dt.loads.time;
@@ -216,6 +219,7 @@ utility_UCI
 ng_cost = 0.5/29.3; %$/kWh --> Converted from $/therm to $/kWh, 29.3 kWh / 1 Therm
 % rng_cost = 3/29.3;
 rng_cost = 2.*ng_cost;
+% rng_cost = 3;
 rng_storage_cost = 0.2/29.3;
 ng_inject = 1/29.3; %$/kWh --> Converted from $/therm to $/kWh, 29.3 kWh / 1 Therm
 %% Tech Parameters/Costs
