@@ -42,7 +42,9 @@ biogas_frac = sum(var_ldg.ldg_rfuel)./sum(var_ldg.ldg_fuel + var_ldg.ldg_rfuel)
 con_frac = sum(var_ldg.ldg_fuel)./sum(var_ldg.ldg_fuel + var_ldg.ldg_rfuel)
 
 h2_frac = var_ldg.ldg_hfuel./(var_ldg.ldg_fuel + var_ldg.ldg_rfuel + var_ldg.ldg_hfuel);
+h2_frac(isnan(h2_frac)) = 0;
 non_h2_frac = 1 - h2_frac;
+% non_h2_frac(isnan(non_h2_frac)) = 0;
 end
 %% Plotting Generation
 

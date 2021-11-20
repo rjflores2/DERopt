@@ -86,8 +86,8 @@ esa_on = 1; %Building RAtes are Adjusted for CARE Rates
 crit_tier = []; %%%Residential Critical Load Requirements (Load Tier)
 crit_tier_com = 0.15; %%%Commercial Critical Load Requirements (% of load)
 
-%% Critical Load Level
-crit_load_lvl = 6;
+%% Critical Load Level6
+crit_load_lvl = 5;
 
 %% Turning incentives and other financial tools on/off
 % sgip_on = 1;

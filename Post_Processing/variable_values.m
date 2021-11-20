@@ -56,6 +56,8 @@ var_h2es.h2es_adopt = value(var_h2es.h2es_adopt);
 var_h2es.h2es_chrg = value(var_h2es.h2es_chrg);
 var_h2es.h2es_dchrg = value(var_h2es.h2es_dchrg);
 var_h2es.h2es_soc = value(var_h2es.h2es_soc);
+var_h2es.h2es_bin = value(var_h2es.h2es_bin);
+
 
 %% HRS Station
 var_hrs.hrs_supply_adopt = value(var_hrs.hrs_supply_adopt);
@@ -77,6 +79,7 @@ var_ldg.ldg_rfuel = value(var_ldg.ldg_rfuel);
 var_ldg.ldg_hfuel = value(var_ldg.ldg_hfuel);
 var_ldg.ldg_elec_ramp = value(var_ldg.ldg_elec_ramp);
 var_ldg.ldg_off = value(var_ldg.ldg_off);
+var_ldg.ldg_opstate = value(var_ldg.ldg_opstate);
 %% Bottoming Cycle
 var_lbot.lbot_elec = value(var_lbot.lbot_elec);
 var_lbot.lbot_on = value(var_lbot.lbot_on);

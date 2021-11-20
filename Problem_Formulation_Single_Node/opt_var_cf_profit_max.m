@@ -4,10 +4,24 @@ clear var*
 Constraints=[];
 
 T = length(time);     %t-th time interval from 1...T
-% K = size(elec,2);     %k-kth building from 
 M = length(endpts);   %# of months in the simulation
 
 % Objective = [];
+
+%% General import & export
+
+%%% Wholesale export on the day ahead market
+var_sales.wholesale_export = spdvar(T,1,'full');
+
+%%% Wholesale import on the day ahead market
+if wholesale_import
+    var_sales.wholesale_import = spdvar(T,1,'full');
+else
+    var_sales.wholesale_import = zeros(T,1);
+end
+    
+    
+
 
 %% Utility Electricity
 if isempty(utility_exists) == 0
@@ -404,7 +418,6 @@ else
     var_h2es.h2es_soc = zeros(T,1);
     var_h2es.h2es_chrg = zeros(T,1);
     var_h2es.h2es_dchrg = zeros(T,1);
-    var_h2es.h2es_bin = zeros(T,1);
     el_eff = zeros(T,1);
 end
 %% Renewable Electrolyzer
@@ -577,19 +590,10 @@ if ~isempty(dg_legacy)
     else
        var_ldg.ldg_sfuel = zeros(T,1);
     end
-    %%%DG Operational State
-    if ldg_op_state
-        var_ldg.ldg_opstate = binvar(T,size(dg_legacy,2),'full');
-    else
-        var_ldg.ldg_opstate = ones(T,size(dg_legacy,2));
-    end
-    
-    
     %%%DG On/Off State - Number of variables is equal to:
     %%% (Time Instances) / On/Off length
     %     (dg_legacy(end,i)/t_step)
     %     ldg_off=binvar(ceil(length(time)/(dg_legacy(end,i)/t_step)),K,'full');
-    
     var_ldg.ldg_off = [];
         
     %%%If hydrogen production is an option

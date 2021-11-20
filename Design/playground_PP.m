@@ -18,40 +18,25 @@ pv_on = 1;        %Turn on PV
 ees_on = 1;       %Turn on EES/REES
 rees_on = 1;  %Turn on REES
 
-%%%Community/Utility Scale systems
-util_solar_on = 1;
-util_ees_on = 0;
-
 %%%Hydrogen technologies
-el_on = 0; %Turn on generic electrolyer
-rel_on = 0; %Turn on renewable tied electrolyzer
-h2es_on = 0; %Hydrogen energy storage
+el_on = 1; %Turn on generic electrolyer
+rel_on = 1; %Turn on renewable tied electrolyzer
+h2es_on = 1; %Hydrogen energy storage
 hrs_on = 0; %Turn on hydrogen fueling station
 h2_inject_on = 0; %Turn on H2 injection into pipeline
 %% Legacy System Toggles
-lpv_on = 1; %Turn on legacy PV 
-lees_on = 1; %Legacy EES
-ltes_on = 1; %Legacy TES
 
 ldg_on = 1; %Turn on legacy GT
 lbot_on = 1; %Turn on legacy bottoming cycle / Steam turbine
 lhr_on = 1; %Legacy HR
 ldb_on = 1; %Legacy Duct Burner
-lboil_on = 1; %Legacy boilers
 
-%% Utility PV Solar
-util_pv_wheel = 1; %General Wheeling Capabilities
-util_pv_wheel_lts = 0; %Wheeling for long term storage
-util_pp_import = 0; %Can import power at power plant node
-util_pp_export = 0; %Can import power at power plant node
 
-%% Legacy Generator Options
-ldg_op_state = 1; %%%Generator can turn on/off
-%%%Gas turbine cycling costs
-dg_legacy_cyc = 1;
+%% Powerplant Capabilities & Markets
+%%%Power plant can import on the day ahead market
+wholesale_import = 0;
 
-%%%Shut off legacy generator option
-ldg_off = 0;
+
 %% Island operation (opt_nem.m) 
 
 %%%Electric rates for UCI
@@ -66,17 +51,14 @@ island = 0;
 export_on = 0; %%%Tied to PV and REES export under current utility rates (opt_PV, opt_ees)
 
 %%%General export
-gen_export_on = 0; %%%Placed a "general export" capability in the general electrical energy equality system (opt_gen_equalities)
+gen_export_on = 1; %%%Placed a "general export" capability in the general electrical energy equality system (opt_gen_equalities)
 
 %% Carbon Related Toggles
 
 %%%Available biogas/renewable gas per year (biogas limit is prorated in the model to the
 %%%simulation period)
 %%%Used in opt_gen_inequalities
-biogas_limit = [144E6];%144E6; %kWh biofuel available per year
-biogas_limit = [144E7];%144E6; %kWh biofuel available per year
-biogas_limit = [491265*293.1]; %%%kWh - biofuel availabe per year - based on Matt Gudorff emails/pptx
-biogas_limit = [0];
+biogas_limit = []; %%%kWh - biofuel availabe per year - based on Matt Gudorff emails/pptx
 % biogas_limit = [491265*2931]; %%%kWh - biofuel availabe per year - based on Matt Gudorff emails/pptx
 % biogas_limit = [10];%144E6; %kWh biofuel available per year
 
@@ -89,18 +71,14 @@ h2_fuel_forced_fraction = []; %%%Energy fuel requirements
 h2_fuel_limit = [];%0.1; %%%Fuel limit on an energy basis - should be 0.1
 
 %%%CO2 Limit
-co2_lim = [4.5893e+07].*0.25; %%%Baseline emissions for 2018, 4 month economic dispatch
-co2_lim = [2.1562e+07].*0.01;
-co2_lim = [2.1551e+07].*0.36;
+co2_lim = []; 
 
-co2_lim = [2.1550e+07].*(1-.25);
-% co2_lim = [];
-%% Turning incentives and other financial tools on/off
-sgip_on = 0;
+%% Legacy GT Options
+%%%Gas turbine cycling costs
+dg_legacy_cyc = 1;
 
-%% Throughput requirement - DOE H2 Integration
-h2_charging_rec = []; %Required throughput per day
-
+%%%Shut off legacy generator option
+ldg_off = 0;
 %% PV (opt_pv.m)
 %%%maxpv is maximum capacity that can be installed. If includes different
 %%%orientations, set maxpv to row vector: for example maxpv =
@@ -133,7 +111,7 @@ addpath(genpath('H:\_Tools_\DERopt\Design'))
 addpath(genpath('H:\_Tools_\DERopt\Input_Data'))
 addpath(genpath('H:\_Tools_\DERopt\Load_Processing'))
 addpath(genpath('H:\_Tools_\DERopt\Post_Processing'))
-addpath(genpath('H:\_Tools_\DERopt\Problem_Formulation_Single_Node'))
+addpath(genpath('H:\_Tools_\DERopt\Problem_Formulation_Single_Node\Max_Profit'))
 addpath(genpath('H:\_Tools_\DERopt\Techno_Economic'))
 addpath(genpath('H:\_Tools_\DERopt\Utilities'))
 addpath(genpath('H:\_Tools_\DERopt\Data'))
@@ -168,57 +146,11 @@ addpath('H:\Data\Emission_Factors')
 addpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Data\Emission_Factors')
 addpath('C:\Users\cyc\OneDrive - University of California - Irvine\DERopt (Office)\Data\Emission_Factors')
 
-%% Loading building demand
-%%%Loading Data
-dt = load('H:\Data\UCI\Campus_Loads_2014_2019.mat');
-%dt = load('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Data\Campus_Loads_2014_2019.mat');
-% dt = load('C:\Users\cyc\OneDrive - University of California - Irvine\DERopt (Office)\Data\Campus_Loads_2014_2019.mat');
-
-heat = dt.loads.heating;
-time = dt.loads.time;
-if chiller_plant_opt
-    elec = dt.loads.elec;
-    cool = dt.loads.cooling;
-else
-    elec = dt.loads.elec_total;
-    cool = [];
-end
-
-%%% Placeholders
-dc_exist = 1;
-rate = {'TOU8'};
-low_income = 0;
-sgip_pbi = 1;
-res_units = 0;
-
-%%% Formatting Building Data
-%%%Values to filter data by
-year_idx = 2018;
-% month_idx = [10];
-month_idx = [1 4 7 10];
-month_idx = [2 9];
-
-% month_idx = [9];
-% month_idx = [1];
-% month_idx = [];
-bldg_loader_UCI
-
-
- mean(solar)
- mean(elec)*4/1000
-mean(heat)*4/1000
-
-% for ii = 1:12
-% avgs_uci(ii,1) = mean(solar(stpts(ii):endpts(ii)));
-% avgs_uci(ii,2) = mean(elec(stpts(ii):endpts(ii)))*4/1000;
-% avgs_uci(ii,3) = mean(heat(stpts(ii):endpts(ii)))*4/1000;
-% end
-% avgs_uci
+%% Price Signals
+yr_target = 2019;
+price_signals
 
 %% Utility Data
-%%%Loading Utility Data and Generating Energy Charge Vectors
-utility_UCI
-% export_price = export_price*0;
 %%%Placeholder natural gas cost
 ng_cost = 0.5/29.3; %$/kWh --> Converted from $/therm to $/kWh, 29.3 kWh / 1 Therm
 % rng_cost = 3/29.3;
@@ -227,17 +159,17 @@ rng_cost = 2.*ng_cost;
 rng_storage_cost = 0.2/29.3;
 ng_inject = 1/29.3; %$/kWh --> Converted from $/therm to $/kWh, 29.3 kWh / 1 Therm
 %% Tech Parameters/Costs
-%%%Technology Parameters
-tech_select_UCI
-
-%%%Including Required Return with Capital Payment (1 = Yes)
-req_return_on = 1;
-
-%%%Capital cost mofificaitons
-cap_cost_mod
+% %%%Technology Parameters
+% tech_select_UCI
+% 
+% %%%Including Required Return with Capital Payment (1 = Yes)
+% req_return_on = 1;
+% 
+% %%%Capital cost mofificaitons
+% cap_cost_mod
 
 %% Legacy Technologies
-tech_legacy_UCI
+tech_legacy_PP
 
 %% DERopt
 %% Setting up variables and cost function
@@ -249,21 +181,10 @@ fprintf('Took %.2f seconds \n', elapsed)
 
 %% General Equality Constraints
 fprintf('%s: General Equalities.', datestr(now,'HH:MM:SS'))
-tic
-if onoff_model
-    opt_gen_equalities %%%Does not include NEM and wholesale in elec equality constraint
-else
-    opt_gen_equalities_vc_mod
-end
+opt_gen_equalities %%%Does not include NEM and wholesale in elec equality constraint
 elapsed = toc;
 fprintf('Took %.2f seconds \n', elapsed)
 
-%% General Inequality Constraints
-fprintf('%s: General Inequalities. ', datestr(now,'HH:MM:SS'))
-tic
-opt_gen_inequalities
-elapsed = toc;
-fprintf('Took %.2f seconds \n', elapsed)
 
 %% Heat Recovery Inequality Constraints
 fprintf('%s: Heat Recovery Inequalities. ', datestr(now,'HH:MM:SS'))
@@ -277,77 +198,56 @@ tic
 opt_dg_legacy
 elapsed = toc;
 fprintf('Took %.2f seconds \n', elapsed)
-%% Legacy ST Constraints
+% Legacy ST Constraints
 fprintf('%s: Legacy ST Constraints. ', datestr(now,'HH:MM:SS'))
 tic
 opt_bot_legacy
 elapsed = toc;
 fprintf('Took %.2f seconds \n', elapsed)
 %% Solar PV Constraints
-fprintf('%s: PV Constraints.', datestr(now,'HH:MM:SS'))
-tic
-opt_pv 
-elapsed = toc;
-fprintf('Took %.2f seconds \n', elapsed)
+% fprintf('%s: PV Constraints.', datestr(now,'HH:MM:SS'))
+% tic
+% opt_pv 
+% elapsed = toc;
+% fprintf('Took %.2f seconds \n', elapsed)
 
 %% EES Constraints
-fprintf('%s: EES Constraints.', datestr(now,'HH:MM:SS'))
-tic
-opt_ees
-elapsed = toc;
-fprintf('Took %.2f seconds \n', elapsed)
+% fprintf('%s: EES Constraints.', datestr(now,'HH:MM:SS'))
+% tic
+% opt_ees
+% elapsed = toc;
+% fprintf('Took %.2f seconds \n', elapsed)
 %% Legacy EES Constraints
-fprintf('%s: Legacy EES Constraints.', datestr(now,'HH:MM:SS'))
-tic
-opt_ees_legacy
-elapsed = toc;
-fprintf('Took %.2f seconds \n', elapsed)
-%% Legacy VC Constraints
-fprintf('%s: Legacy VC Constraints.', datestr(now,'HH:MM:SS'))
-tic
-if onoff_model
-opt_vc_legacy
-end
-elapsed = toc;
-fprintf('Took %.2f seconds \n', elapsed)
+% fprintf('%s: Legacy EES Constraints.', datestr(now,'HH:MM:SS'))
+% tic
+% opt_ees_legacy
+% elapsed = toc;
+% fprintf('Took %.2f seconds \n', elapsed)
 %% Legacy TES Constraints
-fprintf('%s: Legacy TES Constraints.', datestr(now,'HH:MM:SS'))
-tic
-opt_tes_legacy
-elapsed = toc;
-fprintf('Took %.2f seconds \n', elapsed)
+% fprintf('%s: Legacy TES Constraints.', datestr(now,'HH:MM:SS'))
+% tic
+% opt_tes_legacy
+% elapsed = toc;
+% fprintf('Took %.2f seconds \n', elapsed)
 %% DER Incentives
-fprintf('%s: DER Incentives Constraints.', datestr(now,'HH:MM:SS'))
-tic
-opt_incentives
-elapsed = toc;
-fprintf('Took %.2f seconds \n', elapsed)
+% fprintf('%s: DER Incentives Constraints.', datestr(now,'HH:MM:SS'))
+% tic
+% opt_incentives
+% elapsed = toc;
+% fprintf('Took %.2f seconds \n', elapsed)
 
 %% H2 production Constraints
-fprintf('%s: Electrolyzer and H2 Storage Constraints.', datestr(now,'HH:MM:SS'))
-tic
-opt_h2_production
-elapsed = toc;
-fprintf('Took %.2f seconds \n', elapsed)
-%% Utility Solar
-fprintf('%s: Utility Scale Solar Constraints.', datestr(now,'HH:MM:SS'))
-tic
-opt_utility_pv
-elapsed = toc;
-fprintf('Took %.2f seconds \n', elapsed)
-%% Utility EES Storage
-fprintf('%s: Utility Scale Battery Storage Constraints.', datestr(now,'HH:MM:SS'))
-tic
-opt_utility_ees
-elapsed = toc;
-fprintf('Took %.2f seconds \n', elapsed)
-
-%% H2 Pipeline Injection
-fprintf('%s: H2 Pipeline Injection Constraints.', datestr(now,'HH:MM:SS'))
-tic
-opt_h2_pipeline_injection
-elapsed = toc;
-fprintf('Took %.2f seconds \n', elapsed)
+% fprintf('%s: Electrolyzer and H2 Storage Constraints.', datestr(now,'HH:MM:SS'))
+% tic
+% opt_h2_production
+% elapsed = toc;
+% fprintf('Took %.2f seconds \n', elapsed)
+% %% H2 Pipeline Injection
+% fprintf('%s: H2 Pipeline Injection Constraints.', datestr(now,'HH:MM:SS'))
+% tic
+% opt_h2_pipeline_injection
+% elapsed = toc;
+% fprintf('Took %.2f seconds \n', elapsed)
 
 %% Optimize
 fprintf('%s: Optimizing \n....', datestr(now,'HH:MM:SS'))
@@ -360,4 +260,4 @@ finish = datetime('now') ; totalelapsed = toc(startsim)
 variable_values
 
 %% System Evaluaiton
-uci_evaluation_2
+% uci_evaluation_2
