@@ -23,9 +23,9 @@ util_solar_on = 1;
 util_ees_on = 0;
 
 %%%Hydrogen technologies
-el_on = 0; %Turn on generic electrolyer
-rel_on = 0; %Turn on renewable tied electrolyzer
-h2es_on = 0; %Hydrogen energy storage
+el_on = 1; %Turn on generic electrolyer
+rel_on = 1; %Turn on renewable tied electrolyzer
+h2es_on = 1; %Hydrogen energy storage
 hrs_on = 0; %Turn on hydrogen fueling station
 h2_inject_on = 0; %Turn on H2 injection into pipeline
 %% Legacy System Toggles
@@ -46,12 +46,16 @@ util_pp_import = 0; %Can import power at power plant node
 util_pp_export = 0; %Can import power at power plant node
 
 %% Legacy Generator Options
-ldg_op_state = 1; %%%Generator can turn on/off
+ldg_op_state = 0; %%%Generator can turn on/off
 %%%Gas turbine cycling costs
 dg_legacy_cyc = 1;
 
 %%%Shut off legacy generator option
 ldg_off = 0;
+
+%%%H2 fuel limit in legacy generator
+%%%Used in opt_gen_inequalities
+h2_fuel_limit = [0.5];%0.1; %%%Fuel limit on an energy basis - should be 0.1
 %% Island operation (opt_nem.m) 
 
 %%%Electric rates for UCI
@@ -76,7 +80,7 @@ gen_export_on = 0; %%%Placed a "general export" capability in the general electr
 biogas_limit = [144E6];%144E6; %kWh biofuel available per year
 biogas_limit = [144E7];%144E6; %kWh biofuel available per year
 biogas_limit = [491265*293.1]; %%%kWh - biofuel availabe per year - based on Matt Gudorff emails/pptx
-biogas_limit = [0];
+% biogas_limit = [0];
 % biogas_limit = [491265*2931]; %%%kWh - biofuel availabe per year - based on Matt Gudorff emails/pptx
 % biogas_limit = [10];%144E6; %kWh biofuel available per year
 
@@ -84,15 +88,7 @@ biogas_limit = [0];
 %%%Used in opt_gen_inequalities
 h2_fuel_forced_fraction = []; %%%Energy fuel requirements
 
-%%%H2 fuel limit in legacy generator
-%%%Used in opt_gen_inequalities
-h2_fuel_limit = [];%0.1; %%%Fuel limit on an energy basis - should be 0.1
-
 %%%CO2 Limit
-co2_lim = [4.5893e+07].*0.25; %%%Baseline emissions for 2018, 4 month economic dispatch
-co2_lim = [2.1562e+07].*0.01;
-co2_lim = [2.1551e+07].*0.36;
-
 co2_lim = [2.1550e+07].*(1-.25);
 % co2_lim = [];
 %% Turning incentives and other financial tools on/off
