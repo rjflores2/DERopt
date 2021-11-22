@@ -104,7 +104,8 @@ end
 %% Gas Turbine Fuel Input Limit - Hydrogen
 if ~isempty(h2_fuel_limit) && ldg_on
     Constraints = [Constraints
-        ((1 - h2_fuel_limit).*var_ldg.ldg_hfuel <= h2_fuel_limit.*(var_ldg.ldg_fuel + var_ldg.ldg_rfuel + var_ldg.ldg_hfuel)):'H2 Fuel Limit in GT'];   
+        ((1 - h2_fuel_limit).*var_ldg.ldg_hfuel <= h2_fuel_limit.*(var_ldg.ldg_fuel + var_ldg.ldg_rfuel)):'H2 Fuel Limit in GT'];   
+%         ((1 - h2_fuel_limit).*var_ldg.ldg_hfuel <= h2_fuel_limit.*(var_ldg.ldg_fuel + var_ldg.ldg_rfuel + var_ldg.ldg_hfuel)):'H2 Fuel Limit in GT'];   
 end
 
 %% CO2 limit

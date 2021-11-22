@@ -89,7 +89,7 @@ biogas_limit = [491265*293.1]; %%%kWh - biofuel availabe per year - based on Mat
 h2_fuel_forced_fraction = []; %%%Energy fuel requirements
 
 %%%CO2 Limit
-co2_lim = [2.1550e+07].*(1-.25);
+co2_lim = [2.1550e+07].*(1-.75);
 % co2_lim = [];
 %% Turning incentives and other financial tools on/off
 sgip_on = 0;
