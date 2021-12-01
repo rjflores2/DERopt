@@ -39,8 +39,13 @@ if  ~exist('ldg_on','var')
 end
 if ldg_on
 biogas_frac = sum(var_ldg.ldg_rfuel)./sum(var_ldg.ldg_fuel + var_ldg.ldg_rfuel)
+if isnan(biogas_frac)
+    biogas_frac = 0;
+end
 con_frac = sum(var_ldg.ldg_fuel)./sum(var_ldg.ldg_fuel + var_ldg.ldg_rfuel)
-
+if isnan(con_frac)
+    con_frac = 0;
+end
 h2_frac = var_ldg.ldg_hfuel./(var_ldg.ldg_fuel + var_ldg.ldg_rfuel + var_ldg.ldg_hfuel);
 h2_frac(isnan(h2_frac)) = 0;
 non_h2_frac = 1 - h2_frac;
@@ -70,10 +75,15 @@ if ldg_on
         var_pp.pp_elec_wheel...
         var_pp.pp_elec_wheel_lts]./1000;
 else
-    plot_data = e_adjust.*[zeros(length( var_pv.pv_elec),4) ...
+    plot_data = e_adjust.*[var_ldg.ldg_elec ...
+        var_ldg.ldg_elec ...
+        var_ldg.ldg_elec ...
+        var_lbot.lbot_elec ...
+        var_pv.pv_elec ...
         var_rees.rees_dchrg + var_ees.ees_dchrg + var_lees.ees_dchrg...
-    var_pv.pv_elec ...
-    var_util.import]./1000;
+        var_util.import ...
+        var_pp.pp_elec_wheel...
+        var_pp.pp_elec_wheel_lts]./1000;
 end
 
 p3 = area(time,plot_data);
@@ -144,7 +154,9 @@ hold off
 
 
 %% Plotting Heating
+if ~isempty(heat) && sum(heat) > 0
 f5 = figure;
+
 hold on
 plot_data = [];
 plot_data = e_adjust.*[var_boil.boil_fuel.*boil_legacy(2) ...
@@ -165,7 +177,7 @@ xlim([x_lim_range])
 set(gcf, 'Position',  [-1500, -150, 900, 400])
 ylim([0 15])
 hold off
-
+end
 %% Plotting H2 Production
 f6 = figure;
 

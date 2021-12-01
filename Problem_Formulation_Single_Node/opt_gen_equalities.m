@@ -45,3 +45,12 @@ if util_solar_on || util_ees_on
             (sum(el_eff.*var_el.el_prod_wheel,2) + sum(el_eff.*var_rel.rel_prod_wheel,2) == sum(var_pp.pp_elec_wheel_lts,2)):'PP to LTS Wheeling Electricity Balance'];
     end
 end
+
+%% SHITTT
+
+% Constraints = [Constraints
+%     sum(var_ldg.ldg_hfuel(idx,:),2) + sum(var_ldg.db_hfire(idx,:),2) + sum(var_boil.boil_hfuel(idx,:),2) <= .001
+%     sum(var_rel.rel_adopt) + sum(var_el.el_adopt) == 5000*0.6];
+
+% Constraints = [Constraints
+% sum(var_rees.rees_adopt) + sum(var_ees.ees_adopt) == 1.1896e+04];

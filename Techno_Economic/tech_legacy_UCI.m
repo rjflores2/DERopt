@@ -37,9 +37,16 @@ if ldg_on
     q1 = 1.165836640310779;
     q2 = 65.443426383939470;
     
+    %%%Titan coefficients - constant efficiency
+%     f1 = 1/.36;
+%     f2 = 0;
+%     q1 = 1.166;
+%     q2 = 0;
+    
     dg_legacy = [0.026; 14500; 13000; 0.01; 0.01; 0.52;f1; f2; q1; q2; 60*24*3];
     dg_legacy = [0.026; 14500; 6000; 0.01; 0.01; 0.52;f1; f2; q1; q2; 60*24*3];
     dg_legacy = [0.006; 14500; 6000; 0.01; 0.01; 0.52;f1; f2; q1; q2; 60*24*3];
+%     dg_legacy = [0.006; 14500; 0; 0.01; 0.01; 0.52;f1; f2; q1; q2; 60*24*3];
     
     %%%Costs assocaited with cycling the gas turbine
     %%% Cost to turn on the engine - 1 ($/start) - taken from 75% percentile of cold starts

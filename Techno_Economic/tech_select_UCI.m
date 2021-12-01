@@ -1,6 +1,6 @@
 %% Technology Selection
 %% Utility
-utility_exists=1;
+utility_exists=[1];
 
 %% Solar PV
 if pv_on
@@ -142,6 +142,7 @@ if ees_on
 else
     ees_v = [];
     rees_v = [];
+    sgip = [];
 end
 
 %% Generic Electrolyzer

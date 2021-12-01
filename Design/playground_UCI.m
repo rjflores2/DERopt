@@ -23,9 +23,9 @@ util_solar_on = 1;
 util_ees_on = 0;
 
 %%%Hydrogen technologies
-el_on = 1; %Turn on generic electrolyer
-rel_on = 1; %Turn on renewable tied electrolyzer
-h2es_on = 1; %Hydrogen energy storage
+el_on = 0; %Turn on generic electrolyer
+rel_on = 0; %Turn on renewable tied electrolyzer
+h2es_on = 0; %Hydrogen energy storage
 hrs_on = 0; %Turn on hydrogen fueling station
 h2_inject_on = 0; %Turn on H2 injection into pipeline
 %% Legacy System Toggles
@@ -55,7 +55,9 @@ ldg_off = 0;
 
 %%%H2 fuel limit in legacy generator
 %%%Used in opt_gen_inequalities
-h2_fuel_limit = [0.5];%0.1; %%%Fuel limit on an energy basis - should be 0.1
+h2_fuel_limit = [.11];%0.1; %%%Fuel limit on an energy basis - should be 0.1
+
+
 %% Island operation (opt_nem.m) 
 
 %%%Electric rates for UCI
@@ -80,7 +82,7 @@ gen_export_on = 0; %%%Placed a "general export" capability in the general electr
 biogas_limit = [144E6];%144E6; %kWh biofuel available per year
 biogas_limit = [144E7];%144E6; %kWh biofuel available per year
 biogas_limit = [491265*293.1]; %%%kWh - biofuel availabe per year - based on Matt Gudorff emails/pptx
-% biogas_limit = [0];
+biogas_limit = [0];
 % biogas_limit = [491265*2931]; %%%kWh - biofuel availabe per year - based on Matt Gudorff emails/pptx
 % biogas_limit = [10];%144E6; %kWh biofuel available per year
 
@@ -89,7 +91,7 @@ biogas_limit = [491265*293.1]; %%%kWh - biofuel availabe per year - based on Mat
 h2_fuel_forced_fraction = []; %%%Energy fuel requirements
 
 %%%CO2 Limit
-co2_lim = [2.1550e+07].*(1-.75);
+co2_lim = [0.30];
 % co2_lim = [];
 %% Turning incentives and other financial tools on/off
 sgip_on = 0;
@@ -163,7 +165,6 @@ addpath('H:\Data\CPUC_SGIP_Signal')
 addpath('H:\Data\Emission_Factors')
 addpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Data\Emission_Factors')
 addpath('C:\Users\cyc\OneDrive - University of California - Irvine\DERopt (Office)\Data\Emission_Factors')
-
 %% Loading building demand
 %%%Loading Data
 dt = load('H:\Data\UCI\Campus_Loads_2014_2019.mat');
@@ -193,16 +194,32 @@ year_idx = 2018;
 % month_idx = [10];
 month_idx = [1 4 7 10];
 month_idx = [2 9];
+month_idx = [1 3 6 7 9 11];
 
+
+
+% month_idx = [2];
 % month_idx = [9];
 % month_idx = [1];
 % month_idx = [];
 bldg_loader_UCI
 
 
- mean(solar)
- mean(elec)*4/1000
-mean(heat)*4/1000
+elec = elec ;
+heat = [];
+
+
+if length(month_idx) == 6 && ~isempty(co2_lim)
+    co2_lim = 6.4533e+07.*(1-co2_lim);
+elseif length(month_idx) == 2 && ~isempty(co2_lim)
+    co2_lim = 2.1550e+07.*(1-co2_lim);
+end
+%  [mean(solar) ...
+%  mean(elec)*4/1000 ....
+% mean(heat)*4/1000]
+% assss
+% elec = elec + heat./3;
+% heat = 0;
 
 % for ii = 1:12
 % avgs_uci(ii,1) = mean(solar(stpts(ii):endpts(ii)));
@@ -357,3 +374,10 @@ variable_values
 
 %% System Evaluaiton
 uci_evaluation_2
+
+co2_lim/6.4533e+07
+1 - co2_lim/6.4533e+07
+
+%%
+fval/sum(elec)
+(fval - sum((var_utilpv.util_pv_adopt/e_adjust.*solar_util - sum(var_pp.pp_elec_wheel,2) - sum(var_pp.pp_elec_export,2)).*lmp_util))/sum(elec)

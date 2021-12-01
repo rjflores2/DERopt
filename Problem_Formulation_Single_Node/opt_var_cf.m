@@ -69,6 +69,7 @@ if isempty(utility_exists) == 0
 %     end   
     
 else
+    Objective = 0;
     %%%Electrical Import Variables
     var_util.import=zeros(T,1);
     
@@ -641,6 +642,7 @@ else
     var_ldg.ldg_sfuel = zeros(T,1);
     var_ldg.ldg_fuel = [];
     var_ldg.ldg_off = [];
+    var_ldg.ldg_opstate = 1;
     var_ldg.ldg_off = 1;
     var_ldg.ldg_elec_ramp = [];
 end
