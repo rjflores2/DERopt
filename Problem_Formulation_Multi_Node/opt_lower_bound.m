@@ -83,11 +83,33 @@ if ~isempty(crit_load_lvl) && crit_load_lvl >0
     if ~isempty(pv_v) || ~isempty(pv_legacy)
         Constraints = [Constraints
             (0 <= var_resiliency.pv_elec):'PV Reseliency >= 0'];
+        if sim_lvl == 3
+        Constraints = [Constraints
+            (0 <= var_resiliency.pv_real):'PV Real Reseliency >= 0'
+            (0 <= var_resiliency.pv_reactive):'PV Reactive Reseliency >= 0'];
+        end
     end
     if lees_on || lrees_on || ~isempty(ees_v)
         Constraints = [Constraints
             (0 <= var_resiliency.ees_chrg):'EES Reseliency Chrg >=0'
             (0 <= var_resiliency.ees_dchrg):'EES Reseliency Dchrg >=0'
             (0 <= var_resiliency.ees_soc):'EES Reseliency SOC >= 0'];
+        if sim_lvl == 3
+            Constraints = [Constraints
+                (0 <= var_resiliency.ees_dchrg_real):'EES Real Reseliency >= 0'
+                (0 <= var_resiliency.ees_dchrg_reactive):'EES Reactive Reseliency >= 0'];
+        end
+    end
+    
+    if sim_lvl == 2 || sim_lvl == 3
+        Constraints = [Constraints
+            (0 <= var_resiliency.import):'Imports Reseliency Chrg >=0'
+            (0 <= var_resiliency.export):'Exports Reseliency Dchrg >=0'];
+        
+        if sim_lvl == 3
+            Constraints = [Constraints
+                (0 <= var_resiliency.import_reactive):'Imports Reactive Reseliency Chrg >=0'
+                (0 <= var_resiliency.export_reactive):'Exports Reactive Reseliency Dchrg >=0'];
+        end
     end
 end

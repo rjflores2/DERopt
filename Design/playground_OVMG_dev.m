@@ -3,9 +3,9 @@ clear all; close all; clc ; started_at = datetime('now'); startsim = tic;
 
 
 
-for crit_load_lvl = [1 2 3 4 6 7] %%% Corresponding END around line 500 - after files have been saved
-    clearvars -except crit_load_lvl crit_load_lvl started_at startsim
-% crit_load_lvl = 1;
+% for crit_load_lvl = [1 2 3 4 6 7] %%% Corresponding END around line 500 - after files have been saved
+%     clearvars -except crit_load_lvl crit_load_lvl started_at startsim
+crit_load_lvl = 7;
 % %%
 %% Parameters
 
@@ -14,11 +14,19 @@ for crit_load_lvl = [1 2 3 4 6 7] %%% Corresponding END around line 500 - after 
 opt_now = 1; %CPLEX
 opt_now_yalmip = 0; %YALMIP
 
-%% Simulation level
+%% Resiliency Simulation level
 %%% 1) = at each building
 %%% 2) = at the transformer
 %%% 3) = at the circuit
-sim_lvl = 2;
+sim_lvl = 3;
+
+%% Infrastructure Cosntraints
+%%%AC Power Flow Simulation
+%%% 1) LinDistFlow
+acpf_sim = 1;
+
+%%%Are the transformer limits on or off?
+acpf_xfmr_on = 0;
 
 %% Downselection of building energy data?
 testing = 0;
@@ -121,9 +129,9 @@ import_limit = .8;
 export_on = 1;
 
 %%%Transformer constraints on/off
-xfmr_on = 0;
+xfmr_on = 1;
 %%%Transformer limit adjustment
-t_alpha = 1;
+t_alpha = 2;
 
 %%% Island operation (opt_nem.m)
 island = 0;
@@ -197,24 +205,59 @@ adopted.rees = [];
 adopted.ees = [];
 adopted.mean_elec = [];
 
-if sim_lvl == 1
+%% Simulation indicies based on resiliency constraints
+if sim_lvl == 1 && (~acpf_sim || isempty(acpf_sim)) %%%If resiliency is examined per building and no linearized ACPF/infrastructure constraints are implemented 
     sim_end = length(st_idx);
-elseif sim_lvl == 2
+elseif sim_lvl == 2 ||  ((~acpf_sim || isempty(acpf_sim)) && xfmr_on) %%%If resiliency is examined at each transformer, OR only xfmr constraints are implemented
     sim_end = length(xfmrs_unique);
-elseif sim_lvl == 3
+elseif sim_lvl == 3 && acpf_sim %%%If resiliency is examined on each individual branch OR ACPF is implemented
+    xfmr_2_circuit = readtable('H:\_Tools_\DERopt\Data\OVMG_Inputs\OV_Distribtuion_Circuit_Xfmrs.xlsx');
+    %%%Temp hard coding of transformers
+    sheets = {'Sm1','Sm2','Sm3','Sm4','Sm5','Sm6','St1'};
+    sim_end = width(xfmr_2_circuit) - 1;
 end
 
-for sim_idx = 1:sim_end
-    if sim_lvl == 1
+%%
+for sim_idx = 5%1:sim_end
+   %% Building indicies in the current simulation
+    if sim_lvl == 1 && (acpf_sim == 0 || isempty(acpf_sim))
         bldg_ind = [st_idx(sim_idx):end_idx(sim_idx)];
-    elseif sim_lvl == 2
+    elseif sim_lvl == 2  && (acpf_sim == 0 || isempty(acpf_sim))
         bldg_ind = find(strcmp(xfmrs_unique(sim_idx),xfmr_map));
         xfmrs = xfmrs_unique(sim_idx);
+    elseif sim_lvl == 3 && acpf_sim > 0
+        %%%Transformers in the current circuit branch
+        xfmrs = table2cell(xfmr_2_circuit(:,sim_idx + 1));
+        xfmrs = xfmrs( ~strcmp(xfmrs,''));
+        %%%Finding building indicies
+        bldg_ind = [];
+        for kk = 1:length(xfmrs)
+            find(strcmp(xfmrs(kk),xfmr_map))
+            bldg_ind = [bldg_ind
+                find(strcmp(xfmrs(kk),xfmr_map))];
+        end
     end
+    
     clear bldg
     bldg = bldg_base;
     
-    bldg_ind
+    %% Loadings relevant circuit data
+    if acpf_sim == 1 || sim_lvl >= 3
+        %%Branch/Bus matrix
+        [branch_bus,bb_lbl] = xlsread('OV_Branch_bus_Matricies.xlsx',char(sheets(sim_idx)));
+        %%% Eliminating NaN in branch bus matrix
+        branch_bus(isnan(branch_bus)) = 0;
+        %%%Transformer labels included in current power flow
+        bb_lbl = bb_lbl(1,2:end)
+        
+        %%%Circuit properties
+        reactance = [];
+        reactance = xlsread('OV_Line_Properties.xlsx',strcat(char(sheets(sim_idx)),'_Reactance'));
+        reactance(isnan(reactance)) = 0;
+        resistance = [];
+        resistance = xlsread('OV_Line_Properties.xlsx',strcat(char(sheets(sim_idx)),'_Resistance'));
+        resistance(isnan(resistance)) = 0;
+    end
     %% Extracting UO Data
     elec = [];
     gas = [];
@@ -284,31 +327,11 @@ for sim_idx = 1:sim_end
         
     
     %% Reducing scope for testing
-    % bldg_ind = [306];
-    
-    % elec = [elec_o(:,bldg_ind)];
-    % rate = rate(bldg_ind);
-    % dc_exist = dc_exist(bldg_ind);
-    % low_income = low_income(bldg_ind);
-    % res_units = res_units(bldg_ind);
-    
-    % bldg_ind = find(res_units==0);
-    % bldg_ind = [1];
-    % bldg_ind = [1 27 92 95 96 97 100 174 204 231 246 282 302 305];
-    % bldg_ind = [301:317];
-    % if testing
-    %     bldg_ind = 3;
-    % else
-    %     bldg_ind = [];
-    % end
     if ~isempty(bldg_ind)
-        % return
-        % bldg_ind = [1:160];
         elec = elec(:,bldg_ind);
         if crit_load_lvl > 0
             elec_res = elec_resiliency_full(:,bldg_ind);
         end
-        %     elec_o = elec_o(:,bldg_ind);
         dc_exist = dc_exist(bldg_ind);
         rate = rate(bldg_ind);
         low_income = low_income(bldg_ind);
@@ -323,11 +346,20 @@ for sim_idx = 1:sim_end
     %% Formatting Building Data
     bldg_loader_OVMG
     
-    
     %% Utility Data
     %%%Loading Utility Data and Generating Energy Charge Vectors
     utility_SCE_2020
     
+    %% Reducing size for testing
+%     time = time(1:endpts(2));
+%     elec = elec(1:endpts(2),:);
+%     day_multi = day_multi(1:endpts(2),:);
+%     endpts = endpts(1:2);
+%     datetimev = datetimev(1:endpts(2),:);
+%     import_price = import_price(1:endpts(2),:);
+%     export_price = export_price(1:endpts(2),:);
+%     solar = solar(1:endpts(2),:);
+%     sgip_signal = sgip_signal(1:endpts(2),:);
     %% Tech Parameters/Costs
     %%%Technology Parameters
     tech_select
@@ -416,6 +448,12 @@ for sim_idx = 1:sim_end
         elapsed = toc;
         fprintf('Took %.2f seconds \n', elapsed)
         
+        %% LinDistFlow Constraints
+        fprintf('%s: LinDistFlow Constraints.', datestr(now,'HH:MM:SS'))
+        tic
+        opt_ldf
+        elapsed = toc;
+        fprintf('Took %.2f seconds \n', elapsed)
         %% Lower Bounds
         fprintf('%s: Lower Bound Constraints.', datestr(now,'HH:MM:SS'))
         tic
@@ -432,6 +470,7 @@ for sim_idx = 1:sim_end
         
         %% Extract Variables
         variable_values_multi_node
+        return
     end
     %%
     adopted.pv = [adopted.pv  var_pv.pv_adopt];
@@ -496,99 +535,7 @@ if isempty(crit_load_lvl) || crit_load_lvl == 0
     save(strcat(sc_txt,'_DdER'),'bldg')
 else
     save_here = 2
-    save(strcat(sc_txt,'_DdER_Crit_Load_XFMR_',num2str(crit_load_lvl)),'bldg')
+    save(strcat(sc_txt,'_DER_Crit_Load_Circuit5_',num2str(crit_load_lvl)),'bldg')
 end
-end
-return
-
-%%
-%%
-%%
-%%
-% pv_size = var_pv.pv_adopt
-% ees_size = var_ees.ees_adopt
-% rees_size = var_rees.rees_adopt
-% close all
-% plot(var_rees.rees_soc)
-% plot(var_lrees.rees_soc)
-% %% Saving variables if decisions are made during design stage
-% if ~testing
-%     if  downselection == 1
-%         save('temp','var_pv','var_ees','var_rees','pv_cap_mod','rees_cap_mod','ees_cap_mod','var_sgip')
-%     else
-%         temp = load('temp')
-%         var_pv.pv_adopt = temp.var_pv.pv_adopt;
-%         
-%         var_ees.ees_adopt = temp.var_ees.ees_adopt;
-%         var_ees.ees_soc = var_lees.ees_soc;
-%         var_ees.ees_chrg = var_lees.ees_chrg;
-%         var_ees.ees_dchrg = var_lees.ees_dchrg;
-%         
-%         
-%         var_rees.rees_adopt = temp.var_rees.rees_adopt;
-%         var_rees.rees_soc = var_lrees.rees_soc;
-%         var_rees.rees_chrg = var_lrees.rees_chrg;
-%         var_rees.rees_dchrg = var_lrees.rees_dchrg;
-%         
-%         var_sgip = temp.var_sgip;
-%         
-%         pv_cap_mod = temp.pv_cap_mod;
-%         rees_cap_mod = temp.rees_cap_mod;
-%         ees_cap_mod = temp.ees_cap_mod;
-%         
-%         % return
-%         %% Update Utility Costs
-%         OVMG_updated_utility_costs
-%         %% Updating UO File
-%         npbi_idx = 1;
-%         pbi_idx = 1;
-%         eq_idx = 1;
-%         for ii = 1:length(bldg)
-%             %%%New import/export for each building
-%             bldg(ii).elec_der = [var_util.import(:,ii) - (var_rees.rees_dchrg_nem(:,ii) + var_pv.pv_nem(:,ii))... %%%Net electricity flow
-%                 var_util.import(:,ii)... %%%All imports
-%                 (var_rees.rees_dchrg_nem(:,ii) + var_pv.pv_nem(:,ii))]; %%%All Exports
-%             
-%             %%%DER Systems
-%             bldg(ii).der_systems.pv_adopt = var_pv.pv_adopt(ii); %%%Adopted solar  (kW)
-%             bldg(ii).der_systems.ees_adopt = var_ees.ees_adopt(ii); %%%Adopted EES  (kWh)
-%             bldg(ii).der_systems.rees_adopt = var_rees.rees_adopt(ii); %%%Adopted REES  (kWh)
-%             
-%             bldg(ii).der_systems.pv_ops = [var_pv.pv_elec(:,ii) var_pv.pv_nem(:,ii)];
-%             bldg(ii).der_systems.ees_ops = [var_ees.ees_soc(:,ii) var_ees.ees_chrg(:,ii) var_ees.ees_dchrg(:,ii)];
-%             bldg(ii).der_systems.rees_ops = [var_rees.rees_soc(:,ii) var_rees.rees_chrg(:,ii) var_rees.rees_dchrg(:,ii) var_rees.rees_dchrg_nem(:,ii)];
-%             
-%             
-%             %%%SGIP Values
-%             if strcmp(bldg_type(ii),'MFm') || strcmp(bldg_type(ii),'Single-Family Detached') || strcmp(bldg_type(ii),'Residential')
-%                 if low_income(ii) == 1
-%                     bldg(ii).der_systems.sgip_pbi = [0;0;0];
-%                     bldg(ii).der_systems.sgip_npbi = 0;
-%                     bldg(ii).der_systems.sgip_equity = temp.var_sgip.sgip_ees_npbi_equity(eq_idx);
-%                     eq_idx = eq_idx + 1;
-%                 else
-%                     bldg(ii).der_systems.sgip_pbi = [0;0;0];
-%                     bldg(ii).der_systems.sgip_npbi = temp.var_sgip.sgip_ees_npbi(npbi_idx);
-%                     bldg(ii).der_systems.sgip_equity = 0;
-%                     npbi_idx = npbi_idx + 1;
-%                 end
-%             else
-%                 bldg(ii).der_systems.sgip_pbi = temp.var_sgip.sgip_ees_pbi(:,pbi_idx);
-%                 bldg(ii).der_systems.sgip_npbi = 0;
-%                 bldg(ii).der_systems.sgip_equity = 0;
-%                 pbi_idx = pbi_idx + 1;
-%             end
-%             
-%             bldg(ii).der_systems.cap_mods = [pv_cap_mod(ii) ees_cap_mod(ii) rees_cap_mod(ii)];
-%             
-%         end
-%         
-%         if isempty(crit_load_lvl) || crit_load_lvl == 0
-%             save_here = 1
-%             save(strcat(sc_txt,'_DER'),'bldg')
-%         else
-%             save_here = 2
-%             save(strcat(sc_txt,'_DER_Crit_Load_',num2str(crit_load_lvl)),'bldg')
-%         end
-%     end
 % end
+return

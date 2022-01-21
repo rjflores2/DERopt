@@ -402,12 +402,23 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%% LDN Transformers %%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-if xfmr_on
+if xfmr_on && acpf_sim < 1
+    N = length(unique(xfmr_subset));
     %%%Real Power
-    var_xfmr.Pinj = sdpvar(T,length(t_rating),'full'); %kW
+    var_xfmr.Pinj = sdpvar(N,T,'full'); %kW
     %%%Reactive Power
     %  var_xfmr.Qinj = sdpvar(T,length(t_map),'full'); %kVAR
 else
      var_xfmr.Pinj = 0
 end
 
+%% LinDistFlow
+if acpf_sim == 1
+    N = length(bb_lbl) - 1;
+    B = size(branch_bus,1);
+    var_ldf.pflow = sdpvar(B,T,'full');
+     var_xfmr.Pinj = sdpvar(N,T,'full'); %kW
+   
+else
+    var_ldf.pflow = zeros(T,1);
+end

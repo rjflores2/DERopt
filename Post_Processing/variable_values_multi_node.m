@@ -39,9 +39,23 @@ var_lrees.rees_dchrg_nem = value(var_lrees.rees_dchrg_nem);
  var_resiliency.ees_chrg = value(var_resiliency.ees_chrg);
  var_resiliency.ees_dchrg = value(var_resiliency.ees_dchrg);
  var_resiliency.ees_soc = value(var_resiliency.ees_soc);
- 
+ var_resiliency.import = value(var_resiliency.import);
+ var_resiliency.export = value(var_resiliency.export);
+ var_resiliency.Pinj = value(var_resiliency.Pinj);
+ var_resiliency.Qinj = value(var_resiliency.Qinj);
+ var_resiliency.pflow = value(var_resiliency.pflow);
+ var_resiliency.qflow = value(var_resiliency.qflow);
+ var_resiliency.bus_voltage = value(var_resiliency.bus_voltage);
+ var_resiliency.pv_real = value(var_resiliency.pv_real);
+ var_resiliency.pv_reactive = value(var_resiliency.pv_reactive);
+ var_resiliency.ees_dchrg_real = value(var_resiliency.ees_dchrg_real);
+ var_resiliency.ees_dchrg_reactive = value(var_resiliency.ees_dchrg_reactive);
+ var_resiliency.import_reactive = value(var_resiliency.import_reactive);
+ var_resiliency.export_reactive = value(var_resiliency.export_reactive);
  %% Transformer Values
  var_xfmr.Pinj = value(var_xfmr.Pinj);
+ %% LinDistFlow Values
+ var_ldf.pflow = value(var_ldf.pflow);
 %% SGIP values
 if ~isempty(var_sgip.sgip_ees_pbi)
     var_sgip.sgip_ees_pbi = value(var_sgip.sgip_ees_pbi);

@@ -1,19 +1,18 @@
-%% Electrical Infrastructure Parameters
-%% Distribution system transformers
 %% Which Transfomer Each Building Belongs To
 xfmr_map = [];
 %%%Transformers at each building
 for ii = 1:length(bldg)
     xfmr_map{ii,1} = char(bldg(ii).xfmr);
 end
-%%%Cutting down transformers to buildings that are examined
-if ~isempty(bldg_ind)
-    xfmr_map = xfmr_map(bldg_ind);
-end
+% %%%Cutting down transformers to buildings that are examined
+% if ~isempty(bldg_ind)
+%     xfmr_map = xfmr_map(bldg_ind);
+% end
 
 %%%Current transformers
 xfmrs_unique = unique(xfmr_map);
 
+%% Transformer data
 %%%Pulling transformer Data
 xfmr_tbl = readtable('xfmr_ratings.xlsx');
 %%%Transformer ratings (kVa)
@@ -25,13 +24,3 @@ for ii = 1:length(xfmrs_unique)
     t_rating(ii,1) = xfmr_tbl.Rating_kVA_(find(strcmp(xfmrs_unique(ii),xfmr_tbl.Name)));
     
 end
-
-%%%Baseline transformer Loading
-baseline_xfmr_loading = zeros(size(elec,1),length(t_rating));
-for ii = 1:length(t_rating)
-    idx = find(t_map == ii);
-    baseline_xfmr_loading(:,ii) = sum(elec(:,idx),2);
-end
-
-
-% end
