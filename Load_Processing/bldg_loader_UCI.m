@@ -108,7 +108,7 @@ day_multi = ones(size(elec));
 
 %% Loading SGIP CO2 Signal
 % sgip_signal_hour = xlsread('H:\_Tools_\DERopt\Data\CPUC_SGIP_Signal\hourly_resolved.xlsx');
-sgip_signal_hour = xlsread('H:\_Tools_\DERopt\Data\CPUC_SGIP_Signal\hourly_resolved.csv');
+sgip_signal_hour = xlsread('C:\Users\cyc\OneDrive - UC Irvine\DERopt (Office New)\Data\hourly_resolved.xlsx');
 
 %%%Mannually adjusting SGIP time signal to fit with current UCI Data
 delta = time(1) - sgip_signal_hour(1);
