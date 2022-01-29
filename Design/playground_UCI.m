@@ -137,21 +137,21 @@ import_limit = .6;
 %% Adding paths
 %%%YALMIP Master Path
 addpath(genpath('H:\Matlab_Paths\YALMIP-master')) %rjf path
-addpath(genpath('C:\Program Files\MATLAB\YALMIP-master')) %cyc path
+addpath(genpath('C:\Program Files\MATLAB\R2014b\YALMIP-master')) %cyc path
 
 %%%CPLEX Path
 addpath(genpath('C:\Program Files\IBM\ILOG\CPLEX_Studio128\cplex\matlab\x64_win64')) %rjf path
 addpath(genpath('C:\Program Files\IBM\ILOG\CPLEX_Studio1263\cplex\matlab\x64_win64')) %cyc path
 
 %%%DERopt paths
-addpath(genpath('H:\_Tools_\DERopt\Design'))
-addpath(genpath('H:\_Tools_\DERopt\Input_Data'))
-addpath(genpath('H:\_Tools_\DERopt\Load_Processing'))
-addpath(genpath('H:\_Tools_\DERopt\Post_Processing'))
-addpath(genpath('H:\_Tools_\DERopt\Problem_Formulation_Single_Node'))
-addpath(genpath('H:\_Tools_\DERopt\Techno_Economic'))
-addpath(genpath('H:\_Tools_\DERopt\Utilities'))
-addpath(genpath('H:\_Tools_\DERopt\Data'))
+% addpath(genpath('H:\_Tools_\DERopt\Design'))
+% addpath(genpath('H:\_Tools_\DERopt\Input_Data'))
+% addpath(genpath('H:\_Tools_\DERopt\Load_Processing'))
+% addpath(genpath('H:\_Tools_\DERopt\Post_Processing'))
+% addpath(genpath('H:\_Tools_\DERopt\Problem_Formulation_Single_Node'))
+% addpath(genpath('H:\_Tools_\DERopt\Techno_Economic'))
+% addpath(genpath('H:\_Tools_\DERopt\Utilities'))
+% addpath(genpath('H:\_Tools_\DERopt\Data'))
 %%%cyc PC Paths
 % addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Design'))
 % addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Input_Data'))
@@ -162,31 +162,31 @@ addpath(genpath('H:\_Tools_\DERopt\Data'))
 % addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Utilities'))
 % 
 % %%%cyc Office Paths
-% addpath(genpath('C:\Users\cyc\OneDrive - University of California - Irvine\DERopt (Office)\Design'))
-% addpath(genpath('C:\Users\cyc\OneDrive - University of California - Irvine\DERopt (Office)\Input_Data'))
-% addpath(genpath('C:\Users\cyc\OneDrive - University of California - Irvine\DERopt (Office)\Load_Processing'))
-% addpath(genpath('C:\Users\cyc\OneDrive - University of California - Irvine\DERopt (Office)\Post_Processing'))
-% addpath(genpath('C:\Users\cyc\OneDrive - University of California - Irvine\DERopt (Office)\Problem_Formulation_Single_Node'))
-% addpath(genpath('C:\Users\cyc\OneDrive - University of California - Irvine\DERopt (Office)\Techno_Economic'))
-% addpath(genpath('C:\Users\cyc\OneDrive - University of California - Irvine\DERopt (Office)\Utilities'))
+addpath(genpath('C:\Users\cyc\OneDrive - UC Irvine\DERopt (Office New)\Design'))
+addpath(genpath('C:\Users\cyc\OneDrive - UC Irvine\DERopt (Office New)\Input_Data'))
+addpath(genpath('C:\Users\cyc\OneDrive - UC Irvine\DERopt (Office New)\Load_Processing'))
+addpath(genpath('C:\Users\cyc\OneDrive - UC Irvine\DERopt (Office New)\Post_Processing'))
+addpath(genpath('C:\Users\cyc\OneDrive - UC Irvine\DERopt (Office New)\Problem_Formulation_Single_Node'))
+addpath(genpath('C:\Users\cyc\OneDrive - UC Irvine\DERopt (Office New)\Techno_Economic'))
+addpath(genpath('C:\Users\cyc\OneDrive - UC Irvine\DERopt (Office New)\Utilities'))
 
 %%%Specific project path
 % addpath('H:\_Research_\CEC_OVMG\DERopt')
 
 %%%SGIP CO2 Signal
-addpath('H:\Data\CPUC_SGIP_Signal')
+% addpath('H:\Data\CPUC_SGIP_Signal')
 % addpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Data')
-% addpath('C:\Users\cyc\OneDrive - University of California - Irvine\DERopt (Office)\Data')
+addpath('C:\Users\cyc\OneDrive - UC Irvine\DERopt (Office New)\Data')
 
 %%%CO2 Signal Path
-addpath('H:\Data\Emission_Factors')
-addpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Data\Emission_Factors')
-addpath('C:\Users\cyc\OneDrive - University of California - Irvine\DERopt (Office)\Data\Emission_Factors')
+% addpath('H:\Data\Emission_Factors')
+% addpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Data\Emission_Factors')
+addpath('C:\Users\cyc\OneDrive - UC Irvine\DERopt (Office New)\Data\Emission_Factors')
 %% Loading building demand
 %%%Loading Data
-dt = load('H:\Data\UCI\Campus_Loads_2014_2019.mat');
-%dt = load('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Data\Campus_Loads_2014_2019.mat');
-% dt = load('C:\Users\cyc\OneDrive - University of California - Irvine\DERopt (Office)\Data\Campus_Loads_2014_2019.mat');
+% dt = load('H:\Data\UCI\Campus_Loads_2014_2019.mat');
+% dt = load('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Data\Campus_Loads_2014_2019.mat');
+dt = load('C:\Users\cyc\OneDrive - UC Irvine\DERopt (Office New)\Data\Campus_Loads_2014_2019.mat');
 
 heat = dt.loads.heating;
 time = dt.loads.time;
