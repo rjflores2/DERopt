@@ -6,3 +6,4 @@
 %%%Ignoring data files that are too large to upload to the free website  
 /Data
 
+*.mdmp

@@ -5,7 +5,7 @@ clear all; close all; clc ; started_at = datetime('now'); startsim = tic;
 
 % for crit_load_lvl = [1 2 3 4 6 7] %%% Corresponding END around line 500 - after files have been saved
 %     clearvars -except crit_load_lvl crit_load_lvl started_at startsim
-crit_load_lvl = 7;
+crit_load_lvl = 1;
 % %%
 %% Parameters
 
@@ -78,25 +78,6 @@ else
 end
 testing
 downselection
-%% Turning technologies on/off (opt_var_cf.m and tech_select.m)
-% if downselection == 0
-%     pv_on = 0;        %Turn on PV
-%     ees_on = 0;       %Turn on EES/REES
-%     rees_on = 0;  %Turn on REES
-% else
-%     pv_on = 1;
-%     ees_on = 1;
-%     rees_on = 1;
-% end Legacy technologies
-% if downselection == 0
-%     lpv_on = 1;
-%     lees_on = 0;
-%     lrees_on = 1;
-% else
-%     lpv_on = 0;
-%     lees_on = 0;
-%     lrees_on = 0;
-% end
 
 %% ESA On/Off (opt_var_cf)
 esa_on = 1; %Building RAtes are Adjusted for CARE Rates
@@ -218,7 +199,7 @@ elseif sim_lvl == 3 && acpf_sim %%%If resiliency is examined on each individual 
 end
 
 %%
-for sim_idx = 5%1:sim_end
+for sim_idx = 3:sim_end
    %% Building indicies in the current simulation
     if sim_lvl == 1 && (acpf_sim == 0 || isempty(acpf_sim))
         bldg_ind = [st_idx(sim_idx):end_idx(sim_idx)];
@@ -470,8 +451,11 @@ for sim_idx = 5%1:sim_end
         
         %% Extract Variables
         variable_values_multi_node
-        return
+        
     end
+    
+    save(strcat('Sim_',num2str(sim_idx)))
+    
     %%
     adopted.pv = [adopted.pv  var_pv.pv_adopt];
     adopted.rees = [adopted.rees var_rees.rees_adopt];
@@ -529,7 +513,7 @@ end
 OVMG_updated_utility_costs
 %% Saving Data
 bldg = bldg_base;
-
+assss
 if isempty(crit_load_lvl) || crit_load_lvl == 0
     save_here = 1
     save(strcat(sc_txt,'_DdER'),'bldg')

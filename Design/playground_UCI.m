@@ -1,7 +1,7 @@
 %% Playground file for OVMG Project
 clear all; close all; clc ; started_at = datetime('now'); startsim = tic;
 
-co2_lim_loop = [0 .10 .25 .50 .60 .65 .675 .7 .725 .75 .775 .8];
+co2_lim_loop = [0 .10 .25 .50 .60 .65 .675 .7 .725 .75 .775 .8 .85 .9 .95 .99];
 co2_production = [];
 for co2_val = co2_lim_loop
     
@@ -29,8 +29,8 @@ ees_on = 1;       %Turn on EES/REES
 rees_on = 1;  %Turn on REES
 
 %%%Community/Utility Scale systems
-util_solar_on = 0;
-util_ees_on = 0;
+util_solar_on = 1;
+util_ees_on = 1;
 
 %%%Hydrogen technologies
 el_on = 1; %Turn on generic electrolyer
@@ -50,13 +50,13 @@ ldb_on = 1; %Legacy Duct Burner
 lboil_on = 1; %Legacy boilers
 
 %% Utility PV Solar
-util_pv_wheel = 0; %General Wheeling Capabilities
+util_pv_wheel = 1; %General Wheeling Capabilities
 util_pv_wheel_lts = 0; %Wheeling for long term storage
 util_pp_import = 0; %Can import power at power plant node
 util_pp_export = 0; %Can import power at power plant node
 
 %% Legacy Generator Options
-ldg_op_state = 0; %%%Generator can turn on/off
+ldg_op_state = 1; %%%Generator can turn on/off
 %%%Gas turbine cycling costs
 dg_legacy_cyc = 1;
 
@@ -65,7 +65,7 @@ ldg_off = 0;
 
 %%%H2 fuel limit in legacy generator
 %%%Used in opt_gen_inequalities
-h2_fuel_limit = [.23];%0.1; %%%Fuel limit on an energy basis - should be 0.1
+h2_fuel_limit = [1];%0.1; %%%Fuel limit on an energy basis - should be 0.1
 
 
 %% Island operation (opt_nem.m) 
@@ -404,9 +404,9 @@ co2_production =     co2_emissions;
     
     %%
     if isempty(co2_lim)
-        save('H:\_Tools_\UCI_Results\Sc2\Baseline.mat')
+        save('H:\_Tools_\UCI_Results\Sc6\Baseline2.mat')
     else
-        save(strcat('H:\_Tools_\UCI_Results\Sc2\',num2str(100.*co2_lim_red),'_reduction.mat'))
+        save(strcat('H:\_Tools_\UCI_Results\Sc6\',num2str(100.*co2_lim_red),'_reduction.mat'))
     end
 end
 end
