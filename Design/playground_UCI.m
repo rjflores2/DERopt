@@ -36,7 +36,7 @@ util_ees_on = 1;
 el_on = 1; %Turn on generic electrolyer
 rel_on = 1; %Turn on renewable tied electrolyzer
 h2es_on = 1; %Hydrogen energy storage
-hrs_on = 0; %Turn on hydrogen fueling station
+hrs_on = 1; %Turn on hydrogen fueling station
 h2_inject_on = 0; %Turn on H2 injection into pipeline
 %% Legacy System Toggles
 lpv_on = 1; %Turn on legacy PV 
@@ -52,8 +52,8 @@ lboil_on = 1; %Legacy boilers
 %% Utility PV Solar
 util_pv_wheel = 1; %General Wheeling Capabilities
 util_pv_wheel_lts = 0; %Wheeling for long term storage
-util_pp_import = 0; %Can import power at power plant node
-util_pp_export = 0; %Can import power at power plant node
+util_pp_import = 1; %Can import power at power plant node
+util_pp_export = 1; %Can import power at power plant node
 
 %% Legacy Generator Options
 ldg_op_state = 1; %%%Generator can turn on/off
@@ -61,7 +61,7 @@ ldg_op_state = 1; %%%Generator can turn on/off
 dg_legacy_cyc = 1;
 
 %%%Shut off legacy generator option
-ldg_off = 0;
+ldg_off = 1;
 
 %%%H2 fuel limit in legacy generator
 %%%Used in opt_gen_inequalities
@@ -74,7 +74,7 @@ h2_fuel_limit = [1];%0.1; %%%Fuel limit on an energy basis - should be 0.1
 %%% 1: current rate, which does not value export
 %%% 2: current import rate + LMP export rate
 %%% 3: LMP Rate + 0.2 and LMP Export
-uci_rate = 1;
+uci_rate = 3;
 
 island = 0;
 
@@ -92,7 +92,7 @@ gen_export_on = 0; %%%Placed a "general export" capability in the general electr
 biogas_limit = [144E6];%144E6; %kWh biofuel available per year
 biogas_limit = [144E7];%144E6; %kWh biofuel available per year
 biogas_limit = [491265*293.1]; %%%kWh - biofuel availabe per year - based on Matt Gudorff emails/pptx
-% biogas_limit = [0];
+biogas_limit = [0];
 % biogas_limit = [491265*2931]; %%%kWh - biofuel availabe per year - based on Matt Gudorff emails/pptx
 % biogas_limit = [10];%144E6; %kWh biofuel available per year
 
@@ -255,7 +255,7 @@ ng_cost = 0.5/29.3; %$/kWh --> Converted from $/therm to $/kWh, 29.3 kWh / 1 The
 rng_cost = 2.*ng_cost;
 % rng_cost = 3;
 rng_storage_cost = 0.2/29.3;
-ng_inject = 1/29.3; %$/kWh --> Converted from $/therm to $/kWh, 29.3 kWh / 1 Therm
+ng_inject = 0.05/29.3; %$/kWh --> Converted from $/therm to $/kWh, 29.3 kWh / 1 Therm
 %% Tech Parameters/Costs
 %%%Technology Parameters
 tech_select_UCI
