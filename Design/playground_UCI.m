@@ -36,8 +36,8 @@ util_ees_on = 1;
 el_on = 1; %Turn on generic electrolyer
 rel_on = 1; %Turn on renewable tied electrolyzer
 h2es_on = 1; %Hydrogen energy storage
-hrs_on = 1; %Turn on hydrogen fueling station
-h2_inject_on = 0; %Turn on H2 injection into pipeline
+hrs_on = 0; %Turn on hydrogen fueling station
+h2_inject_on = 1; %Turn on H2 injection into pipeline
 %% Legacy System Toggles
 lpv_on = 1; %Turn on legacy PV 
 lees_on = 1; %Legacy EES
@@ -144,14 +144,14 @@ addpath(genpath('C:\Program Files\IBM\ILOG\CPLEX_Studio128\cplex\matlab\x64_win6
 addpath(genpath('C:\Program Files\IBM\ILOG\CPLEX_Studio1263\cplex\matlab\x64_win64')) %cyc path
 
 %%%DERopt paths
-% addpath(genpath('H:\_Tools_\DERopt\Design'))
-% addpath(genpath('H:\_Tools_\DERopt\Input_Data'))
-% addpath(genpath('H:\_Tools_\DERopt\Load_Processing'))
-% addpath(genpath('H:\_Tools_\DERopt\Post_Processing'))
-% addpath(genpath('H:\_Tools_\DERopt\Problem_Formulation_Single_Node'))
-% addpath(genpath('H:\_Tools_\DERopt\Techno_Economic'))
-% addpath(genpath('H:\_Tools_\DERopt\Utilities'))
-% addpath(genpath('H:\_Tools_\DERopt\Data'))
+addpath(genpath('H:\_Tools_\DERopt\Design'))
+addpath(genpath('H:\_Tools_\DERopt\Input_Data'))
+addpath(genpath('H:\_Tools_\DERopt\Load_Processing'))
+addpath(genpath('H:\_Tools_\DERopt\Post_Processing'))
+addpath(genpath('H:\_Tools_\DERopt\Problem_Formulation_Single_Node'))
+addpath(genpath('H:\_Tools_\DERopt\Techno_Economic'))
+addpath(genpath('H:\_Tools_\DERopt\Utilities'))
+addpath(genpath('H:\_Tools_\DERopt\Data'))
 %%%cyc PC Paths
 % addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Design'))
 % addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Input_Data'))
@@ -162,13 +162,13 @@ addpath(genpath('C:\Program Files\IBM\ILOG\CPLEX_Studio1263\cplex\matlab\x64_win
 % addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Utilities'))
 % 
 % %%%cyc Office Paths
-addpath(genpath('C:\Users\cyc\OneDrive - UC Irvine\DERopt (Office New)\Design'))
-addpath(genpath('C:\Users\cyc\OneDrive - UC Irvine\DERopt (Office New)\Input_Data'))
-addpath(genpath('C:\Users\cyc\OneDrive - UC Irvine\DERopt (Office New)\Load_Processing'))
-addpath(genpath('C:\Users\cyc\OneDrive - UC Irvine\DERopt (Office New)\Post_Processing'))
-addpath(genpath('C:\Users\cyc\OneDrive - UC Irvine\DERopt (Office New)\Problem_Formulation_Single_Node'))
-addpath(genpath('C:\Users\cyc\OneDrive - UC Irvine\DERopt (Office New)\Techno_Economic'))
-addpath(genpath('C:\Users\cyc\OneDrive - UC Irvine\DERopt (Office New)\Utilities'))
+% addpath(genpath('C:\Users\cyc\OneDrive - UC Irvine\DERopt (Office New)\Design'))
+% addpath(genpath('C:\Users\cyc\OneDrive - UC Irvine\DERopt (Office New)\Input_Data'))
+% addpath(genpath('C:\Users\cyc\OneDrive - UC Irvine\DERopt (Office New)\Load_Processing'))
+% addpath(genpath('C:\Users\cyc\OneDrive - UC Irvine\DERopt (Office New)\Post_Processing'))
+% addpath(genpath('C:\Users\cyc\OneDrive - UC Irvine\DERopt (Office New)\Problem_Formulation_Single_Node'))
+% addpath(genpath('C:\Users\cyc\OneDrive - UC Irvine\DERopt (Office New)\Techno_Economic'))
+% addpath(genpath('C:\Users\cyc\OneDrive - UC Irvine\DERopt (Office New)\Utilities'))
 
 %%%Specific project path
 % addpath('H:\_Research_\CEC_OVMG\DERopt')
@@ -184,9 +184,9 @@ addpath('C:\Users\cyc\OneDrive - UC Irvine\DERopt (Office New)\Data')
 addpath('C:\Users\cyc\OneDrive - UC Irvine\DERopt (Office New)\Data\Emission_Factors')
 %% Loading building demand
 %%%Loading Data
-% dt = load('H:\Data\UCI\Campus_Loads_2014_2019.mat');
+dt = load('H:\Data\UCI\Campus_Loads_2014_2019.mat');
 % dt = load('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Data\Campus_Loads_2014_2019.mat');
-dt = load('C:\Users\cyc\OneDrive - UC Irvine\DERopt (Office New)\Data\Campus_Loads_2014_2019.mat');
+% dt = load('C:\Users\cyc\OneDrive - UC Irvine\DERopt (Office New)\Data\Campus_Loads_2014_2019.mat');
 
 heat = dt.loads.heating;
 time = dt.loads.time;
