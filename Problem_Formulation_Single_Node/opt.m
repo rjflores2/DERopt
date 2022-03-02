@@ -15,7 +15,7 @@ if opt_now==1
     options = cplexoptimset;
     options.Display='on';
     %     options.MaxTime = 2*3600;
-    options.MaxNodes = 15000;
+    options.MaxNodes = 100000;
     x = [];
 %     load starting_point
 %     if length(model.f) ~= length(x)
@@ -23,11 +23,14 @@ if opt_now==1
 %     end
     fprintf('%s Starting CPLEX Solver \n', datestr(now,'HH:MM:SS'))
     tic
+    
     %         [x, fval, exitflag, output, lambda] = cplexlp(model.f, model.Aineq, model.bineq, model.Aeq, model.beq, lb, ub, [], options);
-    if ldg_op_state
-        [x, fval, exitflag, output] = cplexmilp(model.f, model.Aineq, model.bineq, model.Aeq, model.beq, [],[],[],lb,ub,model.ctype,x,options);
+    if sum(strfind(model.ctype,'B')>0) + sum(strfind(model.ctype,'I')>0)
+        opt_cplexmilp = 1
+        [x, fval, exitflag, output] = cplexmilp(model.f, model.Aineq, model.bineq, model.Aeq, model.beq, [],[],[],lb,ub,model.ctype,x,options);        
     else
-        [x, fval, exitflag, output, lambda] = cplexlp(model.f, model.Aineq, model.bineq, model.Aeq, model.beq, lb, ub, [], options);
+        opt_cplexlp = 1
+        [x, fval, exitflag, output, lambda] = cplexlp(model.f, model.Aineq, model.bineq, model.Aeq, model.beq, lb, ub, [], options);        
     end
     
     elapsed = toc;
@@ -41,32 +44,6 @@ if opt_now==1
     % Recovering data and assigning to the YALMIP variables
     assign(recover(recoverymodel.used_variables),x)
     
-   
-    
-    
-    (sum(value(var_pv.pv_adopt))+sum(pv_legacy(2,:))).*sum(solar)*(1/e_adjust)
-
-    
-   
-%     %%%SGIP values
-%     if exist('sgip_ees_pbi') || isempty(sgip_ees_pbi)
-%         sgip_ees_pbi = value(sgip_ees_pbi);
-%     else
-%         sgip_ees_pbi = [0;0;0];
-%     end
-%     
-%     if exist('sgip_ees_npbi') && ~isempty(sgip_ees_npbi)
-%         sgip_ees_npbi = value(sgip_ees_npbi);
-%     else
-%         sgip_ees_npbi = 0;
-%     end
-%     
-%     if exist('sgip_ees_npbi_equity') && ~isempty(sgip_ees_npbi_equity)
-%         sgip_ees_npbi_equity = value(sgip_ees_npbi_equity);
-%     else
-%         sgip_ees_npbi_equity=0;
-%     end
-   
 end
 %% Optimize thru YALMIP
 if opt_now_yalmip==1  

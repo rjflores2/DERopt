@@ -55,30 +55,75 @@ if ~isempty(crit_load_lvl) && crit_load_lvl >0
     %% Connected to other transformers
     if sim_lvl == 3
         %%% Aggregating injeciton at each node
-        for ii = 1:N
-            if isempty(find(strcmp(bb_lbl(ii + 1),xfmr_subset_unique)))
+        idx_rec = [];
+%         for ii = 1:N
+%             ii
+%             if isempty(find(strcmp(bb_lbl(ii + 1),xfmr_subset_unique)))
+%                 Constraints = [Constraints
+%                     (var_resiliency.Pinj(ii,:)' == 0):'Resiliency Power injection at branching bus is zero'                    
+%                     (var_resiliency.Qinj(ii,:)' == 0):'Resiliency ReactivePower injection at branching bus is zero'];
+%             else
+%                 ii
+%                 idx = find(strcmp(xfmr_subset_unique(ii),xfmr_subset));
+%                 idx_rec = [idx_rec;idx];
+%                 Constraints = [Constraints
+%                     (var_resiliency.Pinj(ii,:)' == -sum(-var_resiliency.import(:,idx) +var_resiliency.export(:,idx),2)):'Resiliency Real Power Equality'
+%                     (var_resiliency.Qinj(ii,:)' == -sum(-var_resiliency.import_reactive(:,idx) +var_resiliency.export_reactive(:,idx),2)):'Resiliency Real Power Equality'];
+%             end
+%         end
+        idx_rec = [];
+        cnt = 1;
+        
+        for ii = 2:length(bb_lbl)
+            
+%             bb_lbl(ii)
+            idx = find(strcmp(bb_lbl(ii),xfmr_subset));
+            idx_rec = [idx_rec
+                idx];
+            if ~isempty(idx)
                 Constraints = [Constraints
-                    (var_resiliency.Pinj(ii,:)' == 0):'Resiliency Power injection at branching bus is zero'                    
-                    (var_resiliency.Qinj(ii,:)' == 0):'Resiliency ReactivePower injection at branching bus is zero'];
+                    (var_resiliency.Pinj(ii - 1,:)' == -sum(-var_resiliency.import(:,idx) +var_resiliency.export(:,idx),2)):'Resiliency Real Power Equality'
+                    (var_resiliency.Qinj(ii - 1,:)' == -sum(-var_resiliency.import_reactive(:,idx) +var_resiliency.export_reactive(:,idx),2)):'Resiliency Real Power Equality'];
             else
-                idx = find(strcmp(xfmr_subset_unique(ii),xfmr_subset));
-                Constraints = [Constraints
-                    (var_resiliency.Pinj(ii,:)' == -sum(-var_resiliency.import(:,idx) +var_resiliency.export(:,idx),2)):'Resiliency Real Power Equality'
-                    (var_resiliency.Qinj(ii,:)' == -sum(-var_resiliency.import_reactive(:,idx) +var_resiliency.export_reactive(:,idx),2)):'Resiliency Real Power Equality'];
+                
+                 Constraints = [Constraints
+                    (var_resiliency.Pinj(ii - 1,:)' == 0):'Resiliency Real Power Equality'
+                    (var_resiliency.Qinj(ii - 1,:)' == 0):'Resiliency Real Power Equality'];
             end
         end
+%             ii
+%             if isempty(find(strcmp(bb_lbl(ii + 1),xfmr_subset_unique)))
+%                 Constraints = [Constraints
+%                     (var_resiliency.Pinj(ii,:)' == 0):'Resiliency Power injection at branching bus is zero'                    
+%                     (var_resiliency.Qinj(ii,:)' == 0):'Resiliency ReactivePower injection at branching bus is zero'];
+%             else
+%                 idx = find(strcmp(xfmr_subset_unique(ii),xfmr_subset));
+%                 idx_rec = [idx_rec;idx];
+%                 Constraints = [Constraints
+%                     (var_resiliency.Pinj(ii,:)' == -sum(-var_resiliency.import(:,idx) +var_resiliency.export(:,idx),2)):'Resiliency Real Power Equality'
+%                     (var_resiliency.Qinj(ii,:)' == -sum(-var_resiliency.import_reactive(:,idx) +var_resiliency.export_reactive(:,idx),2)):'Resiliency Real Power Equality'];
+%             end
+%         end
         
+%         idx_rec = sort(idx_rec);
         %%%Base voltage
-        base_voltage = [12000/sqrt(3)
+        base_voltage = [12500/sqrt(3)
             zeros(size(branch_bus(:,2:end),1) - 1,1)];
-        
+        base_voltage = 12500/sqrt(3);
         %%%LinDistFlow
         Constraints = [Constraints
-        (var_resiliency.Pinj == branch_bus(:,2:end)'*var_resiliency.pflow):'Resiliency LDF Real Power Flow'
-        (var_resiliency.Qinj == branch_bus(:,2:end)'*var_resiliency.qflow):'Resiliency LDF Real Power Flow'
-        (var_resiliency.pflow(1,:)' == 0):'Resiliency - cut power flow at first branch'
-        (var_resiliency.qflow(1,:)' == 0):'Resiliency - cut reactive power flow at first branch'
-        (branch_bus(:,2:end)*var_resiliency.bus_voltage + repmat(base_voltage,1,length(var_resiliency.bus_voltage )) == 2.*resistance*var_resiliency.pflow + 2.*reactance*var_resiliency.qflow):'Resiliency - Voltage Constraints'];
+            (var_resiliency.Pinj == branch_bus(2:end,2:end)'*var_resiliency.pflow):'Resiliency LDF Real Power Flow'
+            (var_resiliency.Qinj == branch_bus(2:end,2:end)'*var_resiliency.qflow):'Resiliency LDF Real Power Flow'
+            (branch_bus(2:end,2:end)*var_resiliency.bus_voltage == 2.*resistance(2:end,2:end)*var_resiliency.pflow + 2.*reactance(2:end,2:end)*var_resiliency.qflow):'Resiliency - Voltage Constraints'
+            (var_resiliency.bus_voltage(1,:) == base_voltage):'Reference Node Voltage'];
+%             (branch_bus(2:end,2:end)*var_resiliency.bus_voltage + repmat(base_voltage,1,length(var_resiliency.bus_voltage )) == 2.*resistance*var_resiliency.pflow + 2.*reactance*var_resiliency.qflow):'Resiliency - Voltage Constraints'];
         
+        
+        
+        %         (var_resiliency.Pinj == branch_bus(:,2:end)'*var_resiliency.pflow):'Resiliency LDF Real Power Flow'
+%         (var_resiliency.Qinj == branch_bus(:,2:end)'*var_resiliency.qflow):'Resiliency LDF Real Power Flow'
+%     (var_resiliency.pflow(1,:)' == 0):'Resiliency - cut power flow at first branch'
+%         (var_resiliency.qflow(1,:)' == 0):'Resiliency - cut reactive power flow at first branch'
+% (branch_bus(:,2:end)*var_resiliency.bus_voltage + repmat(base_voltage,1,length(var_resiliency.bus_voltage )) == 2.*resistance*var_resiliency.pflow + 2.*reactance*var_resiliency.qflow)
     end
 end

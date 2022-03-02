@@ -213,8 +213,12 @@ else
     day_multi = ones(size(elec,1),1);
 end
 
-
-
+%% Cutting Data Down More
+% elec = elec(1:336,:);
+% time = time(1:336);
+% day_multi = day_multi(1:336);
+% solar = solar(1:336);
+% sgip_signal = sgip_signal(1:336);
 
 
 %% Recreating endpts
@@ -224,7 +228,7 @@ datetimev=datevec(time);
 %%% Finding month start/endpoints
 end_cnt = 1;
 stpts=1;
-
+endpts = [];
 day_cnt = 1;
 day_stpts = 1;
 for ii = 2:length(time)
@@ -268,68 +272,3 @@ end
 %% Shutdown parallel pool
 poolobj = gcp('nocreate')
 delete(poolobj)
-
-%% Old Code
-do_not_run = 131231;
-
-if do_not_run == 1
-    %% Day points
-    
-    for ii = 1%unique(clustering.months)'
-        
-        %%%Time instances belonging to the current month
-        ind = find(clustering.months == ii);
-        
-        %%%Days that belong in the current month
-        ind = find(day_stpts >= min(ind) & day_endpts<= max(ind))
-        
-        %%%Assembling load matricies
-        wk_cnt = 1;
-        wknd_cnt = 1;
-        
-        weekend_ld = [];
-        week_ld = [];
-        for jj = 1:length(ind)
-            if  clustering.weekdays(day_stpts(ind(jj))) == 1 || clustering.weekdays(day_stpts(ind(jj))) == 7
-                weekend_ld(wknd_cnt,:) = elec(day_stpts(ind(jj)):day_endpts(ind(jj)),1)';
-                wknd_cnt = wknd_cnt + 1;
-            else
-                week_ld(wk_cnt,:) = elec(day_stpts(ind(jj)):day_endpts(ind(jj)),1)';
-                wk_cnt = wk_cnt + 1;
-            end
-        end
-        
-        %     r = 2;
-        %     D_wknd = zeros(size(weekend_ld,1),size(weekend_ld,1));
-        %     %%% dissimilarity matricies
-        %     for jj = 1:size(weekend_ld,1)
-        %         for kk = 1:size(weekend_ld,1)
-        %             for ll = 1:size(weekend_ld,1)
-        %
-        %                 D_wknd(jj,kk) = D_wknd(jj,kk) + abs(weekend_ld(jj,ll) - weekend_ld(kk,ll))^r;
-        %             end
-        %             D_wknd(jj,kk) = D_wknd(jj,kk)^(1/r);
-        %         end
-        %     end
-        
-        
-        %     D_wknd
-        %     X = [sum(weekend_ld,2) max(weekend_ld,[],2)];
-        %     [idx,C] = kmedoids(X,2,'Algorithm','pam')
-        %     figure;
-        %     plot(X(idx==1,1),X(idx==1,2),'r.','MarkerSize',7)
-        %     hold on
-        %     plot(X(idx==2,1),X(idx==2,2),'b.','MarkerSize',7)
-        %     plot(C(:,1),C(:,2),'co',...
-        %         'MarkerSize',7,'LineWidth',1.5)
-        %     legend('Cluster 1','Cluster 2','Medoids',...
-        %         'Location','NW');
-        %     title('Cluster Assignments and Medoids');
-        %     hold off
-        
-        %     D_wknd
-        X = [sum(week_ld,2) max(week_ld,[],2)];
-        [idx,C] = kmedoids(X,5,'Algorithm','pam');
-        [Lia,Locb] = ismember(X,C(1,:),'rows');
-    end
-end

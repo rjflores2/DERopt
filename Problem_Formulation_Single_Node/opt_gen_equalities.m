@@ -38,7 +38,7 @@ end
 %% POWERPLANTS
 if util_solar_on || util_ees_on
     Constraints = [Constraints
-        (sum(var_pp.pp_elec_import,2) + sum(var_util_ees.ees_dchrg,2) + sum(var_utilpv.util_pv_elec,2) == sum(var_pp.pp_elec_wheel,2) + sum(var_pp.pp_elec_wheel_lts,2) + sum(var_pp.pp_elec_export,2) + sum(var_util_ees.ees_chrg,2)):'PP Electricity Balance'];
+        (sum(var_pp.pp_elec_import,2) + sum(var_util_ees.ees_dchrg,2) + sum(var_utilpv.util_pv_elec,2) + sum(var_util_wind.util_wind_elec,2) == sum(var_pp.pp_elec_wheel,2) + sum(var_pp.pp_elec_wheel_lts,2) + sum(var_pp.pp_elec_export,2) + sum(var_util_ees.ees_chrg,2) + sum(util_el_eff.*var_util_el.el_prod,2)):'PP Electricity Balance'];
     
     if util_pv_wheel_lts
         Constraints = [Constraints

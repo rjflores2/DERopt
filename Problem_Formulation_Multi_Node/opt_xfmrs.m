@@ -24,7 +24,7 @@ if (xfmr_on && acpf_sim) || (acpf_sim >= 1)
                 (C*[var_xfmr.Pinj(ii,:); var_xfmr.Qinj(ii,:)] <= t_alpha.*t_rating(ii)):'Polygon Xfmr Constraints'];
         end
     elseif  acpf_sim >= 1
-        for ii = 1:N
+        for ii = 1:length(xfmr_subset_unique)%N
             %%%Empty bus not connected to any load
             if isempty(find(strcmp(bb_lbl(ii + 1),xfmr_subset_unique)))
                 Constraints = [Constraints

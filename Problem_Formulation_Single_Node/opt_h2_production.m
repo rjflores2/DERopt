@@ -20,7 +20,7 @@ if ~isempty(el_v) || ~isempty(rel_v)
                 (h2es_v(4,ii)*var_h2es.h2es_adopt(ii) <= var_h2es.h2es_soc(:,ii) <= h2es_v(5,ii)*var_h2es.h2es_adopt(ii)):'H2 Min/Max SOC' %%%Min/Max SOC
                 (var_h2es.h2es_chrg(:,ii) <= h2es_v(6,ii)*var_h2es.h2es_adopt(ii)):'H2 Max Chrg' %%%Max Charge Rate
                 (var_h2es.h2es_dchrg(:,ii) <= h2es_v(7,ii)*var_h2es.h2es_adopt(ii)):'H2 Max Dchrg'%%%Max Discharge Rate
-            (var_h2es.h2es_dchrg(:,ii) <= var_h2es.h2es_bin(:,ii)*10000):'H2ES Op State'
+                (var_h2es.h2es_dchrg(:,ii) <= var_h2es.h2es_bin(:,ii)*10000):'H2ES Op State'
                 (var_h2es.h2es_chrg(:,ii) <= (1-var_h2es.h2es_bin(:,ii))*10000):'H2ES Op State' ];
             %                 (var_h2es.h2es_soc(1) == 0):'H2 Starting SOC'
         end

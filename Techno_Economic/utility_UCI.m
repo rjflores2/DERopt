@@ -6,6 +6,7 @@
 %%% 3: LMP Rate + 0.2 and LMP Export
 if uci_rate == 1
     uci_energy_charge = 0.11; %$/kWh
+    uci_energy_charge = 0.21; %$/kWh
     dc_nontou = 9.16; %$/kW - facility related demand charge
     dc_on = 0;
     dc_mid = 0;
@@ -33,12 +34,12 @@ elseif uci_rate == 2
     
     
 elseif uci_rate == 3
-        dc_nontou = 9.16; %$/kW - facility related demand charge
+    dc_nontou = 9.16; %$/kW - facility related demand charge
     dc_on = 0;
     dc_mid = 0;
     import_price = lmp_uci + 0.2;
-   
-     if export_on || gen_export_on
+    
+    if export_on || gen_export_on
         export_price = lmp_uci;
     else
         export_price = zeros(length(elec),1);

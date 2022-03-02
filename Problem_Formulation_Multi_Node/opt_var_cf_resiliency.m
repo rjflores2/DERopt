@@ -67,12 +67,12 @@ if ~isempty(crit_load_lvl) && crit_load_lvl >0
     %%%If transformers are connected to each other
     if sim_lvl == 3
         N = length(bb_lbl) - 1;
-        B = size(branch_bus,1);
+        B = size(branch_bus,1) - 1;
         var_resiliency.Pinj = sdpvar(N,T_res(2),'full'); %kW
         var_resiliency.Qinj = sdpvar(N,T_res(2),'full'); %kW
         var_resiliency.pflow = sdpvar(B,T_res(2),'full');
         var_resiliency.qflow = sdpvar(B,T_res(2),'full');
-        var_resiliency.bus_voltage = sdpvar(B,T_res(2),'full');
+        var_resiliency.bus_voltage = sdpvar(N,T_res(2),'full');
     else
         var_resiliency.Pinj = zeros(N,T_res(2));
         var_resiliency.pflow = zeros(N,T_res(2));

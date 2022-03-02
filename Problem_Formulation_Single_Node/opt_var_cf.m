@@ -10,7 +10,8 @@ M = length(endpts);   %# of months in the simulation
 % Objective = [];
 
 %% Utility Electricity
-if isempty(utility_exists) == 0
+% if isempty(utility_exists) == 0
+if utility_exists 
     %%%Electrical Import Variables
     var_util.import = sdpvar(T,1,'full');
     
@@ -37,22 +38,16 @@ if isempty(utility_exists) == 0
     %%%Allocating space
     temp_cf = zeros(size(elec));
     
-%     for i=1:K %%%Going through all buildings
-        %%%Find the applicable utility rate
-        index=find(ismember(rate_labels,rate(1)));
-        
-        %%%Specifying cost function
-%         temp_cf(:,i) = day_multi.*var_util.import_price(:,index);
-%     end
+    %%%Find the applicable utility rate
+    index=find(ismember(rate_labels,rate(1)));
     
     %%%Import Energy charges
-%     Objective = sum(sum(var_util.import.*temp_cf));
+    %     Objective = sum(sum(var_util.import.*temp_cf));
     Objective = sum(sum(var_util.import.*(day_multi.*import_price(:,index))));
-
+    
     %%%Clearing temporary cost function matrix
     clear temp_cf
-
-    %     for i =1:K
+    
     if dc_exist == 1
         %%%Find the applicable utility rate
         index=find(ismember(rate_labels,rate(1)));
@@ -82,6 +77,8 @@ else
 end
 
 %% General export
+%%% General export allows export from any onsite resource, regardless of
+%%% fuel source
 if gen_export_on
     var_util.gen_export = sdpvar(T,1,'full');
     var_util.import_state = binvar(T,1,'full');
@@ -89,6 +86,7 @@ if gen_export_on
          + -sum(var_util.gen_export.*export_price);
 else
     var_util.gen_export = zeros(T,1);
+    var_util.import_state = ones(T,1);
 end
 
 %% Technologies That Can Be Adopted at Each Building Energy Hub
@@ -101,31 +99,26 @@ if isempty(pv_v) == 0
     %%%Size of installed System (kW)
     var_pv.pv_adopt= sdpvar(1,size(pv_v,2),'full'); %%%PV Size
     
-    if island == 0 && export_on == 1  %If grid tied, then include NEM and wholesale export
+    if ~isempty(utility_exists) && utility_exists && export_on %If grid tied, then include NEM and wholesale export
         
         %%% Variables that exist when grid tied
         var_pv.pv_nem = sdpvar(T,1,'full'); %%% PV Production exported w/ NEM
-%         pv_wholesale = sdpvar(T,K,'full'); %%% PV Production exported under NEM rates
         
-        %%%PV Export - NEM (kWh)       
-            %%%Utility rates for building k
-            index=find(ismember(rate_labels,rate(1)));
+        %%%PV Export - NEM (kWh)
+        %%%Utility rates for building k
+        index=find(ismember(rate_labels,rate(1)));
 
 
         %%%Adding values to the cost function
          Objective = Objective...
              + sum(sum((-day_multi.*export_price(:,index)).*var_pv.pv_nem)); %%%NEM Revenue Cost
          
-         %%%Clearing temporary variables
-         clear temp_cf1 temp_cf2
     else
         var_pv.pv_nem = zeros(T,1);
     end
     
     %%%PV Cost
-%     mod_val = 0.7
-%     mod_val*pv_cap
-%      mod_val*(pv_v(1)*M*cap_mod.pv - cap_scalar.pv)
+
     Objective = Objective ...
         + sum(M*pv_mthly_debt'.*pv_cap_mod.*var_pv.pv_adopt)... %%%PV Capital Cost ($/kW installed)
         + pv_v(3)*(sum(sum(day_multi.*(var_pv.pv_elec)))) ... %%%PV O&M Cost ($/kWh generated)    
@@ -195,91 +188,7 @@ else
     var_rees.rees_soc=zeros(T,1);
 end
 toc
-%% Energy products exported from a power plant
-if util_solar_on || util_ees_on
-    
-    if util_pp_export
-        var_pp.pp_elec_export = sdpvar(T,1,'full'); %%%Export from the power plant
-    else
-        var_pp.pp_elec_export = zeros(T,1);
-    end
-    
-    %%%Can the power plant import power at the local node??
-    if util_pp_import
-        var_pp.pp_elec_import = sdpvar(T,1,'full'); %%%Import at the power plant
-        var_pp.import_state = binvar(T,1,'full'); %%%Import State
-    else
-        var_pp.pp_elec_import =   zeros(T,1);
-        var_pp.import_state = zeros(T,1);
-    end
-    
-    %%%General wheeling potential
-    if util_pv_wheel
-        var_pp.pp_elec_wheel = sdpvar(T,1,'full');
-    else
-        var_pp.pp_elec_wheel = zeros(T,1);
-    end
-    
-    %%%Wheeling for long term storage
-    if util_pv_wheel_lts
-        var_pp.pp_elec_wheel_lts = sdpvar(T,1,'full');
-    else
-        var_pp.pp_elec_wheel_lts = zeros(T,1);
-    end
-    
-    
-    Objective = Objective ...
-        + sum((-lmp_util).*var_pp.pp_elec_export) ...
-        + sum((lmp_util + 0.015).*var_pp.pp_elec_import) ...
-        + sum((0.01).*(var_pp.pp_elec_wheel + var_pp.pp_elec_wheel_lts));
-else
-    var_pp.pp_elec_export = zeros(T,1);
-    var_pp.pp_elec_import = zeros(T,1);
-    var_pp.pp_elec_wheel = zeros(T,1);
-    var_pp.pp_elec_wheel_lts = zeros(T,1);
-    var_pp.import_state = zeros(T,1);
-end%test
-%% Community Scale Solar
-if ~isempty(utilpv_v)
-    %%% Adopted Utility Scale PV
-    var_utilpv.util_pv_adopt = sdpvar(1,size(utilpv_v,2),'full');
-    %%% Electricity generated and sent to the grid
-    var_utilpv.util_pv_elec = sdpvar(T,size(utilpv_v,2),'full');
-    for ii = 1:size(utilpv_v,2)
-        Objective = Objective ...
-            + sum(M.*utilpv_cap_mod(ii).*utilpv_mthly_debt(ii).*var_utilpv.util_pv_adopt(ii)) ...
-            + sum((utilpv_v(3,ii)).*var_utilpv.util_pv_elec);
-    end
-    
-    
-else
-    var_utilpv.util_pv_adopt = 0;
-    var_utilpv.util_pv_elec = zeros(T,1);
-end
-%% Community Scale Storage
-if ~isempty(util_ees_v)
-    %%%Adopted utility scale EES
-    var_util_ees.ees_adopt = sdpvar(1,size(util_ees_v,2),'full');
-    %%% Adopted EES SOC
-    var_util_ees.ees_soc = sdpvar(T,size(util_ees_v,2),'full');
-    %%% Adopted EES Charging
-    var_util_ees.ees_chrg = sdpvar(T,size(util_ees_v,2),'full');
-    %%% Adopted EES Discharging
-    var_util_ees.ees_dchrg = sdpvar(T,size(util_ees_v,2),'full');
-    
-    for ii = 1:size(util_ees_v,2)
-        Objective = Objective ...
-            + sum(M*util_ees_cap_mod(ii)*util_ees_mthly_debt(ii)*var_util_ees.ees_adopt(ii)) ...
-            + sum( var_util_ees.ees_chrg(:,ii))*util_ees_v(2,ii) ...
-            + sum( var_util_ees.ees_dchrg(:,ii))*util_ees_v(3,ii);
-    end
-    
-else
-    var_util_ees.ees_adopt = 0;
-    var_util_ees.ees_soc = 0;
-    var_util_ees.ees_chrg = zeros(T,1);
-    var_util_ees.ees_dchrg = zeros(T,1);
-end
+
 %% Electrical Energy Storage
 if isempty(ees_v) == 0
     
@@ -341,6 +250,77 @@ else
 end
 toc
 
+%% Renewable Electrolyzer
+if ~isempty(rel_v)
+    
+    %%%Electrolyzer efficiency
+    rel_eff = ones(T,size(rel_v,2));
+    for ii = 1:size(rel_v,2)
+        rel_eff(:,ii) = (1/rel_v(3,ii)).*rel_eff(:,ii);
+    end
+    
+    %%%Adoption technologies
+    var_rel.rel_adopt = sdpvar(1,size(rel_v,2),'full');
+    %%%Electrolyzer production
+    var_rel.rel_prod = sdpvar(T,size(rel_v,2),'full');
+    
+    if util_pv_wheel_lts
+        var_rel.rel_prod_wheel = sdpvar(T,size(el_v,2),'full');
+    else
+        var_rel.rel_prod_wheel = zeros(T,size(el_v,2));
+    end
+    
+    for ii = 1:size(rel_v,2)
+        %%%Electrolyzer Cost Functions
+        Objective = Objective...
+            + sum(M.*rel_mthly_debt.*var_rel.rel_adopt) ... %%%Capital Cost
+            + sum(sum(var_rel.rel_prod + var_rel.rel_prod_wheel).*rel_v(2,:)); %%%VO&M
+    end
+    
+    
+    
+    if isempty(el_v) && ~isempty(h2es_v)
+        %%%Clearing prior values
+        var_h2es.h2es_chrg = [];
+        var_h2es.h2es_dchrg = [];
+        %%%H2 Storage
+        %%%Adopted EES Size
+        var_h2es.h2es_adopt = sdpvar(1,size(h2es_v,2),'full');
+        %var_ees.ees_adopt = semivar(1,K,'full');
+        %%%EES Charging
+        var_h2es.h2es_chrg = sdpvar(T,size(h2es_v,2),'full');
+        %%%EES discharging
+        var_h2es.h2es_dchrg = sdpvar(T,size(h2es_v,2),'full');
+        
+        %%%H2ES Operational State Binary Variables
+        if strict_h2es
+            var_h2es.h2es_bin = binvar(T,size(h2es_v,2),'full');
+        else
+            var_h2es.h2es_bin = sdpvar(T,size(h2es_v,2),'full');
+        end
+        
+        %%%EES SOC
+        var_h2es.h2es_soc = sdpvar(T,size(h2es_v,2),'full');
+        for ii = 1:size(h2es_v,2)
+            %%%Electrolyzer Cost Functions
+            Objective = Objective...
+                + sum(M.*h2es_mthly_debt.*var_h2es.h2es_adopt) ... %%%Capital Cost
+                + sum(sum(var_h2es.h2es_chrg).*h2es_v(2,:)) ... %%%Charging Cost
+                + sum(sum(var_h2es.h2es_dchrg).*h2es_v(3,:)); %%%Discharging Cost
+        end
+        
+        h2_chrg_eff = 1 - h2es_v(8,:);
+    end
+    
+else
+    var_rel.rel_adopt = 0;
+    var_rel.rel_prod = zeros(T,1);
+    var_rel.rel_prod_wheel = zeros(T,1);
+    var_h2es.h2es_chrg = zeros(T,1);
+    var_h2es.h2es_dchrg = zeros(T,1);
+    el_eff = zeros(T,1);
+    rel_eff = 0;
+end
 %% H2 Production and Storage
 
 %%%Electrolyzer
@@ -380,8 +360,12 @@ if ~isempty(el_v)
         %%%EES discharging
         var_h2es.h2es_dchrg = sdpvar(T,size(h2es_v,2),'full');
         
-        %%%EES Operational State Binary Variables
-        var_h2es.h2es_bin = binvar(T,size(h2es_v,2),'full');
+        %%%H2ES Operational State Binary Variables
+        if strict_h2es
+            var_h2es.h2es_bin = binvar(T,size(h2es_v,2),'full');
+        else
+            var_h2es.h2es_bin = sdpvar(T,size(h2es_v,2),'full');
+        end
         
         %%%EES SOC
         var_h2es.h2es_soc = sdpvar(T,size(h2es_v,2),'full');
@@ -407,73 +391,6 @@ else
     var_h2es.h2es_dchrg = zeros(T,1);
     var_h2es.h2es_bin = zeros(T,1);
     el_eff = zeros(T,1);
-end
-%% Renewable Electrolyzer
-if ~isempty(rel_v)
-    
-    %%%Electrolyzer efficiency
-    rel_eff = ones(T,size(rel_v,2));
-    for ii = 1:size(rel_v,2)
-        rel_eff(:,ii) = (1/rel_v(3,ii)).*rel_eff(:,ii);
-    end    
-         
-    %%%Adoption technologies
-    var_rel.rel_adopt = sdpvar(1,size(rel_v,2),'full');
-    %%%Electrolyzer production
-    var_rel.rel_prod = sdpvar(T,size(rel_v,2),'full');
-    
-    if util_pv_wheel_lts
-        var_rel.rel_prod_wheel = sdpvar(T,size(el_v,2),'full');
-    else
-        var_rel.rel_prod_wheel = zeros(T,size(el_v,2));
-    end
-    
-    for ii = 1:size(rel_v,2)
-        %%%Electrolyzer Cost Functions
-        Objective = Objective...
-            + sum(M.*rel_mthly_debt.*var_rel.rel_adopt) ... %%%Capital Cost
-            + sum(sum(var_rel.rel_prod + var_rel.rel_prod_wheel).*rel_v(2,:)); %%%VO&M
-    end
-    
-    
-    
-    if isempty(el_v) && ~isempty(h2es_v)
-        %%%Clearing prior values
-        var_h2es.h2es_chrg = [];
-        var_h2es.h2es_dchrg = [];
-        %%%H2 Storage
-        %%%Adopted EES Size
-        var_h2es.h2es_adopt = sdpvar(1,size(h2es_v,2),'full');
-        %var_ees.ees_adopt = semivar(1,K,'full');
-        %%%EES Charging
-        var_h2es.h2es_chrg = sdpvar(T,size(h2es_v,2),'full');
-        %%%EES discharging
-        var_h2es.h2es_dchrg = sdpvar(T,size(h2es_v,2),'full');
-        
-        %%%EES Operational State Binary Variables
-        var_h2es.h2es_bin = binvar(T,size(h2es_v,2),'full');
-        
-        %%%EES SOC
-        var_h2es.h2es_soc = sdpvar(T,size(h2es_v,2),'full');
-        for ii = 1:size(h2es_v,2)
-            %%%Electrolyzer Cost Functions
-            Objective = Objective...
-                + sum(M.*h2es_mthly_debt.*var_h2es.h2es_adopt) ... %%%Capital Cost
-                + sum(sum(var_h2es.h2es_chrg).*h2es_v(2,:)) ... %%%Charging Cost
-                + sum(sum(var_h2es.h2es_dchrg).*h2es_v(3,:)); %%%Discharging Cost
-        end
-        
-        h2_chrg_eff = 1 - h2es_v(8,:);
-    end
-    
-else
-    var_rel.rel_adopt = 0;
-    var_rel.rel_prod = zeros(T,1);
-    var_rel.rel_prod_wheel = zeros(T,1);
-    var_h2es.h2es_chrg = zeros(T,1);
-    var_h2es.h2es_dchrg = zeros(T,1);
-    el_eff = zeros(T,1);
-rel_eff = 0;
 end
 
 %% HRS equipment
@@ -574,10 +491,18 @@ if ~isempty(dg_legacy)
     var_ldg.ldg_rfuel = sdpvar(T,size(dg_legacy,2),'full');
     %%%DG Fuel that has been stored in the pipeline
     if h2_inject_on
-    var_ldg.ldg_sfuel = sdpvar(T,size(dg_legacy,2),'full');
+        var_ldg.ldg_sfuel = sdpvar(T,size(dg_legacy,2),'full');
     else
-       var_ldg.ldg_sfuel = zeros(T,1);
+        var_ldg.ldg_sfuel = zeros(T,1);
     end
+    %%%DG Fuel that has been stored in the pipeline and directed to the
+    %%%site
+    if util_h2_inject_on
+         var_ldg.ldg_dfuel = sdpvar(T,size(dg_legacy,2),'full');
+    else
+        var_ldg.ldg_dfuel = zeros(T,1);
+    end
+    
     %%%DG Operational State
     if ldg_op_state
         var_ldg.ldg_opstate = binvar(T,size(dg_legacy,2),'full');
@@ -591,8 +516,6 @@ if ~isempty(dg_legacy)
     %     (dg_legacy(end,i)/t_step)
     %     ldg_off=binvar(ceil(length(time)/(dg_legacy(end,i)/t_step)),K,'full');
     
-    var_ldg.ldg_off = [];
-        
     %%%If hydrogen production is an option
     if ~isempty(el_v) || ~isempty(rel_v)
         var_ldg.ldg_hfuel = sdpvar(T,size(dg_legacy,2),'full');
@@ -610,9 +533,6 @@ if ~isempty(dg_legacy)
     %%%If including cycling costs
     if ~isempty(dg_legacy_cyc)
         %%%Only consider if on/off behavior is allowed
-        if ~isempty(var_ldg.ldg_off)
-            %%%Fill in later
-        end
         
         %%%Ramping costs
         if ~isempty(dg_legacy_cyc) && dg_legacy_cyc(2,:) > 0 %%%Only include if cycling costs is nonzero
@@ -627,19 +547,12 @@ if ~isempty(dg_legacy)
         var_ldg.ldg_elec_ramp = [];
     end
     
-    
-    %%%If abandon GT is possible
-    if ldg_off
-        var_ldg.ldg_off = binvar(1,size(dg_legacy,2),'full');
-    else
-        var_ldg.ldg_off = zeros(1,size(dg_legacy,2));
-    end
-        
 else
     var_ldg.ldg_elec = zeros(T,1);
     var_ldg.ldg_rfuel = zeros(T,1);
     var_ldg.ldg_hfuel = zeros(T,1);
     var_ldg.ldg_sfuel = zeros(T,1);
+    var_ldg.ldg_dfuel = zeros(T,1);
     var_ldg.ldg_fuel = [];
     var_ldg.ldg_off = [];
     var_ldg.ldg_opstate = 1;
@@ -654,8 +567,11 @@ if ~isempty(bot_legacy)
     %%%Bottom electrical output
     var_lbot.lbot_elec = sdpvar(length(elec),size(bot_legacy,2),'full');
     %%%Bottom operational state
-    var_lbot.lbot_on = binvar(length(elec),size(bot_legacy,2),'full');
-    
+    if lbot_op_state
+        var_lbot.lbot_on = binvar(length(elec),size(bot_legacy,2),'full');
+    else
+        var_lbot.lbot_on = zeros(T,1);
+    end
     %%%Bottoming cycle
     for i=1:size(bot_legacy,2)
         Objective=Objective+var_lbot.lbot_elec(:,1)'*(bot_legacy(1,i)*ones(length(time),1));%%%Bottoming cycle O&M

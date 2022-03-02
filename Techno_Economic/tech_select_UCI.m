@@ -1,7 +1,4 @@
 %% Technology Selection
-%% Utility
-utility_exists=[1];
-
 %% Solar PV
 if pv_on
     %%% Cap cost ($/kW)
@@ -43,43 +40,6 @@ else
     pv_v = [];
 end
 
-%% Utility Based Solar
-if util_solar_on
-    %%% Cap cost ($/kW)
-    %%% Efficiency / Conversion Percent at 1 kW/m^2
-    %%% O&M ($/kWh generated)
-    utilpv_v = [900; 0.2; 0.001];
-    
-    %%%Financial Aspects - Solar PV
-    utilpv_fin = [0; ... %%%Scaling linear factor - Based on Lazards cost of electricity
-        5; ... %%%MACRS Schedule
-        1]; ... %%%ITC Benefit
-else
-
-utilpv_v = [];
-end
-
-%% Utility Scale Battery
-if util_ees_on
-    %%% (1) Capital Cost ($/kWh installed)
-    %%% (2) Charge O&M ($/kWh charged)
-    %%% (3) Discharge O&M ($/kWh discharged)
-    %%% (4) Minimum state of charge
-    %%% (5) Maximum state of charge
-    %%% (6) Maximum charge rate (% Capacity/hr)
-    %%% (7) Maximum discharge rate (% Capacity/hr)
-    %%% (8) Charging efficiency
-    %%% (9) Discharging efficiency
-    %%% (10) State of charge holdover
-    util_ees_v=[240; 0.001; 0.001; 0.1; 0.95; 0.25; 0.25; .90; .90; .995];
-    
-    %%%Financial Aspects - EES
-    util_ees_fin = [0;... %%%Scaling linear factor - Based on Lazards cost of electricity
-        5; ... %%%MACRS Schedule
-        1]; ... %%%ITC Benefit
-else
-util_ees_v = [];
-end
 %% Electrical Energy Storage
 if ees_on
     %%% (1) Capital Cost ($/kWh installed)

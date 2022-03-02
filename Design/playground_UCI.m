@@ -2,6 +2,10 @@
 clear all; close all; clc ; started_at = datetime('now'); startsim = tic;
 
 co2_lim_loop = [0 .10 .25 .50 .60 .65 .675 .7 .725 .75 .775 .8 .85 .9 .95 .99];
+co2_lim_loop = [0 .10 .25 .50];
+% co2_lim_loop = [0 .60 .65 .675 .7 .725 .75 .775 .8 .85 .9 .95 .99];
+% co2_lim_loop = [0];
+% co2_lim_loop = [0 .85 .9 .95 .99];
 co2_production = [];
 for co2_val = co2_lim_loop
     
@@ -24,20 +28,24 @@ chiller_plant_opt = 0;
 %% Dummy Variables
 elec_dump = []; %%%Variable to "dump" electricity
 %% Adoptable technologies toggles (opt_var_cf.m and tech_select.m)
+utility_exists=[1]; %% Utility access
 pv_on = 1;        %Turn on PV
 ees_on = 1;       %Turn on EES/REES
 rees_on = 1;  %Turn on REES
 
 %%%Community/Utility Scale systems
 util_solar_on = 1;
+util_wind_on = 1;
 util_ees_on = 1;
+util_el_on = 1;
+util_h2_inject_on = 1;
 
 %%%Hydrogen technologies
 el_on = 1; %Turn on generic electrolyer
 rel_on = 1; %Turn on renewable tied electrolyzer
 h2es_on = 1; %Hydrogen energy storage
 hrs_on = 0; %Turn on hydrogen fueling station
-h2_inject_on = 1; %Turn on H2 injection into pipeline
+h2_inject_on = 0; %Turn on H2 injection into pipeline
 %% Legacy System Toggles
 lpv_on = 1; %Turn on legacy PV 
 lees_on = 1; %Legacy EES
@@ -50,18 +58,22 @@ ldb_on = 1; %Legacy Duct Burner
 lboil_on = 1; %Legacy boilers
 
 %% Utility PV Solar
-util_pv_wheel = 1; %General Wheeling Capabilities
+util_pv_wheel = 0; %General Wheeling Capabilities
 util_pv_wheel_lts = 0; %Wheeling for long term storage
-util_pp_import = 1; %Can import power at power plant node
-util_pp_export = 1; %Can import power at power plant node
+util_pp_import = 0; %Can import power at power plant node
+util_pp_export = 0; %Can import power at power plant node
+
+%% Utility H2 production
+util_h2_sale = 0;
+util_h2_pipe_store = 1;
+%% Strict storage design
+strict_h2es = 0;
 
 %% Legacy Generator Options
 ldg_op_state = 1; %%%Generator can turn on/off
+lbot_op_state = 0; %%%Steam turbine can turn on/off
 %%%Gas turbine cycling costs
 dg_legacy_cyc = 1;
-
-%%%Shut off legacy generator option
-ldg_off = 1;
 
 %%%H2 fuel limit in legacy generator
 %%%Used in opt_gen_inequalities
@@ -74,7 +86,7 @@ h2_fuel_limit = [1];%0.1; %%%Fuel limit on an energy basis - should be 0.1
 %%% 1: current rate, which does not value export
 %%% 2: current import rate + LMP export rate
 %%% 3: LMP Rate + 0.2 and LMP Export
-uci_rate = 3;
+uci_rate = 1;
 
 island = 0;
 
@@ -106,7 +118,7 @@ h2_fuel_forced_fraction = []; %%%Energy fuel requirements
 co2_lim_red = co2_val;
 if co2_lim_red > 0
 %     co2_lim = [6.7070e+07.*(1-co2_lim_red)];
-    co2_lim = [6.7070e+07.*(1-co2_lim_red)];
+    co2_lim = [4.8304e+07.*(1-co2_lim_red)];
 else
     co2_lim = [];
 end
@@ -212,6 +224,7 @@ year_idx = 2018;
 month_idx = [1 4 7 10];
 month_idx = [2 9];
 month_idx = [1 3 6 7 9 11];
+month_idx = [1 4 7 10];
 
 
 
@@ -220,7 +233,6 @@ month_idx = [1 3 6 7 9 11];
 % month_idx = [1];
 % month_idx = [];
 bldg_loader_UCI
-
 
 % elec = elec ;
 % heat = [];
@@ -248,6 +260,11 @@ bldg_loader_UCI
 %% Utility Data
 %%%Loading Utility Data and Generating Energy Charge Vectors
 utility_UCI
+
+%%T&D charge ($/kWh)
+t_and_d = 0.01;
+
+
 % export_price = export_price*0;
 %%%Placeholder natural gas cost
 ng_cost = 0.5/29.3; %$/kWh --> Converted from $/therm to $/kWh, 29.3 kWh / 1 Therm
@@ -260,11 +277,15 @@ ng_inject = 0.05/29.3; %$/kWh --> Converted from $/therm to $/kWh, 29.3 kWh / 1 
 %%%Technology Parameters
 tech_select_UCI
 
+%%%Technology parameters for offsite resources
+tech_select_offsite_UCI
+
 %%%Including Required Return with Capital Payment (1 = Yes)
 req_return_on = 1;
 
 %%%Capital cost mofificaitons
 cap_cost_mod
+
 
 %% Legacy Technologies
 tech_legacy_UCI
@@ -277,7 +298,13 @@ if opt_now
     opt_var_cf %%%Added NEM and wholesale export to the PV Section
     elapsed = toc;
     fprintf('Took %.2f seconds \n', elapsed)
+    %% Setting up variables and cost function for offsite resources
+    fprintf('%s: Off-site variables.', datestr(now,'HH:MM:SS'))
+    tic
+    opt_var_cf_offsite %%%Added NEM and wholesale export to the PV Section
+    elapsed = toc;
     
+    fprintf('Took %.2f seconds \n', elapsed)
     %% General Equality Constraints
     fprintf('%s: General Equalities.', datestr(now,'HH:MM:SS'))
     tic
@@ -366,6 +393,14 @@ if opt_now
     opt_utility_pv
     elapsed = toc;
     fprintf('Took %.2f seconds \n', elapsed)
+    
+     %% Utility Wind
+    fprintf('%s: Utility Scale Wind Constraints.', datestr(now,'HH:MM:SS'))
+    tic
+    opt_utility_wind
+    elapsed = toc;
+    fprintf('Took %.2f seconds \n', elapsed)
+    
     %% Utility EES Storage
     fprintf('%s: Utility Scale Battery Storage Constraints.', datestr(now,'HH:MM:SS'))
     tic
@@ -373,6 +408,12 @@ if opt_now
     elapsed = toc;
     fprintf('Took %.2f seconds \n', elapsed)
     
+    %% Utility Electrolyzer
+    fprintf('%s: Utility Scale Electrolyzer Constraints.', datestr(now,'HH:MM:SS'))
+    tic
+    opt_utility_el
+    elapsed = toc;
+    fprintf('Took %.2f seconds \n', elapsed)
     %% H2 Pipeline Injection
     fprintf('%s: H2 Pipeline Injection Constraints.', datestr(now,'HH:MM:SS'))
     tic
@@ -395,18 +436,18 @@ if opt_now
     %% System Evaluaiton
     uci_evaluation_2
     
-%     co2_lim/6.4533e+07
-%     1 - co2_lim/6.4533e+07
+    %     co2_lim/6.4533e+07
+    %     1 - co2_lim/6.4533e+07
     
     if isempty(co2_production)
-co2_production =     co2_emissions;
+        co2_production =     co2_emissions;
     end
     
     %%
     if isempty(co2_lim)
-        save('H:\_Tools_\UCI_Results\Sc6\Baseline2.mat')
+        save('H:\_Tools_\UCI_Results\Sc16\Baseline.mat')
     else
-        save(strcat('H:\_Tools_\UCI_Results\Sc6\',num2str(100.*co2_lim_red),'_reduction.mat'))
+        save(strcat('H:\_Tools_\UCI_Results\Sc16\',num2str(100.*co2_lim_red),'_reduction.mat'))
     end
 end
 end

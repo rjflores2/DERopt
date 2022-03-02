@@ -14,6 +14,10 @@ adopted.rel = var_rel.rel_adopt;
 adopted.h2es = var_h2es.h2es_adopt;
 adopted.h2_inject = var_h2_inject.h2_inject_size;
 adopted.util_pv = var_utilpv.util_pv_adopt;
+adopted.util_wind = var_util_wind.util_wind_adopt;
+adopt.util_ees = var_util_ees.ees_adopt; 
+adopt.util_el = var_util_el.el_adopt; 
+adopt.util_h2_inject = var_util_h2_inject.h2_inject_size;
 adopted
 
 %% CO2 production

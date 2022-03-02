@@ -23,12 +23,25 @@ var_pp.import_state = value(var_pp.import_state);
 var_utilpv.util_pv_adopt = value(var_utilpv.util_pv_adopt);
 var_utilpv.util_pv_elec = value(var_utilpv.util_pv_elec);
 
+%% Utility Wind Variables
+var_util_wind.util_wind_adopt = value(var_util_wind.util_wind_adopt);
+var_util_wind.util_wind_elec = value(var_util_wind.util_wind_elec);
+
 %% Utility Battery Storage
 var_util_ees.ees_adopt = value(var_util_ees.ees_adopt);
 var_util_ees.ees_soc = value(var_util_ees.ees_soc);
 var_util_ees.ees_chrg = value(var_util_ees.ees_chrg);
 var_util_ees.ees_dchrg = value(var_util_ees.ees_dchrg);
 
+%% Utility Electrolyzer
+var_util_el.el_adopt = value(var_util_el.el_adopt);
+var_util_el.el_prod = value(var_util_el.el_prod);
+
+%% Utility H2 Injection
+var_util_h2_inject.h2_inject_adopt = value(var_util_h2_inject.h2_inject_adopt);
+var_util_h2_inject.h2_inject_size = value(var_util_h2_inject.h2_inject_size);
+var_util_h2_inject.h2_inject = value(var_util_h2_inject.h2_inject);
+var_util_h2_inject.h2_store = value(var_util_h2_inject.h2_store);
 %% Renewable Electrical Energy Storage
 var_rees.rees_adopt = value(var_rees.rees_adopt);
 var_rees.rees_chrg = value(var_rees.rees_chrg);
@@ -77,8 +90,10 @@ var_ldg.ldg_elec = value(var_ldg.ldg_elec);
 var_ldg.ldg_fuel = value(var_ldg.ldg_fuel);
 var_ldg.ldg_rfuel = value(var_ldg.ldg_rfuel);
 var_ldg.ldg_hfuel = value(var_ldg.ldg_hfuel);
+var_ldg.ldg_sfuel = value(var_ldg.ldg_hfuel);
+var_ldg.ldg_dfuel = value(var_ldg.ldg_hfuel);
 var_ldg.ldg_elec_ramp = value(var_ldg.ldg_elec_ramp);
-var_ldg.ldg_off = value(var_ldg.ldg_off);
+% var_ldg.ldg_off = value(var_ldg.ldg_off);
 var_ldg.ldg_opstate = value(var_ldg.ldg_opstate);
 %% Bottoming Cycle
 var_lbot.lbot_elec = value(var_lbot.lbot_elec);

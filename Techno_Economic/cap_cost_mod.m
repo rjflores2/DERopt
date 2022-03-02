@@ -90,6 +90,16 @@ if ~isempty(utilpv_v)
     end
 end
 
+%%%Utility Scale wind
+if exist('util_wind_v') && ~isempty(util_wind_v)
+    for ii=1:size(util_wind_v,2)
+        util_wind_mthly_debt(ii,1)=util_wind_v(1,ii)*((1-equity)*(interest*(1+interest)^(period*12))...
+            /((1+interest)^(period*12)-1)+...%%%Money to pay back bank
+            req_return_on*(equity)*(required_return*(1+required_return)^(period*12))...
+            /((1+required_return)^(period*12)-1));
+    end
+end
+
 %%%Utility Battery Storage
 if ~isempty(util_ees_v)
     for ii=1:size(util_ees_v,2)
@@ -100,15 +110,35 @@ if ~isempty(util_ees_v)
     end
 end
 
+%%%Generic electrolyzer
+if exist('util_el_on') && ~isempty(util_el_on)
+    for ii=1:size(util_el_on,2)
+        util_el_mthly_debt(ii,1)=util_el_on(1,ii)*((1-equity)*(interest*(1+interest)^(period*12))...
+            /((1+interest)^(period*12)-1)+...%%%Money to pay back bank
+            req_return_on*(equity)*(required_return*(1+required_return)^(period*12))...
+            /((1+required_return)^(period*12)-1));
+    end
+end
 %%%H2 Pipeline Injeciton
 if exist('h2_inject_v','var') && ~isempty(h2_inject_v)
-    for ii = 1:size(h2_inject_v)
+    for ii = 1:size(h2_inject_v,2)
         h2_inject_mthly_debt(ii) = h2_inject_v(ii)*((1-equity)*(interest*(1+interest)^(period*12))...
             /((1+interest)^(period*12)-1)+...%%%Money to pay back bank
             req_return_on*(equity)*(required_return*(1+required_return)^(period*12))...
             /((1+required_return)^(period*12)-1));
     end
 end
+
+%%%H2 Pipeline Injeciton
+if exist('util_h2_inject_v','var') && ~isempty(util_h2_inject_v)
+    for ii = 1:size(util_h2_inject_v)
+        util_h2_inject_mthly_debt(ii) = util_h2_inject_v(ii)*((1-equity)*(interest*(1+interest)^(period*12))...
+            /((1+interest)^(period*12)-1)+...%%%Money to pay back bank
+            req_return_on*(equity)*(required_return*(1+required_return)^(period*12))...
+            /((1+required_return)^(period*12)-1))
+    end
+end
+
 %% Converting incentives to reductions in debt payments
 if ~isempty(sgip)
     
@@ -374,6 +404,58 @@ if ~isempty(utilpv_v)
         end
     end
 end
+
+%% Utility Scale Wind
+if exist('util_wind_v') && ~isempty(util_wind_v)
+    util_wind_cap_mod = [];
+    for i = 1:size(elec,2)
+        for ii = 1:size(util_wind_v,2)
+            %%%Applicable tax rate
+            if strcmp(rate{i},'R1')
+                tr = tax_rates(1);
+            else
+                tr = tax_rates(2);
+            end
+            
+            %%% Solar PV Examination
+            %%%Maximum PV estimated by either reaching net zero electrical energy
+            %%%or installing maximum capacity
+           % if ~isempty(maxpv)
+           %     pv_scale_factor = min([sum(elec(:,i)).*(12/length(endpts))./(0.2*8760) maxpv(i)]);
+           % else
+           %     pv_scale_factor = min([sum(elec(:,i))./(0.2*8760)]);
+           % end
+           % if pv_scale_factor > 1000
+           %     pv_scale_factor = 1000;
+           % end
+            
+%             pv_scale_factor = pv_scale_factor.*ones(1,size(pv_v,2));
+            
+            %%%Scaling Factor
+            %%%If is low income
+            if low_income(i) ~= 1
+%                 for ii = 1:length(pv_scale_factor)
+                    %%%Decrease in cost due to scale
+                    util_wind_scale_factor = util_wind_fin(1,ii);
+                    
+                    %%%Adjsuted utilpv Costs
+                    debt =12.*ones(10,1).*(util_wind_v(1,ii))*((1-equity)*(interest*(1+interest)^(period*12))...
+                        /((1+interest)^(period*12)-1)+...%%%Money to pay back bank
+                        req_return_on*(equity)*(required_return*(1+required_return)^(period*12))...
+                        /((1+required_return)^(period*12)-1));
+                    
+                    util_wind_cap_mod(i,ii) = cap_cost_scaling(tr,util_wind_v(:,ii),util_wind_fin(:,ii),util_wind_scale_factor,debt,discount_rate);
+                    
+                    
+%                 end
+                %%%If is low income
+            else
+                util_wind_cap_mod(i,ii) = 1 - somah/util_wind_v(1,ii);
+            end
+            
+        end
+    end
+end
 %% Utility Scale Battery Storage
 if ~isempty(util_ees_v)
     util_ees_cap_mod = [];
@@ -423,5 +505,49 @@ if ~isempty(util_ees_v)
             end
             
         end
+    end
+end
+
+%% Utility Scale Electrolyzer
+if exist('util_el_on') && ~isempty(util_el_v)
+    util_el_cap_mod = [];
+    for i = 1:size(elec,2)
+        %%%Applicable tax rate
+        if strcmp(rate{i},'R1')
+            tr = tax_rates(1);
+        else
+            tr = tax_rates(2);
+        end
+        
+        %%%Electrolyzer examination
+        %%%Generating a h2 fuel fraction when this does not exist
+%         if ~isempty(h2_fuel_forced_fraction)
+%             util_el_scale_factor = (sum(elec)./0.33*h2_fuel_forced_fraction)/length(elec)*e_adjust;
+%         else
+%             util_el_scale_factor = (sum(elec)./0.33*0.1)/length(elec)*e_adjust;
+%         end
+        
+%         if util_el_scale_factor >= 28000
+%             util_el_scale_factor = 28000
+%         end
+
+%%% Assuming maximum scale factor
+util_el_scale_factor = 28000
+        %%% Scaling Factor
+        if ~low_income(i)
+            %%%Decrease in cost due to scale
+            util_el_scale_factor = util_el_scale_factor*util_el_fin(1,ii);
+            
+            %%%Adjsuted PV Costs
+            debt =12.*ones(10,1).*(util_el_v(1,ii) + util_el_scale_factor)*((1-equity)*(interest*(1+interest)^(period*12))...
+                /((1+interest)^(period*12)-1)+...%%%Money to pay back bank
+                req_return_on*(equity)*(required_return*(1+required_return)^(period*12))...
+                /((1+required_return)^(period*12)-1));
+            
+            
+                    util_el_cap_mod(i,ii) = cap_cost_scaling(tr,util_el_v(:,ii),util_el_fin(:,ii),util_el_scale_factor,debt,discount_rate);
+        else
+         end
+        
     end
 end

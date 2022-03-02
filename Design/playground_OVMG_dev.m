@@ -5,8 +5,9 @@ clear all; close all; clc ; started_at = datetime('now'); startsim = tic;
 
 % for crit_load_lvl = [1 2 3 4 6 7] %%% Corresponding END around line 500 - after files have been saved
 %     clearvars -except crit_load_lvl crit_load_lvl started_at startsim
-crit_load_lvl = 1;
+crit_load_lvl = 7;
 % %%
+
 %% Parameters
 
 %%% opt.m parameters
@@ -77,7 +78,7 @@ else
     
 end
 testing
-downselection
+downselection = 1
 
 %% ESA On/Off (opt_var_cf)
 esa_on = 1; %Building RAtes are Adjusted for CARE Rates
@@ -199,7 +200,7 @@ elseif sim_lvl == 3 && acpf_sim %%%If resiliency is examined on each individual 
 end
 
 %%
-for sim_idx = 3:sim_end
+for sim_idx = 1:sim_end
    %% Building indicies in the current simulation
     if sim_lvl == 1 && (acpf_sim == 0 || isempty(acpf_sim))
         bldg_ind = [st_idx(sim_idx):end_idx(sim_idx)];
@@ -444,6 +445,7 @@ for sim_idx = 3:sim_end
         %% Optimize
         fprintf('%s: Optimizing \n....', datestr(now,'HH:MM:SS'))
         WHATS_THE_CRITICAL_LOAD = crit_load_lvl
+        
         opt
         
         %% Timer
@@ -453,8 +455,8 @@ for sim_idx = 3:sim_end
         variable_values_multi_node
         
     end
-    
-    save(strcat('Sim_',num2str(sim_idx)))
+%     
+%     save(strcat('Sim_',num2str(sim_idx)))
     
     %%
     adopted.pv = [adopted.pv  var_pv.pv_adopt];
@@ -507,13 +509,19 @@ for sim_idx = 3:sim_end
         
         bldg_base(bldg_ind(ii)).der_systems.cap_mods = [pv_cap_mod(ii) ees_cap_mod(ii) rees_cap_mod(ii)];
     end
+    
+    %% recording resiliency results
+    if sim_lvl >= 3 && acpf_sim == 1
+        save(strcat('UES2b_',num2str(sim_idx),'_CriticalLoad_',num2str(crit_load_lvl)),'var_resiliency')
+        
+    end
 end
 
 %% Update Utility Costs
 OVMG_updated_utility_costs
 %% Saving Data
 bldg = bldg_base;
-assss
+
 if isempty(crit_load_lvl) || crit_load_lvl == 0
     save_here = 1
     save(strcat(sc_txt,'_DdER'),'bldg')

@@ -148,8 +148,8 @@ vector(:,1) = vector(:,1) -365;
 lmp_uci = interp1(vector(:,1),vector(:,2),time)./1000;
 lmp_uci = lmp_uci + (lmp_uci - mean(lmp_uci))*0;
 
-%% Loading Utility LMP Data and solar profiles
-if util_solar_on
+%% Loading Utility LMP Data and solar/wind profiles
+if util_solar_on || util_wind_on
     load Schindlr_LMP_Summary
     
     %%%Shifting LMP start date around
@@ -158,15 +158,33 @@ if util_solar_on
     lmp_util = interp1(vector(:,1),vector(:,2),time)./1000;
     lmp_util = lmp_util + (lmp_util - mean(lmp_util))*0;
     
-    
-    solar_util = xlsread('Five_Points_Tracking.xlsx')./1000;
-    solar_util_tm = datenum([year(time(1)) 1 1 0 0 0]);
-    for ii = 2:8760
-        solar_util_tm(ii,1) = solar_util_tm(ii-1,1) + 1/24;
+    %%%Solar Data
+    if util_solar_on
+        solar_util = xlsread('Five_Points_Tracking.xlsx')./1000;
+        solar_util_tm = datenum([year(time(1)) 1 1 0 0 0]);
+        for ii = 2:8760
+            solar_util_tm(ii,1) = solar_util_tm(ii-1,1) + 1/24;
+        end
+        solar_util = interp1(solar_util_tm,solar_util,time);
+        solar_util(isnan(solar_util)) = 0;
     end
-    solar_util = interp1(solar_util_tm,solar_util,time);
-    solar_util(isnan(solar_util)) = 0;
+    
+    %%%Wind DAta
+    if util_wind_on
+        wind_util = xlsread('tehachapi_2011.xlsx');
+        
+        wind_util_tm = datenum([year(time(1)) 1 1 0 0 0]);
+        for ii = 2:8760
+            wind_util_tm(ii,1) = wind_util_tm(ii-1,1) + 1/24;
+        end
+        wind_util = interp1(wind_util_tm,wind_util,time);
+        wind_util(isnan(wind_util)) = 0;
+        
+    end
 end
+
+%
+
 %% Loading HRS data
 if hrs_on
     load hrs_vector

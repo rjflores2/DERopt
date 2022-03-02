@@ -64,28 +64,22 @@ end
 
 %% Net Energy Metering
 if export_on
-% if (strcmp(class(var_pv.pv_nem),'sdpvar') || strcmp(class(var_rees.rees_dchrg_nem),'sdpvar')) && strcmp(class(var_pv.pv_nem),'sdpvar') %%%If NEM related decision variables exist
-%     for k=1:K
-        %%%Current Utility Rate
-        index=find(ismember(rate_labels,rate(1)));
-        
-        Constraints = [Constraints
-            (export_price(:,index)'*(sum(var_rees.rees_dchrg_nem,2) + var_pv.pv_nem) <= import_price(:,index)'*var_util.import):'NEM Credits < Import Cost'];
-        
-        
-        Constraints = [Constraints
-            (sum(sum(var_rees.rees_dchrg_nem,2) + var_pv.pv_nem) <= sum(var_util.import)):'NEM Energy < Import Energy'];
-        
-
-%     end
+    %%%Current Utility Rate
+    index=find(ismember(rate_labels,rate(1)));
+    
+    Constraints = [Constraints
+        (export_price(:,index)'*(sum(var_rees.rees_dchrg_nem,2) + var_pv.pv_nem) <= import_price(:,index)'*var_util.import):'NEM Credits < Import Cost'
+        (sum(sum(var_rees.rees_dchrg_nem,2) + var_pv.pv_nem) <= sum(var_util.import)):'NEM Energy < Import Energy'];
 end
 
 %% General import / export limits
-if gen_export_on || export_on
+if exist('fac_prop') && (~isempty(utility_exists) || util_pv_wheel)
     Constraints = [Constraints
-        (var_util.gen_export <= (1 - var_util.import_state) .*fac_prop(1)./e_adjust):'General Export Limits'
         (var_util.import + var_pp.pp_elec_wheel + var_pp.pp_elec_wheel_lts <= var_util.import_state .*fac_prop(1)./e_adjust):'General Import Limits'];
-%     + var_pv.pv_nem + var_rees.rees_dchrg_nem
+    if gen_export_on || export_on
+        Constraints = [Constraints
+            (var_util.gen_export <= (1 - var_util.import_state) .*fac_prop(1)./e_adjust):'General Export Limits'];
+    end
 end
 
 %% Power Plant import/export limits
@@ -114,11 +108,19 @@ if ~isempty(co2_lim)
         ( sum(var_util.import.*co2_import) ... %%%CO2 from imports
         + co2_ng*(sum(sum(var_ldg.ldg_fuel)) + sum(sum(var_ldg.db_fire)) + sum(sum(var_boil.boil_fuel)))... %%%CO2 from NG combustion
         + co2_rng*(sum(sum(var_ldg.ldg_rfuel)) + sum(sum(var_ldg.db_rfire)) + sum(sum(var_boil.boil_rfuel))) ... %%%CO2 from rNG combustion
-        + sum(var_pp.pp_elec_export.*co2_import) ...%%%Imports at a power plant
         <= ...
-        sum(var_pp.pp_elec_import.*co2_import) ...%%%Exports at a power plant
-        + co2_ng*sum(var_h2_inject.h2_inject) ... %%%H2 Pipeline Injection
-        + co2_lim):'CO2 Limit'];
+        co2_lim):'CO2 Limit'];
+    
+%      Constraints = [Constraints
+%         ( sum(var_util.import.*co2_import) ... %%%CO2 from imports
+%         + co2_ng*(sum(sum(var_ldg.ldg_fuel)) + sum(sum(var_ldg.db_fire)) + sum(sum(var_boil.boil_fuel)))... %%%CO2 from NG combustion
+%         + co2_rng*(sum(sum(var_ldg.ldg_rfuel)) + sum(sum(var_ldg.db_rfire)) + sum(sum(var_boil.boil_rfuel))) ... %%%CO2 from rNG combustion
+%         + sum(var_pp.pp_elec_export.*co2_import) ...%%%Imports at a power plant
+%         <= ...
+%         sum(var_pp.pp_elec_import.*co2_import) ...%%%Exports at a power plant
+%         + co2_ng*sum(var_h2_inject.h2_inject) ... %%%H2 Pipeline Injection
+%         + co2_lim):'CO2 Limit'];
+    
 end
 
 %% Renewable biogas limit
