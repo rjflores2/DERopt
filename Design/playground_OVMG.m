@@ -75,6 +75,7 @@ downselection
 %     pv_on = 0;        %Turn on PV
 %     ees_on = 0;       %Turn on EES/REES
 %     rees_on = 0;  %Turn on REES
+
 % else
 %     pv_on = 1;
 %     ees_on = 1;
@@ -90,6 +91,10 @@ downselection
 %     lrees_on = 0;
 % end
 
+    pv_on = 0;        %Turn on PV
+    ees_on = 0;       %Turn on EES/REES
+    rees_on = 0;  %Turn on REES
+dg_on = 0; %Turn on Generic DG
 %% ESA On/Off (opt_var_cf)
 esa_on = 1; %Building RAtes are Adjusted for CARE Rates
 

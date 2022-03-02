@@ -6,7 +6,6 @@ utility_exists=1;
 %%% Cap cost ($/kW)
 %%% Efficiency / Conversion Percent at 1 kW/m^2
 %%% O&M ($/kWh generated)
-%%% Power output per unit area (kW/m^2);
 if pv_on
     %pv_v=[3500; 0.2 ; 0.001];
     pv_v=[2650; 0.2 ; 0.001];
