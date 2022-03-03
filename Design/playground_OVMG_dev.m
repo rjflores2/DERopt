@@ -6,6 +6,7 @@ clear all; close all; clc ; started_at = datetime('now'); startsim = tic;
 % for crit_load_lvl = [1 2 3 4 6 7] %%% Corresponding END around line 500 - after files have been saved
 %     clearvars -except crit_load_lvl crit_load_lvl started_at startsim
 crit_load_lvl = 7;
+% crit_load_lvl = [];
 % %%
 
 %% Parameters
@@ -115,6 +116,11 @@ xfmr_on = 1;
 %%%Transformer limit adjustment
 t_alpha = 2;
 
+
+%% SHITT
+xfmr_on = 0;
+
+
 %%% Island operation (opt_nem.m)
 island = 0;
 %% Adding paths
@@ -200,7 +206,7 @@ elseif sim_lvl == 3 && acpf_sim %%%If resiliency is examined on each individual 
 end
 
 %%
-for sim_idx = 1:sim_end
+for sim_idx = sim_end
    %% Building indicies in the current simulation
     if sim_lvl == 1 && (acpf_sim == 0 || isempty(acpf_sim))
         bldg_ind = [st_idx(sim_idx):end_idx(sim_idx)];
@@ -328,6 +334,9 @@ for sim_idx = 1:sim_end
     %% Formatting Building Data
     bldg_loader_OVMG
     
+    %% Determining Resiliency Data for Examination
+    crit_load_selection_OVMG    
+    
     %% Utility Data
     %%%Loading Utility Data and Generating Energy Charge Vectors
     utility_SCE_2020
@@ -426,14 +435,14 @@ for sim_idx = 1:sim_end
         %% LDN Transformer Constraints
         fprintf('%s: LDN Transformer Constraints.', datestr(now,'HH:MM:SS'))
         tic
-        opt_xfmrs
+%         opt_xfmrs
         elapsed = toc;
         fprintf('Took %.2f seconds \n', elapsed)
         
         %% LinDistFlow Constraints
         fprintf('%s: LinDistFlow Constraints.', datestr(now,'HH:MM:SS'))
         tic
-        opt_ldf
+%         opt_ldf
         elapsed = toc;
         fprintf('Took %.2f seconds \n', elapsed)
         %% Lower Bounds

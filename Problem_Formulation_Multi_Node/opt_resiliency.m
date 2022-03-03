@@ -3,7 +3,7 @@ if ~isempty(crit_load_lvl) && crit_load_lvl >0
     %% Electrical Energy Balance
     if sim_lvl == 1 || sim_lvl == 2
         Constraints = [Constraints
-            (var_resiliency.pv_elec + var_resiliency.ees_dchrg + var_resiliency.import == var_resiliency.export + var_resiliency.ees_chrg + elec_res(T_res(1):T_res(2),:)):'Critical Electric Energy Balance'];
+            (var_resiliency.pv_elec + var_resiliency.ees_dchrg + var_resiliency.import == var_resiliency.export + var_resiliency.ees_chrg + elec_res):'Critical Electric Energy Balance'];
     elseif sim_lvl == 3
         %%%Polygon constraints
         L = 30;%%%Number of polygons
@@ -13,13 +13,13 @@ if ~isempty(crit_load_lvl) && crit_load_lvl >0
         C_gen = [cos(theta)' sin(theta)']; %cos/sin of theta for each polygon
 
         Constraints = [Constraints
-            (var_resiliency.pv_real + var_resiliency.ees_dchrg_real + var_resiliency.import== var_resiliency.export + var_resiliency.ees_chrg + elec_res(T_res(1):T_res(2),:)):'Critical Electric Energy Balance'
-            (var_resiliency.pv_reactive + var_resiliency.ees_dchrg_reactive + var_resiliency.import_reactive== var_resiliency.export_reactive + elec_res_reactive(T_res(1):T_res(2),:)):'Critical Reactive Electric Energy Balance'];
+            (var_resiliency.pv_real + var_resiliency.ees_dchrg_real + var_resiliency.import == var_resiliency.export + var_resiliency.ees_chrg + elec_res):'Critical Electric Energy Balance'
+            (var_resiliency.pv_reactive + var_resiliency.ees_dchrg_reactive + var_resiliency.import_reactive== var_resiliency.export_reactive + elec_res_reactive):'Critical Reactive Electric Energy Balance'];
     end
     %% PV Production
     if ~isempty(pv_v) || ~isempty(pv_legacy)
         Constraints = [Constraints
-            ( var_resiliency.pv_elec  <= (1/e_adjust).*repmat(solar(T_res(1):T_res(2)),1,K).*(repmat(pv_legacy_cap,T_res(2),1) + repmat(var_pv.pv_adopt,T_res(2),1))):'PV Resiliency Production'];
+            ( var_resiliency.pv_elec  <= (1/e_adjust).*repmat(legacy.solar(T_res(1):T_res(2)),1,K).*(repmat(pv_legacy_cap,size(elec_res,1),1) + repmat(var_pv.pv_adopt,size(elec_res,1),1))):'PV Resiliency Production'];
         if sim_lvl == 3
             for ii = 1:size(elec,2)
                 Constraints = [Constraints
@@ -33,7 +33,7 @@ if ~isempty(crit_load_lvl) && crit_load_lvl >0
     if lees_on || lrees_on || ~isempty(ees_v)
         for k=1:K
             Constraints = [Constraints
-                var_resiliency.ees_soc(2:T_res(2),k) == ees_v(10)*var_resiliency.ees_soc(1:T_res(2)-1,k) + ees_v(8)*var_resiliency.ees_chrg(2:T_res(2),k)  - (1/ees_v(9))*var_resiliency.ees_dchrg(2:T_res(2),k)  %%%Minus discharging of
+                var_resiliency.ees_soc(2:end,k) == ees_v(10)*var_resiliency.ees_soc(1:end-1,k) + ees_v(8)*var_resiliency.ees_chrg(2:end,k)  - (1/ees_v(9))*var_resiliency.ees_dchrg(2:end,k)  %%%Minus discharging of
                 ees_v(4)*(var_ees.ees_adopt(k) + var_rees.rees_adopt(k) + ees_legacy_cap(k) + rees_legacy_cap(k)) <= var_resiliency.ees_soc(:,k) <= ees_v(5)*(var_ees.ees_adopt(k) + var_rees.rees_adopt(k) + ees_legacy_cap(k) + rees_legacy_cap(k)) %%%Min/Max SOC
                 var_resiliency.ees_chrg(:,k) <= ees_v(6)*(var_ees.ees_adopt(k) + var_rees.rees_adopt(k) + ees_legacy_cap(k) + rees_legacy_cap(k)) %%%Max Charge Rate
                 var_resiliency.ees_dchrg(:,k) <= ees_v(7)*(var_ees.ees_adopt(k) + var_rees.rees_adopt(k) + ees_legacy_cap(k) + rees_legacy_cap(k))]; %%%Max Discharge Rate
