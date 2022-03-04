@@ -206,7 +206,7 @@ elseif sim_lvl == 3 && acpf_sim %%%If resiliency is examined on each individual 
 end
 
 %%
-for sim_idx = sim_end
+for sim_idx = 1:sim_end
    %% Building indicies in the current simulation
     if sim_lvl == 1 && (acpf_sim == 0 || isempty(acpf_sim))
         bldg_ind = [st_idx(sim_idx):end_idx(sim_idx)];

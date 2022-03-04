@@ -15,7 +15,7 @@ if opt_now==1
     options = cplexoptimset;
     options.Display='on';
     %     options.MaxTime = 2*3600;
-    options.MaxNodes = 100000;
+    options.MaxNodes = 140000;
     x = [];
 %     load starting_point
 %     if length(model.f) ~= length(x)

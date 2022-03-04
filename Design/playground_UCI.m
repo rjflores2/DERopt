@@ -2,7 +2,7 @@
 clear all; close all; clc ; started_at = datetime('now'); startsim = tic;
 
 co2_lim_loop = [0 .10 .25 .50 .60 .65 .675 .7 .725 .75 .775 .8 .85 .9 .95 .99];
-co2_lim_loop = [0 .10 .25 .50];
+% co2_lim_loop = [0 .10 .25 .50];
 % co2_lim_loop = [0 .60 .65 .675 .7 .725 .75 .775 .8 .85 .9 .95 .99];
 % co2_lim_loop = [0];
 % co2_lim_loop = [0 .85 .9 .95 .99];
@@ -194,6 +194,7 @@ addpath('C:\Users\cyc\OneDrive - UC Irvine\DERopt (Office New)\Data')
 % addpath('H:\Data\Emission_Factors')
 % addpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Data\Emission_Factors')
 addpath('C:\Users\cyc\OneDrive - UC Irvine\DERopt (Office New)\Data\Emission_Factors')
+
 %% Loading building demand
 %%%Loading Data
 dt = load('H:\Data\UCI\Campus_Loads_2014_2019.mat');
