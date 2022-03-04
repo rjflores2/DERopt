@@ -89,6 +89,8 @@ else
     var_resiliency.import = zeros(endpts(2),K);
     var_resiliency.export = zeros(endpts(2),K);
     var_resiliency.Pinj = 0;
+     var_resiliency.Qinj = 0;
     var_resiliency.pflow = 0;
+        var_resiliency.qflow = 0;
     var_resiliency.bus_voltage = 0;
 end

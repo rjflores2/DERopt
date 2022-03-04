@@ -35,6 +35,7 @@ var_lrees.rees_soc = value(var_lrees.rees_soc);
 var_lrees.rees_dchrg_nem = value(var_lrees.rees_dchrg_nem);
 
 %% Resiliency Values
+if ~isempty(crit_load_lvl) && crit_load_lvl >0
  var_resiliency.pv_elec =value( var_resiliency.pv_elec );
  var_resiliency.ees_chrg = value(var_resiliency.ees_chrg);
  var_resiliency.ees_dchrg = value(var_resiliency.ees_dchrg);
@@ -52,6 +53,7 @@ var_lrees.rees_dchrg_nem = value(var_lrees.rees_dchrg_nem);
  var_resiliency.ees_dchrg_reactive = value(var_resiliency.ees_dchrg_reactive);
  var_resiliency.import_reactive = value(var_resiliency.import_reactive);
  var_resiliency.export_reactive = value(var_resiliency.export_reactive);
+end
  %% Transformer Values
  var_xfmr.Pinj = value(var_xfmr.Pinj);
  %% LinDistFlow Values
