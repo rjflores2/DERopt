@@ -16,10 +16,10 @@ if pv_on
     pv_cap_mod = [2/2.65 %%%Commercial/industrial
         2.65/2.65]; %%%Residential
     
-    %%%Financial Aspects - Solar PV
+    %%%Financial Aspects - Solar PV 
     pv_fin = [-0.4648; ... %%%Scaling linear factor - Based on Lazards cost of electricity
-        5; ... %%%MACRS Schedule
-        1]; ... %%%ITC Benefit
+        5; ... %%%MACRS Schedule Modified Accelerated Cost Recovery System (tax)
+        1]; ... %%%ITC Solar Investment Tax Credit (ITC)   
         
     
     %%%Solar on multifamily affordable homes (SOMAH)
@@ -47,10 +47,14 @@ if ees_on
     %ees_v=[200; 0.001; 0.001; 0.1; 0.95; 0.25; 0.25; .95; .95; .995];
     %ees_v=[300; 0.001; 0.001; 0.1; 0.95; 0.25; 0.25; .95; .95; .995];
     %ees_v=[500; 0.001; 0.001; 0.1; 0.95; 0.25; 0.25; .95; .95; .995];
-    ees_v=[830; 0.001; 0.001; 0.1; 0.95; 0.25; 0.25; .90; .90; .995];
-    ees_v=[830; 0.001; 0.001; 0.1; 0.95; 0.5; 0.5; .90; .90; .9999];
+    %ees_v=[830; 0.001; 0.001; 0.1; 0.95; 0.25; 0.25; .90; .90; .995];
+    %%%%%%%%%%%%%%%           ees_v=[830; 0.001; 0.001; 0.1; 0.95; 0.5; 0.5; .90; .90; .9999];
     %ees_v=[600; 0.001; 0.001; 0.1; 0.95; 0.25; 0.25; 1; 1; .995]; %Testing with 100% RTE
     
+ 
+%         Original one
+%         ees_v=[830; 0.001; 0.001; 0.1; 0.95; 0.5; 0.5; .90; .90; .9999];
+ees_v=[162; 0.00001; 0.0000000001; 0.05; 0.98; 0.9; 0.2; .95; .99; .9999];
     ees_cap=ees_v(1);
     
     %%%How pv capital cost is modified for different types of buildings

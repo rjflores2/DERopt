@@ -41,7 +41,7 @@ crit_tier_com = 0.15; %%%Commercial Critical Load Requirements (% of load)crit_l
 % crit_load_lvl = 5;
 
 %% Turning incentives and other financial tools on/off
-sgip_on = 0;
+sgip_on = 0; %Self-Generation Incentive Program (SGIP)
 
 %% PV (opt_pv.m)
 pv_maxarea = 1; %%% Limits maximum PV size, based on initially solar PV panel
