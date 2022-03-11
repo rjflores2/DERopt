@@ -1,7 +1,7 @@
 %%% OVMG Data Formatting
 %% Loading solar data
 load 'solar_sna.mat'
-
+legacy.solar = solar;
 %% Setting Simulaiton Time
 
 %%% Time Step

@@ -97,6 +97,9 @@ co2_time = datenum(grid_co2(:,1:6));
 co2_import = interp1(co2_time,grid_co2(:,7),time)*2.205; %tonne/MWh * 2.205 lb/kWh / tonne/MWh
 co2_import(isnan(co2_import)) = nanmean(co2_import);
 
+
+co2_import = co2_import.*0;
+
 %%%CO2 rates for NG combustion
 co2_ng=12.74272*(1/29.3071);%%%(lb CO2/therm methane)*(therm/kWh)
 co2_rng=co2_ng*0.2;

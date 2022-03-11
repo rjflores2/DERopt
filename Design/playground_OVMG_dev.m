@@ -3,9 +3,9 @@ clear all; close all; clc ; started_at = datetime('now'); startsim = tic;
 
 
 
-% for crit_load_lvl = [1 2 3 4 6 7] %%% Corresponding END around line 500 - after files have been saved
-%     clearvars -except crit_load_lvl crit_load_lvl started_at startsim
-crit_load_lvl = 7;
+for crit_load_lvl = [4 5 6 7] %%% Corresponding END around line 500 - after files have been saved
+    clearvars -except crit_load_lvl crit_load_lvl started_at startsim
+% crit_load_lvl = 5;
 % crit_load_lvl = [];
 % %%
 
@@ -38,7 +38,7 @@ if ~testing
         sz_on = 1;
     else
         sz_on = 1;
-        temp = load('temp')
+%         temp = load('temp')
     end
     pv_on = sz_on;
     ees_on = sz_on;
@@ -79,7 +79,7 @@ else
     
 end
 testing
-downselection = 1
+downselection = 0
 
 %% ESA On/Off (opt_var_cf)
 esa_on = 1; %Building RAtes are Adjusted for CARE Rates
@@ -151,21 +151,23 @@ addpath(genpath('H:\_Research_\CEC_OVMG\Rates'))
 
 %% Loading/seperating building demand
 
+scenario = 'UES_2b'
+
 fprintf('%s: Loading UO Data.', datestr(now,'HH:MM:SS'))
 tic
 %%%Loading Data
-sc_txt = 'H:\_Research_\CEC_OVMG\URBANopt\UO_Results_0.5.x\UES_2b';
+sc_txt = strcat('H:\_Research_\CEC_OVMG\URBANopt\UO_Results_0.5.x\',scenario);
 load(strcat(sc_txt,'.mat'));
 % bldg = bldg(1:50);
 bldg_base = bldg;
-compare = load('H:\_Research_\CEC_OVMG\URBANopt\UO_Results_0.5.x\UES_2b.mat');
+compare = load(strcat('H:\_Research_\CEC_OVMG\URBANopt\UO_Results_0.5.x\',scenario,'.mat'));
 elapsed = toc;
 fprintf('Took %.2f seconds \n', elapsed)
 bldg_rec = [];
 
 %% Loading Critical Loads
 if crit_load_lvl > 0
-    elec_resiliency_full = xlsread('H:\_Research_\CEC_OVMG\URBANopt\Resiliency\UES_2a_Crit_Loads.xlsx',strcat('Crit_Load_',num2str(crit_load_lvl)));
+    elec_resiliency_full = xlsread(strcat('H:\_Research_\CEC_OVMG\URBANopt\Resiliency\',scenario,'_Crit_Loads.xlsx'),strcat('Crit_Load_',num2str(crit_load_lvl)));
 else
     elec_resiliency_full = [];
 end
@@ -454,7 +456,7 @@ for sim_idx = 1:sim_end
         %% Optimize
         fprintf('%s: Optimizing \n....', datestr(now,'HH:MM:SS'))
         WHATS_THE_CRITICAL_LOAD = crit_load_lvl
-        
+        WHATS_THE_CIRCUIT = sim_idx
         opt
         
         %% Timer
@@ -521,13 +523,16 @@ for sim_idx = 1:sim_end
     
     %% recording resiliency results
     if sim_lvl >= 3 && acpf_sim == 1
-        save(strcat('UES2b_',num2str(sim_idx),'_CriticalLoad_',num2str(crit_load_lvl)),'var_resiliency')
+        save(strcat(scenario,'_',num2str(sim_idx),'_CriticalLoad_',num2str(crit_load_lvl)),'var_resiliency')
         
     end
 end
 
 %% Update Utility Costs
 OVMG_updated_utility_costs
+
+save(strcat(scenario,'_',num2str(WHATS_THE_CRITICAL_LOAD)))
+
 %% Saving Data
 bldg = bldg_base;
 
@@ -538,5 +543,5 @@ else
     save_here = 2
     save(strcat(sc_txt,'_DER_Crit_Load_Circuit5_',num2str(crit_load_lvl)),'bldg')
 end
-% end
+end
 return
