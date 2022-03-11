@@ -93,7 +93,7 @@ addpath(genpath('H:\_Research_\CEC_OVMG\Rates'))
 %% Loading building demand
 
 dt = xlsread('UO_Example.xlsx');
-
+%%% All energy is in kWh
 elec = dt(:,1);
 gas = dt(:,2);
 
@@ -146,7 +146,13 @@ if opt_now
     opt_var_cf %%%Added NEM and wholesale export to the PV Section
     elapsed = toc;
     fprintf('Took %.2f seconds \n', elapsed)
-    
+    %% Adding resiliency and reliability varialbes
+        fprintf('%s: Resileincy Varaibles and Objective Funciton.', datestr(now,'HH:MM:SS'))
+        tic
+        opt_var_cf_resiliency %%%Added NEM and wholesale export to the PV Section
+        elapsed = toc;
+        fprintf('Took %.2f seconds \n', elapsed)
+        % return
     %% General Equality Constraints
     fprintf('%s: General Equalities.', datestr(now,'HH:MM:SS'))
     tic
