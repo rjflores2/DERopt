@@ -13,9 +13,9 @@ ees_on = 1;       %Turn on EES/REES
 rees_on = 1;  %Turn on REES
 
 %%%NO LEGACY SYSTEMS YET!
-lpv_on = 0;
-lees_on = 0;
-lrees_on = 0;
+lpv_on = 1;
+lees_on = 1;
+lrees_on = 1;
 
 %% Toggles not in use
 
@@ -41,7 +41,7 @@ crit_tier_com = 0.15; %%%Commercial Critical Load Requirements (% of load)crit_l
 % crit_load_lvl = 5;
 
 %% Turning incentives and other financial tools on/off
-sgip_on = 0; %Self-Generation Incentive Program (SGIP)
+sgip_on = 1; %Self-Generation Incentive Program (SGIP)
 
 %% PV (opt_pv.m)
 pv_maxarea = 1; %%% Limits maximum PV size, based on initially solar PV panel

@@ -54,7 +54,7 @@ if ees_on
  
 %         Original one
 %         ees_v=[830; 0.001; 0.001; 0.1; 0.95; 0.5; 0.5; .90; .90; .9999];
-ees_v=[162; 0.00001; 0.0000000001; 0.05; 0.98; 0.9; 0.2; .95; .99; .9999];
+ees_v=[162; 0.001; 0.001; 0.05; 0.98; 0.9; 0.2; .95; .99; .9999];
     ees_cap=ees_v(1);
     
     %%%How pv capital cost is modified for different types of buildings
