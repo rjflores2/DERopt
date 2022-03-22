@@ -36,7 +36,7 @@ if utility_exists
     
     for i=1:K %%%Going through all buildings
         
-        %%%Specify ESA eligible tenant fraction
+        %%%Specify ESA eligible tenant fraction (Energy Savings Assistance Program (“ESA”)
         esa_frac = sum(apartment_types(i,1:2))/sum(apartment_types(i,:));
         if ~esa_on
             esa_frac = 0;
