@@ -17,7 +17,7 @@ tax_rates = [0.2 0.3]; %%%Residential and commercial rates
 if ~isempty(pv_v)
     for ii=1:size(pv_v,2)
         pv_mthly_debt(ii,1)=pv_v(1,ii)*((1-equity)*(interest*(1+interest)^(period*12))...
-            /((1+interest)^(period*12)-1)+...%%%Money to pay back bank
+            /((1+interest)^(period*12)-1)+...%%%Money to pay back bank  
             req_return_on*(equity)*(required_return*(1+required_return)^(period*12))...
             /((1+required_return)^(period*12)-1));
     end
@@ -181,7 +181,7 @@ if ~isempty(pv_v)
             %%%Maximum PV estimated by either reaching net zero electrical energy
             %%%or installing maximum capacity
             if ~isempty(maxpv)
-%                 pv_scale_factor = min([sum(elec(:,i)).*(12/length(endpts))./(0.2*8760) maxpv(i)*0.2]);
+%               pv_scale_factor = min([sum(elec(:,i)).*(12/length(endpts))./(0.2*8760) maxpv(i)*0.2]);
                 pv_scale_factor = min([sum(elec(:,i)).*(12/length(endpts))./(0.2*size(elec,1)) maxpv(i)*0.2]);
             else
                 pv_scale_factor = min([sum(elec(:,i))./(0.2*size(elec,1))]);
