@@ -219,7 +219,7 @@ if opt_now
     fprintf('%s: Optimizing \n....', datestr(now,'HH:MM:SS'))
     WHATS_THE_CRITICAL_LOAD = crit_load_lvl
     opt
-    
+ 
     %% Timer
     finish = datetime('now') ; totalelapsed = toc(startsim)
     

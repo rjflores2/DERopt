@@ -104,7 +104,7 @@ if isempty(pv_v) == 0
        
         %%% Variables that exist when grid tied
         var_pv.pv_nem = sdpvar(T,K,'full'); %%% PV Production exported w/ NEM
-        %         var_pv.pv_wholesale = sdpvar(T,K,'full'); %%% PV Production exported under NEM rates
+             %  var_pv.pv_wholesale = sdpvar(T,K,'full'); %%% PV Production exported under NEM rates
         
         %%%PV Export - NEM (kWh)
         temp_cf1 = zeros(size(elec));

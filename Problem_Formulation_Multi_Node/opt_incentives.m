@@ -1,7 +1,7 @@
 %% SGIP for battery energy storage
 if isempty(ees_v) == 0 && sgip_on
     
-    %%%Limiting SGIP incentivized storage
+    %%%Limiting SGIP incentivized storage  pbi: Performance Based Incentive
     %%%Constraints
     Constraints = [Constraints
         var_sgip.sgip_ees_pbi(1,:) <= sgip(end)
