@@ -24,7 +24,7 @@ if opt_now==1
     fprintf('%s Starting CPLEX Solver \n', datestr(now,'HH:MM:SS'))
     tic
     
-    %         [x, fval, exitflag, output, lambda] = cplexlp(model.f, model.Aineq, model.bineq, model.Aeq, model.beq, lb, ub, [], options);
+%         [x, fval, exitflag, output, lambda] = cplexlp(model.f, model.Aineq, model.bineq, model.Aeq, model.beq, lb, ub, [], options);
     if sum(strfind(model.ctype,'B')>0) + sum(strfind(model.ctype,'I')>0)
         opt_cplexmilp = 1
         [x, fval, exitflag, output] = cplexmilp(model.f, model.Aineq, model.bineq, model.Aeq, model.beq, [],[],[],lb,ub,model.ctype,x,options);        
