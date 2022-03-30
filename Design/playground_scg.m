@@ -223,7 +223,7 @@ if opt_now
     %% Timer
     finish = datetime('now') ; totalelapsed = toc(startsim)
     
-    %% Extract Variables
+%     %% Extract Variables
     variable_values_multi_node
 end
 
