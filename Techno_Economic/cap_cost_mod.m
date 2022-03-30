@@ -182,7 +182,8 @@ if ~isempty(pv_v)
             %%%or installing maximum capacity
             if ~isempty(maxpv)
 %               pv_scale_factor = min([sum(elec(:,i)).*(12/length(endpts))./(0.2*8760) maxpv(i)*0.2]);
-                pv_scale_factor = min([sum(elec(:,i)).*(12/length(endpts))./(0.2*size(elec,1)) maxpv(i)*0.2]);
+%                 pv_scale_factor = min([sum(elec(:,i)).*(12/length(endpts))./(0.2*size(elec,1)) maxpv(i)*0.2]);
+                pv_scale_factor = min([sum(elec(:,i))./(0.2*size(elec,1)) maxpv(i)*0.2]);
             else
                 pv_scale_factor = min([sum(elec(:,i))./(0.2*size(elec,1))]);
             end
@@ -238,7 +239,7 @@ if ~isempty(ees_v)
             %%%Maximum PV estimated by either reaching net zero electrical energy
             %%%or installing maximum capacity
             if ~isempty(maxpv)
-                pv_scale_factor = min([sum(elec(:,i)).*(12/length(endpts))./(0.2*8760) maxpv(i)]);
+                pv_scale_factor = min([sum(elec(:,i))./(0.2*8760) maxpv(i)]);
             else
                 pv_scale_factor = min([sum(elec(:,i))./(0.2*8760)]);
             end
