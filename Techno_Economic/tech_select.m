@@ -52,9 +52,7 @@ if ees_on
     %ees_v=[600; 0.001; 0.001; 0.1; 0.95; 0.25; 0.25; 1; 1; .995]; %Testing with 100% RTE
     
  
-%         Original one
-%         ees_v=[830; 0.001; 0.001; 0.1; 0.95; 0.5; 0.5; .90; .90; .9999];
-ees_v=[162; 0.001; 0.001; 0.05; 0.98; 0.9; 0.2; .95; .99; .9999];
+    ees_v=[830; 0.001; 0.001; 0.1; 0.95; 0.5; 0.5; .90; .90; .9999];
     ees_cap=ees_v(1);
     
     %%%How pv capital cost is modified for different types of buildings
@@ -87,11 +85,13 @@ end
 %% SOFC
 if  sofc_on
 
-    sofc_v = [2500   %%% 1: Capital cost ($/kWel)
+    sofc_v = [2500   %%% 1: Capital cost ($/kWel) C_fc
           0.06*2500  %%% 2: O&M ($/kWh generated) 6 Yearly % of TIC(Total Installed Cost) % of the purchasing cost (4–10%) 
           0.6        %%% 3: SOFC electrical efficiency at nominal condition (fraction)     
-          0.28]      %%% 4: SOFC thermal efficiency at nominal condition (fraction)
-                  
+          0.28       %%% 4: SOFC thermal efficiency at nominal condition (fraction)
+          25         %%% 5: sofc lifespan n
+          0.1        %%% 6: Annual interest rate i_r
+          0.023];    %%% 7: Gas_price MUST BE FROM UTILITY DATA price of natural gas ($/kWh)       
     % Find these numbers !   
     %%%Financial Aspects - SOFC 
 %     sofc_fin = [-0.4648; ... %%%Scaling linear factor - Based on Lazards cost of electricity

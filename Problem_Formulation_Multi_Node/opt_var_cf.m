@@ -432,7 +432,11 @@ if sofc_on
     var_sofc.sofc_fuel = sdpvar(T,K,'full');       %%%Fuel consumption (kWh) 
     var_sofc.sofc_CO2 = sdpvar(T,K,'full');        %%%CO2 saving (kg)
     
-    % SOFC cost function
+    % SOFC cost function (ref: Ettore Bompard, IJHE)
+    Objective = Objective...
+        +(sofc_v(1)*(sofc_v(6)*((1+sofc_v(6))^sofc_v(5)))/((1+sofc_v(6))^sofc_v(5)-1)*var_sofc.sofc_adopt) ... %%%Annual investment/Capital Cost
+        + (sofc_v(2) * var_sofc.sofc_adopt)...
+        + sum(sofc_v(7)* var_sofc.sofc_elec/sofc_v(3)) ;   %%% Fuel cost price of natural gas ($/kWh) - MUST BE CHECKED
     
    
 end    
