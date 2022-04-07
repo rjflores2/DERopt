@@ -1,6 +1,6 @@
 %% Declaring decision variables and setting up cost function
 yalmip('clear')
-clear var_util var_pv var_ees var_rees var_sgip
+clear var_util var_pv var_ees var_rees var_sgip var_sofc
 Constraints=[];
 
 T = length(time);     %t-th time interval from 1...T
@@ -422,3 +422,17 @@ if acpf_sim == 1
 else
     var_ldf.pflow = zeros(T,1);
 end
+
+%% SOFC
+if sofc_on
+    % Declaring Variables    
+    var_sofc.sofc_adopt = sdpvar(1,K,'full');      %%%SOFC installed capacity (kW)
+    var_sofc.sofc_elec = sdpvar(T,K,'full');       %%%SOFC electricity produced (kWh) 
+    var_sofc.sofc_heat = sdpvar(T,K,'full');       %%%SOFC heat produced (kWh) 
+    var_sofc.sofc_fuel = sdpvar(T,K,'full');       %%%Fuel consumption (kWh) 
+    var_sofc.sofc_CO2 = sdpvar(T,K,'full');        %%%CO2 saving (kg)
+    
+    % SOFC cost function
+    
+   
+end    

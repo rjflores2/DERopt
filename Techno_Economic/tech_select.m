@@ -63,8 +63,8 @@ ees_v=[162; 0.001; 0.001; 0.05; 0.98; 0.9; 0.2; .95; .99; .9999];
     
     %%%Financial Aspects - EES
     ees_fin = [-0.4648;... %%%Scaling linear factor - Based on Lazards cost of electricity
-        7; ... %%%MACRS Schedule
-        0]; ... %%%ITC Benefit
+        7; ... %%%MACRS Schedule:Modified Accelerated Cost Recovery(tax depreciation system to calculate asset depreciation) 
+        0]; ... %%%ITC Benefit:Investment Tax Credit(federal tax incentive for business investment) 
         
     %%%Financial Aspects - EES
     rees_fin = [-0.4648;... %%%Scaling linear factor - Based on Lazards cost of electricity
@@ -83,7 +83,25 @@ else
 ees_v = [];
 rees_v = [];
 end
-    %% SGIP incentives
+
+%% SOFC
+if  sofc_on
+
+    sofc_v = [2500   %%% 1: Capital cost ($/kWel)
+          0.06*2500  %%% 2: O&M ($/kWh generated) 6 Yearly % of TIC(Total Installed Cost) % of the purchasing cost (4–10%) 
+          0.6        %%% 3: SOFC electrical efficiency at nominal condition (fraction)     
+          0.28]      %%% 4: SOFC thermal efficiency at nominal condition (fraction)
+                  
+    % Find these numbers !   
+    %%%Financial Aspects - SOFC 
+%     sofc_fin = [-0.4648; ... %%%Scaling linear factor - Based on Lazards cost of electricity
+%         5; ... %%%MACRS Schedule Modified Accelerated Cost Recovery System (tax)
+%         1]; ... %%% SOFC Investment Tax Credit (ITC)   
+        
+    
+end    
+
+%% SGIP incentives
 if sgip_on
     %%%Self generation incentive program (SGIP) values
     sgip = [5 %%% 1:CO2 reduction required per kWh for large scale systems
