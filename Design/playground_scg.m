@@ -10,7 +10,9 @@ opt_now_yalmip = 0; %YALMIP
 %% Turning technologies on/off (opt_var_cf.m and tech_select.m)
 pv_on = 1;        %Turn on PV
 ees_on = 1;       %Turn on EES/REES
-rees_on = 1;  %Turn on REES
+rees_on = 1;      %Turn on REES
+sofc_on =1;       %Turn on SOFC
+
 
 %%%NO LEGACY SYSTEMS YET!
 lpv_on = 0;
@@ -30,8 +32,8 @@ t_alpha = 1;
 %%%Critical loads
 crit_load_lvl = [];
 
-%% ESA On/Off (opt_var_cf)
-esa_on = 1; %Building RAtes are Adjusted for CARE Rates
+%% ESA On/Off (opt_var_cf) Energy Savings Assistance
+esa_on = 1; %Building RAtes are Adjusted for CARE Rates 
 
 %% Include Critical Loads
 crit_tier = []; %%%Residential Critical Load Requirements (Load Tier)
@@ -41,7 +43,7 @@ crit_tier_com = 0.15; %%%Commercial Critical Load Requirements (% of load)crit_l
 % crit_load_lvl = 5;
 
 %% Turning incentives and other financial tools on/off
-sgip_on = 0;
+sgip_on = 0; %Self-Generation Incentive Program (SGIP)
 
 %% PV (opt_pv.m)
 pv_maxarea = 1; %%% Limits maximum PV size, based on initially solar PV panel
@@ -219,11 +221,11 @@ if opt_now
     fprintf('%s: Optimizing \n....', datestr(now,'HH:MM:SS'))
     WHATS_THE_CRITICAL_LOAD = crit_load_lvl
     opt
-    
+ 
     %% Timer
     finish = datetime('now') ; totalelapsed = toc(startsim)
     
-    %% Extract Variables
+%     %% Extract Variables
     variable_values_multi_node
 end
 

@@ -1,6 +1,6 @@
 %% Declaring decision variables and setting up cost function
 yalmip('clear')
-clear var_util var_pv var_ees var_rees var_sgip
+clear var_util var_pv var_ees var_rees var_sgip var_sofc
 Constraints=[];
 
 T = length(time);     %t-th time interval from 1...T
@@ -36,7 +36,7 @@ if utility_exists
     
     for i=1:K %%%Going through all buildings
         
-        %%%Specify ESA eligible tenant fraction
+        %%%Specify ESA eligible tenant fraction (Energy Savings Assistance Program (“ESA”)
         esa_frac = sum(apartment_types(i,1:2))/sum(apartment_types(i,:));
         if ~esa_on
             esa_frac = 0;
@@ -104,7 +104,7 @@ if isempty(pv_v) == 0
        
         %%% Variables that exist when grid tied
         var_pv.pv_nem = sdpvar(T,K,'full'); %%% PV Production exported w/ NEM
-        %         var_pv.pv_wholesale = sdpvar(T,K,'full'); %%% PV Production exported under NEM rates
+             %  var_pv.pv_wholesale = sdpvar(T,K,'full'); %%% PV Production exported under NEM rates
         
         %%%PV Export - NEM (kWh)
         temp_cf1 = zeros(size(elec));
@@ -422,3 +422,17 @@ if acpf_sim == 1
 else
     var_ldf.pflow = zeros(T,1);
 end
+
+%% SOFC
+if sofc_on
+    % Declaring Variables    
+    var_sofc.sofc_adopt = sdpvar(1,K,'full');      %%%SOFC installed capacity (kW)
+    var_sofc.sofc_elec = sdpvar(T,K,'full');       %%%SOFC electricity produced (kWh) 
+    var_sofc.sofc_heat = sdpvar(T,K,'full');       %%%SOFC heat produced (kWh) 
+    var_sofc.sofc_fuel = sdpvar(T,K,'full');       %%%Fuel consumption (kWh) 
+    var_sofc.sofc_CO2 = sdpvar(T,K,'full');        %%%CO2 saving (kg)
+    
+    % SOFC cost function
+    
+   
+end    
