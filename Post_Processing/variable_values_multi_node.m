@@ -16,6 +16,12 @@ var_ees.ees_soc = value(var_ees.ees_soc);
 var_ees.ees_chrg = value(var_ees.ees_chrg);
 var_ees.ees_dchrg = value(var_ees.ees_dchrg);
 
+%% SOFC Values
+var_sofc.sofc_adopt = value(var_sofc.sofc_adopt);      %%%SOFC installed capacity (kW)
+var_sofc.sofc_elec = value(var_sofc.sofc_elec);       %%%SOFC electricity produced (kWh) 
+var_sofc.sofc_heat = value(var_sofc.sofc_heat);       %%%SOFC heat produced (kWh) 
+var_sofc.sofc_fuel = value(var_sofc.sofc_fuel);       %%%Fuel consumption (kWh) 
+    
 %% Legacy EES Values
 var_lees.ees_chrg = value(var_lees.ees_chrg);
 var_lees.ees_dchrg = value(var_lees.ees_dchrg);

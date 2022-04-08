@@ -183,6 +183,12 @@ if opt_now
     elapsed = toc;
     fprintf('Took %.2f seconds \n', elapsed)
     
+    %% SOFC Soncstraints
+    fprintf('%s: SOFC Constraints.', datestr(now,'HH:MM:SS'))
+    tic
+    opt_sofc
+    elapsed = toc;
+    fprintf('Took %.2f seconds \n', elapsed)
     %% DER Incentives
     fprintf('%s: DER Incentives Constraints.', datestr(now,'HH:MM:SS'))
     tic

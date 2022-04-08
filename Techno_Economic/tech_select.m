@@ -86,18 +86,19 @@ end
 if  sofc_on
 
     sofc_v = [2500   %%% 1: Capital cost ($/kWel) C_fc
-          0.06*2500  %%% 2: O&M ($/kWh generated) 6 Yearly % of TIC(Total Installed Cost) % of the purchasing cost (4–10%) 
+          0.06*2500  %%% 2: O&M ($/kW/yr generated) 6 Yearly % of TIC(Total Installed Cost) % of the purchasing cost (4–10%) 
           0.6        %%% 3: SOFC electrical efficiency at nominal condition (fraction)     
-          0.28       %%% 4: SOFC thermal efficiency at nominal condition (fraction)
-          25         %%% 5: sofc lifespan n
-          0.1        %%% 6: Annual interest rate i_r
-          0.023];    %%% 7: Gas_price MUST BE FROM UTILITY DATA price of natural gas ($/kWh)       
+          0.28];       %%% 4: SOFC thermal efficiency at nominal condition (fraction)
+             
     % Find these numbers !   
     %%%Financial Aspects - SOFC 
-%     sofc_fin = [-0.4648; ... %%%Scaling linear factor - Based on Lazards cost of electricity
-%         5; ... %%%MACRS Schedule Modified Accelerated Cost Recovery System (tax)
+%     sofc_fin = [-0.4648; ...  $/kW %%%Scaling linear factor - Based on Lazards cost of electricity
+%         5; ... year %%%MACRS Schedule Modified Accelerated Cost Recovery System (tax)
 %         1]; ... %%% SOFC Investment Tax Credit (ITC)   
-        
+       
+%% DUMMY NG COST
+ng_cost = 0.023;
+%%
     
 end    
 

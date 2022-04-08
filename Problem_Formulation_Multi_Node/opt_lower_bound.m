@@ -113,3 +113,10 @@ if ~isempty(crit_load_lvl) && crit_load_lvl >0
         end
     end
 end
+%% SOFC
+if sofc_on
+    Constraints = [Constraints
+        (0 <= var_sofc.sofc_adopt):'SOFC Adoption >=0'
+        (0 <= var_sofc.sofc_elec):'SOFC Electircity >=0'
+        (0 <= var_sofc.sofc_heat):'SOFC Heat >=0'];
+end
