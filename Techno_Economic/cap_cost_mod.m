@@ -3,7 +3,7 @@
 interest=0.08; %%%Interest rates on any loans
 interest=nthroot(interest+1,12)-1; %Converting from annual to monthly rate for compounding interest
 period=10;%%%Length of any loans (years)
-equity=0.2; %%%Percent of investment made by investors
+equity=0.2; %%%Percent of investment made by investors and reqire a return on equity
 required_return=.12; %%%Required return on equity investment
 required_return=nthroot(required_return+1,12)-1; % Converting from annual to monthly rate for compounding required return
 equity_return=10;% Length at which equity + required return will be paid off (Years)
@@ -17,9 +17,9 @@ tax_rates = [0.2 0.3]; %%%Residential and commercial rates
 if ~isempty(pv_v)
     for ii=1:size(pv_v,2)
         pv_mthly_debt(ii,1)=pv_v(1,ii)*((1-equity)*(interest*(1+interest)^(period*12))...
-            /((1+interest)^(period*12)-1)+...%%%Money to pay back bank  
+            /((1+interest)^(period*12)-1)+...%%% Loan payment on the portion funded by debt: Money to pay back bank  :
             req_return_on*(equity)*(required_return*(1+required_return)^(period*12))...
-            /((1+required_return)^(period*12)-1));
+            /((1+required_return)^(period*12)-1)); %%%Loan payment on the portion funded by our own equity or personal funds $/month/kW
     end
 end
 
@@ -27,7 +27,7 @@ end
 if ~isempty(ees_v)
     for ii=1:size(ees_v,2)
         ees_mthly_debt(ii,1)=ees_v(1,ii)*((1-equity)*(interest*(1+interest)^(period*12))...
-            /((1+interest)^(period*12)-1)+...%%%Money to pay back bank
+            /((1+interest)^(period*12)-1)+...%%%Money to pay back bank 
             req_return_on*(equity)*(required_return*(1+required_return)^(period*12))...
             /((1+required_return)^(period*12)-1));
     end
@@ -38,6 +38,15 @@ if ~isempty(ees_v)
                 req_return_on*(equity)*(required_return*(1+required_return)^(period*12))...
                 /((1+required_return)^(period*12)-1));
         end
+    end
+end
+%%%SOFC 
+if ~isempty(sofc_v)
+    for ii=1:size(sofc_v,2)
+        sofc_mthly_debt(ii,1)=sofc_v(1,ii)*((1-equity)*(interest*(1+interest)^(period*12))...
+            /((1+interest)^(period*12)-1)+...%%%Money to pay back bank  $/month/kW
+            req_return_on*(equity)*(required_return*(1+required_return)^(period*12))...
+            /((1+required_return)^(period*12)-1));
     end
 end
 

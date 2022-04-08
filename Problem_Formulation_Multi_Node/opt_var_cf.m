@@ -433,9 +433,9 @@ if sofc_on
      
     % SOFC cost function (ref: Ettore Bompard, IJHE)
     Objective = Objective...
-        +(2500*var_sofc.sofc_adopt) ... %%%Annual investment/Capital Cost
-        + sum((sofc_v(2) * var_sofc.sofc_adopt))... %%% O&M 
+        + sum(M*sofc_mthly_debt.*var_sofc.sofc_adopt)...  %%%Annual investment/Capital Cost ($/kW)*(kW)
+        + sum((sofc_v(2) * var_sofc.sofc_adopt))... %%% O&M ($/kW/yr)*(kW)
         + sum(ng_cost * var_sofc.sofc_elec./sofc_v(3)) ;   %%% Fuel cost price of natural gas ($/kWh) - MUST BE CHECKED
-    
-   
+  % + sum(M*sofc_mthly_debt.*pv_cap_mod'.*var_sofc.sofc_adopt)...  %%%Annual investment/Capital Cost ($/kW)*(kW)
+            
 end    

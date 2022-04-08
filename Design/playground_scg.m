@@ -183,7 +183,7 @@ if opt_now
     elapsed = toc;
     fprintf('Took %.2f seconds \n', elapsed)
     
-    %% SOFC Soncstraints
+    %% SOFC constraints
     fprintf('%s: SOFC Constraints.', datestr(now,'HH:MM:SS'))
     tic
     opt_sofc
