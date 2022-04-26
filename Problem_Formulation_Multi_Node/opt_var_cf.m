@@ -439,3 +439,13 @@ if sofc_on
   % + sum(M*sofc_mthly_debt.*pv_cap_mod'.*var_sofc.sofc_adopt)...  %%%Annual investment/Capital Cost ($/kW)*(kW)
             
 end    
+
+%% REWH
+if erwh_on =1
+    % Declaring Variables
+    var_erwh.erwh_adopt = sdpvar(1,K,'full');      %%%REWH installed capacity (kW)
+    var_erwh.erwh_elec = sdpvar(T,K,'full');       %%%REWH electricity consumed (kWh) 
+    var_erwh.erwh_heat = sdpvar(T,K,'full');       %%%REWH heat produced (kWh) 
+ % 
+    
+end

@@ -50,6 +50,11 @@ if ~isempty(sofc_v)
     end
 end
 
+%%% ERWH
+
+
+
+
 %%%Generic electrolyzer
 if ~isempty(el_v)
     for ii=1:size(el_v,2)

@@ -100,7 +100,12 @@ if  sofc_on
 ng_cost = 0.023;
 %%
     
-end    
+end
+%% ERWH
+    ewrh_v = [1000    %%% 1: Capital cost ($/kWel) https://www.homedepot.com/
+          0.06*2500  %%% 2: O&M ($/kWhe/yr generated) 
+          0.95];     %%% 3: ERWH energy factor (EF)from AHRI Directory      
+     
 
 %% SGIP incentives
 if sgip_on

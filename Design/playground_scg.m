@@ -12,7 +12,7 @@ pv_on = 1;        %Turn on PV
 ees_on = 1;       %Turn on EES/REES
 rees_on = 1;      %Turn on REES
 sofc_on =1;       %Turn on SOFC
-erwh_on =1;       %Turn on Electric Resistance Water Heater 
+erwh_on =1;       %Turn on Electric Resistance Water Heater (ERWH) 
 
 
 %%%NO LEGACY SYSTEMS YET!
@@ -188,6 +188,13 @@ if opt_now
     fprintf('%s: SOFC Constraints.', datestr(now,'HH:MM:SS'))
     tic
     opt_sofc
+    elapsed = toc;
+    fprintf('Took %.2f seconds \n', elapsed)
+    
+    %% ERWH constraints
+    fprintf('%s: ERWH Constraints.', datestr(now,'HH:MM:SS'))
+    tic
+    opt_erwh
     elapsed = toc;
     fprintf('Took %.2f seconds \n', elapsed)
     %% DER Incentives
