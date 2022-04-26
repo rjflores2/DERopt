@@ -12,6 +12,7 @@ pv_on = 1;        %Turn on PV
 ees_on = 1;       %Turn on EES/REES
 rees_on = 1;      %Turn on REES
 sofc_on =1;       %Turn on SOFC
+erwh_on =1;       %Turn on Electric Resistance Water Heater 
 
 
 %%%NO LEGACY SYSTEMS YET!
@@ -108,7 +109,7 @@ low_income = 0;
 %%%Number of residential units
 res_units = 1;
 %%%Max PV Capacity
-maxpv = 20;
+maxpv = 2000000;
 %%%Apartment Types
 %%% Col1: non-profit units
 %%% Col2: low-income for profit units

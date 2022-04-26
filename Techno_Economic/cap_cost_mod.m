@@ -17,7 +17,7 @@ tax_rates = [0.2 0.3]; %%%Residential and commercial rates
 if ~isempty(pv_v)
     for ii=1:size(pv_v,2)
         pv_mthly_debt(ii,1)=pv_v(1,ii)*((1-equity)*(interest*(1+interest)^(period*12))...
-            /((1+interest)^(period*12)-1)+...%%% Loan payment on the portion funded by debt: Money to pay back bank  :
+            /((1+interest)^(period*12)-1)+...%%%Loan payment on the portion funded by debt: Money to pay back bank  :
             req_return_on*(equity)*(required_return*(1+required_return)^(period*12))...
             /((1+required_return)^(period*12)-1)); %%%Loan payment on the portion funded by our own equity or personal funds $/month/kW
     end

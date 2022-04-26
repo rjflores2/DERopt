@@ -60,8 +60,8 @@ if ees_on
         830/830]; %%%Residential
     
     %%%Financial Aspects - EES
-    ees_fin = [-0.4648;... %%%Scaling linear factor - Based on Lazards cost of electricity
-        7; ... %%%MACRS Schedule:Modified Accelerated Cost Recovery(tax depreciation system to calculate asset depreciation) 
+    ees_fin = [-0.4648;... %%%Scaling linear factor - Based on Lazards cost of electricity ($/kW installed)
+        7; ... %%%MACRS Schedule:Modified Accelerated Cost Recovery(tax depreciation system to calculate asset depreciation)-PPA(Power Purchase Agreement)
         0]; ... %%%ITC Benefit:Investment Tax Credit(federal tax incentive for business investment) 
         
     %%%Financial Aspects - EES
@@ -94,7 +94,7 @@ if  sofc_on
     %%%Financial Aspects - SOFC 
 %     sofc_fin = [-0.4648; ...  $/kW %%%Scaling linear factor - Based on Lazards cost of electricity
 %         5; ... year %%%MACRS Schedule Modified Accelerated Cost Recovery System (tax)
-%         1]; ... %%% SOFC Investment Tax Credit (ITC)   
+%         0.26]; ... %%% SOFC Investment Tax Credit (ITC)/ from www.irs.gov  
        
 %% DUMMY NG COST
 ng_cost = 0.023;
