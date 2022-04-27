@@ -436,16 +436,18 @@ if sofc_on
         + sum(M*sofc_mthly_debt.*var_sofc.sofc_adopt)...  %%%Annual investment/Capital Cost ($/kW)*(kW)
         + sum((sofc_v(2) * var_sofc.sofc_adopt))... %%% O&M ($/kW/yr)*(kW)
         + sum(ng_cost * var_sofc.sofc_elec./sofc_v(3)) ;   %%% Fuel cost price of natural gas ($/kWh) - MUST BE CHECKED
-  % + sum(M*sofc_mthly_debt.*pv_cap_mod'.*var_sofc.sofc_adopt)...  %%%Annual investment/Capital Cost ($/kW)*(kW)
-            
+         
 end    
 
-%% REWH
-if erwh_on =1
-    % Declaring Variables
-    var_erwh.erwh_adopt = sdpvar(1,K,'full');      %%%REWH installed capacity (kW)
-    var_erwh.erwh_elec = sdpvar(T,K,'full');       %%%REWH electricity consumed (kWh) 
-    var_erwh.erwh_heat = sdpvar(T,K,'full');       %%%REWH heat produced (kWh) 
- % 
-    
-end
+% %% REWH
+% if erwh_on
+%     % Declaring Variables
+%     var_erwh.erwh_adopt = sdpvar(1,K,'full');      %%%REWH installed capacity (kW)
+%     var_erwh.erwh_elec = sdpvar(T,K,'full');       %%%REWH electricity consumed (kWh) 
+%     var_erwh.erwh_heat = sdpvar(T,K,'full');       %%%REWH heat produced (kWh) 
+%     % REWH cost function 
+%    Objective = Objective...
+%         + sum(M*ewrh_mthly_debt.*var_erwh.erwh_adopt)...  %%%Annual investment/Capital Cost ($/kW)*(kW)
+%         + sum( 0.3 * var_erwh.erwh_heat./ewrh_v(2)) ;   %%% Electricity consumption cost($/kWh)
+%      %import_price(:,index)'         
+% end
