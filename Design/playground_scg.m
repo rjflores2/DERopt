@@ -12,7 +12,7 @@ pv_on = 1;        %Turn on PV
 ees_on = 1;       %Turn on EES/REES
 rees_on = 1;      %Turn on REES
 sofc_on =1;       %Turn on SOFC
-erwh_on =1;       %Turn on Electric Resistance Water Heater (ERWH) 
+erwh_on =1;       %Turn on ERWH (Electric Resistance Water Heater) 
 
 
 %%%NO LEGACY SYSTEMS YET!
@@ -99,7 +99,7 @@ dt = xlsread('UO_Example.xlsx');
 %%% All energy is in kWh
 elec = dt(:,1);
 gas = dt(:,2);
-% hw = dt(:,3);
+hotwater = dt(:,3);
 
 %%%Which rate?
 rate = {'R1'};

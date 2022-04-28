@@ -21,7 +21,12 @@ var_sofc.sofc_adopt = value(var_sofc.sofc_adopt);      %%%SOFC installed capacit
 var_sofc.sofc_elec = value(var_sofc.sofc_elec);       %%%SOFC electricity produced (kWh) 
 var_sofc.sofc_heat = value(var_sofc.sofc_heat);       %%%SOFC heat produced (kWh) 
 % var_sofc.sofc_fuel = value(var_sofc.sofc_fuel);       %%%Fuel consumption (kWh) 
-    
+
+%% ERWH Values
+var_erwh.erwh_adopt = value(var_erwh.erwh_adopt);      %%%ERWH installed capacity (kW)
+var_erwh.erwh_elec = value(var_erwh.erwh_elec);       %%%ERWH electricity produced (kWh) 
+var_erwh.erwh_heat = value(var_erwh.erwh_heat);       %%%ERWH heat produced (kWh) 
+
 %% Legacy EES Values
 var_lees.ees_chrg = value(var_lees.ees_chrg);
 var_lees.ees_dchrg = value(var_lees.ees_dchrg);

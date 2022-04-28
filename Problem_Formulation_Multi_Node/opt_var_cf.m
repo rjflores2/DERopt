@@ -439,15 +439,17 @@ if sofc_on
          
 end    
 
-% %% REWH
-% if erwh_on
-%     % Declaring Variables
-%     var_erwh.erwh_adopt = sdpvar(1,K,'full');      %%%REWH installed capacity (kW)
-%     var_erwh.erwh_elec = sdpvar(T,K,'full');       %%%REWH electricity consumed (kWh) 
-%     var_erwh.erwh_heat = sdpvar(T,K,'full');       %%%REWH heat produced (kWh) 
-%     % REWH cost function 
-%    Objective = Objective...
-%         + sum(M*ewrh_mthly_debt.*var_erwh.erwh_adopt)...  %%%Annual investment/Capital Cost ($/kW)*(kW)
-%         + sum( 0.3 * var_erwh.erwh_heat./ewrh_v(2)) ;   %%% Electricity consumption cost($/kWh)
-%      %import_price(:,index)'         
-% end
+%% REWH
+if erwh_on
+    % Declaring Variables
+    var_erwh.erwh_adopt = sdpvar(1,K,'full');      %%%REWH installed capacity (kW)
+    var_erwh.erwh_elec = sdpvar(T,K,'full');       %%%REWH electricity consumed (kWh) 
+    var_erwh.erwh_heat = sdpvar(T,K,'full');       %%%REWH heat produced (kWh) 
+    % REWH cost function 
+   Objective = Objective...
+        + sum(M*ewrh_mthly_debt.*var_erwh.erwh_adopt)...  %%%Annual investment/Capital Cost ($/kW)*(kW)
+       % + sum(0.3 * var_erwh.erwh_heat./ewrh_v(2)) ;   %%% Electricity consumption cost($/kWh)
+     %import_price(:,index)' electricity price   
+     % I commented out because I think the additional elecricity
+     % consumption is included in opt_gen_equalities.m, resulting in more imported electricity 
+end

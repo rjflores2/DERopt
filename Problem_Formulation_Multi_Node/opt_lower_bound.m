@@ -120,3 +120,13 @@ if sofc_on
         (0 <= var_sofc.sofc_elec):'SOFC Electricity >=0'
         (0 <= var_sofc.sofc_heat):'SOFC Heat >=0'];
 end
+
+%% ERWH
+if erwh_on
+    Constraints = [Constraints
+        (0 <= var_erwh.erwh_adopt):'ERWH Adoption >=0'
+        (0 <= var_erwh.erwh_elec):'ERWH Electricity >=0'];
+        %(0 <= var_erwh.erwh_heat):'ERWH Heat >=0'
+        % I thought it might be redundant to add heat to the constraints
+        % Heat is equal to the hot water data
+end
