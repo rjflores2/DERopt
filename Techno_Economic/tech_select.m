@@ -105,6 +105,9 @@ end
     erwh_v = [1000    %%% 1: Capital cost ($/kWel) https://www.homedepot.com/
               0.95];  %%% 2: ERWH energy factor (EF)from AHRI Directory      
      
+%% GWH     instead of O&M cost the gas consumption is multiplied by its cost  
+    gwh_v = [2000    %%% 1: Capital cost ($/kWg) 
+              0.6];  %%% 2: GWH energy factor (EF)     
 
 %% SGIP incentives
 if sgip_on

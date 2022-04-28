@@ -463,5 +463,5 @@ if gwh_on
     % GWH cost function 
    Objective = Objective...
         + sum(M*gwh_mthly_debt.*var_gwh.gwh_adopt)...  %%%Annual investment/Capital Cost ($/kW)*(kW)
-      
+        + sum(ng_cost * var_gwh.gwh_gas) ;   %%% Fuel cost price of natural gas ($/kWh)
 end
