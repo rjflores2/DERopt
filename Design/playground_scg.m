@@ -12,7 +12,7 @@ pv_on = 1;        %Turn on PV
 ees_on = 1;       %Turn on EES/REES
 rees_on = 1;      %Turn on REES
 sofc_on =1;       %Turn on SOFC
-erwh_on =1;       %Turn on ERWH (Electric Resistance Water Heater)
+erwh_on =0;       %Turn on ERWH (Electric Resistance Water Heater)
 gwh_on =1;        %Turn on GWH (Gas Water Heater)
 
 %%%NO LEGACY SYSTEMS YET!

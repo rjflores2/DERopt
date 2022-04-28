@@ -102,13 +102,15 @@ ng_cost = 0.023;
     
 end
 %% ERWH     instead of O&M cost the electricity consumption is multiplied by its cost  
+if erwh_on
     erwh_v = [1000    %%% 1: Capital cost ($/kWel) https://www.homedepot.com/
               0.95];  %%% 2: ERWH energy factor (EF)from AHRI Directory      
-     
+end      
 %% GWH     instead of O&M cost the gas consumption is multiplied by its cost  
+if gwh_on
     gwh_v = [2000    %%% 1: Capital cost ($/kWg) 
               0.6];  %%% 2: GWH energy factor (EF)     
-
+end
 %% SGIP incentives
 if sgip_on
     %%%Self generation incentive program (SGIP) values
