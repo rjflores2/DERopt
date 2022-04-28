@@ -12,8 +12,8 @@ pv_on = 1;        %Turn on PV
 ees_on = 1;       %Turn on EES/REES
 rees_on = 1;      %Turn on REES
 sofc_on =1;       %Turn on SOFC
-erwh_on =1;       %Turn on ERWH (Electric Resistance Water Heater) 
-
+erwh_on =1;       %Turn on ERWH (Electric Resistance Water Heater)
+gwh_on =1;        %Turn on GWH (Gas Water Heater)
 
 %%%NO LEGACY SYSTEMS YET!
 lpv_on = 0;
@@ -196,6 +196,13 @@ if opt_now
     fprintf('%s: ERWH Constraints.', datestr(now,'HH:MM:SS'))
     tic
     opt_erwh
+    elapsed = toc;
+    fprintf('Took %.2f seconds \n', elapsed)
+    
+    %% GWH constraints
+    fprintf('%s: GWH Constraints.', datestr(now,'HH:MM:SS'))
+    tic
+    opt_gwh
     elapsed = toc;
     fprintf('Took %.2f seconds \n', elapsed)
     %% DER Incentives

@@ -51,9 +51,9 @@ if ~isempty(sofc_v)
 end
 
 %%% ERWH
-if ~isempty(ewrh_v)
-    for ii=1:size(ewrh_v,2)
-        ewrh_mthly_debt(ii,1)=ewrh_v(1,ii)*((1-equity)*(interest*(1+interest)^(period*12))...
+if ~isempty(erwh_v)
+    for ii=1:size(erwh_v,2)
+        erwh_mthly_debt(ii,1)=erwh_v(1,ii)*((1-equity)*(interest*(1+interest)^(period*12))...
             /((1+interest)^(period*12)-1)+...%%%Money to pay back bank  $/month/kW
             req_return_on*(equity)*(required_return*(1+required_return)^(period*12))...
             /((1+required_return)^(period*12)-1));

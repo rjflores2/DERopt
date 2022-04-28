@@ -8,4 +8,4 @@ Constraints = [Constraints
 %% Building Hot water Balances
 %For each building k, all timesteps t
 Constraints = [Constraints
-    (var_erwh.erwh_heat == hotwater):'BLDG HotWater Balance'];
+    (var_erwh.erwh_heat + var_gwh.gwh_heat == hotwater):'BLDG HotWater Balance'];

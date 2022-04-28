@@ -7,10 +7,10 @@ utility_exists=1;
 %%% Efficiency / Conversion Percent at 1 kW/m^2
 %%% O&M ($/kWh generated)
 if pv_on
-    %pv_v=[3500; 0.2 ; 0.001];
-    pv_v=[2650; 0.2 ; 0.001]; %pv_v=[2650; 0.2 ; 0.001];
+    %pv_v=[3500; 0.2 ; 0.001]; 
+    pv_v=[2000; 0.2 ; 0.001]; %pv_v=[2650; 0.2 ; 0.001]; https://atb.nrel.gov/electricity/2021/residential_pv
      
-    pv_cap=pv_v(1,:);
+    pv_cap=pv_v(1,:);%NREL:PV capital cost: 2000 in 2035, 1300 in 2045 w/ conservative scenario
     
     %%%How pv capital cost is modified for different types of buildings
     pv_cap_mod = [2/2.65 %%%Commercial/industrial
@@ -85,8 +85,8 @@ end
 %% SOFC
 if  sofc_on
 
-    sofc_v = [2500   %%% 1: Capital cost ($/kWel) C_fc
-          0.06*2500  %%% 2: O&M ($/kW/yr generated) 6 Yearly % of TIC(Total Installed Cost) % of the purchasing cost (4–10%) 
+    sofc_v = [3000   %%% 1: Capital cost ($/kWel) C_fc
+          0.06*3000  %%% 2: O&M ($/kW/yr generated) 6 Yearly % of TIC(Total Installed Cost) % of the purchasing cost (4–10%) 
           0.6        %%% 3: SOFC electrical efficiency at nominal condition (fraction)     
           0.28];       %%% 4: SOFC thermal efficiency at nominal condition (fraction)
              
@@ -102,7 +102,7 @@ ng_cost = 0.023;
     
 end
 %% ERWH     instead of O&M cost the electricity consumption is multiplied by its cost  
-    ewrh_v = [1000    %%% 1: Capital cost ($/kWel) https://www.homedepot.com/
+    erwh_v = [1000    %%% 1: Capital cost ($/kWel) https://www.homedepot.com/
               0.95];  %%% 2: ERWH energy factor (EF)from AHRI Directory      
      
 
