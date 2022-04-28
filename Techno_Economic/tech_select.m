@@ -139,14 +139,27 @@ inv_v = [49];
 xfmr_v = [1090];
 
 %% Tech select
-
+%%% PV
 if ~pv_on
     pv_v=[];
 end
-
+%%% EES
 if ~ees_on
     ees_v =[];
 end
+%%% SOFC
+if ~sofc_on
+    sofc_v =[];
+end
+%%% ERWH
+if ~erwh_on
+    erwh_v =[];
+end
+%%% GWH
+if ~gwh_on
+    gwh_v =[];
+end
+
 
 %% Placeholders
 

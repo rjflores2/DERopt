@@ -17,21 +17,24 @@ var_ees.ees_chrg = value(var_ees.ees_chrg);
 var_ees.ees_dchrg = value(var_ees.ees_dchrg);
 
 %% SOFC Values
+if ~isempty(sofc_v)  
 var_sofc.sofc_adopt = value(var_sofc.sofc_adopt);      %%%SOFC installed capacity (kW)
 var_sofc.sofc_elec = value(var_sofc.sofc_elec);       %%%SOFC electricity produced (kWh) 
 var_sofc.sofc_heat = value(var_sofc.sofc_heat);       %%%SOFC heat produced (kWh) 
 % var_sofc.sofc_fuel = value(var_sofc.sofc_fuel);       %%%Fuel consumption (kWh) 
-
+end
 %% ERWH Values
+if ~isempty(erwh_v)  
 var_erwh.erwh_adopt = value(var_erwh.erwh_adopt);      %%%ERWH installed capacity (kW)
 var_erwh.erwh_elec = value(var_erwh.erwh_elec);       %%%ERWH electricity consumed (kWh) 
 var_erwh.erwh_heat = value(var_erwh.erwh_heat);       %%%ERWH heat produced (kWh) 
-
+end
 %% GWH Values
+if ~isempty(gwh_v)  
 var_gwh.gwh_adopt = value(var_gwh.gwh_adopt);      %%%GWH installed capacity (kW)
 var_gwh.gwh_gas = value(var_gwh.gwh_gas);       %%%GWH gas consumed (kWh) 
 var_gwh.gwh_heat = value(var_gwh.gwh_heat);       %%%GWH heat produced (kWh) 
-
+end
 %% Legacy EES Values
 var_lees.ees_chrg = value(var_lees.ees_chrg);
 var_lees.ees_dchrg = value(var_lees.ees_dchrg);

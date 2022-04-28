@@ -8,8 +8,5 @@ Constraints = [Constraints
 
 %% Building Hot water Balances
 %For each building k, all timesteps t
-if gwh_on && erwh_on ==1
 Constraints = [Constraints
     (var_erwh.erwh_heat + var_gwh.gwh_heat == hotwater):'BLDG HotWater Balance'];
-   
-end
