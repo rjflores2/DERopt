@@ -452,8 +452,11 @@ if erwh_on
      %import_price(:,index)' electricity price   
      % I commented out because I think the additional elecricity
      % consumption is included in opt_gen_equalities.m, resulting in more imported electricity 
+else
+    var_erwh.erwh_adopt = zeros(1,K);      
+    var_erwh.erwh_elec = zeros(T,K);        
+    var_erwh.erwh_heat = zeros(T,K);         
 end
-
 %% GWH
 if gwh_on
     % Declaring Variables
@@ -464,4 +467,9 @@ if gwh_on
    Objective = Objective...
         + sum(M*gwh_mthly_debt.*var_gwh.gwh_adopt)...  %%%Annual investment/Capital Cost ($/kW)*(kW)
         + sum(ng_cost * var_gwh.gwh_gas) ;   %%% Fuel cost price of natural gas ($/kWh)
+else
+    var_gwh.gwh_adopt = zeros(1,K);        
+    var_gwh.gwh_gas = zeros(T,K);         
+    var_gwh.gwh_heat = zeros(T,K);   
+    
 end
