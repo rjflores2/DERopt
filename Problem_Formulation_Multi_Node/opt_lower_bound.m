@@ -128,14 +128,17 @@ if erwh_on
         (0 <= var_erwh.erwh_heat):'ERWH Heat >=0'];
         %(0 <= var_erwh.erwh_elec):'ERWH Electricity >=0'
         % I thought it might be redundant to add electricity to the constraints
-       
 end
-
 %% GWH 
 if gwh_on
     Constraints = [Constraints
         (0 <= var_gwh.gwh_adopt):'GWH Adoption >=0'
-        (0 <= var_gwh.gwh_heat):'GWH Heat >=0'];
-        
+        (0 <= var_gwh.gwh_heat):'GWH Heat >=0'];     
+end
+
+%% SOFCWH  % probably don’t even need to add this because of 0 <= var_sofc.sofc_heat
+if sofcwh_on
+    Constraints = [Constraints
+         (0 <= var_sofcwh.sofcwh_heat):'SOFCWH Heat >=0'];      
 end
 

@@ -37,6 +37,12 @@ var_gwh.gwh_adopt = value(var_gwh.gwh_adopt);      %%%GWH installed capacity (kW
 var_gwh.gwh_gas = value(var_gwh.gwh_gas);       %%%GWH gas consumed (kWh) 
 var_gwh.gwh_heat = value(var_gwh.gwh_heat);       %%%GWH heat produced (kWh) 
 end
+
+%% SOFCWH Values    
+if ~isempty(sofcwh_v)  
+var_sofcwh.sofcwh_heat = value(var_sofcwh.sofcwh_heat);       %%%SOFC heat used for water heating(kWh) 
+end
+
 %% Legacy EES Values
 var_lees.ees_chrg = value(var_lees.ees_chrg);
 var_lees.ees_dchrg = value(var_lees.ees_dchrg);

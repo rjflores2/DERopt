@@ -88,7 +88,7 @@ if  sofc_on
     sofc_v = [3000   %%% 1: Capital cost ($/kWel) C_fc
           0.06*3000  %%% 2: O&M ($/kW/yr generated) 6 Yearly % of TIC(Total Installed Cost) % of the purchasing cost (4–10%) 
           0.6        %%% 3: SOFC electrical efficiency at nominal condition (fraction)     
-          0.28];       %%% 4: SOFC thermal efficiency at nominal condition (fraction)
+          0.3];       %%% 4: SOFC thermal efficiency at nominal condition (fraction)
              
     % Find these numbers !   
     %%%Financial Aspects - SOFC 
@@ -111,6 +111,10 @@ if gwh_on
     gwh_v = [2000    %%% 1: Capital cost ($/kWg) 
               0.6];  %%% 2: GWH energy factor (EF)     
 end
+%% SOFCWH
+if sofcwh_on
+   sofcwh_v = sofc_v(4);
+end  
 %% SGIP incentives
 if sgip_on
     %%%Self generation incentive program (SGIP) values
@@ -162,6 +166,10 @@ if ~gwh_on
     gwh_v =[];
 end
 
+%%% SOFCWH
+if ~sofcwh_on
+    sofcwh_v =[];
+end 
 
 %% Placeholders
 

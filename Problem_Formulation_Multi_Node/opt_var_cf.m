@@ -473,3 +473,11 @@ else
     var_gwh.gwh_heat = zeros(T,K);   
     
 end
+%% SOFCWH
+if sofcwh_on
+    % Declaring Variables
+     var_sofcwh.sofcwh_heat = sdpvar(T,K,'full');       %%%SOFC heat produced used for water heating(kWh) 
+    % SOFCWH cost function is included in SOFC cost function 
+else         
+     var_sofcwh.sofcwh_heat = zeros(T,K);   
+end
