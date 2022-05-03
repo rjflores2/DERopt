@@ -40,7 +40,8 @@ end
 
 %% SOFCWH Values    
 if ~isempty(sofcwh_v)  
-var_sofcwh.sofcwh_heat = value(var_sofcwh.sofcwh_heat);       %%%SOFC heat used for water heating(kWh) 
+var_sofcwh.sofcwh_heat = value(var_sofcwh.sofcwh_heat);            %%%SOFC heat used for water heating(kWh) 
+var_sofcwh.sofcwh_wasteheat = value(var_sofcwh.sofcwh_wasteheat);  %%%SOFC heat that is not used for water heating
 end
 
 %% Legacy EES Values

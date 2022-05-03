@@ -100,7 +100,7 @@ dt = xlsread('UO_Example.xlsx');
 %%% All energy is in kWh
 elec = dt(:,1);
 gas = dt(:,2);
-hotwater = dt(:,4);
+hotwater = dt(:,3);
 
 %%%Which rate?
 rate = {'R1'};

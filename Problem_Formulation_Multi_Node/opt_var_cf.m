@@ -477,7 +477,10 @@ end
 if sofcwh_on
     % Declaring Variables
      var_sofcwh.sofcwh_heat = sdpvar(T,K,'full');       %%%SOFC heat produced used for water heating(kWh) 
-    % SOFCWH cost function is included in SOFC cost function 
+     var_sofcwh.sofcwh_wasteheat = sdpvar(T,K,'full');  %%%SOFC heat wasted(kWh)
+    
+     % SOFCWH cost function is included in SOFC cost function 
 else         
-     var_sofcwh.sofcwh_heat = zeros(T,K);   
+     var_sofcwh.sofcwh_heat = zeros(T,K); 
+     var_sofcwh.sofcwh_wasteheat = zeros(T,K);
 end

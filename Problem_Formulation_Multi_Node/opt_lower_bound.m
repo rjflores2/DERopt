@@ -139,6 +139,7 @@ end
 %% SOFCWH  % probably don’t even need to add this because of 0 <= var_sofc.sofc_heat
 if sofcwh_on
     Constraints = [Constraints
+         (0 <= var_sofcwh.sofcwh_wasteheat):'SOFC wasted heat >=0'
          (0 <= var_sofcwh.sofcwh_heat):'SOFCWH Heat >=0'];      
 end
 
