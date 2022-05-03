@@ -39,10 +39,8 @@ var_gwh.gwh_heat = value(var_gwh.gwh_heat);       %%%GWH heat produced (kWh)
 end
 
 %% SOFCWH Values    
-if ~isempty(sofcwh_v)  
 var_sofcwh.sofcwh_heat = value(var_sofcwh.sofcwh_heat);            %%%SOFC heat used for water heating(kWh) 
 var_sofcwh.sofcwh_wasteheat = value(var_sofcwh.sofcwh_wasteheat);  %%%SOFC heat that is not used for water heating
-end
 
 %% Legacy EES Values
 var_lees.ees_chrg = value(var_lees.ees_chrg);

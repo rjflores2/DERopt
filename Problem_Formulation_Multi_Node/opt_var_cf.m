@@ -482,5 +482,5 @@ if sofcwh_on
      % SOFCWH cost function is included in SOFC cost function 
 else         
      var_sofcwh.sofcwh_heat = zeros(T,K); 
-     var_sofcwh.sofcwh_wasteheat = zeros(T,K);
+     var_sofcwh.sofcwh_wasteheat = var_sofc.sofc_heat-var_sofcwh.sofcwh_heat;
 end
