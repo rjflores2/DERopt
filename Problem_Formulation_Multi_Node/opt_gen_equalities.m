@@ -10,5 +10,5 @@ Constraints = [Constraints
 %For each building k, all timesteps t
 if isempty(hotwater)==0 
 Constraints = [Constraints
-    (var_erwh.erwh_heat + var_gwh.gwh_heat + var_sofcwh.sofcwh_heat == hotwater):'BLDG HotWater Balance'];
+    (var_erwh.erwh_heat + var_gwh.gwh_heat + var_sofc.sofc_wh == hotwater):'BLDG HotWater Balance'];
 end

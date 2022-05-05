@@ -21,6 +21,7 @@ if ~isempty(sofc_v)
 var_sofc.sofc_adopt = value(var_sofc.sofc_adopt);      %%%SOFC installed capacity (kW)
 var_sofc.sofc_elec = value(var_sofc.sofc_elec);       %%%SOFC electricity produced (kWh) 
 var_sofc.sofc_heat = value(var_sofc.sofc_heat);       %%%SOFC heat produced (kWh) 
+var_sofc.sofc_wh = value(var_sofc.sofc_wh);            %%%SOFC heat used for water heating(kWh) 
 % var_sofc.sofc_fuel = value(var_sofc.sofc_fuel);       %%%Fuel consumption (kWh) 
 end
 
@@ -37,10 +38,6 @@ var_gwh.gwh_adopt = value(var_gwh.gwh_adopt);      %%%GWH installed capacity (kW
 var_gwh.gwh_gas = value(var_gwh.gwh_gas);       %%%GWH gas consumed (kWh) 
 var_gwh.gwh_heat = value(var_gwh.gwh_heat);       %%%GWH heat produced (kWh) 
 end
-
-%% SOFCWH Values    
-var_sofcwh.sofcwh_heat = value(var_sofcwh.sofcwh_heat);            %%%SOFC heat used for water heating(kWh) 
-var_sofcwh.sofcwh_wasteheat = value(var_sofcwh.sofcwh_wasteheat);  %%%SOFC heat that is not used for water heating
 
 %% Legacy EES Values
 var_lees.ees_chrg = value(var_lees.ees_chrg);

@@ -119,6 +119,10 @@ if sofc_on
         (0 <= var_sofc.sofc_adopt):'SOFC Adoption >=0'
         (0 <= var_sofc.sofc_elec):'SOFC Electricity >=0'
         (0 <= var_sofc.sofc_heat):'SOFC Heat >=0'];
+    if sofcwh_on
+        Constraints = [Constraints
+        (0 <= var_sofc.sofc_wh):'SOFC Water Heating >=0'];
+    end
 end
 
 %% ERWH
@@ -135,11 +139,3 @@ if gwh_on
         (0 <= var_gwh.gwh_adopt):'GWH Adoption >=0'
         (0 <= var_gwh.gwh_heat):'GWH Heat >=0'];     
 end
-
-%% SOFCWH  % probably don’t even need to add this because of 0 <= var_sofc.sofc_heat
-if sofcwh_on
-    Constraints = [Constraints
-         (0 <= var_sofcwh.sofcwh_wasteheat):'SOFC wasted heat >=0'
-         (0 <= var_sofcwh.sofcwh_heat):'SOFCWH Heat >=0'];      
-end
-

@@ -88,18 +88,14 @@ if  sofc_on
     sofc_v = [3000   %%% 1: Capital cost ($/kWel) C_fc
           0.06*3000  %%% 2: O&M ($/kW/yr generated) 6 Yearly % of TIC(Total Installed Cost) % of the purchasing cost (4–10%) 
           0.6        %%% 3: SOFC electrical efficiency at nominal condition (fraction)     
-          0.3];       %%% 4: SOFC thermal efficiency at nominal condition (fraction)
-             
+          0.3];       %%% 4: SOFC thermal efficiency at nominal condition (fraction)          
     % Find these numbers !   
     %%%Financial Aspects - SOFC 
 %     sofc_fin = [-0.4648; ...  $/kW %%%Scaling linear factor - Based on Lazards cost of electricity
 %         5; ... year %%%MACRS Schedule Modified Accelerated Cost Recovery System (tax)
-%         0.26]; ... %%% SOFC Investment Tax Credit (ITC)/ from www.irs.gov  
-       
+%         0.26]; ... %%% SOFC Investment Tax Credit (ITC)/ from www.irs.gov       
 %% DUMMY NG COST
 ng_cost = 0.023;
-%%
-    
 end
 %% ERWH     instead of O&M cost the electricity consumption is multiplied by its cost  
 if erwh_on
@@ -111,10 +107,7 @@ if gwh_on
     gwh_v = [2000    %%% 1: Capital cost ($/kWg) 
               0.6];  %%% 2: GWH energy factor (EF)     
 end
-%% SOFCWH
-if sofcwh_on
-   sofcwh_v = sofc_v(4);
-end  
+ 
 %% SGIP incentives
 if sgip_on
     %%%Self generation incentive program (SGIP) values

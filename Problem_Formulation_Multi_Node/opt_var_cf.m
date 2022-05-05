@@ -429,16 +429,22 @@ if sofc_on
     var_sofc.sofc_adopt = sdpvar(1,K,'full');      %%%SOFC installed capacity (kW)
     var_sofc.sofc_elec = sdpvar(T,K,'full');       %%%SOFC electricity produced (kWh) 
     var_sofc.sofc_heat = sdpvar(T,K,'full');       %%%SOFC heat produced (kWh) 
- %  var_sofc.sofc_fuel = sdpvar(T,K,'full');       %%%Fuel consumption (kWh) 
-     
+    if sofcwh_on
+    var_sofc.sofc_wh = sdpvar(T,K,'full');         %%%SOFC heat produced used for water heating(kWh)
+    else
+        var_sofc.sofc_wh = zeros(T,K);        
+    end
+    %var_sofc.sofc_fuel = sdpvar(T,K,'full');       %%%Fuel consumption (kWh) 
     % SOFC cost function (ref: Ettore Bompard, IJHE)
     Objective = Objective...
         + sum(M*sofc_mthly_debt.*var_sofc.sofc_adopt)...  %%%Annual investment/Capital Cost ($/kW)*(kW)
         + sum((sofc_v(2) * var_sofc.sofc_adopt))... %%% O&M ($/kW/yr)*(kW)
         + sum(ng_cost * var_sofc.sofc_elec./sofc_v(3)) ;   %%% Fuel cost price of natural gas ($/kWh) - MUST BE CHECKED
-         
+else
+    var_sofc.sofc_adopt = zeros(1,K);
+    var_sofc.sofc_elec = zeros(T,K);
+    var_sofc.sofc_heat = zeros(T,K);
 end    
-
 %% ERWH
 if erwh_on
     % Declaring Variables
@@ -472,15 +478,4 @@ else
     var_gwh.gwh_gas = zeros(T,K);         
     var_gwh.gwh_heat = zeros(T,K);   
     
-end
-%% SOFCWH
-if sofcwh_on
-    % Declaring Variables
-     var_sofcwh.sofcwh_heat = sdpvar(T,K,'full');       %%%SOFC heat produced used for water heating(kWh) 
-     var_sofcwh.sofcwh_wasteheat = sdpvar(T,K,'full');  %%%SOFC heat wasted(kWh)
-    
-     % SOFCWH cost function is included in SOFC cost function 
-else         
-     var_sofcwh.sofcwh_heat = zeros(T,K); 
-     var_sofcwh.sofcwh_wasteheat = var_sofc.sofc_heat-var_sofcwh.sofcwh_heat;
 end
