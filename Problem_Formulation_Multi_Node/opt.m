@@ -8,6 +8,7 @@ if opt_now==1
     
     %%%Setting lower/upper bounds for all variables
     %     lb=zeros(size(model.f));
+    x=[];
     lb=[];
     ub=inf(size(lb));
     elapsed = toc;
