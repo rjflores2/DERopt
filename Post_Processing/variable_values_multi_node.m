@@ -18,8 +18,8 @@ var_ees.ees_dchrg = value(var_ees.ees_dchrg);
 
 %% SOFC Values
 if ~isempty(sofc_v)  
-var_sofc.sofc_adopt = value(var_sofc.sofc_adopt);      %%%SOFC installed capacity (kW)
-%var_sofc.sofc_number = value(var_sofc.sofc_number);   %%% Number of SOFC units #
+%var_sofc.sofc_adopt = value(var_sofc.sofc_adopt);      %%%SOFC installed capacity (kW)
+var_sofc.sofc_number = value(var_sofc.sofc_number);   %%% Number of SOFC units #
 var_sofc.sofc_elec = value(var_sofc.sofc_elec);       %%%SOFC electricity produced (kWh) 
 var_sofc.sofc_heat = value(var_sofc.sofc_heat);       %%%SOFC heat produced (kWh) 
 var_sofc.sofc_wh = value(var_sofc.sofc_wh);            %%%SOFC heat used for water heating(kWh)
