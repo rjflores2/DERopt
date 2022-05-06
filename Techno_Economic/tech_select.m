@@ -85,11 +85,12 @@ end
 %% SOFC
 if  sofc_on
 
-    sofc_v = [3000   %%% 1: Capital cost ($/kWel) C_fc
-          0.06*3000  %%% 2: O&M ($/kW/yr generated) 6 Yearly % of TIC(Total Installed Cost) % of the purchasing cost (4–10%) 
+    sofc_v = [1000   %%% 1: Capital cost ($/kWel) C_fc
+          0.06*1000  %%% 2: O&M ($/kW/yr generated) 6 Yearly % of TIC(Total Installed Cost) % of the purchasing cost (4–10%) 
           0.6        %%% 3: SOFC electrical efficiency at nominal condition (fraction)     
           0.3        %%% 4: SOFC thermal efficiency at nominal condition (fraction)          
-          0.5];      %%% 5: Minimum SOFC capacity is 500 Watt- 0.5 kW increments
+          0.5        %%% 5: Minimum SOFC capacity is 500 Watt- 0.5 kW increments
+          0.01];     %%% 6: Ramp rate is 5% of nominal capacity per minute [T. D. Hutty, S. Dong, R. Lee, and S. Brown]
       % Find these numbers !   
     %%%Financial Aspects - SOFC 
 %     sofc_fin = [-0.4648; ...  $/kW %%%Scaling linear factor - Based on Lazards cost of electricity

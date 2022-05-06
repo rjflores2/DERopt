@@ -116,7 +116,6 @@ end
 %% SOFC
 if sofc_on
     Constraints = [Constraints
-        %(0 <= var_sofc.sofc_adopt):'SOFC Adoption >=0'
         (0 <= var_sofc.sofc_number):'SOFC Units >=0' 
         (0 <= var_sofc.sofc_elec):'SOFC Electricity >=0'
         (0 <= var_sofc.sofc_heat):'SOFC Heat >=0'];

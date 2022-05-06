@@ -427,7 +427,6 @@ end
 if sofc_on
     % Declaring Variables    
     var_sofc.sofc_number = intvar(1,K,'full');      %%%SOFC installed capacity (kW)
-    %var_sofc.sofc_number = integer(var_sofc.sofc_adopt);              %%%SOFC installed unit numbers (kW)      
     var_sofc.sofc_elec = sdpvar(T,K,'full');       %%%SOFC electricity produced (kWh) 
     var_sofc.sofc_heat = sdpvar(T,K,'full');       %%%SOFC heat produced (kWh) 
     if sofcwh_on
