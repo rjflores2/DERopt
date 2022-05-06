@@ -90,7 +90,17 @@ if  sofc_on
           0.6        %%% 3: SOFC electrical efficiency at nominal condition (fraction)     
           0.3        %%% 4: SOFC thermal efficiency at nominal condition (fraction)          
           0.5        %%% 5: Minimum SOFC capacity is 500 Watt- 0.5 kW increments
-          0.01];     %%% 6: Ramp rate is 5% of nominal capacity per minute [T. D. Hutty, S. Dong, R. Lee, and S. Brown]
+          0.01];     %%% 6: kw/s   %%%%Ramp rate is 5% of nominal capacity per minute [T. D. Hutty, S. Dong, R. Lee, and S. Brown]
+      
+      %%%ramp rate conversion
+      sofc_v(6) = t_step/((sofc_v(5)/sofc_v(6))/60);
+      sofc_v(6)
+      
+%       if sofc_v(6) > 1
+%           sofc_v(6) = 1;
+%       end
+%       
+      
       % Find these numbers !   
     %%%Financial Aspects - SOFC 
 %     sofc_fin = [-0.4648; ...  $/kW %%%Scaling linear factor - Based on Lazards cost of electricity

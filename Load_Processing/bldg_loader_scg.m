@@ -4,7 +4,7 @@ load 'solar_sna.mat'
 
 %% Setting Simulaiton Time
 
-%%% Time Step
+%%% Time Step (minutes)
 t_step = 60;
 
 %%%Demand Charge Adjustment
