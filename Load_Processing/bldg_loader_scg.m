@@ -5,18 +5,18 @@ load 'solar_sna.mat'
 %% Setting Simulaiton Time
 
 %%% Time Step (minutes)
-t_step = 60;
+t_step = (time(2) - time(1))*(24*60);
 
 %%%Demand Charge Adjustment
 e_adjust = 60/t_step;
 
 time = [];
-time = ([2019 1 1 0 0 0]);
+time = ([yr 1 1 0 0 0]);
 %%%Generating all time steps
-for ii = 2:8760
+for ii = 2:length(elec)
     % for ii = 2:length(elec)
     time(ii,:) = time(ii-1,:);
-    time(ii,5) =  time(ii,5) + 60;
+    time(ii,5) =  time(ii,5) + t_step;
 end
 time = datenum(time);
 
@@ -52,6 +52,12 @@ sgip_signal = xlsread('hourly_resolved.csv');
 %%%Lining up SGIP signal with current time step
 ind = find(datevec(sgip_signal(:,1)) == datetimev(1));
 sgip_signal = sgip_signal(ind(1):ind(1)+8760-1,:);
+
+%% Loading TDV Data
+%%%Loading Data
+tdv_elec_raw = readtable('TDV_C6.xlsx','Sheet','Elec');
+
+find(string(tdv_elec_raw.Properties.VariableNames) == mat2str(yr))
 
 %% Locating Summer Months
 summer_month = [];

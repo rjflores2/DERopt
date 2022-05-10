@@ -80,13 +80,14 @@ addpath('H:\_Research_\CEC_OVMG\URBANopt\UO_Results_0.5.x')
 
 %%%DERopt paths
 addpath(genpath('H:\_Tools_\DERopt\Data'))
-addpath(genpath('H:\_Tools_\DERopt\Design'))
-addpath(genpath('H:\_Tools_\DERopt\Input_Data'))
-addpath(genpath('H:\_Tools_\DERopt\Load_Processing'))
-addpath(genpath('H:\_Tools_\DERopt\Post_Processing'))
-addpath(genpath('H:\_Tools_\DERopt\Problem_Formulation_Multi_Node'))
-addpath(genpath('H:\_Tools_\DERopt\Techno_Economic'))
-addpath(genpath('H:\_Tools_\DERopt\Utilities'))
+
+addpath(genpath('H:\_Tools_\SCG_DERopt\DERopt\Design'))
+addpath(genpath('H:\_Tools_\SCG_DERopt\DERopt\Input_Data'))
+addpath(genpath('H:\_Tools_\SCG_DERopt\DERopt\Load_Processing'))
+addpath(genpath('H:\_Tools_\SCG_DERopt\DERopt\Post_Processing'))
+addpath(genpath('H:\_Tools_\SCG_DERopt\DERopt\Problem_Formulation_Multi_Node'))
+addpath(genpath('H:\_Tools_\SCG_DERopt\DERopt\Techno_Economic'))
+addpath(genpath('H:\_Tools_\SCG_DERopt\DERopt\Utilities'))
 
 %%% Building UO Object Path
 addpath('H:\_Research_\CEC_OVMG\URBANopt\UO_Processing')
@@ -96,11 +97,16 @@ addpath(genpath('H:\_Research_\CEC_OVMG\Rates'))
 
 %% Loading building demand
 
-dt = xlsread('UO_Example.xlsx');
+% dt = xlsread('UO_Example.xlsx');
+dt = readtable('CZ06_Baseline_2020.xlsx');
+
 %%% All energy is in kWh
-elec = dt(:,1);
-heat = dt(:,2);
-hotwater = dt(:,3);
+time = dt.HoursSince00_00Jan1;
+elec = dt.Elec_kWh_;
+cool = dt.Cooling_kWh_;
+heat = dt.Heating_kWh_;
+hotwater = dt.DHW_kWh_;
+misc_gas = dt.MiscGas;
 
 %%%Which rate?
 rate = {'R1'};
@@ -121,6 +127,10 @@ apartment_types = [0 0 1];
 
 
 %% Formatting Building Data
+
+%%%Year to be simulated
+yr = 2025;
+
 bldg_loader_scg
 
 %% Utility Data
