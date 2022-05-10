@@ -132,7 +132,7 @@ apartment_types = [0 0 1];
 yr = 2025;
 
 bldg_loader_scg
-
+return
 %% Utility Data
 %%%Loading Utility Data and Generating Energy Charge Vectors
 utility_SCE_2020
