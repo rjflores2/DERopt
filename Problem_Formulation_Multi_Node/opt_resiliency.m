@@ -56,6 +56,13 @@ if ~isempty(crit_load_lvl) && crit_load_lvl >0
     if sim_lvl == 3
         %%% Aggregating injeciton at each node
         idx_rec = [];
+        %%%Polygon constraints
+        L = 20;%%%Number of polygons
+        i = 0:L-1;
+        theta = pi/L + i.*(2*pi)./L; %Angle of polygon i (rads)
+        C = [cos(theta)' sin(theta)']; %cos/sin of theta for each polygon
+        %     s = t_rating*cos(theta(1)); %s rating around archimedes circle
+        
 %         for ii = 1:N
 %             ii
 %             if isempty(find(strcmp(bb_lbl(ii + 1),xfmr_subset_unique)))
@@ -90,6 +97,17 @@ if ~isempty(crit_load_lvl) && crit_load_lvl >0
                     (var_resiliency.Pinj(ii - 1,:)' == 0):'Resiliency Real Power Equality'
                     (var_resiliency.Qinj(ii - 1,:)' == 0):'Resiliency Real Power Equality'];
             end
+            
+            
+            %%%If its a transformer in the table
+            if ~isempty(xfmr_tbl.Rating_kVA_(find(strcmp(bb_lbl(ii),xfmr_tbl.Name))))
+                Constraints = [Constraints
+                    (C*[var_resiliency.Pinj(ii - 1,:) ; var_resiliency.Qinj(ii - 1,:)] <= 1*xfmr_tbl.Rating_kVA_(find(strcmp(bb_lbl(ii),xfmr_tbl.Name)))):'Resiliency xfmr aparent power limit'];
+         
+            inhere = ii
+            end
+            
+            
         end
 %             ii
 %             if isempty(find(strcmp(bb_lbl(ii + 1),xfmr_subset_unique)))
@@ -115,7 +133,8 @@ if ~isempty(crit_load_lvl) && crit_load_lvl >0
             (var_resiliency.Pinj == branch_bus(2:end,2:end)'*var_resiliency.pflow):'Resiliency LDF Real Power Flow'
             (var_resiliency.Qinj == branch_bus(2:end,2:end)'*var_resiliency.qflow):'Resiliency LDF Real Power Flow'
             (branch_bus(2:end,2:end)*var_resiliency.bus_voltage == 2.*resistance(2:end,2:end)*var_resiliency.pflow + 2.*reactance(2:end,2:end)*var_resiliency.qflow):'Resiliency - Voltage Constraints'
-            (var_resiliency.bus_voltage(1,:) == base_voltage):'Reference Node Voltage'];
+            (var_resiliency.bus_voltage(1,:) == base_voltage):'Reference Node Voltage'
+            (base_voltage(1)*0.97 <= var_resiliency.bus_voltage <= base_voltage(1)*1.05):'Voltage PU Requirements'];
 %             (branch_bus(2:end,2:end)*var_resiliency.bus_voltage + repmat(base_voltage,1,length(var_resiliency.bus_voltage )) == 2.*resistance*var_resiliency.pflow + 2.*reactance*var_resiliency.qflow):'Resiliency - Voltage Constraints'];
         
         

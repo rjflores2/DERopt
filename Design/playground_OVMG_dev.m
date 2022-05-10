@@ -3,7 +3,7 @@ clear all; close all; clc ; started_at = datetime('now'); startsim = tic;
 
 
 
-for crit_load_lvl = [4 5 6 7] %%% Corresponding END around line 500 - after files have been saved
+for crit_load_lvl = [0 1 2 3 4 5 6 7];%%[4 5 6 7] %%% Corresponding END around line 500 - after files have been saved
     clearvars -except crit_load_lvl crit_load_lvl started_at startsim
 % crit_load_lvl = 5;
 % crit_load_lvl = [];
@@ -114,7 +114,7 @@ export_on = 1;
 %%%Transformer constraints on/off
 xfmr_on = 1;
 %%%Transformer limit adjustment
-t_alpha = 2;
+t_alpha = 1.25;
 
 
 %% SHITT
@@ -151,7 +151,9 @@ addpath(genpath('H:\_Research_\CEC_OVMG\Rates'))
 
 %% Loading/seperating building demand
 
-scenario = 'UES_2b'
+scenario = 'ues_2a_v2'
+
+% scenario = 'UES_2b'
 
 fprintf('%s: Loading UO Data.', datestr(now,'HH:MM:SS'))
 tic
@@ -167,6 +169,7 @@ bldg_rec = [];
 
 %% Loading Critical Loads
 if crit_load_lvl > 0
+%     elec_resiliency_full = xlsread(strcat('H:\_Research_\CEC_OVMG\URBANopt\Resiliency\UES_2a_Crit_Loads.xlsx'),strcat('Crit_Load_',num2str(crit_load_lvl)));
     elec_resiliency_full = xlsread(strcat('H:\_Research_\CEC_OVMG\URBANopt\Resiliency\',scenario,'_Crit_Loads.xlsx'),strcat('Crit_Load_',num2str(crit_load_lvl)));
 else
     elec_resiliency_full = [];
@@ -208,6 +211,8 @@ elseif sim_lvl == 3 && acpf_sim %%%If resiliency is examined on each individual 
 end
 
 %%
+
+
 for sim_idx = 1:sim_end
    %% Building indicies in the current simulation
     if sim_lvl == 1 && (acpf_sim == 0 || isempty(acpf_sim))
@@ -541,7 +546,7 @@ if isempty(crit_load_lvl) || crit_load_lvl == 0
     save(strcat(sc_txt,'_DdER'),'bldg')
 else
     save_here = 2
-    save(strcat(sc_txt,'_DER_Crit_Load_Circuit5_',num2str(crit_load_lvl)),'bldg')
+    save(strcat(sc_txt,'_DER_Crit_Load_Circuit3_',num2str(crit_load_lvl)),'bldg')
 end
 end
 return

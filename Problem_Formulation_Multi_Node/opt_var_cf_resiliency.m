@@ -75,9 +75,11 @@ if ~isempty(crit_load_lvl) && crit_load_lvl >0
         var_resiliency.qflow = sdpvar(B,size(elec_res,1),'full');
         var_resiliency.bus_voltage = sdpvar(N,size(elec_res,1),'full');
     else
-        var_resiliency.Pinj = zeros(N,size(elec_res,1));
-        var_resiliency.pflow = zeros(N,size(elec_res,1));
-        var_resiliency.bus_voltage = zeros(N,size(elec_res,1));
+        var_resiliency.Pinj = zeros(1,size(elec_res,1));
+         var_resiliency.Qinj = zeros(1,size(elec_res,1))
+        var_resiliency.pflow = zeros(1,size(elec_res,1));
+        var_resiliency.qflow = zeros(1,size(elec_res,1));
+        var_resiliency.bus_voltage = zeros(1,size(elec_res,1));
     end
     
     

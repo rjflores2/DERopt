@@ -58,7 +58,7 @@ ldb_on = 1; %Legacy Duct Burner
 lboil_on = 1; %Legacy boilers
 
 %% Utility PV Solar
-util_pv_wheel = 0; %General Wheeling Capabilities
+util_pv_wheel = 1; %General Wheeling Capabilities
 util_pv_wheel_lts = 0; %Wheeling for long term storage
 util_pp_import = 0; %Can import power at power plant node
 util_pp_export = 0; %Can import power at power plant node
@@ -86,7 +86,7 @@ h2_fuel_limit = [1];%0.1; %%%Fuel limit on an energy basis - should be 0.1
 %%% 1: current rate, which does not value export
 %%% 2: current import rate + LMP export rate
 %%% 3: LMP Rate + 0.2 and LMP Export
-uci_rate = 1;
+uci_rate = 3;
 
 island = 0;
 
@@ -446,9 +446,9 @@ if opt_now
     
     %%
     if isempty(co2_lim)
-        save('H:\_Tools_\UCI_Results\Sc17\Baseline.mat')
+        save('H:\_Tools_\UCI_Results\Sc19\Baseline.mat')
     else
-        save(strcat('H:\_Tools_\UCI_Results\Sc17\',num2str(100.*co2_lim_red),'_reduction.mat'))
+        save(strcat('H:\_Tools_\UCI_Results\Sc19\',num2str(100.*co2_lim_red),'_reduction.mat'))
     end
 end
 end
