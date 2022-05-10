@@ -426,7 +426,8 @@ end
 %% SOFC
 if sofc_on
     % Declaring Variables    
-    var_sofc.sofc_number = intvar(1,K,'full');      %%%SOFC installed capacity (kW)
+    var_sofc.sofc_number  = intvar(1,K,'full');    %%%SOFC number of purchased/installed units (#)
+    var_sofc.sofc_opstate = intvar(T,K,'full');    %%%SOFC number of operating SOFCs at each time(#)
     var_sofc.sofc_elec = sdpvar(T,K,'full');       %%%SOFC electricity produced (kWh) 
     var_sofc.sofc_heat = sdpvar(T,K,'full');       %%%SOFC heat produced (kWh) 
     if sofcwh_on
@@ -442,9 +443,11 @@ if sofc_on
         + sum(ng_cost * var_sofc.sofc_elec./sofc_v(3)) ;   %%% Fuel cost price of natural gas ($/kWh) - MUST BE CHECKED
 else
 %     var_sofc.sofc_adopt = zeros(1,K);
-    var_sofc.sofc_number= zeros(1,K);
+    var_sofc.sofc_number = zeros(1,K);
+    var_sofc.sofc_opstate = zeros(T,K);
     var_sofc.sofc_elec = zeros(T,K);
     var_sofc.sofc_heat = zeros(T,K);
+    
 end    
 %% ERWH
 if erwh_on
