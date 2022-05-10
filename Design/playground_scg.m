@@ -63,8 +63,8 @@ grid_import_on = 0;
 import_limit = .8;
 %%%Can export back to the grid
 export_on = 1;
-
-
+%%%Which NEM scenario applies? (2.0 or 3.0)
+nem_rate = 3.0;
 
 %%% Island operation (opt_nem.m)
 island = 0;
@@ -128,6 +128,8 @@ apartment_types = [0 0 1];
 
 %% Formatting Building Data
 
+%%%Climate Zone
+cz_name = 'CZ06';
 %%%Year to be simulated
 yr = 2025;
 

@@ -56,14 +56,14 @@ if sgip_on
 end
 %% Loading TDV Data
 %%%Loading Data
-tdv_elec_raw = readtable('TDV_C6.xlsx','Sheet','Elec'); %%%Elec (kbtu/kWh)
-tdv_gas_raw = readtable('TDV_C6.xlsx','Sheet','Gas'); %%%Gas (kbtu/therm)
+tdv_elec_raw = readtable(strcat('TDV_',cz_name,'.xlsx'),'Sheet','Elec'); %%%Elec (kbtu/kWh)
+tdv_gas_raw = readtable(strcat('TDV_',cz_name,'.xlsx'),'Sheet','Gas'); %%%Gas (kbtu/therm)
 
 %%%Which year are we looking at?
 yr_idx = find(strcmp(tdv_elec_raw.Properties.VariableNames,cellstr(strcat('x',mat2str(yr)))));
 tdv_elec = [];
 tdv_gas = [];
-tic
+
 %%%Extracting Relevant TDV and adjusting based on losses
 for ii = yr_idx:width(tdv_elec_raw)      
     
@@ -87,7 +87,32 @@ tdv_gas = interp1(tdv_time,tdv_gas,time);
 
 %%%Unit conversion for gas  - 1 therm = 29.3 kWh
 tdv_gas = tdv_gas./29.3;
-toc
+
+clear tdv_time
+
+%% Loading Avoided Cost Data (ACC)
+if nem_rate == 3
+    %%%Loading in raw data
+    acc_elec_raw = readtable(strcat('ACC_',cz_name,'.xlsx'),'Sheet','Hourly_Values'); %%%Avoided Cost ($/MWh)
+    
+    %%%Which year are we looking at?
+    yr_idx = find(strcmp(acc_elec_raw.Properties.VariableNames,cellstr(strcat('x',mat2str(yr)))));
+    
+    acc_elec = [];
+    %%%Extracting Relevant TDV and adjusting based on losses
+    for ii = yr_idx:width(tdv_elec_raw)
+        acc_elec = [acc_elec
+            table2array(acc_elec_raw(:,ii))];
+    end
+    
+    acc_time = [];
+    acc_time = datenum(([yr 1 1 0 0 0]));
+    for ii = 2:size(acc_elec,1)
+        acc_time(ii,1) = acc_time(ii-1,1) + 1/24;
+    end
+    %%%Extracting TDV of interest
+    acc_elec = interp1(acc_time,acc_elec,time);
+end
 %% Locating Summer Months
 summer_month = [];
 counter = 1;
