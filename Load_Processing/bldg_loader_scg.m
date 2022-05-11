@@ -28,6 +28,52 @@ stpts=1;
 
 day_cnt = 1;
 day_stpts = 1;
+if isempty(mth)
+    for ii = 2:length(time)
+        if datetimev(ii,2) ~= datetimev(ii-1,2)
+            endpts(end_cnt,1) = ii-1;
+            stpts(end_cnt+1,1) = ii;
+            end_cnt = end_cnt +1;
+        end
+        
+        if datetimev(ii,3) ~= datetimev(ii-1,3)
+            day_endpts(day_cnt,1) = ii-1;
+            day_stpts(day_cnt+1,1) = ii;
+            day_cnt = day_cnt +1;
+        end
+        
+        if ii == length(time);
+            endpts(end_cnt,1) = ii;
+            day_endpts(day_cnt,1) = ii;
+        end
+    end
+end
+%% Filtering months 
+if ~isempty(mth)
+    
+    %%%Finding indicies for months of interest
+    idx = find(ismember(datetimev(:,2),mth));
+   
+    %%%Cutting down data files
+   time = time(idx);
+   elec = elec(idx);
+   cool = cool(idx);
+   heat = heat(idx);
+   hotwater = hotwater(idx);
+   misc_gas = misc_gas(idx);
+   solar = solar(idx);
+   
+   
+
+%%%Date vectors for all time stamps
+datetimev=datevec(time);
+%%% Finding month start/endpoints
+
+end_cnt = 1;
+stpts=1;
+
+day_cnt = 1;
+day_stpts = 1;
 for ii = 2:length(time)
     if datetimev(ii,2) ~= datetimev(ii-1,2)
         endpts(end_cnt,1) = ii-1;
@@ -45,6 +91,8 @@ for ii = 2:length(time)
         endpts(end_cnt,1) = ii;
         day_endpts(day_cnt,1) = ii;
     end
+end
+   
 end
 %% Loading SGIP CO2 Signal
 if sgip_on

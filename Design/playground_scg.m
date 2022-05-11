@@ -134,8 +134,6 @@ maxpv = 2000000;
 %%% Col2: low-income for profit units
 %%% Col3: >200% poverty limit units
 apartment_types = [0 0 1];
-%
-
 
 %% Formatting Building Data
 
@@ -143,6 +141,8 @@ apartment_types = [0 0 1];
 cz_name = 'CZ06';
 %%%Year to be simulated
 yr = 2040;
+%%%Month filter - use during development/debugging
+mth = [7];
 
 bldg_loader_scg
 
