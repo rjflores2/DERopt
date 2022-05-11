@@ -58,7 +58,7 @@ if ~isempty(mth)
    heat = heat(idx);
    hotwater = hotwater(idx);
    misc_gas = misc_gas(idx);
-   
+   solar = solar(idx);
    
    
 

@@ -147,7 +147,7 @@ yr = 2040;
 mth = 7;
 
 bldg_loader_scg
-return
+
 %% Utility Data
 %%%Loading Utility Data and Generating Energy Charge Vectors
 utility_elec

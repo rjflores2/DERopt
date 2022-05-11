@@ -83,12 +83,12 @@ if ~isempty(crit_load_lvl) && crit_load_lvl >0
     
 else
     
-    var_resiliency.pv_elec = zeros(endpts(2),K);
-    var_resiliency.ees_chrg = zeros(endpts(2),K);
-    var_resiliency.ees_dchrg = zeros(endpts(2),K);
-    var_resiliency.ees_soc = zeros(endpts(2),K);
-    var_resiliency.import = zeros(endpts(2),K);
-    var_resiliency.export = zeros(endpts(2),K);
+    var_resiliency.pv_elec = zeros(endpts(1),K);
+    var_resiliency.ees_chrg = zeros(endpts(1),K);
+    var_resiliency.ees_dchrg = zeros(endpts(1),K);
+    var_resiliency.ees_soc = zeros(endpts(1),K);
+    var_resiliency.import = zeros(endpts(1),K);
+    var_resiliency.export = zeros(endpts(1),K);
     var_resiliency.Pinj = 0;
      var_resiliency.Qinj = 0;
     var_resiliency.pflow = 0;
