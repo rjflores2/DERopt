@@ -143,9 +143,11 @@ apartment_types = [0 0 1];
 cz_name = 'CZ06';
 %%%Year to be simulated
 yr = 2040;
+%%%Month filter - use during development/debugging
+mth = 7;
 
 bldg_loader_scg
-
+return
 %% Utility Data
 %%%Loading Utility Data and Generating Energy Charge Vectors
 utility_elec
