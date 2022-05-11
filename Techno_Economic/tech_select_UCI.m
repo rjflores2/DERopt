@@ -3,7 +3,7 @@
 %% Utility
 utility_exists=1;
 
-%% Solar PV
+%% Onsite Solar PV
 if pv_on
     %%% Cap cost ($/kW)
     %%% Efficiency / Conversion Percent at 1 kW/m^2
@@ -11,9 +11,10 @@ if pv_on
     
     %pv_v=[3500; 0.2 ; 0.001];
     
-    pv_v=[3000; 0.2 ; 0.001];
+%     pv_v=[3000; 0.2 ; 0.001];
 %     pv_v=[2650; 0.2 ; 0.001];
     
+    pv_v = [900; 0.2; 0.001];
     
     %%%How pv capital cost is modified for different types of buildings
     pv_cap_mod = [2/2.65 %%%Commercial/industrial
@@ -24,6 +25,10 @@ if pv_on
         5; ... %%%MACRS Schedule
         1]; ... %%%ITC Benefit
         
+    pv_fin = [0; ... %%%Scaling linear factor - Based on Lazards cost of electricity
+        5; ... %%%MACRS Schedule
+        1]; ... %%%ITC Benefit
+    
     % pv_fin = [-0.4648; ... %%%Scaling linear factor - Based on Lazards cost of electricity
     %     0; ... %%%MACRS Schedule
     %     0]; ... %%%ITC Benefit
@@ -52,7 +57,7 @@ if util_solar_on
     utilpv_v = [900; 0.2; 0.001];
     
     %%%Financial Aspects - Solar PV
-    utilpv_fin = [0; ... %%%Scaling linear factor - Based on Lazards cost of electricity
+    utilpv_fin =[0; ... %%%Scaling linear factor - Based on Lazards cost of electricity
         5; ... %%%MACRS Schedule
         1]; ... %%%ITC Benefit
 else
@@ -182,23 +187,27 @@ else
     h2es_v = [];
 end
 
-%% Reversible electroyzer
-% Source:
-% https://www.hydrogen.energy.gov/pdfs/review20/fc332_wei_2020_o.pdf -
-% Slide 26
-%%% (1) Capital Cost ($/kW H2 produced)
-%%% (2) Variable O&M ($/kWh H2 produced)
-%%% (3) Electrolyzer efficiency (kWh H2/kWh elec)
-%%% (4) Fuel Cell Efficiency (kWh elec/kWh H2)
-%%% (5) Ratio of electrolyzer electricity in to fuel cell capacity (kW electrolyzer input / kW fuel cell output
-%%% (6) Minimum load fraction 
-%%% (7) Ramp Limit
+%% Reversible Solid Oxide Cell [SOFC+SOEC]
+if rsoc_on
+    % Source:
+    % https://www.hydrogen.energy.gov/pdfs/review20/fc332_wei_2020_o.pdf -
+    % Slide 26
+    %%% (1) Capital Cost ($/kW H2 produced)
+    %%% (2) Variable O&M ($/kWh H2 produced)
+    %%% (3) Electrolyzer efficiency (kWh H2/kWh elec)
+    %%% (4) Fuel Cell Efficiency (kWh elec/kWh H2)
+    %%% (5) Ratio of electrolyzer electricity in to fuel cell capacity (kW electrolyzer input / kW fuel cell output
+    %%% (6) Minimum load fraction 
+    %%% (7) Ramp Limit
 
-rsoc_v = [1120*.12/12; 0.02; 0.83; 0.53; 1.816; 0.1; 0.1];
-% rsoc_v = [10*.12/12;0.01;1;1;1.5];
+    rsoc_v = [1120*.12/12; 0.02; 0.83; 0.53; 1.816; 0.1; 0.1];
+    % rsoc_v = [10*.12/12;0.01;1;1;1.5];
 
-%%%Dummy variable for reversible SOC capital cost
-rsoc_mthly_debt = rsoc_v(1);
+    %%%Dummy variable for reversible SOC capital cost
+    rsoc_mthly_debt = rsoc_v(1);
+else
+    rsoc_v = [];
+end
 
 %% Renewable Electrolyzer (rel)
 if rel_on

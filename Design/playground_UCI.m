@@ -20,14 +20,15 @@ rees_on = 1;  %Turn on REES
 rees_op_state = 1; % Turn on REES constraint
 
 %%%Community/Utility Scale systems
-util_solar_on = 1;
-util_ees_on = 1;
+util_solar_on = 0;
+util_ees_on = 0;
 
 %%%Hydrogen technologies
 el_on = 1; %Turn on generic electrolyer
 rel_on = 1; %Turn on renewable tied electrolyzer
 h2es_on = 1; %Hydrogen energy storage
 hrs_on = 0; %Turn on hydrogen fueling station
+rsoc_on = 1; % Turn on reversible solid oxide cell (added by cyc)
 
 %% Legacy System Toggles
 lpv_on = 1; %Turn on legacy PV
@@ -46,7 +47,7 @@ lboil_on = 1; %Legacy boilers
 %%% 1: current rate, which does not value export
 %%% 2: current import rate + LMP export rate
 %%% 3: LMP Rate + 0.2 and LMP Export
-uci_rate = 3;
+uci_rate = 1;
 
 island = 0;
 
@@ -61,26 +62,20 @@ gen_export_on = 1; %%%Placed a "general export" capability in the general electr
 %%%Available biogas/renewable gas per year (biogas limit is prorated in the model to the
 %%%simulation period)
 %%%Used in opt_gen_inequalities
-biogas_limit = [144E6];%144E6; %kWh biofuel available per year
-
+% biogas_limit = [144E6];%144E6; %kWh biofuel available per year
+biogas_limit = 0;
 %%%Required fuel input
 %%%Used in opt_gen_inequalities
 h2_fuel_forced_fraction = []; %%%Energy fuel requirements
 
 %%%H2 fuel limit in legacy generator
-h2_fuel_limit = 0.1;%[];%0.15; %%%Fuel limit on an energy basis - should be 0.1
+h2_fuel_limit = 1;%[];%0.15; %%%Fuel limit on an energy basis - should be 0.1
 
-%%%CO2 Limit
+% CO2 Limit
 % For a complete year in 2018, CO2 emission is 1.3365E8 lbs.
 % co2_lim = 35785283.5020413*(1-80/100);%10735500;%[];%3.5785e+07;%1.2220e+07*0.5;
-%% Turning technologies on/off (opt_var_cf.m and tech_select.m)
-%%%CO2 Limit
-% co2_lim = [2.3862e+07*.3];%1.2220e+07*0.5;
-% co2_lim = [1.2051e+07*0.6];
-% co2_lim = [8.83E+06];
-co2_lim = [];%[2.3862e+07*.3];%1.2220e+07*0.5;
-% co2_lim = [ 0*1.2363e+07];%1.2220e+07*0.5;
-% co2_lim = [];
+% Turning technologies on/off (opt_var_cf.m and tech_select.m)
+co2_lim = 19381235.65;
 
 %% Turning incentives and other financial tools on/off
 sgip_on = 0;
@@ -98,7 +93,7 @@ ldg_off = 0;
 %%%maxpv is maximum capacity that can be installed. If includes different
 %%%orientations, set maxpv to row vector: for example maxpv =
 %%%[max_north_capacity  max_east/west_capacity  max_flat_capacity  max_south_capacity]
-maxpv = [30000];% ; %%%Maxpv 
+maxpv = [300000];% ; %%%Maxpv 
 toolittle_pv = 0; %%% Forces solar PV adoption - value is defined by toolittle_pv value - kW
 curtail = 0; %%%Allows curtailment is = 1
 %% EES (opt_ees.m & opt_rees.m)
@@ -154,20 +149,20 @@ addpath('H:\_Research_\CEC_OVMG\DERopt')
 
 %%%SGIP CO2 Signal
 addpath('H:\Data\CPUC_SGIP_Signal')
-addpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Data')
+addpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Data') % cyc home computer
 addpath('C:\Users\cyc\OneDrive - University of California - Irvine\DERopt (Office)\Data')
 
 %%% CO2 Signal Path
 addpath('H:\Data\Emission_Factors')
-addpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Data\Emission_Factors')
+addpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Data\Emission_Factors') % cyc home computer
 addpath('C:\Users\cyc\OneDrive - University of California - Irvine\DERopt (Office)\Data\Emission_Factors')
 
 %% Loading building demand
 
 %%%Loading Data
 %dt = load('H:\Data\UCI\Campus_Loads_2014_2019.mat');
-%dt = load('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Data\Campus_Loads_2014_2019.mat');
-dt = load('C:\Users\cyc\OneDrive - University of California - Irvine\DERopt (Office)\Data\Campus_Loads_2014_2019.mat');
+dt = load('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Data\Campus_Loads_2014_2019.mat');
+%dt = load('C:\Users\cyc\OneDrive - University of California - Irvine\DERopt (Office)\Data\Campus_Loads_2014_2019.mat');
 heat = dt.loads.heating;
 time = dt.loads.time;
 

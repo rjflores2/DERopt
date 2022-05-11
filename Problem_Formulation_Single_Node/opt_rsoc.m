@@ -10,9 +10,10 @@ if ~isempty(rsoc_v)
             'rSOC electricity Production'
         (-var_rsoc.rsoc_adopt*(rsoc_v(7)/e_adjust/rsoc_v(5)) <= var_rsoc.rsoc_prod(2:size(var_rsoc.rsoc_prod,1)) - ...
             var_rsoc.rsoc_prod(1:size(var_rsoc.rsoc_prod,1) - 1) <= var_rsoc.rsoc_adopt*(rsoc_v(7)/e_adjust/rsoc_v(5))):...
-            'rSOC hydrogen Production'
-         (var_rsoc.rsoc_elec(:,ii) <= var_rsoc.rsoc_bin(:,ii)*10000):'RSOC Elec Op State'
-         (var_rsoc.rsoc_prod(:,ii) <= (1 - var_rsoc.rsoc_bin(:,ii))*10000):'RSOC H2 Op State'];
+            'rSOC hydrogen Production'];
+% Temp opt out.
+%          (var_rsoc.rsoc_elec(:,ii) <= var_rsoc.rsoc_bin(:,ii)*10000):'RSOC Elec Op State'
+%          (var_rsoc.rsoc_prod(:,ii) <= (1 - var_rsoc.rsoc_bin(:,ii))*10000):'RSOC H2 Op State'];
 %     
     %%% START RJF deactivated constraints
     

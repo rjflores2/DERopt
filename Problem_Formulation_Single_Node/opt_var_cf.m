@@ -539,7 +539,7 @@ if ~isempty(dg_legacy)
     %%% (Time Instances) / On/Off length
     %     (dg_legacy(end,i)/t_step)
     %     ldg_off=binvar(ceil(length(time)/(dg_legacy(end,i)/t_step)),K,'full');
-    var_ldg.ldg_off = [];
+%     var_ldg.ldg_off = [];
         
     %%%If hydrogen production is an option
     if ~isempty(el_v) || ~isempty(rel_v) || ~isempty(rsoc_v)
@@ -558,9 +558,9 @@ if ~isempty(dg_legacy)
     %%%If including cycling costs
     if ~isempty(dg_legacy_cyc)
         %%%Only consider if on/off behavior is allowed
-        if ~isempty(var_ldg.ldg_off)
-            %%%Fill in later
-        end
+%         if ~isempty(var_ldg.ldg_off)
+%             %%%Fill in later
+%         end
         
         %%%Ramping costs
         if ~isempty(dg_legacy_cyc) && dg_legacy_cyc(2,:) > 0 %%%Only include if cycling costs is nonzero
