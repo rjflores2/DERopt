@@ -51,9 +51,10 @@ end
 %% Filtering months 
 if ~isempty(mth)
     
+    %%%Finding indicies for months of interest
     idx = find(ismember(datetimev(:,2),mth));
-%    idx = find(datetimev(:,2) == mth);
    
+    %%%Cutting down data files
    time = time(idx);
    elec = elec(idx);
    cool = cool(idx);
