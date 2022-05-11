@@ -80,7 +80,18 @@ addpath('H:\_Research_\CEC_OVMG\URBANopt\UO_Results_0.5.x')
 
 %%%DERopt paths
 addpath(genpath('H:\_Tools_\DERopt\Data'))
+%%% pm paths
+%%%DERopt paths - Pegah
+addpath(genpath('C:\Users\19498\Documents\GitHub\DERopt\Data'))
+addpath(genpath('C:\Users\19498\Documents\GitHub\DERopt\Design'))
+addpath(genpath('C:\Users\19498\Documents\GitHub\DERopt\Input_Data'))
+addpath(genpath('C:\Users\19498\Documents\GitHub\DERopt\Load_Processing'))
+addpath(genpath('C:\Users\19498\Documents\GitHub\DERopt\Post_Processing'))
+addpath(genpath('C:\Users\19498\Documents\GitHub\DERopt\Problem_Formulation_Multi_Node'))
+addpath(genpath('C:\Users\19498\Documents\GitHub\DERopt\Techno_Economic'))
+addpath(genpath('C:\Users\19498\Documents\GitHub\DERopt\Utilities'))
 
+%%% rjf paths
 addpath(genpath('H:\_Tools_\SCG_DERopt\DERopt\Design'))
 addpath(genpath('H:\_Tools_\SCG_DERopt\DERopt\Input_Data'))
 addpath(genpath('H:\_Tools_\SCG_DERopt\DERopt\Load_Processing'))
