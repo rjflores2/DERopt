@@ -17,7 +17,7 @@ if opt_now==1
     options = cplexoptimset;
     options.Display='on';
     %     options.MaxTime = 2*3600;
-    options.MaxNodes = 100;
+    options.MaxNodes = 100000;
     
     
     fprintf('%s Starting CPLEX Solver \n', datestr(now,'HH:MM:SS'))

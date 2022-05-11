@@ -50,7 +50,9 @@ if isempty(mth)
 end
 %% Filtering months 
 if ~isempty(mth)
-   idx = find( datetimev(:,2) == mth);
+    
+    idx = find(ismember(datetimev(:,2),mth));
+%    idx = find(datetimev(:,2) == mth);
    
    time = time(idx);
    elec = elec(idx);

@@ -3,7 +3,7 @@ if ~isempty(sofc_v)
     for i=1:K
             Constraints = [Constraints
                 (var_sofc.sofc_opstate <= var_sofc.sofc_number):'Limit operating SOFCs to purchased SOFC'  % # operating SOFC limit
-                (0.1*sofc_v(5)*var_sofc.sofc_opstate(:,i) <= var_sofc.sofc_elec(:,i) <= sofc_v(5)*var_sofc.sofc_opstate(:,i)):'Max elec limited by operating SOFCs'    % electricity generation
+                (0.5*sofc_v(5)*var_sofc.sofc_opstate(:,i) <= var_sofc.sofc_elec(:,i) <= sofc_v(5)*var_sofc.sofc_opstate(:,i)):'Max elec limited by operating SOFCs'    % electricity generation
                 ((sofc_v(4)*var_sofc.sofc_elec(:,i))/sofc_v(3) == var_sofc.sofc_heat(:,i)):'SOFC Heat Generation' %Cogenerated heat by SOFC
                 (var_sofc.sofc_wh(:,i) <= var_sofc.sofc_heat(:,i)):'Max heat limited by SOFC capacity'  %the heat used for water heating cannot be more than available heat from CHP_SOFC
                 ((-sofc_v(6)* sofc_v(5)*var_sofc.sofc_opstate(2:end,i)) <= (var_sofc.sofc_elec(2:end,i) - var_sofc.sofc_elec(1:end-1,i)) <= (sofc_v(6)* sofc_v(5)* var_sofc.sofc_opstate(2:end,i))):'SOFC ramp rate'];
