@@ -80,7 +80,6 @@ addpath('H:\_Research_\CEC_OVMG\URBANopt\UO_Results_0.5.x')
 
 %%%DERopt paths
 addpath(genpath('H:\_Tools_\DERopt\Data'))
-
 addpath(genpath('H:\_Tools_\SCG_DERopt\DERopt\Design'))
 addpath(genpath('H:\_Tools_\SCG_DERopt\DERopt\Input_Data'))
 addpath(genpath('H:\_Tools_\SCG_DERopt\DERopt\Load_Processing'))
@@ -131,7 +130,7 @@ apartment_types = [0 0 1];
 %%%Climate Zone
 cz_name = 'CZ06';
 %%%Year to be simulated
-yr = 2025;
+yr = 2040;
 
 bldg_loader_scg
 

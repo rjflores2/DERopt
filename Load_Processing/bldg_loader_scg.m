@@ -56,7 +56,7 @@ if sgip_on
 end
 %% Loading TDV Data
 %%%Loading Data
-tdv_elec_raw = readtable(strcat('TDV_',cz_name,'.xlsx'),'Sheet','Elec'); %%%Elec (kbtu/kWh)
+tdv_elec_raw = readtable(strcat('TDV_',cz_name,'.xlsx'),'Sheet','Elec'); %%%Elec (Btu/kWh)
 tdv_gas_raw = readtable(strcat('TDV_',cz_name,'.xlsx'),'Sheet','Gas'); %%%Gas (kbtu/therm)
 
 %%%Which year are we looking at?
@@ -85,8 +85,12 @@ end
 tdv_elec = interp1(tdv_time,tdv_elec,time);
 tdv_gas = interp1(tdv_time,tdv_gas,time);
 
-%%%Unit conversion for gas  - 1 therm = 29.3 kWh
-tdv_gas = tdv_gas./29.3;
+%%%Unit conversion for elec - 3412.14 btu/kWh (units are kWh primary energy/kWh electricity)
+tdv_elec = tdv_elec./3412.14; %./1000; %kWh/kWh
+
+%%%Unit conversion for gas  - 1 therm = 100 kbtu. Conversion becomes
+%%%unitless
+tdv_gas = tdv_gas./100; %kWh/kWh
 
 clear tdv_time
 
@@ -111,7 +115,7 @@ if nem_rate == 3
         acc_time(ii,1) = acc_time(ii-1,1) + 1/24;
     end
     %%%Extracting TDV of interest
-    acc_elec = interp1(acc_time,acc_elec,time);
+    acc_elec = interp1(acc_time,acc_elec,time)./1000; % $/kWh
 end
 %% Locating Summer Months
 summer_month = [];
