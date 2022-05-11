@@ -82,9 +82,9 @@ addpath('H:\_Research_\CEC_OVMG\URBANopt\UO_Results_0.5.x')
 addpath(genpath('H:\_Tools_\DERopt\Data'))
 %%% pm paths
 %%%DERopt paths - Pegah
-addpath(genpath('C:\Users\19498\Documents\GitHub\DERopt\Data'))
 addpath(genpath('C:\Users\19498\Documents\GitHub\DERopt\Design'))
 addpath(genpath('C:\Users\19498\Documents\GitHub\DERopt\Input_Data'))
+addpath(genpath('C:\Users\19498\Documents\GitHub\DERopt\Data'))
 addpath(genpath('C:\Users\19498\Documents\GitHub\DERopt\Load_Processing'))
 addpath(genpath('C:\Users\19498\Documents\GitHub\DERopt\Post_Processing'))
 addpath(genpath('C:\Users\19498\Documents\GitHub\DERopt\Problem_Formulation_Multi_Node'))
@@ -164,6 +164,7 @@ tech_legacy_OVMG
 % low_income = 1;
 %%%Capital cost mofificaitons
 cap_cost_mod
+%% Building and run model
 
 if opt_now
     %% DERopt

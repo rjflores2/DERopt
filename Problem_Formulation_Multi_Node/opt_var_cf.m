@@ -427,7 +427,7 @@ end
 if sofc_on
     % Declaring Variables    
     var_sofc.sofc_number  = intvar(1,K,'full');    %%%SOFC number of purchased/installed units (#)
-    var_sofc.sofc_opstate = intvar(1,K,'full');    %%%SOFC number of operating SOFCs at each time(#)
+    var_sofc.sofc_opstate = intvar(T,K,'full');    %%%SOFC number of operating SOFCs at each time(#)
     var_sofc.sofc_elec = sdpvar(T,K,'full');       %%%SOFC electricity produced (kWh) 
     var_sofc.sofc_heat = sdpvar(T,K,'full');       %%%SOFC heat produced (kWh) 
     if sofcwh_on
@@ -444,7 +444,7 @@ if sofc_on
 else
 %     var_sofc.sofc_adopt = zeros(1,K);
     var_sofc.sofc_number = zeros(1,K);
-    var_sofc.sofc_opstate = zeros(1,K);
+    var_sofc.sofc_opstate = zeros(T,K);
     var_sofc.sofc_elec = zeros(T,K);
     var_sofc.sofc_heat = zeros(T,K);
     

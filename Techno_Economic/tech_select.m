@@ -85,8 +85,8 @@ end
 %% SOFC
 if  sofc_on
 
-    sofc_v = [3000   %%% 1: Capital cost ($/kWel) C_fc
-          0.06*3000  %%% 2: O&M ($/kW/yr generated) 6 Yearly % of TIC(Total Installed Cost) % of the purchasing cost (4–10%) 
+    sofc_v = [50   %%% 1: Capital cost ($/kWel) C_fc
+          0.06*50  %%% 2: O&M ($/kW/yr generated) 6 Yearly % of TIC(Total Installed Cost) % of the purchasing cost (4–10%) 
           0.6        %%% 3: SOFC electrical efficiency at nominal condition (fraction)     
           0.3        %%% 4: SOFC thermal efficiency at nominal condition (fraction)          
           0.5        %%% 5: Minimum SOFC capacity is 500 Watt- 0.5 kW increments
