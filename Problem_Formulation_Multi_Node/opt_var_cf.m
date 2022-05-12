@@ -455,7 +455,7 @@ if erwh_on
     % Declaring Variables
     var_erwh.erwh_adopt = sdpvar(1,K,'full');      %%%ERWH installed capacity (kW)
     var_erwh.erwh_elec = sdpvar(T,K,'full');       %%%ERWH electricity consumed (kWh) 
-    var_erwh.erwh_heat = sdpvar(T,K,'full');       %%%ERWH heat produced (kWh) 
+%     var_erwh.erwh_heat = sdpvar(T,K,'full');       %%%ERWH heat produced (kWh) 
     % ERWH cost function 
    Objective = Objective...
         + sum(M*erwh_mthly_debt.*var_erwh.erwh_adopt)...  %%%Annual investment/Capital Cost ($/kW)*(kW)
@@ -466,14 +466,14 @@ if erwh_on
 else
     var_erwh.erwh_adopt = zeros(1,K);      
     var_erwh.erwh_elec = zeros(T,K);        
-    var_erwh.erwh_heat = zeros(T,K);         
+%     var_erwh.erwh_heat = zeros(T,K);         
 end
 %% GWH
 if gwh_on
     % Declaring Variables
     var_gwh.gwh_adopt = sdpvar(1,K,'full');      %%%GWH installed capacity (kW)
     var_gwh.gwh_gas = sdpvar(T,K,'full');       %%%GWH gas consumed (kWh) 
-    var_gwh.gwh_heat = sdpvar(T,K,'full');       %%%GWH heat produced (kWh) 
+%     var_gwh.gwh_heat = sdpvar(T,K,'full');       %%%GWH heat produced (kWh) 
     % GWH cost function 
    Objective = Objective...
         + sum(M*gwh_mthly_debt.*var_gwh.gwh_adopt)...  %%%Annual investment/Capital Cost ($/kW)*(kW)
@@ -481,7 +481,7 @@ if gwh_on
 else
     var_gwh.gwh_adopt = zeros(1,K);        
     var_gwh.gwh_gas = zeros(T,K);         
-    var_gwh.gwh_heat = zeros(T,K);   
+%     var_gwh.gwh_heat = zeros(T,K);   
     
 end
 
@@ -490,7 +490,7 @@ if gsph_on
     % Declaring Variables
     var_gsph.gsph_adopt = sdpvar(1,K,'full');      %%%GSPH installed capacity (kW)
     var_gsph.gsph_gas = sdpvar(T,K,'full');       %%%GSPH gas consumed (kWh) 
-    var_gsph.gsph_heat = sdpvar(T,K,'full');       %%%GSPH heat produced (kWh) 
+%     var_gsph.gsph_heat = sdpvar(T,K,'full');       %%%GSPH heat produced (kWh) 
     % GSPH cost function 
    Objective = Objective...
         + sum(M*gsph_mthly_debt.*var_gsph.gsph_adopt)...  %%%Annual investment/Capital Cost ($/kW)*(kW)
@@ -498,7 +498,7 @@ if gsph_on
 else
     var_gsph.gsph_adopt = zeros(1,K);        
     var_gsph.gsph_gas = zeros(T,K);         
-    var_gsph.gsph_heat = zeros(T,K);    
+%     var_gsph.gsph_heat = zeros(T,K);    
 end
 
 %% ERSPH
@@ -506,7 +506,7 @@ if ersph_on
     % Declaring Variables
     var_ersph.ersph_adopt = sdpvar(1,K,'full');      %%%ERSPH installed capacity (kW)
     var_ersph.ersph_elec = sdpvar(T,K,'full');       %%%ERSPH electricity consumed (kWh) 
-    var_ersph.ersph_heat = sdpvar(T,K,'full');       %%%ERSPH heat produced (kWh) 
+%     var_ersph.ersph_heat = sdpvar(T,K,'full');       %%%ERSPH heat produced (kWh) 
     % ERSPH cost function 
    Objective = Objective...
         + sum(M*ersph_mthly_debt.*var_ersph.ersph_adopt)...  %%%Annual investment/Capital Cost ($/kW)*(kW)
@@ -514,5 +514,5 @@ if ersph_on
 else
     var_ersph.ersph_adopt = zeros(1,K);        
     var_ersph.ersph_elec = zeros(T,K);         
-    var_ersph.ersph_heat = zeros(T,K);    
+%     var_ersph.ersph_heat = zeros(T,K);    
 end

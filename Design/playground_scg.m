@@ -178,12 +178,12 @@ if opt_now
     elapsed = toc;
     fprintf('Took %.2f seconds \n', elapsed)
     %% Adding resiliency and reliability varialbes
-        fprintf('%s: Resileincy Varaibles and Objective Funciton.', datestr(now,'HH:MM:SS'))
-        tic
-        opt_var_cf_resiliency %%%Added NEM and wholesale export to the PV Section
-        elapsed = toc;
-        fprintf('Took %.2f seconds \n', elapsed)
-        % return
+    fprintf('%s: Resileincy Varaibles and Objective Funciton.', datestr(now,'HH:MM:SS'))
+    tic
+    opt_var_cf_resiliency %%%Added NEM and wholesale export to the PV Section
+    elapsed = toc;
+    fprintf('Took %.2f seconds \n', elapsed)
+    % return
     %% General Equality Constraints
     fprintf('%s: General Equalities.', datestr(now,'HH:MM:SS'))
     tic
@@ -280,7 +280,7 @@ if opt_now
     %% Optimize
     fprintf('%s: Optimizing \n....', datestr(now,'HH:MM:SS'))
     WHATS_THE_CRITICAL_LOAD = crit_load_lvl
-    return
+    
     opt
  
     %% Timer
