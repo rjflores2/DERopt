@@ -70,6 +70,17 @@ if ~isempty(gwh_v)
     end
 end
 
+%%% GSPH
+if ~isempty(gsph_v)
+    for ii=1:size(gsph_v,2)
+        gsph_mthly_debt(ii,1)=gsph_v(1,ii)*((1-equity)*(interest*(1+interest)^(period*12))...
+            /((1+interest)^(period*12)-1)+...%%%Money to pay back bank  $/month/kW
+            req_return_on*(equity)*(required_return*(1+required_return)^(period*12))...
+            /((1+required_return)^(period*12)-1));
+    end
+end
+
+
 %%%Generic electrolyzer
 if ~isempty(el_v)
     for ii=1:size(el_v,2)
