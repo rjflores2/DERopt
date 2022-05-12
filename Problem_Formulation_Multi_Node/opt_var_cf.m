@@ -426,10 +426,10 @@ end
 %% SOFC
 if sofc_on
     % Declaring Variables
-    var_sofc.sofc_number  = intvar(1,K,'full');    %%%SOFC number of purchased/installed units (#)
-    var_sofc.sofc_opstate = intvar(T,K,'full');    %%%SOFC number of operating SOFCs at each time(#)
+    var_sofc.sofc_adopt  = intvar(1,K,'full');    %%%SOFC number of purchased/installed units (#)
+    var_sofc.sofc_op = intvar(T,K,'full');    %%%SOFC number of operating SOFCs at each time(#)
     var_sofc.sofc_elec = sdpvar(T,K,'full');       %%%SOFC electricity produced (kWh)
-    var_sofc.sofc_heat = sdpvar(T,K,'full');       %%%SOFC heat produced (kWh)
+%     var_sofc.sofc_heat = sdpvar(T,K,'full');       %%%SOFC heat produced (kWh)
     if sofcwh_on
         var_sofc.sofc_wh = sdpvar(T,K,'full');         %%%SOFC heat produced used for water heating(kWh)
     else
@@ -439,15 +439,15 @@ if sofc_on
     %var_sofc.sofc_fuel = sdpvar(T,K,'full');       %%%Fuel consumption (kWh)
     % SOFC cost function (ref: Ettore Bompard, IJHE)
     Objective = Objective...
-        + sum(M*sofc_mthly_debt.*var_sofc.sofc_number)...  %%%Annual investment/Capital Cost ($/kW)*(kW)
-        + sum((sofc_v(2).* var_sofc.sofc_number))... %%% O&M ($/kW/yr)*(kW)
+        + sum(M*sofc_mthly_debt.*var_sofc.sofc_adopt)...  %%%Annual investment/Capital Cost ($/kW)*(kW)
+        + sum((sofc_v(2).* var_sofc.sofc_adopt))... %%% O&M ($/kW/yr)*(kW)
         + sum(ng_cost * var_sofc.sofc_elec./sofc_v(3)) ;   %%% Fuel cost price of natural gas ($/kWh) - MUST BE CHECKED
 else
     %     var_sofc.sofc_adopt = zeros(1,K);
-    var_sofc.sofc_number = zeros(1,K);
-    var_sofc.sofc_opstate = zeros(T,K);
+    var_sofc.sofc_adopt = zeros(1,K);
+    var_sofc.sofc_op = zeros(T,K);
     var_sofc.sofc_elec = zeros(T,K);
-    var_sofc.sofc_heat = zeros(T,K);
+%     var_sofc.sofc_heat = zeros(T,K);
     
 end
 %% ERWH
