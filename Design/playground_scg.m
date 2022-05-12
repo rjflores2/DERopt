@@ -280,6 +280,7 @@ if opt_now
     %% Optimize
     fprintf('%s: Optimizing \n....', datestr(now,'HH:MM:SS'))
     WHATS_THE_CRITICAL_LOAD = crit_load_lvl
+    return
     opt
  
     %% Timer
