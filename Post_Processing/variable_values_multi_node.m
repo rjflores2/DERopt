@@ -41,9 +41,16 @@ end
 
 %% GSPH Values
 if ~isempty(gsph_v)  
-var_gsph.gsph_adopt = value(var_gsph.gsph_adopt);      %%%GSPH installed capacity (kW)
+var_gsph.gsph_adopt = value(var_gsph.gsph_adopt);      %%% installed capacity (kW)
 var_gsph.gsph_gas = value(var_gsph.gsph_gas);       %%%GSPH gas consumed (kWh) 
 var_gsph.gsph_heat = value(var_gsph.gsph_heat);       %%%GSPH heat produced (kWh) 
+end
+
+%% ERSPH Values
+if ~isempty(ersph_v)  
+var_ersph.ersph_adopt = value(var_ersph.ersph_adopt);      %%%ERSPH installed capacity (kW)
+var_ersph.ersph_elec = value(var_ersph.ersph_elec);       %%%ERSPH gas consumed (kWh) 
+var_ersph.ersph_heat = value(var_ersph.ersph_heat);       %%%ERSPH heat produced (kWh) 
 end
 
 %% Legacy EES Values

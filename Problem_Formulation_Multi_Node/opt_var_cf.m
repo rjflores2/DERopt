@@ -1,6 +1,6 @@
 %% Declaring decision variables and setting up cost function
 yalmip('clear')
-clear var_util var_pv var_ees var_rees var_sgip var_sofc var_erwh var_gwh var_gsph
+clear var_util var_pv var_ees var_rees var_sgip var_sofc var_erwh var_gwh var_gsph var_ersph
 Constraints=[];
 
 T = length(time);     %t-th time interval from 1...T
@@ -499,4 +499,20 @@ else
     var_gsph.gsph_adopt = zeros(1,K);        
     var_gsph.gsph_gas = zeros(T,K);         
     var_gsph.gsph_heat = zeros(T,K);    
+end
+
+%% ERSPH
+if ersph_on
+    % Declaring Variables
+    var_ersph.ersph_adopt = sdpvar(1,K,'full');      %%%ERSPH installed capacity (kW)
+    var_ersph.ersph_elec = sdpvar(T,K,'full');       %%%ERSPH electricity consumed (kWh) 
+    var_ersph.ersph_heat = sdpvar(T,K,'full');       %%%ERSPH heat produced (kWh) 
+    % ERSPH cost function 
+   Objective = Objective...
+        + sum(M*ersph_mthly_debt.*var_ersph.ersph_adopt)...  %%%Annual investment/Capital Cost ($/kW)*(kW)
+       
+else
+    var_ersph.ersph_adopt = zeros(1,K);        
+    var_ersph.ersph_elec = zeros(T,K);         
+    var_ersph.ersph_heat = zeros(T,K);    
 end

@@ -146,3 +146,9 @@ if gsph_on
         (0 <= var_gsph.gsph_adopt):'GSPH Adoption >=0'
         (0 <= var_gsph.gsph_heat):'GSPH Heat >=0'];     
 end
+%% ERSPH 
+if ersph_on
+    Constraints = [Constraints
+        (0 <= var_ersph.ersph_adopt):'ERSPH Adoption >=0'
+        (0 <= var_ersph.ersph_heat):'ERSPH Heat >=0'];     
+end

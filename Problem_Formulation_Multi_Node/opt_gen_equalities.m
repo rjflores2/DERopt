@@ -17,5 +17,5 @@ end
 %For each building k, all timesteps t
 if isempty(heat)==0 
 Constraints = [Constraints
-    (var_gsph.gsph_heat == heat):'BLDG Heat Balance'];
+    (var_gsph.gsph_heat + var_ersph.ersph_heat == heat):'BLDG Heat Balance'];
 end

@@ -15,7 +15,8 @@ sofc_on =1;       %Turn on SOFC
 erwh_on =1;       %Turn on ERWH (Electric Resistance Water Heater)
 gwh_on =1;        %Turn on GWH (Gas Water Heater)
 sofcwh_on =1;     %Turn on SOFC water heater (CHP)
-gsph_on = 1;      %Turn on GSPH (Gas Space Heater)% opt_gsph
+gsph_on = 1;      %Turn on GSPH (Gas Space Heater)
+ersph_on = 1;      %Turn on ERSPH (Electric Resistance Space Heater)
 
 %%%NO LEGACY SYSTEMS YET!
 lpv_on = 0;
@@ -234,6 +235,12 @@ if opt_now
     fprintf('%s: GSPH Constraints.', datestr(now,'HH:MM:SS'))
     tic
     opt_gsph
+    elapsed = toc;
+    fprintf('Took %.2f seconds \n', elapsed)
+    %% ERSPH constraints
+    fprintf('%s: ERSPH Constraints.', datestr(now,'HH:MM:SS'))
+    tic
+    opt_ersph
     elapsed = toc;
     fprintf('Took %.2f seconds \n', elapsed)
     %% DER Incentives
