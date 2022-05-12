@@ -1,6 +1,6 @@
 %% Declaring decision variables and setting up cost function
 yalmip('clear')
-clear var_util var_pv var_ees var_rees var_sgip var_sofc var_erwh var_gwh
+clear var_util var_pv var_ees var_rees var_sgip var_sofc var_erwh var_gwh var_gsph
 Constraints=[];
 
 T = length(time);     %t-th time interval from 1...T
@@ -483,4 +483,20 @@ else
     var_gwh.gwh_gas = zeros(T,K);         
     var_gwh.gwh_heat = zeros(T,K);   
     
+end
+
+%% GSPH
+if gsph_on
+    % Declaring Variables
+    var_gsph.gsph_adopt = sdpvar(1,K,'full');      %%%GSPH installed capacity (kW)
+    var_gsph.gsph_gas = sdpvar(T,K,'full');       %%%GSPH gas consumed (kWh) 
+    var_gsph.gsph_heat = sdpvar(T,K,'full');       %%%GSPH heat produced (kWh) 
+    % GSPH cost function 
+   Objective = Objective...
+        + sum(M*gsph_mthly_debt.*var_gsph.gsph_adopt)...  %%%Annual investment/Capital Cost ($/kW)*(kW)
+        + sum(ng_cost * var_gsph.gsph_gas) ;   %%% Fuel cost price of natural gas ($/kWh)
+else
+    var_gsph.gsph_adopt = zeros(1,K);        
+    var_gsph.gsph_gas = zeros(T,K);         
+    var_gsph.gsph_heat = zeros(T,K);    
 end

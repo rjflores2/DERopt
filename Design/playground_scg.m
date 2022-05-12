@@ -15,6 +15,7 @@ sofc_on =1;       %Turn on SOFC
 erwh_on =1;       %Turn on ERWH (Electric Resistance Water Heater)
 gwh_on =1;        %Turn on GWH (Gas Water Heater)
 sofcwh_on =1;     %Turn on SOFC water heater (CHP)
+gsph_on = 1;      %Turn on GSPH (Gas Space Heater)% opt_gsph
 
 %%%NO LEGACY SYSTEMS YET!
 lpv_on = 0;
@@ -140,9 +141,9 @@ apartment_types = [0 0 1];
 %%%Climate Zone
 cz_name = 'CZ06';
 %%%Year to be simulated
-yr = 2040;
+yr = 2035;
 %%%Month filter - use during development/debugging
-mth = [7];
+mth = [1 2];
 
 bldg_loader_scg
 
@@ -227,6 +228,12 @@ if opt_now
     fprintf('%s: GWH Constraints.', datestr(now,'HH:MM:SS'))
     tic
     opt_gwh
+    elapsed = toc;
+    fprintf('Took %.2f seconds \n', elapsed)
+    %% GSPH constraints
+    fprintf('%s: GSPH Constraints.', datestr(now,'HH:MM:SS'))
+    tic
+    opt_gsph
     elapsed = toc;
     fprintf('Took %.2f seconds \n', elapsed)
     %% DER Incentives

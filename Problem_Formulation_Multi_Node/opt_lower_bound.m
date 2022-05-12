@@ -140,3 +140,9 @@ if gwh_on
         (0 <= var_gwh.gwh_adopt):'GWH Adoption >=0'
         (0 <= var_gwh.gwh_heat):'GWH Heat >=0'];     
 end
+%% GSPH 
+if gsph_on
+    Constraints = [Constraints
+        (0 <= var_gsph.gsph_adopt):'GSPH Adoption >=0'
+        (0 <= var_gsph.gsph_heat):'GSPH Heat >=0'];     
+end

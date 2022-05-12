@@ -86,7 +86,7 @@ end
 if  sofc_on
 
     sofc_v = [50   %%% 1: Capital cost ($/kWel) C_fc
-          0.06*50  %%% 2: O&M ($/kW/yr generated) 6 Yearly % of TIC(Total Installed Cost) % of the purchasing cost (4–10%) 
+          0.06*50  %%% 2: O&M ($/kW/yr generated) 6 Yearly % of TIC(Total Installed Cost) % of the purchasing cost (4ï¿½10%) 
           0.6        %%% 3: SOFC electrical efficiency at nominal condition (fraction)     
           0.3        %%% 4: SOFC thermal efficiency at nominal condition (fraction)          
           0.5        %%% 5: SOFC capacity is 500 Watt- 0.5 kW increments
@@ -115,10 +115,14 @@ if erwh_on
 end      
 %% GWH     instead of O&M cost the gas consumption is multiplied by its cost  
 if gwh_on
-    gwh_v = [2000    %%% 1: Capital cost ($/kWg) 
+    gwh_v = [2000    %%% 1: Capital cost ($/kWth) 
               0.6];  %%% 2: GWH energy factor (EF)     
 end
- 
+%% GSPH     instead of O&M cost the gas consumption is multiplied by its cost  
+if gsph_on
+    gsph_v = [3000    %%% 1: Capital cost ($/kWth)- 75,000ï¿½100,000 BTU: $2,500ï¿½$5,900: An 80,000 BTU furnace will keep a 1,600- to 2,000-square-foot home warm
+              0.74];  %%% 2: Annual Fuel Utilization Efficiency (AFUE:0.74 in )   
+end 
 %% SGIP incentives
 if sgip_on
     %%%Self generation incentive program (SGIP) values

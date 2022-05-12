@@ -26,6 +26,7 @@ datetimev=datevec(time);
 end_cnt = 1;
 stpts=1;
 
+
 day_cnt = 1;
 day_stpts = 1;
 if isempty(mth)
@@ -53,7 +54,7 @@ if ~isempty(mth)
     
     %%%Finding indicies for months of interest
     idx = find(ismember(datetimev(:,2),mth));
-   
+  
     %%%Cutting down data files
    time = time(idx);
    elec = elec(idx);

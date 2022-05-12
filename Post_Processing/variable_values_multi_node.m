@@ -39,6 +39,13 @@ var_gwh.gwh_gas = value(var_gwh.gwh_gas);       %%%GWH gas consumed (kWh)
 var_gwh.gwh_heat = value(var_gwh.gwh_heat);       %%%GWH heat produced (kWh) 
 end
 
+%% GSPH Values
+if ~isempty(gsph_v)  
+var_gsph.gsph_adopt = value(var_gsph.gsph_adopt);      %%%GSPH installed capacity (kW)
+var_gsph.gsph_gas = value(var_gsph.gsph_gas);       %%%GSPH gas consumed (kWh) 
+var_gsph.gsph_heat = value(var_gsph.gsph_heat);       %%%GSPH heat produced (kWh) 
+end
+
 %% Legacy EES Values
 var_lees.ees_chrg = value(var_lees.ees_chrg);
 var_lees.ees_dchrg = value(var_lees.ees_dchrg);
