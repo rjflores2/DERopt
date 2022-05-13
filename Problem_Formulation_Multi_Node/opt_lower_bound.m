@@ -129,15 +129,16 @@ end
 %% ERWH
 if erwh_on
     Constraints = [Constraints
-        (0 <= var_erwh.erwh_adopt):'ERWH Adoption >=0'];
-%         (0 <= var_erwh.erwh_heat):'ERWH Heat >=0'
+        (0 <= var_erwh.erwh_adopt):'ERWH Adoption >=0'
+        (0 <= var_erwh.erwh_elec):'ERWH Electricity >=0'];
         %(0 <= var_erwh.erwh_elec):'ERWH Electricity >=0'
         % I thought it might be redundant to add electricity to the constraints
 end
 %% GWH 
 if gwh_on
     Constraints = [Constraints
-        (0 <= var_gwh.gwh_adopt):'GWH Adoption >=0'];     
+        (0 <= var_gwh.gwh_adopt):'GWH Adoption >=0'
+        (0 <= var_gwh.gwh_gas):'GWH Gas >=0'];      
 end
 %% GSPH 
 if gsph_on

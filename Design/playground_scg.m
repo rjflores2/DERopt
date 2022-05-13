@@ -144,7 +144,7 @@ cz_name = 'CZ06';
 %%%Year to be simulated
 yr = 2035;
 %%%Month filter - use during development/debugging
-mth = [1 2];
+mth = [];
 
 bldg_loader_scg
 
