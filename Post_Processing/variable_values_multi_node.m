@@ -18,9 +18,9 @@ var_ees.ees_dchrg = value(var_ees.ees_dchrg);
 %% SOFC Values
 if ~isempty(sofc_v)  
 var_sofc.sofc_op = value(var_sofc.sofc_op);  %%% Number of operating SOFC units #
-var_sofc.sofc_adopt = value(var_sofc.sofc_adopt);    %%% Number of purchased SOFC units #
-var_sofc.sofc_elec = value(var_sofc.sofc_elec);        %%%SOFC electricity produced (kWh) 
-% var_sofc.sofc_heat = value(var_sofc.sofc_heat);        %%%SOFC heat produced (kWh) 
+var_sofc.sofc_adopt = value(var_sofc.sofc_adopt);      %%% Number of purchased SOFC units #
+var_sofc.sofc_elec = value(var_sofc.sofc_elec);        %%%SOFC electricity used for building (kWh) 
+%var_sofc.sofc_nem = value(var_sofc.sofc_nem);          %%%SOFC electricity exported to grid(kWh) 
 var_sofc.sofc_wh = value(var_sofc.sofc_wh);            %%%SOFC heat used for water heating(kWh)
 % var_sofc.sofc_fuel = value(var_sofc.sofc_fuel);      %%%Fuel consumption (kWh) 
 end

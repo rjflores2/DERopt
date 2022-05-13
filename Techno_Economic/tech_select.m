@@ -90,8 +90,8 @@ if  sofc_on
         0.6        %%% 3: SOFC electrical efficiency at nominal condition (fraction)
         0.3        %%% 4: SOFC thermal efficiency at nominal condition (fraction)
         0.5        %%% 5: Minimum SOFC capacity is 500 Watt- 0.5 kW increments
-        0.0005     %%% 6: kw/s Ramp rate is 6%; 5% of nominal capacity per minute [T. D. Hutty, S. Dong, R. Lee, and S. Brown] 500 watt nominal=>0.0005kw/s (6%)
-        0.1];      %%% 7: Minimum load setting (% of rated capacity)
+        0.0005      %%% 6: kw/s Ramp rate is 6%; 5% of nominal capacity per minute [T. D. Hutty, S. Dong, R. Lee, and S. Brown] 500 watt nominal=>0.0005kw/s (6%)
+        0.5];      %%% 7: Minimum load setting (% of rated capacity)
     %%ramp rate conversion - Converting the ramp kW/s to the % load
     %%change within the simulation time step
     sofc_v(6) = t_step/((sofc_v(5)/sofc_v(6))/60);

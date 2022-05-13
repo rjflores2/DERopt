@@ -428,8 +428,8 @@ if sofc_on
     % Declaring Variables
     var_sofc.sofc_adopt  = intvar(1,K,'full');    %%%SOFC number of purchased/installed units (#)
     var_sofc.sofc_op = intvar(T,K,'full');    %%%SOFC number of operating SOFCs at each time(#)
-    var_sofc.sofc_elec = sdpvar(T,K,'full');       %%%SOFC electricity produced (kWh)
-%     var_sofc.sofc_heat = sdpvar(T,K,'full');       %%%SOFC heat produced (kWh)
+    var_sofc.sofc_elec = sdpvar(T,K,'full');       %%% SOFC electricity to demand (kWh) SOFC electricity produced (kWh)
+    %var_sofc.sofc_nem = sdpvar(T,K,'full');       %%%SOFC electricity to export (kWh)
     if sofcwh_on
         var_sofc.sofc_wh = sdpvar(T,K,'full');         %%%SOFC heat produced used for water heating(kWh)
     else
@@ -447,8 +447,8 @@ else
     var_sofc.sofc_adopt = zeros(1,K);
     var_sofc.sofc_op = zeros(T,K);
     var_sofc.sofc_elec = zeros(T,K);
-%     var_sofc.sofc_heat = zeros(T,K);
-    
+    %var_sofc.sofc_nem = zeros(T,K);
+        
 end
 %% ERWH
 if erwh_on
