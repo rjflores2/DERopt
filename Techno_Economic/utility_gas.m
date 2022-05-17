@@ -1,7 +1,4 @@
 %% Converting volume fractions to energy fractions
-
-    
-
 if ~isempty(h2_lim)
     h2_lim_e_frac = h2_lim*2*141.88/(h2_lim*2*141.88 + (1-h2_lim)*16*55.5);
 end

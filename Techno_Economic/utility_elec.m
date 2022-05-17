@@ -113,7 +113,7 @@ for i = 1:length(endpts)
     end
 end
 %% Combining Prices
-import_price = [gen_tou res_tou];
+import_price = [gen_tou res_tou + urg_adder];
 
 if nem_rate == 2 || ~exist('nem_rates') %If NEM 2.0 is active or if no nem_rate toggle is specified
     export_price = [gen_tou_ex res_tou_ex];
