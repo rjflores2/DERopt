@@ -60,7 +60,7 @@ if ~isempty(mth)
    elec = elec(idx);
    cool = cool(idx);
    heat = heat(idx);
-   hotwater = hotwater(idx);
+   dhw = dhw(idx);
    misc_gas = misc_gas(idx);
    solar = solar(idx);
    

@@ -94,6 +94,7 @@ addpath(genpath('C:\Users\19498\Documents\GitHub\DERopt\Techno_Economic'))
 addpath(genpath('C:\Users\19498\Documents\GitHub\DERopt\Utilities'))
 
 %%% rjf paths
+addpath(genpath('H:\_Tools_\DERopt\Data'))
 addpath(genpath('H:\_Tools_\SCG_DERopt\DERopt\Design'))
 addpath(genpath('H:\_Tools_\SCG_DERopt\DERopt\Input_Data'))
 addpath(genpath('H:\_Tools_\SCG_DERopt\DERopt\Load_Processing'))
@@ -108,18 +109,24 @@ addpath('H:\_Research_\CEC_OVMG\URBANopt\UO_Processing')
 %%%UO Utility Files
 addpath(genpath('H:\_Research_\CEC_OVMG\Rates'))
 
-%% Loading building demand
+%% Loading building demand - BEopt Data Ref Format
 
 % dt = xlsread('UO_Example.xlsx');
-dt = readtable('CZ06_Baseline_2020.xlsx');
+dt = readtable('CZ06_2020_Ref.csv');
 
-%%% All energy is in kWh
-time = dt.HoursSince00_00Jan1;
-elec = dt.Elec_kWh_;
-cool = dt.Cooling_kWh_;
-heat = dt.Heating_kWh_;
-hotwater = dt.DHW_kWh_;
-misc_gas = dt.MiscGas;
+%%%All energy is in kWh
+time = (dt.HoursSince00_00Jan1 - 0.5)./24;
+%%%Basic loads
+cool = dt.MyDesign_SiteEnergy_Cooling_E__kWh_ + dt.MyDesign_SiteEnergy_CoolingFan_Pump_E__kWh_;
+cool = zeros(size(time)); %dt.MyDesign_SiteEnergy_Cooling_E__kWh_ + dt.MyDesign_SiteEnergy_CoolingFan_Pump_E__kWh_;
+dhw = dt.MyDesign_SiteEnergy_HotWater_E__kWh_;
+misc_gas = dt.MyDesign_SiteEnergy_Lg_Appl__G__Btu_./3412.14;
+heat = dt.MyDesign_SiteEnergy_Heating_G__Btu_./3412.14;
+
+%%%Composite loads
+%%%%% Space cooling model is not complete - cooling is accounted for in the
+%%%%% elec variable. A seperate cooling variable will be developed later
+elec = dt.MyDesign_SiteEnergy_Total_E__kWh_  - dhw;
 
 %%%Which rate?
 rate = {'R1'};
@@ -144,7 +151,7 @@ cz_name = 'CZ06';
 %%%Year to be simulated
 yr = 2035;
 %%%Month filter - use during development/debugging
-mth = [1 2];
+mth = [7];
 
 bldg_loader_scg
 
