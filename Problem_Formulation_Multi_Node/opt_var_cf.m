@@ -434,5 +434,10 @@ if sofc_on
     
     % SOFC cost function
     
-   
+else
+     var_sofc.sofc_adopt = zeros(1,1);      %%%SOFC installed capacity (kW)
+    var_sofc.sofc_elec = zeros(T,K);       %%%SOFC electricity produced (kWh) 
+    var_sofc.sofc_heat = zeros(T,1);       %%%SOFC heat produced (kWh) 
+    var_sofc.sofc_fuel = zeros(T,1);       %%%Fuel consumption (kWh) 
+    var_sofc.sofc_CO2 = zeros(T,1);        %%%CO2 saving (kg)
 end    

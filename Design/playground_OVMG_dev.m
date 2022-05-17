@@ -43,6 +43,7 @@ if ~testing
     pv_on = sz_on;
     ees_on = sz_on;
     rees_on = sz_on;
+    sofc_on = 0;
     lpv_on = 1-sz_on;
     lees_on = 1-sz_on;
     lrees_on = 1-sz_on;
@@ -151,7 +152,7 @@ addpath(genpath('H:\_Research_\CEC_OVMG\Rates'))
 
 %% Loading/seperating building demand
 
-scenario = 'ues_2a_v2'
+scenario = 'ues_1a_v2'
 
 % scenario = 'UES_2b'
 
