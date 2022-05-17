@@ -70,6 +70,12 @@ nem_rate = 3.0;
 
 %%% Island operation (opt_nem.m)
 island = 0;
+
+%% Utility Gas Properties
+h2_mix = 0.2; %Gas mixture assumption (%/vol)
+
+h2_lim = []; %Gas mixture Limit assumption (%/vol)
+
 %% Adding paths
 %%%YALMIP Master Path
 addpath(genpath('H:\Matlab_Paths\YALMIP-master'))
@@ -163,6 +169,9 @@ bldg_loader_scg
 %% Utility Data
 %%%Loading Utility Data and Generating Energy Charge Vectors
 utility_elec
+
+%%%Setting up utility gas info
+utility_gas
 
 %% Tech Parameters/Costs
 %%%Technology Parameters
