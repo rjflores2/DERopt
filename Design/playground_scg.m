@@ -155,6 +155,11 @@ mth = [7];
 
 bldg_loader_scg
 
+%% tdv_limit
+% zne_red = 0; % Percent total energy use reduction (%)
+% tdv_lim = (1-zne_red).*(tdv_elec'*(sum(elec,2) + sum(cool,2)) ...
+%     + tdv_gas'*(sum(heat,2)./gsph_v(2) + sum(hotwater,2)./gwh_v(2) + sum(misc_gas,2)));
+
 %% Utility Data
 %%%Loading Utility Data and Generating Energy Charge Vectors
 utility_elec

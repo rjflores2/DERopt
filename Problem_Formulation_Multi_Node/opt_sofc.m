@@ -6,8 +6,8 @@ if ~isempty(sofc_v)
         (sofc_v(7)*sofc_v(5)*var_sofc.sofc_op <= var_sofc.sofc_elec <= sofc_v(5)*var_sofc.sofc_op):'Min/Max elec limited by operating SOFCs'    % electricity generation
         (var_sofc.sofc_wh <= sofc_v(4).*var_sofc.sofc_elec./sofc_v(3)):'SOFC Heat Recovery' %Recovered heat from SOFC
         ((-sofc_v(6).* sofc_v(5).*var_sofc.sofc_op(2:end,:)) <= (var_sofc.sofc_elec(2:end,:) - var_sofc.sofc_elec(1:end-1,:)) <= (sofc_v(6).* sofc_v(5).* var_sofc.sofc_op(2:end,:))):'SOFC ramp rate'];
-    
-    
+        %(var_sofc.sofc_elec + var_sofc.sofc_acc == sofc_v(5)*var_sofc.sofc_op ):'SOFC Energy Balance - =='];
+    %repmat(var_sofc.sofc_adopt,size(var_sofc.sofc_op,1),1)
     %(var_sofc.sofc_adopt <= sofc_v(5)* var_sofc.sofc_adopt):'SOFC units multiples of 0.5 kw']; %500 watt increments
     %     end
     %      for i=1:K

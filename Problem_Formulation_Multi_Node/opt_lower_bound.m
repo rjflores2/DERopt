@@ -119,7 +119,7 @@ if sofc_on
         (0 <= var_sofc.sofc_adopt):'SOFC Units >=0' 
         (0 <= var_sofc.sofc_op):'SOFC Units >=0' 
         (0 <= var_sofc.sofc_elec):'SOFC Electricity >=0'];
-%         (0 <= var_sofc.sofc_heat):'SOFC Heat >=0'];
+        %(0 <= var_sofc.sofc_nem):'SOFC exported elevctricity >=0'];
     if sofcwh_on
         Constraints = [Constraints
         (0 <= var_sofc.sofc_wh):'SOFC Water Heating >=0'];
@@ -129,15 +129,16 @@ end
 %% ERWH
 if erwh_on
     Constraints = [Constraints
-        (0 <= var_erwh.erwh_adopt):'ERWH Adoption >=0'];
-%         (0 <= var_erwh.erwh_heat):'ERWH Heat >=0'
+        (0 <= var_erwh.erwh_adopt):'ERWH Adoption >=0'
+        (0 <= var_erwh.erwh_elec):'ERWH Electricity >=0'];
         %(0 <= var_erwh.erwh_elec):'ERWH Electricity >=0'
         % I thought it might be redundant to add electricity to the constraints
 end
 %% GWH 
 if gwh_on
     Constraints = [Constraints
-        (0 <= var_gwh.gwh_adopt):'GWH Adoption >=0'];     
+        (0 <= var_gwh.gwh_adopt):'GWH Adoption >=0'
+        (0 <= var_gwh.gwh_gas):'GWH Gas >=0'];      
 end
 %% GSPH 
 if gsph_on
