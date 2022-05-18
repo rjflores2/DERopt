@@ -7,10 +7,10 @@ ex_wholesale = 0.03;
 %% Loading Electric Rates
 
 %%%Residential TOU Rates
-rates_res.tou_fix = xlsread('Res_TOU.xlsx','Fixed');
-rates_res.tou_1 = xlsread('Res_TOU.xlsx','4-9PM');
-rates_res.tou_2 = xlsread('Res_TOU.xlsx','5-8PM');
-rates_res.tou_3 = xlsread('Res_TOU.xlsx','PRIME');
+rates_res.tou_fix = xlsread('Res_TOU_2022.xlsx','Fixed');
+rates_res.tou_1 = xlsread('Res_TOU_2022.xlsx','4-9PM');
+rates_res.tou_2 = xlsread('Res_TOU_2022.xlsx','5-8PM');
+rates_res.tou_3 = xlsread('Res_TOU_2022.xlsx','PRIME');
 
 %%%General TOU Rates
 rates_gen.fix = xlsread('Gen_TOU.xlsx','Fixed');
