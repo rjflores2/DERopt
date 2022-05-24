@@ -122,7 +122,7 @@ addpath(genpath('H:\_Research_\CEC_OVMG\Rates'))
 %% Loading building demand - BEopt Data Ref Format
 
 % dt = xlsread('UO_Example.xlsx');
-dt = readtable('CZ06_2020_Ref.csv');
+dt = readtable('CZ08_2020_Ref.csv');
 
 %%%All energy is in kWh
 time = (dt.HoursSince00_00Jan1 - 0.5)./24;
@@ -157,7 +157,7 @@ apartment_types = [0 0 1];
 %% Formatting Building Data
 
 %%%Climate Zone
-cz_name = 'CZ06';
+cz_name = 'CZ08';
 %%%Year to be simulated
 yr = 2035;
 %%%Month filter - use during development/debugging
