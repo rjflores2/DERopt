@@ -104,8 +104,6 @@ if  sofc_on
 %     sofc_fin = [-0.4648; ...  $/kW %%%Scaling linear factor - Based on Lazards cost of electricity
 %         5; ... year %%%MACRS Schedule Modified Accelerated Cost Recovery System (tax)
 %         0.26]; ... %%% SOFC Investment Tax Credit (ITC)/ from www.irs.gov       
-%% DUMMY NG COST
-ng_cost = 0.023;
 end
 %% ERWH     instead of O&M cost the electricity consumption is multiplied by its cost  
 if erwh_on
