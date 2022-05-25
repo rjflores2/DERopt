@@ -11,12 +11,12 @@ end
 %For each building k, all timesteps t
 if ~isempty(dhw)
     Constraints = [Constraints
-        (var_erwh.erwh_elec.*erwh_v(2) + var_gwh.gwh_gas.*gwh_v(2) + var_sofc.sofc_wh + var_tes.tes_dchrg== dhw):'BLDG HotWater Balance'];
-end
+        (var_erwh.erwh_elec.*erwh_eff + var_gwh.gwh_gas.*gwh_eff + var_sofc.sofc_wh + var_tes.tes_dchrg== dhw):'BLDG HotWater Balance'];
+end  
 
 %% Building Heat Balances
 %For each building k, all timesteps t
 if ~isempty(heat)
     Constraints = [Constraints
-        (var_gsph.gsph_gas.*gsph_v(2) + var_ersph.ersph_elec.*ersph_v(2) == heat):'BLDG Heat Balance'];
-end
+        (var_gsph.gsph_gas.*gsph_eff + var_ersph.ersph_elec.*ersph_eff == heat):'BLDG Heat Balance'];
+end  
