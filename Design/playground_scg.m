@@ -71,11 +71,14 @@ nem_rate = 3.0;
 %%% Island operation (opt_nem.m)
 island = 0;
 
-%%%Utility Cost Increase ($/kWh) $0.03/kWh for 60% RPS, $0.05/kWh for 100%
+%%%Utility Cost Increase ($/kWh) $0.031/kWh for 60% RPS, $0.054/kWh for 100%
 %%%RPS
-urg_adder = [0];
+urg_adder = [0]; %Utility retained generation
 
 %% Utility Gas Properties
+
+h2_cost_kg = 3; %renewable H2 cost ($/kg)
+
 h2_mix = 0.2; %Gas mixture assumption (%/vol)
 
 h2_lim = []; %Gas mixture Limit assumption (%/vol)
