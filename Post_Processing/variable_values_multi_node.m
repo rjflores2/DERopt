@@ -24,7 +24,12 @@ var_sofc.sofc_elec = value(var_sofc.sofc_elec);        %%%SOFC electricity used 
 var_sofc.sofc_wh = value(var_sofc.sofc_wh);            %%%SOFC heat used for water heating(kWh)
 % var_sofc.sofc_fuel = value(var_sofc.sofc_fuel);      %%%Fuel consumption (kWh) 
 end
-
+%% TES Values
+if tes_on
+    var_tes.tes_soc = value(var_tes.tes_soc);
+    var_tes.tes_chrg = value(var_tes.tes_chrg);
+    var_tes.tes_dchrg = value(var_tes.tes_dchrg);
+end
 %% ERWH Values
 if ~isempty(erwh_v)  
 var_erwh.erwh_adopt = value(var_erwh.erwh_adopt);      %%%ERWH installed capacity (kW)

@@ -85,7 +85,7 @@ end
 %% SOFC
 if  sofc_on
     
-    sofc_v = [1000   %%% 1: Capital cost ($/kWel) C_fc
+    sofc_v = [100   %%% 1: Capital cost ($/kWel) C_fc
         0.06*1000    %%% 2: O&M ($/kW/yr generated) 6 Yearly % of TIC(Total Installed Cost) % of the purchasing cost (4–10%)
         0.6        %%% 3: SOFC electrical efficiency at nominal condition (fraction)
         0.3        %%% 4: SOFC thermal efficiency at nominal condition (fraction)

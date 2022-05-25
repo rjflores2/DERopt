@@ -12,6 +12,7 @@ pv_on = 1;        %Turn on PV
 ees_on = 1;       %Turn on EES/REES
 rees_on = 1;      %Turn on REES
 sofc_on =1;       %Turn on SOFC
+tes_on = 1;    %Turn on thermal energy storage
 erwh_on =1;       %Turn on ERWH (Electric Resistance Water Heater)
 gwh_on =1;        %Turn on GWH (Gas Water Heater)
 sofcwh_on =1;     %Turn on SOFC water heater (CHP)

@@ -126,6 +126,13 @@ if sofc_on
     end
 end
 
+%%% TES
+if tes_on
+     Constraints = [Constraints
+        (0 <= var_tes.tes_soc):'TES SOC >=0' 
+        (0 <= var_tes.tes_chrg):'TES Charge >=0' 
+        (0 <= var_tes.tes_dchrg):'TES Discharge >=0'];
+end
 %% ERWH
 if erwh_on
     Constraints = [Constraints

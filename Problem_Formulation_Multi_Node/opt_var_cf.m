@@ -442,11 +442,25 @@ if sofc_on
         + sum(M*sofc_mthly_debt.*var_sofc.sofc_adopt)...  %%%Annual investment/Capital Cost ($/kW)*(kW)
         + sum((sofc_v(2).* var_sofc.sofc_adopt))... %%% O&M ($/kW/yr)*(kW)
         + sum(ng_cost * var_sofc.sofc_elec./sofc_v(3)) ;   %%% Fuel cost price of natural gas ($/kWh) - MUST BE CHECKED
+    
+    if tes_on
+        var_tes.tes_soc = sdpvar(T,K,'full');
+        var_tes.tes_chrg = sdpvar(T,K,'full');
+        var_tes.tes_dchrg = sdpvar(T,K,'full');
+    else
+        var_tes.tes_soc = zeros(1,K);
+        var_tes.tes_chrg = zeros(1,K);
+        var_tes.tes_chrg = zeros(1,K);
+    end
+    
 else
     %     var_sofc.sofc_adopt = zeros(1,K);
     var_sofc.sofc_adopt = zeros(1,K);
     var_sofc.sofc_op = zeros(T,K);
     var_sofc.sofc_elec = zeros(T,K);
+     var_tes.tes_soc = zeros(1,K);
+        var_tes.tes_chrg = zeros(1,K);
+        var_tes.tes_chrg = zeros(1,K);
     %var_sofc.sofc_nem = zeros(T,K);
         
 end
