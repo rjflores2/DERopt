@@ -52,7 +52,7 @@ if ees_on
     %ees_v=[600; 0.001; 0.001; 0.1; 0.95; 0.25; 0.25; 1; 1; .995]; %Testing with 100% RTE
     
  
-    ees_v=[200; 0.001; 0.001; 0.1; 0.95; 0.5; 0.5; .90; .90; .9999];
+    ees_v=[700; 0.001; 0.001; 0.1; 0.95; 0.5; 0.5; .90; .90; .9999];
     ees_cap=ees_v(1);
     
     %%%How pv capital cost is modified for different types of buildings
@@ -85,7 +85,7 @@ end
 %% SOFC
 if  sofc_on
     
-    sofc_v = [100   %%% 1: Capital cost ($/kWel) C_fc
+    sofc_v = [0.7*1000   %%% 1: Capital cost ($/kWel) C_fc Assume 30% tac credit
         0.06*1000    %%% 2: O&M ($/kW/yr generated) 6 Yearly % of TIC(Total Installed Cost) % of the purchasing cost (4–10%)
         0.6        %%% 3: SOFC electrical efficiency at nominal condition (fraction)
         0.3        %%% 4: SOFC thermal efficiency at nominal condition (fraction)
