@@ -107,28 +107,28 @@ if  sofc_on
 end
 %% ERWH     instead of O&M cost the electricity consumption is multiplied by its cost  
 if erwh_on
-    erwh_v = [1000    %%% 1000  1: Capital cost ($/kWel) https://www.homedepot.com/
+    erwh_v = [0    %%% 1000  1: Capital cost ($/kWel) https://www.homedepot.com/
               0.9];   %%% 2: ERWH energy factor- COPHPWH = 3 from AHRI Directory    
 else 
     erwh_v = [];
 end      
 %% GWH     instead of O&M cost the gas consumption is multiplied by its cost  
 if gwh_on
-    gwh_v = [2000    %%% 1: Capital cost ($/kWth) 
+    gwh_v = [0    %%%2000 1: Capital cost ($/kWth) 
               0.6];  %%% 2: GWH energy factor (EF)     
 else 
     gwh_v = [];
 end
 %% GSPH     instead of O&M cost the gas consumption is multiplied by its cost  
 if gsph_on
-    gsph_v = [3000    %%% 1: Capital cost ($/kWth)- 75,000–100,000 BTU: $2,500–$5,900: An 80,000 BTU furnace will keep a 1,600- to 2,000-square-foot home warm
+    gsph_v = [0    %%%3000 1: Capital cost ($/kWth)- 75,000–100,000 BTU: $2,500–$5,900: An 80,000 BTU furnace will keep a 1,600- to 2,000-square-foot home warm
               0.8];  %%% 2: https://modernize.com/hvac/best-furnace-brands/trane-Annual Fuel Utilization Efficiency (AFUE:0.74 in Building America)   
 else 
     gsph_v = [];
 end 
 %% ERSPH     instead of O&M cost the electricity consumption is multiplied by its cost  
 if ersph_on
-    ersph_v = [1200    %%% 1: Capital cost ($/kWel)-  
+    ersph_v = [0    %%%1200 1: Capital cost ($/kWel)-  
               1];  %%% 2: 100% COPHPSPH = 2  energy efficient-https://www.energy.gov/energysaver/electric-resistance-heating 
 else 
     ersph_v = [];

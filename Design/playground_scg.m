@@ -9,7 +9,7 @@ opt_now_yalmip = 0; %YALMIP
 
 %% Turning technologies on/off (opt_var_cf.m and tech_select.m)
 pv_on = 1;        %Turn on PV
-ees_on = 0;       %Turn on EES/REES
+ees_on = 1;       %Turn on EES/REES
 rees_on = 1;      %Turn on REES
 sofc_on =1;       %Turn on SOFC
 tes_on = 1;       %Turn on thermal energy storage
