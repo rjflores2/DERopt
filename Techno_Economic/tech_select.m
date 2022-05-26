@@ -8,7 +8,7 @@ utility_exists=1;
 %%% O&M ($/kWh generated)
 if pv_on
     %pv_v=[3500; 0.2 ; 0.001]; 
-    pv_v=[2000; 0.2 ; 0.001]; %pv_v=[2650; 0.2 ; 0.001]; https://atb.nrel.gov/electricity/2021/residential_pv
+    pv_v=[2484; 0.2 ; 0.001]; %pv_v=[2650; 0.2 ; 0.001]; https://atb.nrel.gov/electricity/2021/residential_pv
      
     pv_cap=pv_v(1,:);%NREL:PV capital cost: 2000 in 2035, 1300 in 2045 w/ conservative scenario
     
@@ -52,7 +52,7 @@ if ees_on
     %ees_v=[600; 0.001; 0.001; 0.1; 0.95; 0.25; 0.25; 1; 1; .995]; %Testing with 100% RTE
     
  
-    ees_v=[200; 0.001; 0.001; 0.1; 0.95; 0.5; 0.5; .90; .90; .9999];
+    ees_v=[911.5; 0.001; 0.001; 0.1; 0.95; 0.5; 0.5; .90; .90; .9999];
     ees_cap=ees_v(1);
     
     %%%How pv capital cost is modified for different types of buildings
@@ -85,8 +85,8 @@ end
 %% SOFC
 if  sofc_on
     
-    sofc_v = [100   %%% 1: Capital cost ($/kWel) C_fc
-        0.06*1000    %%% 2: O&M ($/kW/yr generated) 6 Yearly % of TIC(Total Installed Cost) % of the purchasing cost (4–10%)
+    sofc_v = [0.7*5706   %%% 1: Capital cost ($/kWel) C_fc Assume 30% tac credit
+        0.06*5706    %%% 2: O&M ($/kW/yr generated) 6 Yearly % of TIC(Total Installed Cost) % of the purchasing cost (4–10%)
         0.6        %%% 3: SOFC electrical efficiency at nominal condition (fraction)
         0.3        %%% 4: SOFC thermal efficiency at nominal condition (fraction)
         0.5        %%% 5: Minimum SOFC capacity is 500 Watt- 0.5 kW increments
@@ -107,8 +107,8 @@ if  sofc_on
 end
 %% ERWH     instead of O&M cost the electricity consumption is multiplied by its cost  
 if erwh_on
-    erwh_v = [1000    %%% 1: Capital cost ($/kWel) https://www.homedepot.com/
-              0.95];  %%% 2: ERWH energy factor (EF)from AHRI Directory      
+    erwh_v = [1000    %%% 1000  1: Capital cost ($/kWel) https://www.homedepot.com/
+              0.9];   %%% 2: ERWH energy factor- COPHPWH = 3 from AHRI Directory    
 else 
     erwh_v = [];
 end      
@@ -128,8 +128,8 @@ else
 end 
 %% ERSPH     instead of O&M cost the electricity consumption is multiplied by its cost  
 if ersph_on
-    ersph_v = [1200    %%% 1: Capital cost ($/kWel)- 
-              0.95];  %%% 2: 100% energy efficient-https://www.energy.gov/energysaver/electric-resistance-heating
+    ersph_v = [1200    %%% 1: Capital cost ($/kWel)-  
+              1];  %%% 2: 100% COPHPSPH = 2  energy efficient-https://www.energy.gov/energysaver/electric-resistance-heating 
 else 
     ersph_v = [];
 end 
@@ -182,6 +182,15 @@ end
 %%% GWH
 if ~gwh_on
     gwh_v =[];
+end
+
+%%% ERWH  
+if ~ersph_on
+    ersph_v =[];
+end
+%%% GSPH
+if ~gsph_on
+    gsph_v =[];
 end
 
 %%% SOFCWH

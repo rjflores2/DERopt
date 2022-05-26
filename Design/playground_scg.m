@@ -9,16 +9,15 @@ opt_now_yalmip = 0; %YALMIP
 
 %% Turning technologies on/off (opt_var_cf.m and tech_select.m)
 pv_on = 1;        %Turn on PV
-ees_on = 1;       %Turn on EES/REES
+ees_on = 0;       %Turn on EES/REES
 rees_on = 1;      %Turn on REES
 sofc_on =1;       %Turn on SOFC
-tes_on = 1;    %Turn on thermal energy storage
-erwh_on =1;       %Turn on ERWH (Electric Resistance Water Heater)
-gwh_on =1;        %Turn on GWH (Gas Water Heater)
+tes_on = 1;       %Turn on thermal energy storage
 sofcwh_on =1;     %Turn on SOFC water heater (CHP)
+gwh_on =1;        %Turn on GWH (Gas Water Heater)
 gsph_on = 1;      %Turn on GSPH (Gas Space Heater)
-ersph_on = 1;      %Turn on ERSPH (Electric Resistance Space Heater)
-
+ersph_on = 0;     %Turn on ERSPH (Electric Resistance Space Heater)
+erwh_on = 0;       %Turn on ERWH (Electric Resistance Water Heater)
 %%%NO LEGACY SYSTEMS YET!
 lpv_on = 0;
 lees_on = 0;
@@ -67,20 +66,20 @@ import_limit = .8;
 %%%Can export back to the grid
 export_on = 1;
 %%%Which NEM scenario applies? (2.0 or 3.0)
-nem_rate = 3.0;
+nem_rate = 2.0;
 
 %%% Island operation (opt_nem.m)
 island = 0;
 
 %%%Utility Cost Increase ($/kWh) $0.031/kWh for 60% RPS, $0.054/kWh for 100%
-%%%RPS
-urg_adder = [0]; %Utility retained generation
+%%%RPS 2030:$0.015/kWh__2040:$0.031/kWh__2050:$0.054/kWh
+urg_adder = [0.015]; %Utility retained generation
 
 %% Utility Gas Properties
 
-h2_cost_kg = 3; %renewable H2 cost ($/kg)
+h2_cost_kg = 6; %renewable H2 cost ($/kg)
 
-h2_mix = 0.2; %Gas mixture assumption (%/vol)
+h2_mix = 0.51; %Gas mixture assumption (%/vol)
 
 h2_lim = []; %Gas mixture Limit assumption (%/vol)
 
@@ -161,11 +160,11 @@ apartment_types = [0 0 1];
 %% Formatting Building Data
 
 %%%Climate Zone
-cz_name = 'CZ06';
+cz_name = 'CZ08';
 %%%Year to be simulated
-yr = 2035;
+yr = 2030;
 %%%Month filter - use during development/debugging
-mth = [7];
+mth = [];
 
 bldg_loader_scg
 
