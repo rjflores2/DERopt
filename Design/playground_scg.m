@@ -121,7 +121,7 @@ addpath('H:\_Research_\CEC_OVMG\URBANopt\UO_Processing')
 
 %%%UO Utility Files
 addpath(genpath('H:\_Research_\CEC_OVMG\Rates'))
-
+ads
 %% Loading building demand - BEopt Data Ref Format
 
 % dt = xlsread('UO_Example.xlsx');
@@ -150,7 +150,7 @@ low_income = 0;
 %%%Number of residential units
 res_units = 1;
 %%%Max PV Capacity
-maxpv = 2000000;
+maxpv = 200;
 %%%Apartment Types
 %%% Col1: non-profit units
 %%% Col2: low-income for profit units
