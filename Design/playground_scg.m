@@ -121,7 +121,7 @@ addpath('H:\_Research_\CEC_OVMG\URBANopt\UO_Processing')
 
 %%%UO Utility Files
 addpath(genpath('H:\_Research_\CEC_OVMG\Rates'))
-ads
+
 %% Loading building demand - BEopt Data Ref Format
 
 % dt = xlsread('UO_Example.xlsx');
