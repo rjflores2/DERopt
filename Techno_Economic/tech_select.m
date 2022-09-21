@@ -7,7 +7,7 @@ utility_exists=1;
 %%% Efficiency / Conversion Percent at 1 kW/m^2
 %%% O&M ($/kWh generated)
 if pv_on
-    %pv_v=[3500; 0.2 ; 0.001]; 
+    %pv_v=[3500; 0.2 ; 0.001];  
     pv_v=[2484; 0.2 ; 0.001]; %pv_v=[2650; 0.2 ; 0.001]; https://atb.nrel.gov/electricity/2021/residential_pv
      
     pv_cap=pv_v(1,:);%NREL:PV capital cost: 2000 in 2035, 1300 in 2045 w/ conservative scenario
@@ -55,7 +55,7 @@ if ees_on
     ees_v=[911.5; 0.001; 0.001; 0.1; 0.95; 0.5; 0.5; .90; .90; .9999];
     ees_cap=ees_v(1);
     
-    %%%How pv capital cost is modified for different types of buildings
+    %%%How EES capital cost is modified for different types of buildings
     ees_cap_mod = [575/830 %%%Commercial/industrial
         830/830]; %%%Residential
     
@@ -67,16 +67,16 @@ if ees_on
     %%%Financial Aspects - EES
     rees_fin = [-0.4648;... %%%Scaling linear factor - Based on Lazards cost of electricity
         5; ... %%%MACRS Schedule
-        0]; ... %%%ITC Benefit
+        1]; ... %%%ITC Benefit
         
     ees_fin = [-0.1306;... %%%Scaling linear factor - Based on Lazards cost of electricity
-        7; ... %%%MACRS Schedule
+        0; ... %%%MACRS Schedule
         0]; ... %%%ITC Benefit
         
     %%%Financial Aspects - EES
     rees_fin = [-0.1306;... %%%Scaling linear factor - Based on Lazards cost of electricity
-        5; ... %%%MACRS Schedule
-        1]; ... %%%ITC Benefit
+        0; ... %%%MACRS Schedule
+        0]; ... %%%ITC Benefit
 else
 ees_v = [];
 rees_v = [];
@@ -84,13 +84,13 @@ end
 
 %% SOFC
 if  sofc_on
-    
-    sofc_v = [0.7*5706   %%% 1: Capital cost ($/kWel) C_fc Assume 30% tac credit
-        0.06*5706    %%% 2: O&M ($/kW/yr generated) 6 Yearly % of TIC(Total Installed Cost) % of the purchasing cost (4–10%)
+    %5420.5
+    sofc_v = [0.7*5706  %%% 1: Capital cost ($/kWel) C_fc Assume 30% tax credit
+        0.06*5706     %%% 2: O&M ($/kW/yr generated) 6 Yearly % of TIC(Total Installed Cost) % of the purchasing cost (4–10%)
         0.6        %%% 3: SOFC electrical efficiency at nominal condition (fraction)
         0.3        %%% 4: SOFC thermal efficiency at nominal condition (fraction)
-        0.5        %%% 5: Minimum SOFC capacity is 500 Watt- 0.5 kW increments
-        0.0005      %%% 6: kw/s Ramp rate is 6%; 5% of nominal capacity per minute [T. D. Hutty, S. Dong, R. Lee, and S. Brown] 500 watt nominal=>0.0005kw/s (6%)
+        0.5        %%% %0.5 5: Minimum SOFC capacity is 500 Watt- 0.5 kW increments
+        0.0005     %%% 6: kw/s Ramp rate is 6% of nominal capacity per minute [T. D. Hutty, S. Dong, R. Lee, and S. Brown] 500 watt nominal=> 0.5*6/100/6 = 0.0005kw/s
         0.5];      %%% 7: Minimum load setting (% of rated capacity)
     %%ramp rate conversion - Converting the ramp kW/s to the % load
     %%change within the simulation time step
@@ -108,28 +108,28 @@ end
 %% ERWH     instead of O&M cost the electricity consumption is multiplied by its cost  
 if erwh_on
     erwh_v = [0    %%% 1000  1: Capital cost ($/kWel) https://www.homedepot.com/
-              0.9];   %%% 2: ERWH energy factor- COPHPWH = 3 from AHRI Directory    
+               2.46];   %%% 0.9 for ERWH, 3 for COP_HPWH 2: ERWH energy factor- COPHPWH = 3 from AHRI Directory  From RFJ model for premium heat pump COP is 2.46   
 else 
     erwh_v = [];
 end      
 %% GWH     instead of O&M cost the gas consumption is multiplied by its cost  
 if gwh_on
     gwh_v = [0    %%%2000 1: Capital cost ($/kWth) 
-              0.6];  %%% 2: GWH energy factor (EF)     
+              0.96];  %%% 2: GWH energy factor (EF) Baseline:0.6, Premium_Gas:0.96    
 else 
     gwh_v = [];
 end
 %% GSPH     instead of O&M cost the gas consumption is multiplied by its cost  
 if gsph_on
     gsph_v = [0    %%%3000 1: Capital cost ($/kWth)- 75,000–100,000 BTU: $2,500–$5,900: An 80,000 BTU furnace will keep a 1,600- to 2,000-square-foot home warm
-              0.8];  %%% 2: https://modernize.com/hvac/best-furnace-brands/trane-Annual Fuel Utilization Efficiency (AFUE:0.74 in Building America)   
+              1];  %%% 2: https://modernize.com/hvac/best-furnace-brands/trane-Annual Fuel Utilization Efficiency (AFUE:0.74 in Building America)   
 else 
     gsph_v = [];
 end 
 %% ERSPH     instead of O&M cost the electricity consumption is multiplied by its cost  
 if ersph_on
     ersph_v = [0    %%%1200 1: Capital cost ($/kWel)-  
-              1];  %%% 2: 100% COPHPSPH = 2  energy efficient-https://www.energy.gov/energysaver/electric-resistance-heating 
+              1];  %%%1 for ERSPH, 2 for COP_HPSPH = 2    2: 100%  energy efficient-https://www.energy.gov/energysaver/electric-resistance-heating 
 else 
     ersph_v = [];
 end 

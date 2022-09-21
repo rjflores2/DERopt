@@ -11,7 +11,7 @@ end
 %For each building k, all timesteps t
 if ~isempty(dhw)
     Constraints = [Constraints
-        (var_erwh.erwh_elec.*erwh_eff + var_gwh.gwh_gas.*gwh_eff + var_sofc.sofc_wh + var_tes.tes_dchrg== dhw):'BLDG HotWater Balance'];
+        (var_erwh.erwh_elec.*erwh_eff + var_gwh.gwh_gas.*gwh_eff + var_sofc.sofc_wh + var_tes.tes_dchrg == dhw):'BLDG HotWater Balance'];
 end  
 
 %% Building Heat Balances

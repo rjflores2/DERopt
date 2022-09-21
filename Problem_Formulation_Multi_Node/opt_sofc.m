@@ -12,7 +12,8 @@ if ~isempty(sofc_v)
         if tes_on
             Constraints = [Constraints
                 (var_tes.tes_soc(1,:) == var_tes.tes_soc(end,:)):'SOC at start is same as at end'
-                (var_tes.tes_soc(2:end,:) == var_tes.tes_soc(1:end-1,:).*0.999 + 0.95.*var_tes.tes_chrg(2:end,:) - 1.05.*var_tes.tes_dchrg(2:end,:)):'TES Energy Balance'];
+                (var_tes.tes_soc(2:end,:) == var_tes.tes_soc(1:end-1,:).*0.999 + 0.95.*var_tes.tes_chrg(2:end,:) - 1.05.*var_tes.tes_dchrg(2:end,:)):'TES Energy Balance'
+                 var_tes.tes_soc <= 20]; % convert 80 gallon Hot water tank to kWh capacity
             
         end
         

@@ -459,8 +459,8 @@ else
     var_sofc.sofc_op = zeros(T,K);
     var_sofc.sofc_elec = zeros(T,K);
      var_tes.tes_soc = zeros(1,K);
-        var_tes.tes_chrg = zeros(1,K);
-        var_tes.tes_chrg = zeros(1,K);
+     var_tes.tes_chrg = zeros(1,K);
+     var_tes.tes_chrg = zeros(1,K);
     %var_sofc.sofc_nem = zeros(T,K);
         
 end

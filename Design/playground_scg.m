@@ -14,10 +14,10 @@ rees_on = 1;      %Turn on REES
 sofc_on =1;       %Turn on SOFC
 tes_on = 1;       %Turn on thermal energy storage
 sofcwh_on =1;     %Turn on SOFC water heater (CHP)
-gwh_on =1;        %Turn on GWH (Gas Water Heater)
-gsph_on = 1;      %Turn on GSPH (Gas Space Heater)
-ersph_on = 0;     %Turn on ERSPH (Electric Resistance Space Heater)
-erwh_on = 0;       %Turn on ERWH (Electric Resistance Water Heater)
+gwh_on = 0;        %Turn on GWH (Gas Water Heater)
+gsph_on = 0;      %Turn on GSPH (Gas Space Heater)
+ersph_on = 1;     %Turn on ERSPH (Electric Resistance Space Heater)
+erwh_on = 1;       %Turn on ERWH (Electric Resistance Water Heater)
 %%%NO LEGACY SYSTEMS YET!
 lpv_on = 0;
 lees_on = 0;
@@ -71,8 +71,8 @@ nem_rate = 2.0;
 %%% Island operation (opt_nem.m)
 island = 0;
 
-%%%Utility Cost Increase ($/kWh) $0.031/kWh for 60% RPS, $0.054/kWh for 100%
-%%%RPS 2030:$0.015/kWh__2040:$0.031/kWh__2050:$0.054/kWh
+%%%Utility Cost Increase ($/kWh)   $0.031/kWh for 60% RPS,  $0.054/kWh for 100%
+%%%RPS 2030:$0.015/kWh__2040:$0.031/kWh(60% RPS)__2050:$0.054/kWh (100% RPS)
 urg_adder = [0.015]; %Utility retained generation
 
 %% Utility Gas Properties
@@ -118,29 +118,39 @@ addpath(genpath('H:\_Tools_\SCG_DERopt\DERopt\Utilities'))
 
 %%% Building UO Object Path
 addpath('H:\_Research_\CEC_OVMG\URBANopt\UO_Processing')
-
 %%%UO Utility Files
 addpath(genpath('H:\_Research_\CEC_OVMG\Rates'))
-ads
 %% Loading building demand - BEopt Data Ref Format
 
 % dt = xlsread('UO_Example.xlsx');
-dt = readtable('CZ06_2020_Ref.csv');
+% dt = readtable('CZ06_2020_Ref.csv');
 
-%%%All energy is in kWh
+% %%%All energy is in kWh
+% time = (dt.HoursSince00_00Jan1 - 0.5)./24;
+% %%%Basic loads
+% cool = dt.MyDesign_SiteEnergy_Cooling_E__kWh_ + dt.MyDesign_SiteEnergy_CoolingFan_Pump_E__kWh_;
+% cool = zeros(size(time)); %dt.MyDesign_SiteEnergy_Cooling_E__kWh_ + dt.MyDesign_SiteEnergy_CoolingFan_Pump_E__kWh_;
+% dhw = dt.MyDesign_SiteEnergy_HotWater_E__kWh_;
+% misc_gas = dt.MyDesign_SiteEnergy_Lg_Appl__G__Btu_./3412.14;
+% heat = dt.MyDesign_SiteEnergy_Heating_G__Btu_./3412.14;
+% 
+% %%%Composite loads
+% %%%%% Space cooling model is not complete - cooling is accounted for in the
+% %%%%% elec variable. A seperate cooling variable will be developed later
+% elec = dt.MyDesign_SiteEnergy_Total_E__kWh_  - dhw;
+
+%% rjf mods
+dt = readtable('C:\Users\19498\Documents\GitHub\DERopt\Data\SCG_Nanogrid\Loads\CZ06_Loader.xlsx','Sheet','Heat_pump');
+
 time = (dt.HoursSince00_00Jan1 - 0.5)./24;
-%%%Basic loads
-cool = dt.MyDesign_SiteEnergy_Cooling_E__kWh_ + dt.MyDesign_SiteEnergy_CoolingFan_Pump_E__kWh_;
-cool = zeros(size(time)); %dt.MyDesign_SiteEnergy_Cooling_E__kWh_ + dt.MyDesign_SiteEnergy_CoolingFan_Pump_E__kWh_;
-dhw = dt.MyDesign_SiteEnergy_HotWater_E__kWh_;
-misc_gas = dt.MyDesign_SiteEnergy_Lg_Appl__G__Btu_./3412.14;
-heat = dt.MyDesign_SiteEnergy_Heating_G__Btu_./3412.14;
+%%%Basic Loads
+elec = dt.TotalElec_kWh_;
+heat = dt.TotalGas_kBtu_./3.41214; 
+dhw = dt.DHW_kWh_;
+cool = zeros(size(elec));
+% heat = zeros(size(elec));
 
-%%%Composite loads
-%%%%% Space cooling model is not complete - cooling is accounted for in the
-%%%%% elec variable. A seperate cooling variable will be developed later
-elec = dt.MyDesign_SiteEnergy_Total_E__kWh_  - dhw;
-
+ 
 %%%Which rate?
 rate = {'R1'};
 %%%Do demand charges apply?
@@ -160,7 +170,7 @@ apartment_types = [0 0 1];
 %% Formatting Building Data
 
 %%%Climate Zone
-cz_name = 'CZ08';
+cz_name = 'CZ06';
 %%%Year to be simulated
 yr = 2030;
 %%%Month filter - use during development/debugging
