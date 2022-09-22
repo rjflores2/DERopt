@@ -2,23 +2,28 @@
 if ~isempty(sofc_v)
     %     for i=1:K
     Constraints = [Constraints
-        (var_sofc.sofc_op <= repmat(var_sofc.sofc_adopt,size(var_sofc.sofc_op,1),1) ):'Limit operating SOFCs to purchased SOFC'  % # operating SOFC limit
-        (sofc_v(7)*sofc_v(5)*var_sofc.sofc_op <= var_sofc.sofc_elec <= sofc_v(5)*var_sofc.sofc_op):'Min/Max elec limited by operating SOFCs'    % electricity generation
+        (sofc_v(7)*sofc_v(5)*var_sofc.sofc_adopt <= var_sofc.sofc_elec <= sofc_v(5)*var_sofc.sofc_adopt):'Min/Max elec limited by operating SOFCs'    % electricity generation
         (var_sofc.sofc_wh + var_tes.tes_chrg <= sofc_v(4).*var_sofc.sofc_elec./sofc_v(3)):'SOFC Heat Recovery' %Recovered heat from SOFC
-        ((-sofc_v(6).* sofc_v(5).*var_sofc.sofc_op(2:end,:)) <= (var_sofc.sofc_elec(2:end,:) - var_sofc.sofc_elec(1:end-1,:)) <= (sofc_v(6).* sofc_v(5).* var_sofc.sofc_op(2:end,:))):'SOFC ramp rate'];
-        %(var_sofc.sofc_elec + var_sofc.sofc_acc == sofc_v(5)*var_sofc.sofc_op ):'SOFC Energy Balance - =='];
+        ((-sofc_v(6).* sofc_v(5).*var_sofc.sofc_adopt(2:end,:)) <= (var_sofc.sofc_elec(2:end,:) - var_sofc.sofc_elec(1:end-1,:)) <= (sofc_v(6).* sofc_v(5).* var_sofc.sofc_adopt(2:end,:))):'SOFC ramp rate'];
+    %(var_sofc.sofc_elec + var_sofc.sofc_acc == sofc_v(5)*var_sofc.sofc_op ):'SOFC Energy Balance - =='];
     
+    %%%Removed Constraints from full integer model w/ start/stop
+    %         (var_sofc.sofc_op <= repmat(var_sofc.sofc_adopt,size(var_sofc.sofc_op,1),1) ):'Limit operating SOFCs to purchased SOFC'  % # operating SOFC limit
+    % (sofc_v(7)*sofc_v(5)*var_sofc.sofc_op <= var_sofc.sofc_elec <= sofc_v(5)*var_sofc.sofc_op):'Min/Max elec limited by operating SOFCs'    % electricity generation
+    %         (var_sofc.sofc_wh + var_tes.tes_chrg <= sofc_v(4).*var_sofc.sofc_elec./sofc_v(3)):'SOFC Heat Recovery' %Recovered heat from SOFC
+    %         ((-sofc_v(6).* sofc_v(5).*var_sofc.sofc_op(2:end,:)) <= (var_sofc.sofc_elec(2:end,:) - var_sofc.sofc_elec(1:end-1,:)) <= (sofc_v(6).* sofc_v(5).* var_sofc.sofc_op(2:end,:))):'SOFC ramp rate'];
+    
+    
+    if tes_on
+        Constraints = [Constraints
+            (var_tes.tes_soc(1,:) == var_tes.tes_soc(end,:)):'SOC at start is same as at end'
+            (var_tes.tes_soc(2:end,:) == var_tes.tes_soc(1:end-1,:).*0.999 + 0.95.*var_tes.tes_chrg(2:end,:) - 1.05.*var_tes.tes_dchrg(2:end,:)):'TES Energy Balance'
+            var_tes.tes_soc <= 20]; % convert 80 gallon Hot water tank to kWh capacity
         
-        if tes_on
-            Constraints = [Constraints
-                (var_tes.tes_soc(1,:) == var_tes.tes_soc(end,:)):'SOC at start is same as at end'
-                (var_tes.tes_soc(2:end,:) == var_tes.tes_soc(1:end-1,:).*0.999 + 0.95.*var_tes.tes_chrg(2:end,:) - 1.05.*var_tes.tes_dchrg(2:end,:)):'TES Energy Balance'
-                 var_tes.tes_soc <= 20]; % convert 80 gallon Hot water tank to kWh capacity
-            
-        end
-        
-        
-        %repmat(var_sofc.sofc_adopt,size(var_sofc.sofc_op,1),1)
+    end
+    
+    
+    %repmat(var_sofc.sofc_adopt,size(var_sofc.sofc_op,1),1)
     %(var_sofc.sofc_adopt <= sofc_v(5)* var_sofc.sofc_adopt):'SOFC units multiples of 0.5 kw']; %500 watt increments
     %     end
     %      for i=1:K
