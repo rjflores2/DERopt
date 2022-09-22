@@ -66,20 +66,20 @@ import_limit = .8;
 %%%Can export back to the grid
 export_on = 1;
 %%%Which NEM scenario applies? (2.0 or 3.0)
-nem_rate = 2.0;
+nem_rate = 3.0;
 
 %%% Island operation (opt_nem.m)
 island = 0;
 
 %%%Utility Cost Increase ($/kWh)   $0.031/kWh for 60% RPS,  $0.054/kWh for 100%
-%%%RPS 2030:$0.015/kWh__2040:$0.031/kWh(60% RPS)__2050:$0.054/kWh (100% RPS)
-urg_adder = [0.015]; %Utility retained generation
+%%%RPS 203a0:$0.015/kWh__2040:$0.031/kWh(60% RPS)__2050:$0.054/kWh (100% RPS)
+urg_adder = [0.054]; %Utility retained generation
 
 %% Utility Gas Properties
 
-h2_cost_kg = 6; %renewable H2 cost ($/kg)
+h2_cost_kg = 4; %renewable H2 cost ($/kg)
 
-h2_mix = 0.51; %Gas mixture assumption (%/vol)
+h2_mix = 1; %Gas mixture assumption (%/vol)
 
 h2_lim = []; %Gas mixture Limit assumption (%/vol)
 
@@ -120,6 +120,7 @@ addpath(genpath('H:\_Tools_\SCG_DERopt\DERopt\Utilities'))
 addpath('H:\_Research_\CEC_OVMG\URBANopt\UO_Processing')
 %%%UO Utility Files
 addpath(genpath('H:\_Research_\CEC_OVMG\Rates'))
+
 %% Loading building demand - BEopt Data Ref Format
 
 % dt = xlsread('UO_Example.xlsx');
@@ -140,7 +141,7 @@ addpath(genpath('H:\_Research_\CEC_OVMG\Rates'))
 % elec = dt.MyDesign_SiteEnergy_Total_E__kWh_  - dhw;
 
 %% rjf mods
-dt = readtable('C:\Users\19498\Documents\GitHub\DERopt\Data\SCG_Nanogrid\Loads\CZ06_Loader.xlsx','Sheet','Heat_pump');
+dt = readtable('C:\Users\19498\Documents\GitHub\DERopt\Data\SCG_Nanogrid\Loads\CZ06_Loader.xlsx','Sheet','Premium_Heat_Pump');
 
 time = (dt.HoursSince00_00Jan1 - 0.5)./24;
 %%%Basic Loads
@@ -171,8 +172,8 @@ apartment_types = [0 0 1];
 
 %%%Climate Zone
 cz_name = 'CZ06';
-%%%Year to be simulated
-yr = 2030;
+%%%Year to simulate utility
+yr = 2050; %2030, 2040, 2050
 %%%Month filter - use during development/debugging
 mth = [];
 
