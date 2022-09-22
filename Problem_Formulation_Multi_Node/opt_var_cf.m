@@ -427,6 +427,7 @@ end
 if sofc_on
     % Declaring Variables
     var_sofc.sofc_adopt  = intvar(1,K,'full');    %%%SOFC number of purchased/installed units (#)
+%     var_sofc.sofc_adopt  = sdpvar(1,K,'full');    %%%SOFC number of purchased/installed units (#)
 %     var_sofc.sofc_op = intvar(T,K,'full');    %%%SOFC number of operating SOFCs at each time(#)
     var_sofc.sofc_elec = sdpvar(T,K,'full');       %%% SOFC electricity to demand (kWh) SOFC electricity produced (kWh)
     %var_sofc.sofc_nem = sdpvar(T,K,'full');       %%%SOFC electricity to export (kWh)
