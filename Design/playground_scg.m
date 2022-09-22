@@ -82,7 +82,7 @@ h2_cost_kg = 4; %renewable H2 cost ($/kg)
 h2_mix = 1; %Gas mixture assumption (%/vol)
 
 h2_lim = []; %Gas mixture Limit assumption (%/vol)
-
+%% to check the git
 %% Adding paths
 %%%YALMIP Master Path
 addpath(genpath('H:\Matlab_Paths\YALMIP-master'))

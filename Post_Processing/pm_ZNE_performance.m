@@ -114,7 +114,7 @@ plot(time,var_pv.pv_elec+var_pv.pv_nem+var_rees.rees_chrg,'LineWidth',4,'Color',
 % plot(time,var_util.import,'LineWidth',2,'Color','c')
 plot(time,var_rees.rees_chrg,'LineWidth',2,'Color','m')
 plot(time,elec,'LineWidth',2,'Color','k')
-plot(time,var_rees.rees_dchrg,'LineWidth',5,'Color','c')
+plot(time,var_rees.rees_dchrg,'LineWidth',4,'Color','c')
 legend({'EES-DC','REES-DC','Grid','REES-NEM','PV','REES-C','load'},'Location','northwest','Orientation','horizontal')
 xlim(xlim_range)
 datetick('x','ddd','KeepTicks')

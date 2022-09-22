@@ -8,7 +8,7 @@ utility_exists=1;
 %%% O&M ($/kWh generated)
 if pv_on
     %pv_v=[3500; 0.2 ; 0.001];  
-    pv_v=[2484; 0.2 ; 0.001]; %pv_v=[2650; 0.2 ; 0.001]; https://atb.nrel.gov/electricity/2021/residential_pv
+    pv_v=[1317.5; 0.2 ; 0.001]; %pv_v=[2650; 0.2 ; 0.001]; https://atb.nrel.gov/electricity/2021/residential_pv
      
     pv_cap=pv_v(1,:);%NREL:PV capital cost: 2000 in 2035, 1300 in 2045 w/ conservative scenario
     
@@ -18,8 +18,8 @@ if pv_on
     
     %%%Financial Aspects - Solar PV 
     pv_fin = [-0.4648; ... %%%Scaling linear factor - Based on Lazards cost of electricity
-        5; ... %%%MACRS Schedule Modified Accelerated Cost Recovery System (tax)
-        1]; ... %%%ITC Solar Investment Tax Credit (ITC)   
+        0; ... %%%MACRS Schedule Modified Accelerated Cost Recovery System (tax)
+        0]; ... %%%ITC Solar Investment Tax Credit (ITC)   
         
     
     %%%Solar on multifamily affordable homes (SOMAH)
@@ -52,7 +52,7 @@ if ees_on
     %ees_v=[600; 0.001; 0.001; 0.1; 0.95; 0.25; 0.25; 1; 1; .995]; %Testing with 100% RTE
     
  
-    ees_v=[911.5; 0.001; 0.001; 0.1; 0.95; 0.5; 0.5; .90; .90; .9999];
+    ees_v=[654; 0.001; 0.001; 0.1; 0.95; 0.5; 0.5; .90; .90; .9999];
     ees_cap=ees_v(1);
     
     %%%How EES capital cost is modified for different types of buildings
@@ -61,13 +61,13 @@ if ees_on
     
     %%%Financial Aspects - EES
     ees_fin = [-0.4648;... %%%Scaling linear factor - Based on Lazards cost of electricity ($/kW installed)
-        7; ... %%%MACRS Schedule:Modified Accelerated Cost Recovery(tax depreciation system to calculate asset depreciation)-PPA(Power Purchase Agreement)
+        0; ... %%%MACRS Schedule:Modified Accelerated Cost Recovery(tax depreciation system to calculate asset depreciation)-PPA(Power Purchase Agreement)
         0]; ... %%%ITC Benefit:Investment Tax Credit(federal tax incentive for business investment) 
         
     %%%Financial Aspects - EES
     rees_fin = [-0.4648;... %%%Scaling linear factor - Based on Lazards cost of electricity
-        5; ... %%%MACRS Schedule
-        1]; ... %%%ITC Benefit
+        0; ... %%%MACRS Schedule
+        0]; ... %%%ITC Benefit
         
     ees_fin = [-0.1306;... %%%Scaling linear factor - Based on Lazards cost of electricity
         0; ... %%%MACRS Schedule
@@ -85,8 +85,8 @@ end
 %% SOFC
 if  sofc_on
     %5420.5
-    sofc_v = [0.7*5706  %%% 1: Capital cost ($/kWel) C_fc Assume 30% tax credit
-        0.06*5706     %%% 2: O&M ($/kW/yr generated) 6 Yearly % of TIC(Total Installed Cost) % of the purchasing cost (4–10%)
+    sofc_v = [0.7*5420.5  %%% 1: Capital cost ($/kWel) C_fc Assume 30% tax credit
+        0.06*5420.5     %%% 2: O&M ($/kW/yr generated) 6 Yearly % of TIC(Total Installed Cost) % of the purchasing cost (4–10%)
         0.6        %%% 3: SOFC electrical efficiency at nominal condition (fraction)
         0.3        %%% 4: SOFC thermal efficiency at nominal condition (fraction)
         0.5        %%% %0.5 5: Minimum SOFC capacity is 500 Watt- 0.5 kW increments
@@ -108,7 +108,7 @@ end
 %% ERWH     instead of O&M cost the electricity consumption is multiplied by its cost  
 if erwh_on
     erwh_v = [0    %%% 1000  1: Capital cost ($/kWel) https://www.homedepot.com/
-               2.46];   %%% 0.9 for ERWH, 3 for COP_HPWH 2: ERWH energy factor- COPHPWH = 3 from AHRI Directory  From RFJ model for premium heat pump COP is 2.46   
+               2.46];   %%% 0.9 for ERWH, 2.46 for COP_HPWH 2: ERWH energy factor- COPHPWH = 3 from AHRI Directory  From RFJ model for premium heat pump COP is 2.46   
 else 
     erwh_v = [];
 end      
