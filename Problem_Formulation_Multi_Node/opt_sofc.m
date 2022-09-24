@@ -4,7 +4,7 @@ if ~isempty(sofc_v)
     Constraints = [Constraints
         (sofc_v(7)*sofc_v(5)*var_sofc.sofc_adopt <= var_sofc.sofc_elec <= sofc_v(5)*var_sofc.sofc_adopt):'Min/Max elec limited by operating SOFCs'    % electricity generation
         (var_sofc.sofc_wh + var_tes.tes_chrg <= sofc_v(4).*var_sofc.sofc_elec./sofc_v(3)):'SOFC Heat Recovery' %Recovered heat from SOFC
-        ((-sofc_v(6).* sofc_v(5).*var_sofc.sofc_adopt(2:end,:)) <= (var_sofc.sofc_elec(2:end,:) - var_sofc.sofc_elec(1:end-1,:)) <= (sofc_v(6).* sofc_v(5).* var_sofc.sofc_adopt(2:end,:))):'SOFC ramp rate'];
+        ((-sofc_v(6).* sofc_v(5).*var_sofc.sofc_adopt) <= (var_sofc.sofc_elec(2:end,:) - var_sofc.sofc_elec(1:end-1,:)) <= (sofc_v(6).* sofc_v(5).* var_sofc.sofc_adopt)):'SOFC ramp rate'];
     %(var_sofc.sofc_elec + var_sofc.sofc_acc == sofc_v(5)*var_sofc.sofc_op ):'SOFC Energy Balance - =='];
     
     %%%Removed Constraints from full integer model w/ start/stop

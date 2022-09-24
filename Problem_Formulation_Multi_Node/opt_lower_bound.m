@@ -117,10 +117,14 @@ end
 if sofc_on
     Constraints = [Constraints
         (0 <= var_sofc.sofc_adopt):'SOFC Units >=0' 
-        (0 <= var_sofc.sofc_op):'SOFC Units >=0' 
         (0 <= var_sofc.sofc_elec):'SOFC Electricity >=0'];
-        %(0 <= var_sofc.sofc_nem):'SOFC exported elevctricity >=0'];
-    if sofcwh_on
+    %(0 <= var_sofc.sofc_nem):'SOFC exported elevctricity >=0'];
+    
+    if isfield(var_sofc,'sofc_op')
+        Constraints = [Constraints
+            (0 <= var_sofc.sofc_op):'SOFC Units >=0' ];
+    end
+        if sofcwh_on
         Constraints = [Constraints
         (0 <= var_sofc.sofc_wh):'SOFC Water Heating >=0'];
     end

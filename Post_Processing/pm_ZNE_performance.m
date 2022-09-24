@@ -15,12 +15,33 @@ import_TDV = sum(var_util.import.*tdv_elec) + ...
 
 export_TDV = sum(var_pv.pv_nem.*tdv_elec) +...
              sum(var_rees.rees_dchrg_nem.*tdv_elec);
-         
+%% Capital and O&M Costs
+%PV
+PV_Cost= sum(M*pv_mthly_debt.*pv_cap_mod'.*var_pv.pv_adopt)...
+        + pv_v(3)*(sum(sum(repmat(day_multi,1,K).*(var_pv.pv_elec + var_pv.pv_nem))))
+    
+REES_Cost= sum(rees_mthly_debt*M.*rees_cap_mod'.*var_rees.rees_adopt) ...
+            + ees_v(2)*sum(sum(repmat(day_multi,1,K).*var_rees.rees_chrg))... 
+            + ees_v(3)*(sum(sum(repmat(day_multi,1,K).*(var_rees.rees_dchrg))))
+        
+EES_Cost= sum(ees_mthly_debt*M.*ees_cap_mod'.* var_ees.ees_adopt) ...
+        + ees_v(2)*sum(sum(repmat(day_multi,1,K).* var_ees.ees_chrg)) ...
+        + ees_v(3)*sum(sum(repmat(day_multi,1,K).* var_ees.ees_dchrg))
+    
+SOFC_Cost= sum(M*sofc_mthly_debt.*var_sofc.sofc_adopt)...  %%%Annual investment/Capital Cost ($/kW)*(kW)
+        + sum((sofc_v(2).* var_sofc.sofc_adopt))... %%% O&M ($/kW/yr)*(kW)
+        + sum(ng_cost * var_sofc.sofc_elec./sofc_v(3))
+    
+Export_Income =- (export_price(:,index)'*(var_rees.rees_dchrg_nem(:,k)) + (export_price(:,index)'* var_pv.pv_nem(:,k))) 
+    
+%Battery
 %% Avoided costs
 pv_acc_dollar =sum(-day_multi.*export_price(:,index).*var_pv.pv_nem);
 
 rees_acc_dollar = sum(day_multi.*(ees_v(3) - export_price(:,index)).*var_rees.rees_dchrg_nem);
 
+%%check
+export=(day_multi.*export_price(:,index).*var_pv.pv_nem)- ((day_multi.*(ees_v(3) - export_price(:,index)).*var_rees.rees_dchrg_nem))
 %% plotting codes
 days_to_look_at = 2;
 xlim_range = [time(24*(days_to_look_at-1)+1)    time(24*days_to_look_at+ 24*6) ];
