@@ -12,9 +12,9 @@ pv_on = 1;        %Turn on PV
 ees_on = 1;       %Turn on EES/REES
 rees_on = 1;      %Turn on REES
 %%% Change these 3 items for SOFC ON/OFF
-sofc_on =1;       %Turn on SOFC
-tes_on = 1;       %Turn on thermal energy storage
-sofcwh_on =1;     %Turn on SOFC water heater (CHP)
+sofc_on =0;       %Turn on SOFC
+tes_on = 0;       %Turn on thermal energy storage
+sofcwh_on =0;     %Turn on SOFC water heater (CHP)
 %%%
 gwh_on = 1;        %Turn on GWH (Gas Water Heater)
 gsph_on = 1;      %Turn on GSPH (Gas Space Heater)

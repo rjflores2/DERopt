@@ -38,6 +38,9 @@ EES_Cost= sum(ees_mthly_debt*M.*ees_cap_mod'.* var_ees.ees_adopt) ...
 SOFC_Cost= sum(M*sofc_mthly_debt.*var_sofc.sofc_adopt)...  %%%Annual investment/Capital Cost ($/kW)*(kW)
         + sum((sofc_v(2).* var_sofc.sofc_adopt))... %%% O&M ($/kW/yr)*(kW)
         + sum(ng_cost * var_sofc.sofc_elec./sofc_v(3))
+
+SOFC_Cost_NoGas= sum(M*sofc_mthly_debt.*var_sofc.sofc_adopt)...  %%%Annual investment/Capital Cost ($/kW)*(kW)
+        + sum((sofc_v(2).* var_sofc.sofc_adopt))... %%% O&M ($/kW/yr)*(kW)
     
 Export_Income =- (export_price(:,index)'*(var_rees.rees_dchrg_nem(:,k)) + (export_price(:,index)'* var_pv.pv_nem(:,k))); 
 %% Avoided costs
