@@ -163,6 +163,10 @@ if nem_rate == 3
     for ii = 2:size(acc_elec,1)
         acc_time(ii,1) = acc_time(ii-1,1) + 1/24;
     end
+       %%%Ensuring end of acc_time matches the time vector
+    if acc_time(end) < time(end)
+        acc_time(end) = time(end);
+    end
     %%%Extracting TDV of interest
     acc_elec = interp1(acc_time,acc_elec,time)./1000; % $/kWh
 end
