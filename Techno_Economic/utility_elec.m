@@ -115,7 +115,7 @@ end
 %% Combining Prices
 import_price = [gen_tou res_tou + urg_adder];
 
-if nem_rate == 2 || ~exist('nem_rates') %If NEM 2.0 is active or if no nem_rate toggle is specified
+if nem_rate == 2 || ~exist('nem_rate') %If NEM 2.0 is active or if no nem_rate toggle is specified
     export_price = [gen_tou_ex res_tou_ex];
 elseif nem_rate == 3 %If NEM 3.0 is active and ACC prices are used
     export_price = repmat(acc_elec,1,size(import_price,2));

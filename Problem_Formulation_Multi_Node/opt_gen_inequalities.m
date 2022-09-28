@@ -83,6 +83,19 @@ if lpv_on || lrees_on || strcmp(class(var_pv.pv_nem),'sdpvar') || strcmp(class(v
     end
 end
 
+if sofc_on ==0
+% Net Zero Energy
+Constraints = [Constraints
+    (sum(var_util.import.*tdv_elec) +...
+    sum(var_gwh.gwh_gas.*tdv_gas.*tdv_gas_mod) + ...
+    sum(var_gsph.gsph_gas.*tdv_gas.*tdv_gas_mod) <= sum(var_pv.pv_nem.*tdv_elec) +...
+    sum(var_rees.rees_dchrg_nem.*tdv_elec)):'NZE - Electricity requirement'];
+%                              tdv_lim + sum(var_pv.pv_nem.*tdv_elec)+sum (var_sofc.sofc_nem.*tdv_elec) ):'NZE - Electricity requirement'];
+
+
+end
+
+if sofc_on ==1
 % Net Zero Energy
 Constraints = [Constraints
     (sum(var_util.import.*tdv_elec) +...
@@ -91,6 +104,7 @@ Constraints = [Constraints
     sum(var_gsph.gsph_gas.*tdv_gas.*tdv_gas_mod) <= sum(var_pv.pv_nem.*tdv_elec) +...
     sum(var_rees.rees_dchrg_nem.*tdv_elec)):'NZE - Electricity requirement'];
 %                              tdv_lim + sum(var_pv.pv_nem.*tdv_elec)+sum (var_sofc.sofc_nem.*tdv_elec) ):'NZE - Electricity requirement'];
+end
 
 
 
