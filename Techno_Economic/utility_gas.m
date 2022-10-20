@@ -4,7 +4,7 @@ if ~isempty(h2_lim)
 end
 %% Natural Gas Cost
 %%%CO2 Cost 
-co2_cost = 50; %$/tonne 2030: $27.96/tonne __2040: $50/tonne__2050: $71.5/tonne
+co2_cost = 27.96; %$/tonne 2030: $27.96/tonne __2040: $50/tonne__2050: $71.5/tonne
 ng_td = 0.8; %$/therm
 ng_procure = 0.6; %$/therm
 ng_carbon =  (co2_cost/1000)*(105.5/55.5/16*44);% $/therm (1 therm * 105.5MJ/therm * 1kmolCH4/16kg CH4 * 1kmolCO2/1kmolCH4 * 44kg/1kmolCO2)
@@ -24,4 +24,5 @@ if ~isempty(h2_mix)
     
     tdv_gas_mod = (1 - h2_mix_e_frac); %%%Value to multiply TDV values by
 end
+
    

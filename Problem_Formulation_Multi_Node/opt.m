@@ -17,7 +17,7 @@ if opt_now==1
     options = cplexoptimset;
     options.Display='on';
     %     options.MaxTime = 2*3600;
-    options.MaxNodes = 1000000; 
+    options.MaxNodes = 1000000; % 1000; 
         
     fprintf('%s Starting CPLEX Solver \n', datestr(now,'HH:MM:SS'))
     tic
@@ -65,7 +65,7 @@ if opt_now_yalmip==1
             0 <= pv_elec
             0 <= pv_nem
             0 <= pv_wholesale
-            0 <= pv_adopt <= 99999 %Big M limits
+            0 <= pv_adopt <= 9999 %99999 %Big M limits
  %           3 <= pv_adopt <= 99999 % Limits for semivar
             ];
   end

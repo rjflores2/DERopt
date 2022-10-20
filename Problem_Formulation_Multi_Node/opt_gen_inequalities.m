@@ -81,8 +81,8 @@ if lpv_on || lrees_on || strcmp(class(var_pv.pv_nem),'sdpvar') || strcmp(class(v
             (sum(var_rees.rees_dchrg_nem(:,k) + var_pv.pv_nem(:,k) + var_lrees.rees_dchrg_nem(:,k)) <= sum(var_util.import(:,k))):'NEM Energy < Import Energy'];
         
     end
-end
-
+ end
+%%%%%%%% ZNE Constraint 
 if sofc_on ==0
 % Net Zero Energy
 Constraints = [Constraints

@@ -37,6 +37,8 @@ pv_acc_dollar =sum(-day_multi.*export_price(:,index).*var_pv.pv_nem)
 
 rees_acc_dollar = sum(day_multi.*(ees_v(3) - export_price(:,index)).*var_rees.rees_dchrg_nem)
 
+PV_LCOE = PV_Cost/sum(var_pv.pv_elec + var_pv.pv_nem + var_rees.rees_chrg + var_lrees.rees_chrg )
+
 %%check
 export=(day_multi.*export_price(:,index).*var_pv.pv_nem)- ((day_multi.*(ees_v(3) - export_price(:,index)).*var_rees.rees_dchrg_nem));
 total_load= elec + var_ees.ees_chrg + var_lees.ees_chrg + var_erwh.erwh_elec + var_ersph.ersph_elec;
