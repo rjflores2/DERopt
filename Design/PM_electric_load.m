@@ -29,7 +29,7 @@ set(gca,'FontSize',42,...
 set(gca,'fontname','Times New Roman')
 datetick('x','ddd','KeepTicks')
 xlim(xlim_range)
-ylim([0 6])
+ylim([0 3])
 ylabel('Power (kW)')
 hold off
 saveas(gcf,'winter_electric_load.fig')
@@ -64,7 +64,7 @@ set(gca,'FontSize',42,...
 set(gca,'fontname','Times New Roman')
 datetick('x','ddd','KeepTicks')
 xlim(xlim_range)
-ylim([0 6])
+ylim([0 3])
 ylabel('Power (kW)')
 hold off
 saveas(gcf,'summer_electric_load.fig')
