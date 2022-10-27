@@ -7,15 +7,15 @@ import_gas_TDV = sum((var_sofc.sofc_elec./sofc_v(3)).*tdv_gas.*tdv_gas_mod) +...
 import_TDV = sum(var_util.import.*tdv_elec) + ...
              sum((var_sofc.sofc_elec./sofc_v(3)).*tdv_gas.*tdv_gas_mod) +...
              sum(var_gwh.gwh_gas.*tdv_gas.*tdv_gas_mod) + ...
-             sum(var_gsph.gsph_gas.*tdv_gas.*tdv_gas_mod);
+             sum(var_gsph.gsph_gas.*tdv_gas.*tdv_gas_mod)
 
 export_TDV = sum(var_pv.pv_nem.*tdv_elec) +...
-             sum(var_rees.rees_dchrg_nem.*tdv_elec);
-
+             sum(var_rees.rees_dchrg_nem.*tdv_elec)
+                    
 %% Energy import and export (kWh)      
 imported_gas_kWh= sum((var_sofc.sofc_elec./sofc_v(3)))+...
-                  sum(var_gwh.gwh_gas) + sum(var_gsph.gsph_gas);
-imported_elec_kWh = sum(var_util.import);
+                  sum(var_gwh.gwh_gas) + sum(var_gsph.gsph_gas)
+imported_elec_kWh = sum(var_util.import)
 exported_REES_kWh = sum(var_rees.rees_dchrg_nem)
 exported_PV_kWh = sum(var_pv.pv_nem)
 

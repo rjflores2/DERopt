@@ -16,10 +16,10 @@ sofc_on =1;       %Turn on SOFC
 tes_on = 1;       %Turn on thermal energy storage
 sofcwh_on = 1;     %Turn on SOFC water heater (CHP)
 %%%
-gwh_on = 0;        %Turn on GWH (Gas Water Heater)
-gsph_on = 0;      %Turn on GSPH (Gas Space Heater)
-ersph_on = 1;     %Turn on ERSPH (Electric Resistance Space Heater)
-erwh_on = 1;       %Turn on ERWH (Electric Resistance Water Heater)
+gwh_on = 1;        %Turn on GWH (Gas Water Heater)
+gsph_on = 1;      %Turn on GSPH (Gas Space Heater)
+ersph_on = 0;     %Turn on ERSPH (Electric Resistance Space Heater)
+erwh_on = 0;       %Turn on ERWH (Electric Resistance Water Heater)
 %%%NO LEGACY SYSTEMS YET!
 lpv_on = 0;
 lees_on = 0;
@@ -68,20 +68,20 @@ import_limit = .8;
 %%%Can export back to the grid
 export_on = 1;
 %%%Which NEM scenario applies? 2025:2.0  2035:3.0  2045:3.0
-nem_rate = 3.0;
+nem_rate = 2.0;
 
 %%% Island operation (opt_nem.m)
 island = 0;
 
 %%%Utility Cost Increase ($/kWh)   $0.031/kWh for 60% RPS,  $0.054/kWh for 100%
 %%%RPS 2030:$0.015/kWh (30% RPS)__2040:$0.031/kWh(60% RPS)__2050:$0.054/kWh (100% RPS)
-urg_adder = [0.054]; %Utility retained generation
+urg_adder = [0.015]; %Utility retained generation
 
 %% Utility Gas Properties
 
-h2_cost_kg = 4; %renewable H2 cost ($/kg)  2030:6 $/kg__2040:4.5 $/kg__2050:4 $/kg
+h2_cost_kg = 6; %renewable H2 cost ($/kg)  2030:6 $/kg__2040:4.5 $/kg__2050:4 $/kg
 
-h2_mix = 1; %Gas mixture assumption (%/vol)  2030:0.51__2040:0.86__2050:1(100% H2)
+h2_mix = 0.51; %Gas mixture assumption (%/vol)  2030:0.51__2040:0.86__2050:1(100% H2)
 
 h2_lim = []; %Gas mixture Limit assumption (%/vol)
 %% to check the git
@@ -144,7 +144,7 @@ addpath(genpath('H:\_Research_\CEC_OVMG\Rates'))
 % elec = dt.MyDesign_SiteEnergy_Total_E__kWh_  - dhw;
 
 %% rjf mods
-dt = readtable('C:\Users\19498\Documents\GitHub\DERopt\Data\SCG_Nanogrid\Loads\CZ15_Loader.xlsx','Sheet','Premium_Heat_Pump');
+dt = readtable('C:\Users\19498\Documents\GitHub\DERopt\Data\SCG_Nanogrid\Loads\CZ15_Loader.xlsx','Sheet','Baseline');
 
 time = (dt.HoursSince00_00Jan1 - 0.5)./24;
 %%%Basic Loads
@@ -176,7 +176,7 @@ apartment_types = [0 0 1];
 %%%Climate Zone
 cz_name = 'CZ15';
 %%%Year to simulate utility
-yr = 2050; %2030, 2040, 2050
+yr = 2030; %2030, 2040, 2050
 %%%Month filter - use during development/debugging
 mth = [];
 
