@@ -70,7 +70,7 @@ set(gca,'FontSize',38,...
 set(gca,'fontname','Times New Roman')
 datetick('x','ddd','KeepTicks')
 xlim(xlim_range)
-ylim([-2 2])
+ylim([-8 8])
 ylabel('Energy (kWh)')
 hold off
 saveas(gcf,'winter_EES_REES_SOC.fig')
@@ -108,7 +108,7 @@ set(gca,'FontSize',38,...
 set(gca,'fontname','Times New Roman')
 datetick('x','ddd','KeepTicks')
 xlim(xlim_range)
-ylim([-2 2])
+ylim([-8 8])
 ylabel('Energy (kWh)')
 hold off
 saveas(gcf,'summer_EES_REES_SOC.fig')
@@ -174,7 +174,7 @@ set(gca,'fontname','Times New Roman')
 datetick('x','ddd','KeepTicks')
 xlim(xlim_range)
 ylabel('TDV electricity (kWh/kWh)')
-ylim([0 2])
+% ylim([0 2])
 hold off
 saveas(gcf,'winter_TDV.fig')
 %%
@@ -192,6 +192,6 @@ set(gca,'fontname','Times New Roman')
 datetick('x','ddd','KeepTicks')
 xlim(xlim_range)
 ylabel('TDV electricity (kWh/kWh)')
-ylim([0 2])
+% ylim([0 2])
 hold off
 saveas(gcf,'summer_TDV.fig')

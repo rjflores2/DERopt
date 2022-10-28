@@ -105,7 +105,12 @@ plot(var_pv.pv_elec,'LineWidth',1)
 plot(var_sofc.sofc_elec,'LineWidth',2,'Color','g')
 
 legend({'building','building + EES-C','Grid','REES-D','EES-D','EES-C','PV','SOFC'},'Location','northwest','Orientation','horizontal')
-%%%%
+%%
+LCOE = fval/Total_Load
+SOFC_LCOE = SOFC_Cost/sum(var_sofc.sofc_elec)
+PV_LCOE = PV_Cost/sum(var_pv.pv_elec + var_pv.pv_nem + var_rees.rees_chrg + var_lrees.rees_chrg )
+
+%%%
 %  figure 
 %  Grid = var_util.import;
 %  PVEX = var_pv.pv_nem;

@@ -83,7 +83,7 @@ if lpv_on || lrees_on || strcmp(class(var_pv.pv_nem),'sdpvar') || strcmp(class(v
     end
 end
  
-%%
+% %%
 % %%%%%%%% ZNE Constraint 
 % if sofc_on ==0
 % % Net Zero Energy
@@ -107,7 +107,7 @@ end
 %     sum(var_rees.rees_dchrg_nem.*tdv_elec)):'NZE - Electricity requirement'];
 % %                              tdv_lim + sum(var_pv.pv_nem.*tdv_elec)+sum (var_sofc.sofc_nem.*tdv_elec) ):'NZE - Electricity requirement'];
 % end
-% 
+
 % 
 % 
 % %Constraints = [Constraints

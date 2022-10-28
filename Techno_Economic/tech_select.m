@@ -8,7 +8,7 @@ utility_exists=1;
 %%% O&M ($/kWh generated)
 if pv_on
     %pv_v=[3500; 0.2 ; 0.001];  2025:2484 $/kW__2035:1944 $/kW__2045:1317.5 $/kW
-    pv_v=[2484; 0.2 ; 0.001];  %https://atb.nrel.gov/electricity/2021/residential_pv
+    pv_v=[1317.5; 0.2 ; 0.001];  %https://atb.nrel.gov/electricity/2021/residential_pv
      
     pv_cap=pv_v(1,:);%NREL:PV capital cost: 2000 in 2035, 1300 in 2045 w/ conservative scenario
     
@@ -18,8 +18,8 @@ if pv_on
     
     %%%Financial Aspects - Solar PV 
     pv_fin = [-0.4648; ... %%%Scaling linear factor - Based on Lazards cost of electricity
-        5; ... %%%MACRS Schedule Modified Accelerated Cost Recovery System (tax) 2025:5__2030:0__2045:0
-        1]; ... %%%ITC Solar Investment Tax Credit (ITC)2025:1__2030:0__2045:0   
+        0; ... %%%MACRS Schedule Modified Accelerated Cost Recovery System (tax) 2025:5__2030:0__2045:0
+        0]; ... %%%ITC Solar Investment Tax Credit (ITC)2025:1__2030:0__2045:0   
         
     
     %%%Solar on multifamily affordable homes (SOMAH)
@@ -52,7 +52,7 @@ if ees_on
     %ees_v=[600; 0.001; 0.001; 0.1; 0.95; 0.25; 0.25; 1; 1; .995]; %Testing with 100% RTE
     
     %2025:911.5 $/kWh__2035:755 $/kWh__2045:654 $/kWh
-    ees_v=[911.5; 0.001; 0.001; 0.1; 0.95; 0.5; 0.5; .90; .90; .9999];
+    ees_v=[654; 0.001; 0.001; 0.1; 0.95; 0.5; 0.5; .90; .90; .9999];
     ees_cap=ees_v(1);
     
     %%%How EES capital cost is modified for different types of buildings
@@ -61,13 +61,13 @@ if ees_on
     
     %%%Financial Aspects - EES
     ees_fin = [-0.4648;... %%%Scaling linear factor - Based on Lazards cost of electricity ($/kW installed)
-        7; ... %%%MACRS Schedule:Modified Accelerated Cost Recovery(tax depreciation system to calculate asset depreciation)-PPA(Power Purchase Agreement) 2025:7__2030:0__2045:0   
+        0; ... %%%MACRS Schedule:Modified Accelerated Cost Recovery(tax depreciation system to calculate asset depreciation)-PPA(Power Purchase Agreement) 2025:7__2030:0__2045:0   
         0]; ... %%%ITC Benefit:Investment Tax Credit(federal tax incentive for business investment) 2025:0__2030:0__2045:0  
         
     %%%Financial Aspects - EES
     rees_fin = [-0.4648;... %%%Scaling linear factor - Based on Lazards cost of electricity
-        5; ... %%%MACRS Schedule 2025:5__2030:0__2045:0   
-        1]; ... %%%ITC Benefit 2025:1__2030:0__2045:0 
+        0; ... %%%MACRS Schedule 2025:5__2030:0__2045:0   
+        0]; ... %%%ITC Benefit 2025:1__2030:0__2045:0 
         
 %     ees_fin = [-0.1306;... %%%Scaling linear factor - Based on Lazards cost of electricity
 %         0; ... %%%MACRS Schedule
@@ -85,8 +85,8 @@ end
 %% SOFC
 if  sofc_on
     %2025:5706 $/kW__2035:5529.5 $/kW__2045:5420.5 $/kW
-    sofc_v = [0.7*2300    %%% 1: Capital cost ($/kWel) C_fc Assume 30% tax credit
-        0.06*2300     %%% 2: O&M ($/kW/yr generated) 6 Yearly % of TIC(Total Installed Cost) % of the purchasing cost (4–10%)
+    sofc_v = [0.7*1000    %%% 1: Capital cost ($/kWel) C_fc Assume 30% tax credit
+        0.06*1000     %%% 2: O&M ($/kW/yr generated) 6 Yearly % of TIC(Total Installed Cost) % of the purchasing cost (4–10%)
         0.6        %%% 3: SOFC electrical efficiency at nominal condition (fraction)
         0.3        %%% 4: SOFC thermal efficiency at nominal condition (fraction)
         0.5        %%% %0.5 5: Minimum SOFC capacity is 500 Watt- 0.5 kW increments
@@ -108,21 +108,21 @@ end
 %% ERWH     instead of O&M cost the electricity consumption is multiplied by its cost  
 if erwh_on
     erwh_v = [0    %%% 1000  1: Capital cost ($/kWel) https://www.homedepot.com/
-               0.99];   %CZ16:WHP COP:2.62 CZ16:ERWH:0.95 PremiumERWH:1 WHP:1.65  %%% 0.9 for ERWH 0.99 for premium on-demand, 2.46 for COP_HPWH 2: ERWH energy factor- COPHPWH = 3 from AHRI Directory  From RFJ model for premium heat pump COP is 2.46   
+               2.46];   %CZ16:WHP COP:2.62 CZ16:ERWH:0.95 PremiumERWH:1 WHP:1.65  %%% 0.9 for ERWH 0.99 for premium on-demand, 2.46 for COP_HPWH 2: ERWH energy factor- COPHPWH = 3 from AHRI Directory  From RFJ model for premium heat pump COP is 2.46   
 else 
     erwh_v = [];
 end      
 %% GWH     instead of O&M cost the gas consumption is multiplied by its cost  
 if gwh_on
     gwh_v = [0    %%%2000 1: Capital cost ($/kWth) 
-              0.6];  %%% 2: GWH energy factor (EF) Baseline:0.6, Premium_Gas:0.96    
+              0.96];  %%% 2: GWH energy factor (EF) Baseline:0.6, Premium_Gas:0.96    
 else 
     gwh_v = [];
 end
 %% GSPH     instead of O&M cost the gas consumption is multiplied by its cost  
 if gsph_on
     gsph_v = [0    %%%3000 1: Capital cost ($/kWth)- 75,000–100,000 BTU: $2,500–$5,900: An 80,000 BTU furnace will keep a 1,600- to 2,000-square-foot home warm
-              0.8];  %%% BEopt: Baseline: 0.8 - Premium Gas: 0.96  
+              0.96];  %%% BEopt: Baseline: 0.8 - Premium Gas: 0.96  
 else 
     gsph_v = [];
 end 

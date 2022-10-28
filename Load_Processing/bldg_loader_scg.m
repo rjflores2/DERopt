@@ -108,6 +108,9 @@ end
 tdv_elec_raw = readtable(strcat('TDV_',cz_name,'.xlsx'),'Sheet','Elec'); %%%Elec (Btu/kWh)
 tdv_gas_raw = readtable(strcat('TDV_',cz_name,'.xlsx'),'Sheet','Gas'); %%%Gas (kbtu/therm)
 
+% tdv_elec_raw = readtable(strcat('TDV_2025.xlsx'),'Sheet','Elec'); %%%Elec (Btu/kWh)
+% tdv_gas_raw = readtable(strcat('TDV_2025.xlsx'),'Sheet','Gas'); %%%Gas (kbtu/therm)
+
 %%%Which year are we looking at?
 yr_idx = find(strcmp(tdv_elec_raw.Properties.VariableNames,cellstr(strcat('x',mat2str(yr)))));
 tdv_elec = [];
