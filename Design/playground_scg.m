@@ -7,6 +7,141 @@ clear all; close all; clc ; started_at = datetime('now'); startsim = tic;
 opt_now = 1; %CPLEX
 opt_now_yalmip = 0; %YALMIP
 
+
+%% PM Running Values
+
+%%%Turn TDV On/Off
+tdv_on = 1;
+
+%%%Building file details
+cz = 'CZ06';
+sheet_name = 'Baseline'
+
+%%%Year of Interest
+yr = 2030%2030, 2040, 2050
+
+%%%Equipment efficiencies - Electric Water Heater
+% erwh_eff = 1.65;    %CZ15:WHP COP:2.62 CZ16:ERWH:0.95 PremiumERWH:1 
+                    %%% CZ16 WHP:1.65  %%% 0.9 for ERWH 0.99 for premium on-demand,
+                    %%% CZ06 2.46 for COP_HPWH 2: ERWH energy factor- COPHPWH = 3 from AHRI Directory  From RFJ model for premium heat pump COP is 2.46
+
+%%%Gas water heater
+% gwh_eff = 0.6;  %%% 2: GWH energy factor (EF) Baseline:0.6, Premium_Gas:0.96
+
+%%%Gas Space HEater
+% gsph_eff = 0.96; %%% BEopt: Baseline: 0.8 - Premium Gas: 0.96  
+
+%% Logical values for PM model and some pre-processing
+
+file_name = strcat('Data\SCG_Nanogrid\Loads\',cz,'_Loader.xlsx');
+
+%%%Electric space heater
+ersph_eff = 1;
+
+if strcmp(sheet_name,'Baseline')
+    sc_num = 1;
+    bldg_electrified = 0;    %%%Is building electric or no?
+    gwh_eff = 0.6;  %%% 2: GWH energy factor (EF) Baseline:0.6, Premium_Gas:0.96
+    gsph_eff = 0.8;
+    erwh_eff = 0;
+elseif strcmp(sheet_name,'Premium_gas')
+    sc_num = 2;
+    bldg_electrified = 0;    %%%Is building electric or no?
+    gwh_eff = 0.96;  %%% 2: GWH energy factor (EF) Baseline:0.6, Premium_Gas:0.96
+    gsph_eff = 0.96;
+    erwh_eff = 0;
+elseif strcmp(sheet_name,'Elec_resistive')
+    sc_num = 3;
+    bldg_electrified = 1;    %%%Is building electric or no?
+    gwh_eff = 0;  %%% 2: GWH energy factor (EF) Baseline:0.6, Premium_Gas:0.96
+    gsph_eff = 0;
+    erwh_eff = 0.9;
+elseif strcmp(sheet_name,'Premium_elec_resistive')
+    sc_num = 4;
+    bldg_electrified = 1;    %%%Is building electric or no?
+    gwh_eff = 0;  %%% 2: GWH energy factor (EF) Baseline:0.6, Premium_Gas:0.96
+    gsph_eff = 0;
+    erwh_eff = 0.99;
+elseif strcmp(sheet_name,'Heat_pump')
+    sc_num = 5;
+    bldg_electrified = 1;    %%%Is building electric or no?
+    gwh_eff = 0;  %%% 2: GWH energy factor (EF) Baseline:0.6, Premium_Gas:0.96
+    gsph_eff = 0;
+    if strcmp(cz,'CZ06')
+        erwh_eff = 2.46;
+    elseif strcmp(cz,'CZ15')
+        erwh_eff = 2.62;
+    elseif strcmp(cz,'CZ16')
+        erwh_eff = 1.65;
+    end
+elseif strcmp(sheet_name,'Premium_Heat_Pump')
+    sc_num = 6;
+    bldg_electrified = 1;    %%%Is building electric or no?
+    gwh_eff = 0;  %%% 2: GWH energy factor (EF) Baseline:0.6, Premium_Gas:0.96
+    gsph_eff = 0;
+    if strcmp(cz,'CZ06')
+        erwh_eff = 2.46;
+    elseif strcmp(cz,'CZ15')
+        erwh_eff = 2.62;
+    elseif strcmp(cz,'CZ16')
+        erwh_eff = 1.65;
+    end
+end
+gwh_eff
+gsph_eff
+erwh_eff
+if yr == 2030
+    nem_rate = 2.0
+    urg_adder = [0.015] %%%RPS 2030:$0.015/kWh (30% RPS)__2040:$0.031/kWh(60% RPS)__2050:$0.054/kWh (100% RPS)
+    h2_cost_kg = 6 %renewable H2 cost ($/kg)  2030:6 $/kg__2040:4.5 $/kg__2050:4 $/kg
+    h2_mix = 0.51; %Gas mixture assumption (%/vol)  2030:0.51__2040:0.86__2050:1(100% H2)
+    co2_cost = 27.96 %$/tonne 2030: $27.96/tonne __2040: $50/tonne__2050: $71.5/tonne
+    sofc_cap_cost = 5706 %2025:5706 $/kW__2035:5529.5 $/kW__2045:5420.5 $/kW
+    sofc_tax_credit = 0.3;
+    ees_cap_cost = 911.5 %2025:911.5 $/kWh__2035:755 $/kWh__2045:654 $/kWh
+    pv_cap_cost = 2484 %2025:2484 $/kW__2035:1944 $/kW__2045:1317.5 $/kW
+    
+    pv_macrs = 5;
+    pv_itc = 1;
+    
+    ees_macrs = 7;
+    ees_itc = 0;
+    rees_macrs = 5;
+    rees_itc = 1;
+elseif yr == 2040
+    nem_rate = 3.0
+    urg_adder = [0.031] %%%RPS 2030:$0.015/kWh (30% RPS)__2040:$0.031/kWh(60% RPS)__2050:$0.054/kWh (100% RPS)
+    h2_cost_kg = 4.5 %renewable H2 cost ($/kg)  2030:6 $/kg__2040:4.5 $/kg__2050:4 $/kg
+    h2_mix = 0.86 %Gas mixture assumption (%/vol)  2030:0.51__2040:0.86__2050:1(100% H2)
+    co2_cost = 50 %$/tonne 2030: $27.96/tonne __2040: $50/tonne__2050: $71.5/tonne
+    sofc_cap_cost = 5529.5 %2025:5706 $/kW__2035:5529.5 $/kW__2045:5420.5 $/kW
+    sofc_tax_credit = 0.3;
+    ees_cap_cost = 755 %2025:911.5 $/kWh__2035:755 $/kWh__2045:654 $/kWh
+    pv_cap_cost = 2484 %2025:2484 $/kW__2035:1944 $/kW__2045:1317.5 $/kW
+    pv_macrs = 0;
+    pv_itc = 0;
+    ees_macrs = 0;
+    ees_itc = 0;
+    rees_macrs = 0;
+    rees_itc = 0;
+elseif yr == 2050
+    nem_rate = 3.0
+    urg_adder = [0.054] %%%RPS 2030:$0.015/kWh (30% RPS)__2040:$0.031/kWh(60% RPS)__2050:$0.054/kWh (100% RPS)
+    h2_cost_kg = 4 %renewable H2 cost ($/kg)  2030:6 $/kg__2040:4.5 $/kg__2050:4 $/kg
+    h2_mix = 1 %Gas mixture assumption (%/vol)  2030:0.51__2040:0.86__2050:1(100% H2)
+    co2_cost = 71.5 %$/tonne 2030: $27.96/tonne __2040: $50/tonne__2050: $71.5/tonne
+    sofc_cap_cost = 5420.5 %2025:5706 $/kW__2035:5529.5 $/kW__2045:5420.5 $/kW
+    sofc_tax_credit = 0.3;
+    ees_cap_cost = 654 %2025:911.5 $/kWh__2035:755 $/kWh__2045:654 $/kWh
+    pv_cap_cost = 1317.5 %2025:2484 $/kW__2035:1944 $/kW__2045:1317.5 $/kW
+    pv_macrs = 0;
+    pv_itc = 0; 
+    ees_macrs = 0;
+    ees_itc = 0;
+    rees_macrs = 0;
+    rees_itc = 0;
+end
+
 %% Turning technologies on/off (opt_var_cf.m and tech_select.m)
 pv_on = 1;        %Turn on PV
 ees_on = 1;       %Turn on EES/REES
@@ -16,10 +151,10 @@ sofc_on =1;       %Turn on SOFC
 tes_on = 1;       %Turn on thermal energy storage
 sofcwh_on = 1;     %Turn on SOFC water heater (CHP)
 %%%
-gwh_on = 0;        %Turn on GWH (Gas Water Heater)
-gsph_on = 0;      %Turn on GSPH (Gas Space Heater)
-ersph_on = 1;     %Turn on ERSPH (Electric Resistance Space Heater)
-erwh_on = 1;       %Turn on ERWH (Electric Resistance Water Heater)
+gwh_on = (1 - bldg_electrified);        %Turn on GWH (Gas Water Heater)
+gsph_on = (1 - bldg_electrified);      %Turn on GSPH (Gas Space Heater)
+ersph_on = bldg_electrified;     %Turn on ERSPH (Electric Resistance Space Heater)
+erwh_on = bldg_electrified;       %Turn on ERWH (Electric Resistance Water Heater)
 %%%NO LEGACY SYSTEMS YET!
 lpv_on = 0;
 lees_on = 0;
@@ -68,20 +203,18 @@ import_limit = .8;
 %%%Can export back to the grid
 export_on = 1;
 %%%Which NEM scenario applies? 2025:2.0  2035:3.0  2045:3.0
-nem_rate = 3.0;
+% nem_rate = nem_rate;
+
+
 
 %%% Island operation (opt_nem.m)
 island = 0;
 
 %%%Utility Cost Increase ($/kWh)   $0.031/kWh for 60% RPS,  $0.054/kWh for 100%
 %%%RPS 2030:$0.015/kWh (30% RPS)__2040:$0.031/kWh(60% RPS)__2050:$0.054/kWh (100% RPS)
-urg_adder = [0.054]; %Utility retained generation
+% urg_adder = [0.015]; %Utility retained generation
 
-%% Utility Gas Properties
 
-h2_cost_kg = 1; %renewable H2 cost ($/kg)  2030:6 $/kg__2040:4.5 $/kg__2050:4 $/kg
-
-h2_mix = 1; %Gas mixture assumption (%/vol)  2030:0.51__2040:0.86__2050:1(100% H2)
 
 h2_lim = []; %Gas mixture Limit assumption (%/vol)
 %% to check the git
@@ -144,7 +277,9 @@ addpath(genpath('H:\_Research_\CEC_OVMG\Rates'))
 % elec = dt.MyDesign_SiteEnergy_Total_E__kWh_  - dhw;
 
 %% rjf mods
-dt = readtable('C:\Users\19498\Documents\GitHub\DERopt\Data\SCG_Nanogrid\Loads\CZ15_Loader.xlsx','Sheet','Premium_gas');
+% dt = readtable('C:\Users\19498\Documents\GitHub\DERopt\Data\SCG_Nanogrid\Loads\CZ15_Loader.xlsx','Sheet','Premium_gas');
+dt = readtable(file_name,'Sheet',sheet_name);
+% sc_num = 5;
 
 time = (dt.HoursSince00_00Jan1 - 0.5)./24;
 %%%Basic Loads
@@ -174,9 +309,9 @@ apartment_types = [0 0 1];
 %% Formatting Building Data
 
 %%%Climate Zone
-cz_name = 'CZ06';
+cz_name = cz;%'CZ06';
 %%%Year to simulate utility
-yr = 2050; %2030, 2040, 2050
+% yr = 2030; %2030, 2040, 2050
 %%%Month filter - use during development/debugging
 mth = [];
 
@@ -217,6 +352,7 @@ if opt_now
     fprintf('%s: Objective Function.', datestr(now,'HH:MM:SS'))
     tic
     opt_var_cf %%%Added NEM and wholesale export to the PV Section
+    
     elapsed = toc;
     fprintf('Took %.2f seconds \n', elapsed)
     %% Adding resiliency and reliability varialbes
@@ -331,4 +467,6 @@ if opt_now
 %     %% Extract Variables
     variable_values_multi_node
 end
-
+%%
+strcat(num2str(yr-5),'_Int_Scenario_',num2str(sc_num))
+% save(strcat(num2str(yr-5),'_Int_Scenario_',num2str(sc_num)))

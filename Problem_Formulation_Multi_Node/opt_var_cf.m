@@ -1,6 +1,7 @@
 %% Declaring decision variables and setting up cost function
 yalmip('clear')
-clear var_util var_pv var_ees var_rees var_sgip var_sofc var_erwh var_gwh var_gsph var_ersph
+clear var_util var_pv var_ees var_rees var_sgip var_sofc var_erwh var_gwh var_gsph var_ersph var_resiliency var_lees var_ldf var_tes var_ldf var_xfmr var_lrees
+
 Constraints=[];
 
 T = length(time);     %t-th time interval from 1...T
@@ -212,6 +213,8 @@ else
     var_rees.rees_dchrg_nem=zeros(T,K);
     var_rees.rees_soc=zeros(T,K);
 end
+Objective
+% pause
 toc
 %% Electrical Energy Storage
 if isempty(ees_v) == 0
@@ -269,6 +272,7 @@ else
     var_sgip.sgip_ees_npbi = 0;
     var_sgip.sgip_ees_npbi_equity = 0;
 end
+
 toc
 
 %% Legacy Technologies
@@ -423,6 +427,7 @@ else
     var_ldf.pflow = zeros(T,1);
 end
 
+
 %% SOFC
 if sofc_on
     % Declaring Variables
@@ -466,6 +471,7 @@ else
     %var_sofc.sofc_nem = zeros(T,K);
         
 end
+
 %% ERWH
 if erwh_on
     % Declaring Variables
@@ -486,6 +492,7 @@ else
     erwh_eff = 0;
 %     var_erwh.erwh_heat = zeros(T,K);         
 end
+
 %% GWH
 if gwh_on
     % Declaring Variables

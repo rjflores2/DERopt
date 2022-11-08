@@ -32,6 +32,18 @@ Storage_Shifting_LCOS = ((M*pv_mthly_debt.*pv_cap_mod'.*var_pv.pv_adopt) ... %%%
     + sum(var_pv.pv_elec + var_pv.pv_nem).*pv_v(3))./sum(var_pv.pv_elec + var_pv.pv_nem + var_rees.rees_chrg + var_lrees.rees_chrg) ...
     + EES_LCOS
 
+Storage_Shifting_LCOS = ((M*pv_mthly_debt.*pv_cap_mod'.*var_pv.pv_adopt) ... %%%Capital Cost
+    + sum(var_pv.pv_elec + var_pv.pv_nem).*pv_v(3))./sum(var_pv.pv_elec + var_pv.pv_nem + var_rees.rees_chrg + var_lrees.rees_chrg) ...
+    + (sum(rees_mthly_debt*M.*rees_cap_mod'.*var_rees.rees_adopt) ...%%%Capital Cost
+    + sum(ees_v(2)*sum(sum(repmat(day_multi,1,K).*var_rees.rees_chrg)))... %%%Charging O&M
+    + sum(ees_v(3)*(sum(sum(repmat(day_multi,1,K).*(var_rees.rees_dchrg))))))....
+    ./sum(var_rees.rees_dchrg_nem + var_rees.rees_dchrg);
+
+
+Storage_Shifting_LCOS = ((M*pv_mthly_debt.*pv_cap_mod'.*var_pv.pv_adopt) ... %%%Capital Cost
+    + sum(var_pv.pv_elec + var_pv.pv_nem).*pv_v(3))./sum(var_pv.pv_elec + var_pv.pv_nem + var_rees.rees_chrg + var_lrees.rees_chrg) ...
+    + EES_LCOS
+
 
 [LCOE... %%% Total LCOE 
     utility_LCOE...
