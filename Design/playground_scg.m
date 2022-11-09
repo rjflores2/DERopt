@@ -11,11 +11,11 @@ opt_now_yalmip = 0; %YALMIP
 %% PM Running Values
 
 %%%Turn TDV On/Off
-tdv_on = 1;
+tdv_on = 0;
 
 %%%Building file details
-cz = 'CZ06';
-sheet_name = 'Baseline'
+cz = 'CZ16';
+sheet_name = 'Premium_Heat_Pump'
 
 %%%Year of Interest
 yr = 2030%2030, 2040, 2050
@@ -309,7 +309,8 @@ apartment_types = [0 0 1];
 %% Formatting Building Data
 
 %%%Climate Zone
-cz_name = cz;%'CZ06';
+% cz_name = cz;%'CZ06';
+cz_name = 'CZ06';
 %%%Year to simulate utility
 % yr = 2030; %2030, 2040, 2050
 %%%Month filter - use during development/debugging
@@ -469,4 +470,4 @@ if opt_now
 end
 %%
 strcat(num2str(yr-5),'_Int_Scenario_',num2str(sc_num))
-% save(strcat(num2str(yr-5),'_Int_Scenario_',num2str(sc_num)))
+save(strcat(num2str(yr-5),'_Int_Scenario_',num2str(sc_num)))
