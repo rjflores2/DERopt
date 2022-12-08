@@ -184,7 +184,7 @@ for ii_loop = [1:3]
             rees_itc = 0;
         end
         
-        h2_cost_kg = 1.5
+%         h2_cost_kg = 1.5
         
         %% Turning technologies on/off (opt_var_cf.m and tech_select.m)
         pv_on = 1;        %Turn on PV
