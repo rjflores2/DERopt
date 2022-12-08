@@ -71,41 +71,52 @@ end
 
 
 %% Net Energy Metering
-if (lpv_on || lrees_on || strcmp(class(var_pv.pv_nem),'sdpvar') || strcmp(class(var_rees.rees_dchrg_nem),'sdpvar')) %%%If NEM related decision variables exist
+%%%NEM 2.0 rules - NEM 2.0 applies and the property has on-site solar or
+%%%a battery charged by renewable sources
+if nem_rate == 2.0 && (lpv_on || lrees_on || strcmp(class(var_pv.pv_nem),'sdpvar') || strcmp(class(var_rees.rees_dchrg_nem),'sdpvar')) %%%If NEM related decision variables exist
     for k=1:K
         %%%Current Utility Rate
         index=find(ismember(rate_labels,rate(k)));
         
         Constraints = [Constraints
-            (export_price(:,index)'*(var_rees.rees_dchrg_nem(:,k) + var_pv.pv_nem(:,k) + var_lrees.rees_dchrg_nem(:,k)) <= import_price(:,index)'*var_util.import(:,k)):'NEM Credits < Import Cost'];
-                
+            (export_price(:,index)'*(var_rees.rees_dchrg_nem(:,k) + var_pv.pv_nem(:,k) + var_lrees.rees_dchrg_nem(:,k) + var_sofc.sofc_nem(:,k)) <= import_price(:,index)'*var_util.import(:,k)):'NEM Credits < Import Cost'
+            (sum(var_rees.rees_dchrg_nem(:,k) + var_pv.pv_nem(:,k) + var_lrees.rees_dchrg_nem(:,k) + var_sofc.sofc_nem(:,k)) <= sum(var_util.import(:,k))):'NEM Energy < Import Energy'];
+        
+    end
+    
+elseif nem_rate == 3.0 && (lpv_on || lrees_on || strcmp(class(var_pv.pv_nem),'sdpvar') || strcmp(class(var_rees.rees_dchrg_nem),'sdpvar')) %%%If NEM related decision variables exist
+    for k=1:K
+        %%%Current Utility Rate
+        index=find(ismember(rate_labels,rate(k)));
+        
         Constraints = [Constraints
-            (sum(var_rees.rees_dchrg_nem(:,k) + var_pv.pv_nem(:,k) + var_lrees.rees_dchrg_nem(:,k)) <= sum(var_util.import(:,k))):'NEM Energy < Import Energy'];
+            (export_price(:,index)'*(var_rees.rees_dchrg_nem(:,k) + var_pv.pv_nem(:,k) + var_lrees.rees_dchrg_nem(:,k) + var_sofc.sofc_nem(:,k)) <= import_price(:,index)'*var_util.import(:,k)):'NEM Credits < Import Cost'];
         
     end
 end
  
 %%
-%%%%%%%% ZNE Constraint 
+%%%%%%%% TDV ZNE Constraint 
 
 if sofc_on && tdv_on
-% Net Zero Energy
-Constraints = [Constraints
-    (sum(var_util.import.*tdv_elec) +...
-    sum((var_sofc.sofc_elec./sofc_v(3)).*tdv_gas.*tdv_gas_mod)+...
-    sum(var_gwh.gwh_gas.*tdv_gas.*tdv_gas_mod) + ...
-    sum(var_gsph.gsph_gas.*tdv_gas.*tdv_gas_mod) <= sum(var_pv.pv_nem.*tdv_elec) +...
-    sum(var_rees.rees_dchrg_nem.*tdv_elec)):'NZE - Electricity requirement'];
-%                              tdv_lim + sum(var_pv.pv_nem.*tdv_elec)+sum (var_sofc.sofc_nem.*tdv_elec) ):'NZE - Electricity requirement'];
+    % Net Zero Energy
+    Constraints = [Constraints
+        (sum(var_util.import.*tdv_elec) +...
+        sum((var_sofc.sofc_ng).*tdv_gas.*tdv_gas_mod)+...
+        sum(var_gwh.gwh_gas.*tdv_gas.*tdv_gas_mod) + ...
+        sum(var_gsph.gsph_gas.*tdv_gas.*tdv_gas_mod) <= sum(var_sofc.sofc_nem.*tdv_elec) +...
+        sum(var_pv.pv_nem.*tdv_elec) +...
+        sum(var_rees.rees_dchrg_nem.*tdv_elec)):'TDV NZE - Energy requirement'];
+    %                              tdv_lim + sum(var_pv.pv_nem.*tdv_elec)+sum (var_sofc.sofc_nem.*tdv_elec) ):'NZE - Electricity requirement'];
 elseif ~sofc_on && tdv_on
-% Net Zero Energy
-Constraints = [Constraints
-    (sum(var_util.import.*tdv_elec) +...
-    sum(var_gwh.gwh_gas.*tdv_gas.*tdv_gas_mod) + ...
-    sum(var_gsph.gsph_gas.*tdv_gas.*tdv_gas_mod) <= sum(var_pv.pv_nem.*tdv_elec) +...
-    sum(var_rees.rees_dchrg_nem.*tdv_elec)):'NZE - Electricity requirement'];
-%                              tdv_lim + sum(var_pv.pv_nem.*tdv_elec)+sum (var_sofc.sofc_nem.*tdv_elec) ):'NZE - Electricity requirement'];
-
+    % Net Zero Energy
+    Constraints = [Constraints
+        (sum(var_util.import.*tdv_elec) +...
+        sum(var_gwh.gwh_gas.*tdv_gas.*tdv_gas_mod) + ...
+        sum(var_gsph.gsph_gas.*tdv_gas.*tdv_gas_mod) <= sum(var_pv.pv_nem.*tdv_elec) +...
+        sum(var_rees.rees_dchrg_nem.*tdv_elec)):'TDV NZE - Energy requirement'];
+    %                              tdv_lim + sum(var_pv.pv_nem.*tdv_elec)+sum (var_sofc.sofc_nem.*tdv_elec) ):'NZE - Electricity requirement'];
+    
 end
 
 

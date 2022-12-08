@@ -16,15 +16,16 @@ var_ees.ees_soc = value(var_ees.ees_soc);
 var_ees.ees_chrg = value(var_ees.ees_chrg);
 var_ees.ees_dchrg = value(var_ees.ees_dchrg);
 %% SOFC Values
-if ~isempty(sofc_v)  
-var_sofc.sofc_adopt = value(var_sofc.sofc_adopt);      %%% Number of purchased SOFC units #
-var_sofc.sofc_elec = value(var_sofc.sofc_elec);        %%%SOFC electricity used for building (kWh) 
-%var_sofc.sofc_nem = value(var_sofc.sofc_nem);          %%%SOFC electricity exported to grid(kWh) 
-var_sofc.sofc_wh = value(var_sofc.sofc_wh);            %%%SOFC heat used for water heating(kWh)
-% var_sofc.sofc_fuel = value(var_sofc.sofc_fuel);      %%%Fuel consumption (kWh) 
+if ~isempty(sofc_v)
+    var_sofc.sofc_adopt = value(var_sofc.sofc_adopt);       %%% Number of purchased SOFC units #
+    var_sofc.sofc_elec = value(var_sofc.sofc_elec);         %%%SOFC electricity used for building (kWh)
+    var_sofc.sofc_nem = value(var_sofc.sofc_nem);           %%%SOFC electricity exported to grid(kWh)
+    var_sofc.sofc_wh = value(var_sofc.sofc_wh);             %%%SOFC heat used for water heating(kWh)
+    var_sofc.sofc_ng = value(var_sofc.sofc_ng);           %%%Fuel consumption (kWh)
+    var_sofc.sofc_h2 = value(var_sofc.sofc_h2);           %%%H2 Fuel consumption (kWh)
     if isfield(var_sofc,'sofc_op')
         var_sofc.sofc_op = value(var_sofc.sofc_op);  %%% Number of operating SOFC units #
-    end 
+    end
 end
 %% TES Values
 if tes_on
@@ -33,31 +34,33 @@ if tes_on
     var_tes.tes_dchrg = value(var_tes.tes_dchrg);
 end
 %% ERWH Values
-if ~isempty(erwh_v)  
-var_erwh.erwh_adopt = value(var_erwh.erwh_adopt);      %%%ERWH installed capacity (kW)
-var_erwh.erwh_elec = value(var_erwh.erwh_elec);       %%%ERWH electricity consumed (kWh) 
-% var_erwh.erwh_heat = value(var_erwh.erwh_heat);       %%%ERWH heat produced (kWh) 
+if ~isempty(erwh_v)
+    var_erwh.erwh_adopt = value(var_erwh.erwh_adopt);      %%%ERWH installed capacity (kW)
+    var_erwh.erwh_elec = value(var_erwh.erwh_elec);       %%%ERWH electricity consumed (kWh)
+    % var_erwh.erwh_heat = value(var_erwh.erwh_heat);       %%%ERWH heat produced (kWh)
 end
 
 %% GWH Values
-if ~isempty(gwh_v)  
-var_gwh.gwh_adopt = value(var_gwh.gwh_adopt);      %%%GWH installed capacity (kW)
-var_gwh.gwh_gas = value(var_gwh.gwh_gas);       %%%GWH gas consumed (kWh) 
-% var_gwh.gwh_heat = value(var_gwh.gwh_heat);       %%%GWH heat produced (kWh) 
+if ~isempty(gwh_v)
+    var_gwh.gwh_adopt = value(var_gwh.gwh_adopt);      %%%GWH installed capacity (kW)
+    var_gwh.gwh_gas = value(var_gwh.gwh_gas);       %%%GWH gas consumed (kWh)
+    var_gwh.gwh_h2 = value(var_gwh.gwh_h2);       %%%GWH H2 consumed (kWh)
+    % var_gwh.gwh_heat = value(var_gwh.gwh_heat);       %%%GWH heat produced (kWh)
 end
 
 %% GSPH Values
-if ~isempty(gsph_v)  
-var_gsph.gsph_adopt = value(var_gsph.gsph_adopt);      %%% installed capacity (kW)
-var_gsph.gsph_gas = value(var_gsph.gsph_gas);       %%%GSPH gas consumed (kWh) 
-% var_gsph.gsph_heat = value(var_gsph.gsph_heat);       %%%GSPH heat produced (kWh) 
+if ~isempty(gsph_v)
+    var_gsph.gsph_adopt = value(var_gsph.gsph_adopt);      %%% installed capacity (kW)
+    var_gsph.gsph_gas = value(var_gsph.gsph_gas);       %%%GSPH gas consumed (kWh)
+    var_gsph.gsph_h2 = value(var_gsph.gsph_h2);       %%%GSPH H2 consumed (kWh)
+    % var_gsph.gsph_heat = value(var_gsph.gsph_heat);       %%%GSPH heat produced (kWh)
 end
 
 %% ERSPH Values
-if ~isempty(ersph_v)  
-var_ersph.ersph_adopt = value(var_ersph.ersph_adopt);      %%%ERSPH installed capacity (kW)
-var_ersph.ersph_elec = value(var_ersph.ersph_elec);       %%%ERSPH gas consumed (kWh) 
-% var_ersph.ersph_heat = value(var_ersph.ersph_heat);       %%%ERSPH heat produced (kWh) 
+if ~isempty(ersph_v)
+    var_ersph.ersph_adopt = value(var_ersph.ersph_adopt);      %%%ERSPH installed capacity (kW)
+    var_ersph.ersph_elec = value(var_ersph.ersph_elec);       %%%ERSPH gas consumed (kWh)
+    % var_ersph.ersph_heat = value(var_ersph.ersph_heat);       %%%ERSPH heat produced (kWh)
 end
 
 %% Legacy EES Values

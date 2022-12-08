@@ -55,13 +55,15 @@ if ~isempty(mth)
     %%%Finding indicies for months of interest
     idx = find(ismember(datetimev(:,2),mth));
   
+%     idx = idx(1:2);
+    
     %%%Cutting down data files
    time = time(idx);
    elec = elec(idx);
    cool = cool(idx);
    heat = heat(idx);
    dhw = dhw(idx);
-   misc_gas = misc_gas(idx);
+%    misc_gas = misc_gas(idx);
    solar = solar(idx);
    
    

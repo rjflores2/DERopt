@@ -1,11 +1,11 @@
 %% Playground file for OVMG Project
 clear all; close all; clc ; started_at = datetime('now'); startsim = tic;
 fval_rec = zeros(3,6);
-for ii_loop = 1%[1:3]
+for ii_loop = [1:3]
     
     yr = 2030 + 10*(ii_loop - 1);
     
-    for jj_loop = 1%1:6
+    for jj_loop = 1:6
         clearvars -except ii_loop jj_loop fval_rec yr started_at startsim
         ii_loop
         jj_loop
@@ -120,31 +120,41 @@ for ii_loop = 1%[1:3]
         if yr == 2030
             nem_rate = 2.0
             urg_adder = [0.015] %%%RPS 2030:$0.015/kWh (30% RPS)__2040:$0.031/kWh(60% RPS)__2050:$0.054/kWh (100% RPS)
-            h2_cost_kg = 6 %renewable H2 cost ($/kg)  2030:6 $/kg__2040:4.5 $/kg__2050:4 $/kg
-            h2_mix = 0.51; %Gas mixture assumption (%/vol)  2030:0.51__2040:0.86__2050:1(100% H2)
-            co2_cost = 27.96 %$/tonne 2030: $27.96/tonne __2040: $50/tonne__2050: $71.5/tonne
+            h2_cost_kg = 6.2 %renewable H2 cost ($/kg)  2030:6.2 $/kg__2040:5.4 $/kg__2050:4.6 $/kg
+            h2_mix = 0; %Gas mixture assumption (%/vol)  2030:0.51__2040:0.86__2050:1(100% H2)
+            ng_procure = 0.745; % $/therm
+            tdv_gas_mod = 0.9357;
+            
+            fc_ci_lim = 312/1000; % kg CO2/MWh * MWh/1000 kWh
+            
+            co2_cost = 0 %$/tonne 2030: $27.96/tonne __2040: $50/tonne__2050: $71.5/tonne
             sofc_cap_cost = 5706 %2025:5706 $/kW__2035:5529.5 $/kW__2045:5420.5 $/kW
             sofc_tax_credit = 0.3;
-            ees_cap_cost = 911.5 %2025:911.5 $/kWh__2035:755 $/kWh__2045:654 $/kWh
-            pv_cap_cost = 2484 %2025:2484 $/kW__2035:1944 $/kW__2045:1317.5 $/kW
+            ees_cap_cost = (0.7)*911.5 %2025:911.5 $/kWh__2035:755 $/kWh__2045:654 $/kWh
+            pv_cap_cost = (0.7)*2484 %2025:2484 $/kW__2035:1944 $/kW__2045:1317.5 $/kW
             
-            pv_macrs = 5;
-            pv_itc = 1;
+            pv_macrs = 0;
+            pv_itc = 0;
             
-            ees_macrs = 7;
+            ees_macrs = 0;
             ees_itc = 0;
-            rees_macrs = 5;
-            rees_itc = 1;
+            rees_macrs = 0;
+            rees_itc = 0;
         elseif yr == 2040
             nem_rate = 3.0
             urg_adder = [0.031] %%%RPS 2030:$0.015/kWh (30% RPS)__2040:$0.031/kWh(60% RPS)__2050:$0.054/kWh (100% RPS)
-            h2_cost_kg = 4.5 %renewable H2 cost ($/kg)  2030:6 $/kg__2040:4.5 $/kg__2050:4 $/kg
-            h2_mix = 0.86 %Gas mixture assumption (%/vol)  2030:0.51__2040:0.86__2050:1(100% H2)
-            co2_cost = 50 %$/tonne 2030: $27.96/tonne __2040: $50/tonne__2050: $71.5/tonne
+            h2_cost_kg = 5.4 %renewable H2 cost ($/kg)  2030:6.2 $/kg__2040:5.4 $/kg__2050:4.6 $/kg
+            h2_mix = 0; %Gas mixture assumption (%/vol)  2030:0.51__2040:0.86__2050:1(100% H2)
+            ng_procure = 1.116; % $/therm
+            tdv_gas_mod = 0.8731;
+            
+            fc_ci_lim = 178/1000; % kg CO2/MWh * MWh/1000 kWh
+            
+            co2_cost = 0 %$/tonne 2030: $27.96/tonne __2040: $50/tonne__2050: $71.5/tonne
             sofc_cap_cost = 5529.5 %2025:5706 $/kW__2035:5529.5 $/kW__2045:5420.5 $/kW
             sofc_tax_credit = 0.3;
-            ees_cap_cost = 755 %2025:911.5 $/kWh__2035:755 $/kWh__2045:654 $/kWh
-            pv_cap_cost = 2484 %2025:2484 $/kW__2035:1944 $/kW__2045:1317.5 $/kW
+            ees_cap_cost = (0.78)*755 %2025:911.5 $/kWh__2035:755 $/kWh__2045:654 $/kWh
+            pv_cap_cost = (0.78)*1944; %2025:2484 $/kW__2035:1944 $/kW__2045:1317.5 $/kW
             pv_macrs = 0;
             pv_itc = 0;
             ees_macrs = 0;
@@ -154,9 +164,14 @@ for ii_loop = 1%[1:3]
         elseif yr == 2050
             nem_rate = 3.0
             urg_adder = [0.054] %%%RPS 2030:$0.015/kWh (30% RPS)__2040:$0.031/kWh(60% RPS)__2050:$0.054/kWh (100% RPS)
-            h2_cost_kg = 4 %renewable H2 cost ($/kg)  2030:6 $/kg__2040:4.5 $/kg__2050:4 $/kg
-            h2_mix = 1 %Gas mixture assumption (%/vol)  2030:0.51__2040:0.86__2050:1(100% H2)
-            co2_cost = 71.5 %$/tonne 2030: $27.96/tonne __2040: $50/tonne__2050: $71.5/tonne
+            h2_cost_kg = 4.6; %renewable H2 cost ($/kg)  2030:6.2 $/kg__2040:5.4 $/kg__2050:4.6 $/kg
+            h2_mix = 0 %Gas mixture assumption (%/vol)  2030:0.51__2040:0.86__2050:1(100% H2)
+            ng_procure = 1.473; % $/therm
+            tdv_gas_mod = 0.7973;
+            
+            fc_ci_lim = 44/1000; % kg CO2/MWh * MWh/1000 kWh
+            
+            co2_cost = 0 %$/tonne 2030: $27.96/tonne __2040: $50/tonne__2050: $71.5/tonne
             sofc_cap_cost = 5420.5 %2025:5706 $/kW__2035:5529.5 $/kW__2045:5420.5 $/kW
             sofc_tax_credit = 0.3;
             ees_cap_cost = 654 %2025:911.5 $/kWh__2035:755 $/kWh__2045:654 $/kWh
@@ -169,9 +184,8 @@ for ii_loop = 1%[1:3]
             rees_itc = 0;
         end
         
-        pv_cap_cost = 1e4;
-        ees_cap_cost = 1e4;
-        sofc_cap_cost = 1e4;
+        h2_cost_kg = 1.5
+        
         %% Turning technologies on/off (opt_var_cf.m and tech_select.m)
         pv_on = 1;        %Turn on PV
         ees_on = 1;       %Turn on EES/REES
@@ -499,9 +513,12 @@ for ii_loop = 1%[1:3]
             variable_values_multi_node
         end
         fval_rec(ii_loop,jj_loop) = fval
+        
+        %% Save data in this cell
+                strcat(cz,'_',num2str(yr-5),'_Sc_',num2str(sc_num),'_TDV_',num2str(tdv_on))
+        save(strcat(cz,'_',num2str(yr-5),'_Sc_',num2str(sc_num),'_TDV_',num2str(tdv_on)))
+        
     end
 end
 return
 %%
-strcat(num2str(yr-5),'_Int_Scenario_',num2str(sc_num))
-save(strcat(num2str(yr-5),'_Int_Scenario_',num2str(sc_num)))

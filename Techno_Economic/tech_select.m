@@ -87,8 +87,8 @@ if  sofc_on
     %2025:5706 $/kW__2035:5529.5 $/kW__2045:5420.5 $/kW
     sofc_v = [(1-sofc_tax_credit).*sofc_cap_cost    %%% 1: Capital cost ($/kWel) C_fc Assume 30% tax credit
         0.06*sofc_cap_cost     %%% 2: O&M ($/kW/yr generated) 6 Yearly % of TIC(Total Installed Cost) % of the purchasing cost (4–10%)
-        0.6        %%% 3: SOFC electrical efficiency at nominal condition (fraction)
-        0.3        %%% 4: SOFC thermal efficiency at nominal condition (fraction)
+        0.6*(47.1/52.2)        %%% 3: SOFC electrical efficiency at nominal condition (fraction)
+        0.3*(47.1/52.2)        %%% 4: SOFC thermal efficiency at nominal condition (fraction)
         0.5        %%% %0.5 5: Minimum SOFC capacity is 500 Watt- 0.5 kW increments
         0.0005     %%% 6: kw/s Ramp rate is 6% of nominal capacity per minute [T. D. Hutty, S. Dong, R. Lee, and S. Brown] 500 watt nominal=> 0.5*6/100/6 = 0.0005kw/s
         0.5];      %%% 7: Minimum load setting (% of rated capacity)

@@ -117,16 +117,18 @@ end
 if sofc_on
     Constraints = [Constraints
         (0 <= var_sofc.sofc_adopt):'SOFC Units >=0' 
-        (0 <= var_sofc.sofc_elec):'SOFC Electricity >=0'];
-    %(0 <= var_sofc.sofc_nem):'SOFC exported elevctricity >=0'];
+        (0 <= var_sofc.sofc_elec):'SOFC Electricity >=0'
+        (0 <= var_sofc.sofc_ng):'SOFC NG >=0'
+        (0 <= var_sofc.sofc_h2):'SOFC H2 >=0'
+        (0 <= var_sofc.sofc_nem):'SOFC exported elevctricity >=0'];
     
-    if isfield(var_sofc,'sofc_op')
+    %     if isfield(var_sofc,'sofc_op')
+    %         Constraints = [Constraints
+    %             (0 <= var_sofc.sofc_op):'SOFC Units >=0' ];
+    %     end
+    if sofcwh_on
         Constraints = [Constraints
-            (0 <= var_sofc.sofc_op):'SOFC Units >=0' ];
-    end
-        if sofcwh_on
-        Constraints = [Constraints
-        (0 <= var_sofc.sofc_wh):'SOFC Water Heating >=0'];
+            (0 <= var_sofc.sofc_wh):'SOFC Water Heating >=0'];
     end
 end
 
@@ -149,12 +151,14 @@ end
 if gwh_on
     Constraints = [Constraints
         (0 <= var_gwh.gwh_adopt):'GWH Adoption >=0'
-        (0 <= var_gwh.gwh_gas):'GWH Gas >=0'];      
+        (0 <= var_gwh.gwh_gas):'GWH Gas >=0'
+        (0 <= var_gwh.gwh_h2):'GWH H2 >=0'];      
 end
 %% GSPH 
 if gsph_on
     Constraints = [Constraints
         (0 <= var_gsph.gsph_adopt):'GSPH Adoption >=0'
+        (0 <= var_gsph.gsph_h2):'GSPH H2 >=0'
         (0 <= var_gsph.gsph_gas):'GSPH Gas >=0'];     
 end
 %% ERSPH 

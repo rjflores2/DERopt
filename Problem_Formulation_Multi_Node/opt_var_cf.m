@@ -429,13 +429,23 @@ end
 
 
 %% SOFC
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%% PM SOFC %%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if sofc_on
     % Declaring Variables
-      var_sofc.sofc_adopt  = intvar(1,K,'full');    %%%SOFC number of purchased/installed units (#)
-%      var_sofc.sofc_adopt  = sdpvar(1,K,'full');    %%%SOFC number of purchased/installed units (#)
-      var_sofc.sofc_op = intvar(T,K,'full');    %%%SOFC number of operating SOFCs at each time(#)
-      var_sofc.sofc_elec = sdpvar(T,K,'full');       %%% SOFC electricity to demand (kWh) SOFC electricity produced (kWh)
-     %var_sofc.sofc_nem = sdpvar(T,K,'full');       %%%SOFC electricity to export (kWh)
+    var_sofc.sofc_adopt  = intvar(1,K,'full');    %%%SOFC number of purchased/installed units (#)
+    %          var_sofc.sofc_adopt  = sdpvar(1,K,'full');    %%%SOFC number of purchased/installed units (#)
+    var_sofc.sofc_op = zeros(T,K);%intvar(T,K,'full');    %%%SOFC number of operating SOFCs at each time(#)
+    var_sofc.sofc_elec = sdpvar(T,K,'full');       %%% SOFC electricity to demand (kWh) SOFC electricity produced (kWh)
+    
+    zeros(T,K);%
+    
+    %%% New variables
+%     var_sofc.sofc_nem = sdpvar(T,K,'full');       %%% SOFC electricity to NEM (kWh) SOFC electricity produced (kWh)
+    var_sofc.sofc_ng = sdpvar(T,K,'full');       %%% SOFC Conventional fuel input (kWh) SOFC electricity produced (kWh)
+    var_sofc.sofc_h2 = sdpvar(T,K,'full');       %%% SOFC H2 fuel input (kWh) SOFC electricity produced (kWh)
+    
     if sofcwh_on
         var_sofc.sofc_wh = sdpvar(T,K,'full');         %%%SOFC heat produced used for water heating(kWh)
     else
@@ -447,7 +457,51 @@ if sofc_on
     Objective = Objective...
         + sum(M*sofc_mthly_debt.*var_sofc.sofc_adopt)...  %%%Annual investment/Capital Cost ($/kW)*(kW)
         + sum((sofc_v(2).* var_sofc.sofc_adopt))... %%% O&M ($/kW/yr)*(kW)
-        + sum(ng_cost * var_sofc.sofc_elec./sofc_v(3)) ;   %%% Fuel cost price of natural gas ($/kWh) - MUST BE CHECKED
+        + sum(h2_cost * var_sofc.sofc_h2) .... %%%Renewable fuel cost * ($/kWh)*(kWh)
+        + sum(ng_cost * var_sofc.sofc_ng) ; %%%Conventional fuel cost * ($/kWh)*(kWh)
+    
+    %     h2_cost_plchldr
+    %         + sum(ng_cost * var_sofc.sofc_elec./sofc_v(3)) ;   %%% Fuel cost price of natural gas ($/kWh) - MUST BE CHECKED
+    
+    
+%     var_sofc.sofc_nem = zeros(T,K);
+    if island == 0 && export_on == 1  %If grid tied, then include NEM and wholesale export
+        
+        
+        %%% Variables that exist when grid tied
+        var_sofc.sofc_nem = sdpvar(T,K,'full'); %%% PV Production exported w/ NEM
+        %  var_pv.pv_wholesale = sdpvar(T,K,'full'); %%% PV Production exported under NEM rates
+        
+        %%%PV Export - NEM (kWh)
+        temp_cf1 = zeros(size(elec));
+        for k = 1:K
+            %%%Utility rates for building k
+            index=find(ismember(rate_labels,rate(k)));
+            %%%Specify ESA eligible tenant fraction
+            esa_frac = sum(apartment_types(k,1:2))/sum(apartment_types(k,:));
+            
+            if ~esa_on
+                esa_frac = 0;
+            end
+            %%%Filling in temp cost function arrays
+            temp_cf1(:,k) = -day_multi.*export_price(:,index).*(1-care_energy_rebate*esa_frac);
+            temp_cf1(:,k) = -day_multi.*export_price(:,index);
+            %             temp_cf2(:,k) = -day_multi.*ex_wholesale;
+            
+        end
+        
+        %%%Adding values to the cost function
+        Objective = Objective...
+            + sum(sum(temp_cf1.*var_sofc.sofc_nem)); %%%NEM Revenue Cost
+        %              + sum(sum(temp_cf2.*pv_wholesale)); %%%Wholesale Revenue
+        
+        %%%Clearing temporary variables
+        clear temp_cf1
+    else
+        var_sofc.sofc_nem = [];
+    end
+    
+    
     
     if tes_on
         var_tes.tes_soc = sdpvar(T,K,'full');
@@ -456,29 +510,32 @@ if sofc_on
     else
         var_tes.tes_soc = zeros(1,K);
         var_tes.tes_chrg = zeros(1,K);
-        var_tes.tes_chrg = zeros(1,K);
+        var_tes.tes_dchrg = zeros(1,K);
     end
     
 else
     %     var_sofc.sofc_adopt = zeros(1,K);
     var_sofc.sofc_adopt = zeros(1,K);
     var_sofc.sofc_op = zeros(T,K);
+    var_sofc.sofc_nem = zeros(T,K);    
+    var_sofc.sofc_ng = zeros(T,K);
+    var_sofc.sofc_h2 = zeros(T,K);    
     var_sofc.sofc_elec = zeros(T,K);
-     var_tes.tes_soc = zeros(1,K);
-     var_tes.tes_chrg = zeros(1,K);
-     var_tes.tes_dchrg = zeros(1,K);
-     var_sofc.sofc_wh = zeros(T,K)
+    var_tes.tes_soc = zeros(1,K);
+    var_tes.tes_chrg = zeros(1,K);
+    var_tes.tes_dchrg = zeros(1,K);
+    var_sofc.sofc_wh = zeros(T,K)
     %var_sofc.sofc_nem = zeros(T,K);
-        
+    
 end
 
 %% ERWH
 if erwh_on
     % Declaring Variables
     var_erwh.erwh_adopt = sdpvar(1,K,'full');      %%%ERWH installed capacity (kW)
-    var_erwh.erwh_elec = sdpvar(T,K,'full');       %%%ERWH electricity consumed (kWh) 
+    var_erwh.erwh_elec = sdpvar(T,K,'full');       %%%ERWH electricity consumed (kWh)
     erwh_eff = erwh_v(2);
-    %   var_erwh.erwh_heat = sdpvar(T,K,'full');       %%%ERWH heat produced (kWh) 
+    %   var_erwh.erwh_heat = sdpvar(T,K,'full');       %%%ERWH heat produced (kWh)
     % ERWH cost function 
    Objective = Objective...
         + sum(M*erwh_mthly_debt.*var_erwh.erwh_adopt)...  %%%Annual investment/Capital Cost ($/kW)*(kW)
@@ -493,12 +550,12 @@ else
 %     var_erwh.erwh_heat = zeros(T,K);         
 end
 
-%% GWH
+%% Generic Gas water heater
 if gwh_on
     % Declaring Variables
     var_gwh.gwh_adopt = sdpvar(1,K,'full');      %%%GWH installed capacity (kW)
     var_gwh.gwh_gas = sdpvar(T,K,'full');       %%%GWH gas consumed (kWh)
-    %     var_gwh.gwh_heat = sdpvar(T,K,'full');       %%%GWH heat produced (kWh)
+    var_gwh.gwh_h2 = sdpvar(T,K,'full');       %%%GWH H2 consumed (kWh)
     
     %%%GWH efficiency
     %     gwh_eff = repmat(gwh_v(2),T,1);
@@ -509,11 +566,12 @@ if gwh_on
     
     Objective = Objective...
         + sum(M*gwh_mthly_debt.*var_gwh.gwh_adopt)...  %%%Annual investment/Capital Cost ($/kW)*(kW)
-        + sum(ng_cost * var_gwh.gwh_gas) ;   %%% Fuel cost price of natural gas ($/kWh)
+        + sum(ng_cost * var_gwh.gwh_gas) ... ;   %%% Fuel cost price of natural gas ($/kWh)
+        + sum(h2_cost * var_gwh.gwh_h2);%%% Fuel cost price of H2 ($/kWh)
 else
     var_gwh.gwh_adopt = zeros(1,K);        
     var_gwh.gwh_gas = zeros(T,K);         
-%     var_gwh.gwh_heat = zeros(T,K);   
+    var_gwh.gwh_h2 = zeros(T,K);   
     gwh_eff = 0;
 end
 
@@ -522,17 +580,19 @@ if gsph_on
     % Declaring Variables
     var_gsph.gsph_adopt = sdpvar(1,K,'full');      %%%GSPH installed capacity (kW)
     var_gsph.gsph_gas = sdpvar(T,K,'full');       %%%GSPH gas consumed (kWh) 
+    var_gsph.gsph_h2 = sdpvar(T,K,'full');       %%%GSPH H2 consumed (kWh) 
     gsph_eff = gsph_v(2);
     %     var_gsph.gsph_heat = sdpvar(T,K,'full');       %%%GSPH heat produced (kWh) 
     % GSPH cost function 
    Objective = Objective...
         + sum(M*gsph_mthly_debt.*var_gsph.gsph_adopt)...  %%%Annual investment/Capital Cost ($/kW)*(kW)
-        + sum(ng_cost * var_gsph.gsph_gas) ;   %%% Fuel cost price of natural gas ($/kWh)
+        + sum(ng_cost * var_gsph.gsph_gas) ...   %%% Fuel cost price of natural gas ($/kWh)
+        + sum(h2_cost * var_gsph.gsph_h2) ;
 else
     var_gsph.gsph_adopt = zeros(1,K);        
     var_gsph.gsph_gas = zeros(T,K);   
     gsph_eff = 0;
-%     var_gsph.gsph_heat = zeros(T,K);    
+    var_gsph.gsph_h2 = zeros(T,K);    
 end
 
 %% ERSPH
