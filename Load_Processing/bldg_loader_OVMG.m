@@ -208,6 +208,15 @@ if downselection == 1
     
     solar = solar_filtered.*mean(solar)./mean(solar_filtered);
     sgip_signal = [time sgip_filtered.*mean(solar)./mean(sgip_signal(:,2))];
+    
+elseif downselection == 2 && ~isempty(mth)
+    elec = elec(stpts(min(mth)):endpts(max(mth)),:);
+    time = time(stpts(min(mth)):endpts(max(mth)),:);
+    day_multi = ones(size(elec,1),1);
+    
+    
+    solar = solar(stpts(min(mth)):endpts(max(mth)),:);
+    sgip_signal = sgip_signal(stpts(min(mth)):endpts(max(mth)),:);
 else
     
     day_multi = ones(size(elec,1),1);

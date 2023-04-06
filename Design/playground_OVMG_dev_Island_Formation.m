@@ -3,11 +3,12 @@ clear all; close all; clc ; started_at = datetime('now'); startsim = tic;
 
 
 
-for crit_load_lvl = [7]%[0 1 2 3 4 5 6 7];%%[4 5 6 7] %%% Corresponding END around line 500 - after files have been saved
+for crit_load_lvl = [7];%%[4 5 6 7] %%% Corresponding END around line 500 - after files have been saved
     clearvars -except crit_load_lvl crit_load_lvl started_at startsim
 % crit_load_lvl = 5;
 % crit_load_lvl = [];
 % %%
+
 
 %% Parameters
 
@@ -33,7 +34,7 @@ acpf_xfmr_on = 0;
 %% Downselection of building energy data?
 testing = 0;
 if ~testing
-    downselection = 0;
+    downselection = 2;
     if downselection == 1
         sz_on = 1;
     else
@@ -156,7 +157,7 @@ scenario = 'ues_baseline_update'
 
 % scenario = 'UES_1b'
 % scenario = 'ues_1a_v2'
-% scenario = 'UES_2b'
+scenario = 'UES_2b'
 
 fprintf('%s: Loading UO Data.', datestr(now,'HH:MM:SS'))
 tic
@@ -207,16 +208,16 @@ if sim_lvl == 1 && (~acpf_sim || isempty(acpf_sim)) %%%If resiliency is examined
 elseif sim_lvl == 2 ||  ((~acpf_sim || isempty(acpf_sim)) && xfmr_on) %%%If resiliency is examined at each transformer, OR only xfmr constraints are implemented
     sim_end = length(xfmrs_unique);
 elseif sim_lvl == 3 && acpf_sim %%%If resiliency is examined on each individual branch OR ACPF is implemented
-    xfmr_2_circuit = readtable('H:\_Tools_\DERopt\Data\OVMG_Inputs\OV_Distribtuion_Circuit_Xfmrs.xlsx');
+    xfmr_2_circuit = readtable('H:\_Tools_\DERopt\Data\OVMG_Inputs\OV_Distribtuion_Circuit_Xfmrs_Island_Formation.xlsx');
     %%%Temp hard coding of transformers
-    sheets = {'Sm1','Sm2','Sm3','Sm4','Sm5','Sm6','St1'};
+    sheets = {'Sm1','Sm2','Sm3','Sm4','St1'};
     sim_end = width(xfmr_2_circuit) - 1;
 end
 
 %%
 
 
-for sim_idx = 1:sim_end
+for sim_idx = 1%:sim_end
    %% Building indicies in the current simulation
     if sim_lvl == 1 && (acpf_sim == 0 || isempty(acpf_sim))
         bldg_ind = [st_idx(sim_idx):end_idx(sim_idx)];
@@ -242,7 +243,7 @@ for sim_idx = 1:sim_end
     %% Loadings relevant circuit data
     if acpf_sim == 1 || sim_lvl >= 3
         %%Branch/Bus matrix
-        [branch_bus,bb_lbl] = xlsread('OV_Branch_bus_Matricies.xlsx',char(sheets(sim_idx)));
+        [branch_bus,bb_lbl] = xlsread('OV_Branch_Bus_Matricies_Island_Formation.xlsx',char(sheets(sim_idx)));
         %%% Eliminating NaN in branch bus matrix
         branch_bus(isnan(branch_bus)) = 0;
         %%%Transformer labels included in current power flow
@@ -250,10 +251,10 @@ for sim_idx = 1:sim_end
         
         %%%Circuit properties
         reactance = [];
-        reactance = xlsread('OV_Line_Properties.xlsx',strcat(char(sheets(sim_idx)),'_Reactance'));
+        reactance = xlsread('OV_Line_Properties_Island_Formation.xlsx',strcat(char(sheets(sim_idx)),'_Reactance'));
         reactance(isnan(reactance)) = 0;
         resistance = [];
-        resistance = xlsread('OV_Line_Properties.xlsx',strcat(char(sheets(sim_idx)),'_Resistance'));
+        resistance = xlsread('OV_Line_Properties_Island_Formation.xlsx',strcat(char(sheets(sim_idx)),'_Resistance'));
         resistance(isnan(resistance)) = 0;
     end
     %% Extracting UO Data
@@ -342,6 +343,7 @@ for sim_idx = 1:sim_end
     sgip_pbi = strcmp(rate,'TOU8') + strcmp(rate,'GS1');
     
     %% Formatting Building Data
+    mth = [6];
     bldg_loader_OVMG
     
     %% Determining Resiliency Data for Examination
@@ -472,7 +474,7 @@ for sim_idx = 1:sim_end
         
         %% Extract Variables
         variable_values_multi_node
-        
+        return
     end
 %     
 %     save(strcat('Sim_',num2str(sim_idx)))
@@ -531,7 +533,7 @@ for sim_idx = 1:sim_end
     
     %% recording resiliency results
     if sim_lvl >= 3 && acpf_sim == 1
-        save(strcat(scenario,'_',num2str(sim_idx),'_CriticalLoad_',num2str(crit_load_lvl)),'var_resiliency')
+        save(strcat(scenario,'_',num2str(sim_idx),'_CriticalLoad_Island_formation_',num2str(crit_load_lvl)),'var_resiliency')
         
     end
 end
@@ -549,7 +551,7 @@ if isempty(crit_load_lvl) || crit_load_lvl == 0
     save(strcat(sc_txt,'_DdER'),'bldg')
 else
     save_here = 2
-    save(strcat(sc_txt,'_DER_Crit_Load_Circuit3_',num2str(crit_load_lvl)),'bldg')
+    save(strcat(sc_txt,'_DER_Crit_Load_Circuit_Island_Formation_',num2str(crit_load_lvl)),'bldg')
 end
 end
 return

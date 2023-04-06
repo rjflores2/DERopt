@@ -33,6 +33,7 @@ if ~isempty(crit_load_lvl) && crit_load_lvl >0
     if lees_on || lrees_on || ~isempty(ees_v)
         for k=1:K
             Constraints = [Constraints
+                var_resiliency.ees_soc(1,k) <= var_resiliency.ees_soc(end,k)
                 var_resiliency.ees_soc(2:end,k) == ees_v(10)*var_resiliency.ees_soc(1:end-1,k) + ees_v(8)*var_resiliency.ees_chrg(2:end,k)  - (1/ees_v(9))*var_resiliency.ees_dchrg(2:end,k)  %%%Minus discharging of
                 ees_v(4)*(var_ees.ees_adopt(k) + var_rees.rees_adopt(k) + ees_legacy_cap(k) + rees_legacy_cap(k)) <= var_resiliency.ees_soc(:,k) <= ees_v(5)*(var_ees.ees_adopt(k) + var_rees.rees_adopt(k) + ees_legacy_cap(k) + rees_legacy_cap(k)) %%%Min/Max SOC
                 var_resiliency.ees_chrg(:,k) <= ees_v(6)*(var_ees.ees_adopt(k) + var_rees.rees_adopt(k) + ees_legacy_cap(k) + rees_legacy_cap(k)) %%%Max Charge Rate

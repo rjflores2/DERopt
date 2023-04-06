@@ -1,6 +1,10 @@
 %%%EES Constraints
 %% Grid tied EES
 if isempty(ees_v) == 0
+    
+    Constraints = [Constraints
+        ((var_ees.ees_adopt' + var_rees.rees_adopt') <= res_units.*30):'EES Installed Capacity Limit'];
+    
     for k=1:K
         %%%SOC Equality / Energy Balance
         Constraints = [Constraints
@@ -24,6 +28,8 @@ if isempty(ees_v) == 0
                 Constraints = [Constraints;
                     (-var_rees.rees_chrg(:,k)'*sgip_signal(:,2) +  var_rees.rees_dchrg(:,k)'*sgip_signal(:,2) >= var_rees.rees_adopt(k)*sgip(1)):'SGIP CO2 Reduciton'];
             end
+            
+            
         end
     end
 end

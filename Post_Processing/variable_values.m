@@ -34,14 +34,14 @@ var_util_ees.ees_chrg = value(var_util_ees.ees_chrg);
 var_util_ees.ees_dchrg = value(var_util_ees.ees_dchrg);
 
 %% Utility Electrolyzer
-var_util_el.el_adopt = value(var_util_el.el_adopt);
-var_util_el.el_prod = value(var_util_el.el_prod);
+% var_util_el.el_adopt = value(var_util_el.el_adopt);
+% var_util_el.el_prod = value(var_util_el.el_prod);
 
 %% Utility H2 Injection
-var_util_h2_inject.h2_inject_adopt = value(var_util_h2_inject.h2_inject_adopt);
-var_util_h2_inject.h2_inject_size = value(var_util_h2_inject.h2_inject_size);
-var_util_h2_inject.h2_inject = value(var_util_h2_inject.h2_inject);
-var_util_h2_inject.h2_store = value(var_util_h2_inject.h2_store);
+% var_util_h2_inject.h2_inject_adopt = value(var_util_h2_inject.h2_inject_adopt);
+% var_util_h2_inject.h2_inject_size = value(var_util_h2_inject.h2_inject_size);
+% var_util_h2_inject.h2_inject = value(var_util_h2_inject.h2_inject);
+% var_util_h2_inject.h2_store = value(var_util_h2_inject.h2_store);
 %% Renewable Electrical Energy Storage
 var_rees.rees_adopt = value(var_rees.rees_adopt);
 var_rees.rees_chrg = value(var_rees.rees_chrg);

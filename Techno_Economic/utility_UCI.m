@@ -37,7 +37,7 @@ elseif uci_rate == 3
     dc_nontou = 9.16; %$/kW - facility related demand charge
     dc_on = 0;
     dc_mid = 0;
-    import_price = lmp_uci + 0.2;
+    import_price = lmp_uci + .10;
     
     if export_on || gen_export_on
         export_price = lmp_uci;
