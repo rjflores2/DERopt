@@ -29,7 +29,7 @@ ops = sdpsettings('solver','cplex','verbose',1)
 %         [x, fval, exitflag, output, lambda] = cplexlp(model.f, model.Aineq, model.bineq, model.Aeq, model.beq, lb, ub, [], options);
     if sum(strfind(model.ctype,'B')>0) + sum(strfind(model.ctype,'I')>0)
         opt_cplexmilp = 1
-        [x, fval, exitflag, output] = cplexmilp(model.f, model.Aineq, model.bineq, model.Aeq, model.beq, [],[],[],lb,ub,model.ctype,x,options);        
+        [x, fval, exitflag, output] = cplexmilp(model.f, model.Aineq, model.bineq, model.Aeq, model.beq, [],[],[],lb,ub,model.ctype,x,ops);        
     else
         opt_cplexlp = 1
         [x, fval, exitflag, output, lambda] = cplexlp(model.f, model.Aineq, model.bineq, model.Aeq, model.beq, lb, ub, [], ops);        

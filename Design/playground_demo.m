@@ -25,6 +25,16 @@ for co2_val = co2_lim_loop
 
 
 %% Parameters
+ 
+cfg_files_path = 'H:\_Tools_';
+%cfg_files_path = 'E:\MotusVentures';
+
+cfg_data_path = 'H:\Data\UCI';
+%cfg_data_path = 'E:\MotusVentures\DERopt\Data';
+
+cfg_results_path = 'H:\_Tools_\UCI_Results\Sc19';
+%cfg_results_path = 'E:\MotusVentures\DERopt\SolveResults';
+
 
 %%% opt.m parameters
 %%%Choose optimizaiton solver 
@@ -159,20 +169,23 @@ import_limit = .6;
 %%%YALMIP Master Path
 addpath(genpath('H:\Matlab_Paths\YALMIP-master')) %rjf path
 addpath(genpath('C:\Program Files\MATLAB\R2014b\YALMIP-master')) %cyc path
+%addpath(genpath('E:\MotusVentures\YALMIP-master')) %rjf path
+%addpath(genpath('C:\Program Files\MATLAB\R2023a\YALMIP-master')) %cyc path
+
 
 %%%CPLEX Path
 addpath(genpath('C:\Program Files\IBM\ILOG\CPLEX_Studio128\cplex\matlab\x64_win64')) %rjf path
 addpath(genpath('C:\Program Files\IBM\ILOG\CPLEX_Studio1263\cplex\matlab\x64_win64')) %cyc path
 
 %%%DERopt paths
-addpath(genpath('H:\_Tools_\DERopt\Design'))
-addpath(genpath('H:\_Tools_\DERopt\Input_Data'))
-addpath(genpath('H:\_Tools_\DERopt\Load_Processing'))
-addpath(genpath('H:\_Tools_\DERopt\Post_Processing'))
-addpath(genpath('H:\_Tools_\DERopt\Problem_Formulation_Single_Node'))
-addpath(genpath('H:\_Tools_\DERopt\Techno_Economic'))
-addpath(genpath('H:\_Tools_\DERopt\Utilities'))
-addpath(genpath('H:\_Tools_\DERopt\Data'))
+addpath(genpath(append(cfg_files_path,'\DERopt\Design')))
+addpath(genpath(append(cfg_files_path, '\DERopt\Input_Data')))
+addpath(genpath(append(cfg_files_path, '\DERopt\Load_Processing')))
+addpath(genpath(append(cfg_files_path, '\DERopt\Post_Processing')))
+addpath(genpath(append(cfg_files_path, '\DERopt\Problem_Formulation_Single_Node')))
+addpath(genpath(append(cfg_files_path, '\DERopt\Techno_Economic')))
+addpath(genpath(append(cfg_files_path, '\DERopt\Utilities')))
+addpath(genpath(append(cfg_files_path, '\DERopt\Data')))
 %%%cyc PC Paths
 % addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Design'))
 % addpath(genpath('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Input_Data'))
@@ -206,7 +219,7 @@ addpath('C:\Users\cyc\OneDrive - UC Irvine\DERopt (Office New)\Data\Emission_Fac
 
 %% Loading building demand
 %%%Loading Data
-dt = load('H:\Data\UCI\Campus_Loads_2014_2019.mat');
+dt = load(append(cfg_data_path, '\Campus_Loads_2014_2019.mat'));
 % dt = load('C:\Users\kenne\OneDrive - University of California - Irvine\DERopt\Data\Campus_Loads_2014_2019.mat');
 % dt = load('C:\Users\cyc\OneDrive - UC Irvine\DERopt (Office New)\Data\Campus_Loads_2014_2019.mat');
 
@@ -502,9 +515,9 @@ co2_emissions_total = sum(co2_emissions)
     
     %%
 %     if isempty(co2_lim)
-%         save('H:\_Tools_\UCI_Results\Sc19\Baseline.mat')
+%         save(append(cfg_results_path, '\Baseline.mat'))
 %     else
-%         save(strcat('H:\_Tools_\UCI_Results\Sc19\',num2str(100.*co2_lim_red),'_reduction.mat'))
+%         save(strcat(append(cfg_results_path , '\'),num2str(100.*co2_lim_red),'_reduction.mat'))
 %     end
 end
 %%
