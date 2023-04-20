@@ -78,30 +78,21 @@ solar = interp1(norm_slr(:,1),norm_slr(:,2),time);
 %% Loadings Emission Factors
 
 %%%Grid emission factors
-grid_co2 = xlsread('grid_co2_factors.xlsx');
+grid_co2 = xlsread('grid_co2_factors.xlsx'); 
 yr_shift = 12 + (year_idx(1) - 2018);
 grid_co2(:,1) = grid_co2(:,1) - yr_shift;
 co2_time = datenum(grid_co2(:,1:6));
-% % grid_co2(:,1) = grid_co2(:,1) - (grid_co2(1) - year(time(1)));
-% % co2_time = datenum(grid_co2(:,1:6));
-% co2_time = [];
-% co2_time(1) = time(1);
-% for ii = 2:size(grid_co2,1)
-%     co2_time(ii,1) = co2_time(ii-1) + 1/24;
-% end
-% 
-% co2_time_vec = datevec(co2_time);
-% co2_time_vec(:,1) = co2_time_vec(:,1) - yr_shift;
-% co2_time = datenum(grid_co2(:,1:6));
-% %%%Grid emissions
-co2_import = interp1(co2_time,grid_co2(:,7),time)*2.205; %tonne/MWh * 2.205 lb/kWh / tonne/MWh
-co2_import(isnan(co2_import)) = nanmean(co2_import);
 
+% %%%Grid emissions [kg/kWh)
+co2_import = interp1(co2_time,grid_co2(:,7),time); %[kg/kWh] - Unit conversion - tonne/MWh  = 1000 kg/ 1000 kWh = kg/kWh
+co2_import(isnan(co2_import)) = nanmean(co2_import); %%%Eliminating any NaNs
 
+%%% Dummy value for DEMO only - erasing emissions for CA grid in favor of a
+%%% less efficient grid
 co2_import = co2_import*0 + 0.45;
 
-%%%CO2 rates for NG combustion
-co2_ng=12.74272*(1/29.3071);%%%(lb CO2/therm methane)*(therm/kWh)
+%%%CO2 rates for NG combustion 
+co2_ng = (1/50)*(1/16)*44*3.6 ;%%%[kg/kWh]: (kg CH4 / 50MJ)*(1kmolCH4 / 16kg)*(1kmolCO2 / 1kmolCH4)*(44kgCO2 / 1kmolCO2)*(3.6MJ / 1kWh)   
 co2_rng=co2_ng*0.2;
 %% Day multiplier
 
