@@ -9,9 +9,11 @@ if opt_now==1
     fprintf('Model Export took %.2f seconds \n', elapsed)
     
     %% Other limits and settings
+    
     %%%Setting lower/upper bounds for all variables
     lb=zeros(size(model.f));
     ub=inf(size(lb));
+
     %%%Solver settings
     ops = sdpsettings('solver','cplex','verbose',1)
     
@@ -19,48 +21,56 @@ if opt_now==1
     %%%CO2 limit index
     co2_lim_idx = find(model.bineq == co2_lim);
  
-   %% Loop to rerun optimization
+    %% Loop to rerun optimization
    
-   for ii = 1:length(co2_red)
-       %%%Empty out any prior solver results
-       clear x fval exitflag output
-       %%%If this is not the 1st iteration, update the CO2 limit
-       if ii > 1
-           model.bineq(co2_lim_idx) = co2_base*(1-co2_red(ii));
-       end
-    x = [];
+    for ii = 1:length(co2_red)
+    
+        %%%Empty out any prior solver results
+        clear x fval exitflag output
+        
+        %%%If this is not the 1st iteration, update the CO2 limit
+        if ii > 1
+            model.bineq(co2_lim_idx) = co2_base*(1-co2_red(ii));
+        end
+    
+        x = [];
 
-    fprintf('%s Starting CPLEX Solver \n', datestr(now,'HH:MM:SS'))
-    tic
+        fprintf('%s Starting CPLEX Solver \n', datestr(now,'HH:MM:SS'))
+        tic
     
-%         [x, fval, exitflag, output, lambda] = cplexlp(model.f, model.Aineq, model.bineq, model.Aeq, model.beq, lb, ub, [], options);
-    if sum(strfind(model.ctype,'B')>0) + sum(strfind(model.ctype,'I')>0)
-        opt_cplexmilp = 1
-        [x, fval, exitflag, output] = cplexmilp(model.f, model.Aineq, model.bineq, model.Aeq, model.beq, [],[],[],lb,ub,model.ctype,x,ops);        
-    else
-        opt_cplexlp = 1
-        [x, fval, exitflag, output, lambda] = cplexlp(model.f, model.Aineq, model.bineq, model.Aeq, model.beq, lb, ub, [], ops);        
-    end
+        %  [x, fval, exitflag, output, lambda] = cplexlp(model.f, model.Aineq, model.bineq, model.Aeq, model.beq, lb, ub, [], options);
     
-    %%% Starting Recorder Structure
-    rec.solver.x(ii,:) = x;
-    rec.solver.fval(ii,1) = fval;
-    rec.solver.exitflag(ii,1) = exitflag;
-    rec.solver.output(ii,1) = output;
+        if sum(strfind(model.ctype,'B')>0) + sum(strfind(model.ctype,'I')>0)
+        
+            opt_cplexmilp = 1        
+            [x, fval, exitflag, output] = cplexmilp(model.f, model.Aineq, model.bineq, model.Aeq, model.beq, [],[],[],lb,ub,model.ctype,x,ops);            
+        else
+            opt_cplexlp = 1
+            [x, fval, exitflag, output, lambda] = cplexlp(model.f, model.Aineq, model.bineq, model.Aeq, model.beq, lb, ub, [], ops);        
+        end
     
-    elapsed = toc;
-    fprintf('CPLEX took %.2f seconds \n', elapsed)
+        %%% Starting Recorder Structure
+        rec.solver.x(ii,:) = x;
+        rec.solver.fval(ii,1) = fval;
+        rec.solver.exitflag(ii,1) = exitflag;
+        rec.solver.output(ii,1) = output;
+    
+        elapsed = toc;
+        fprintf('CPLEX took %.2f seconds \n', elapsed)
 
-    %     cplex = Cplex(model); %instantiate object cplex of class Cplex
-    %     cplex.solve() %metod solve() to create Solution dynamic property
-    %     cplex.Solution.status
-    %     cplex.Solution.miprelgap
-    
-    % Recovering data and assigning to the YALMIP variables
-    assign(recover(recoverymodel.used_variables),x)
-   end    
-   return
+        %     cplex = Cplex(model); %instantiate object cplex of class Cplex
+        %     cplex.solve() %metod solve() to create Solution dynamic property
+        %     cplex.Solution.status
+        %     cplex.Solution.miprelgap
+
+        % Recovering data and assigning to the YALMIP variables
+        assign(recover(recoverymodel.used_variables),x)
+    end    
+   
+    return
 end
+
+
 %% Optimize thru YALMIP
 if opt_now_yalmip==1  
 %% Lower Bound Constraints
