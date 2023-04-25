@@ -9,7 +9,7 @@ startsim = tic;
 %%%Baseline CO2 emissions
 co2_base = []; %[kg]
 %%%Desired reduction
-co2_red = [0 .25];
+co2_red = [0 0.05];
 
 %% New "Requirements"
 %%% Need 1) Baseline CO2 emissions - emissions under current operations
@@ -18,7 +18,7 @@ co2_red = [0 .25];
 %%%Baseline CO2 emissions
 co2_base = []; %[kg]
 %%%Desired reduction
-co2_red = [0 .25];
+co2_red = [0:0.05:.5];
 
 %% temporary solution to run in different installs...
 cfg_roman_PC = false;
@@ -297,6 +297,48 @@ cap_cost_mod
 %% Legacy Technologies
 tech_legacy_UCI
 
+%% Plotting loads & Costs for demo purpose
+%%% 'Electric Demand (MW)'
+figure
+hold on
+plot(time,elec.*4./1000,'LineWidth',2)
+set(gca,'XTick',[round(time(1),0)+.5:round(time(end),0)+.5],'FontSize',14)
+box on
+grid on
+datetick('x','ddd','keepticks')
+xlim([time(stpts(3)) time(stpts(3)+96*7)])
+ylabel('Electric Demand (MW)','FontSize',18)
+set(gcf,'Position',[100 450 500 275])
+hold off
+
+%%% 'Electric Price ($/kWh)'
+figure
+hold on
+plot(time,import_price,'LineWidth',2)
+set(gca,'XTick',[round(time(1),0)+.5:round(time(end),0)+.5],'FontSize',14)
+box on
+grid on
+datetick('x','ddd','keepticks')
+xlim([time(stpts(3)) time(stpts(3)+96*7)])
+ylabel('Electric Price ($/kWh)','FontSize',18)
+set(gcf,'Position',[100 100 500 275])
+hold off
+
+%%% 'Solar Potential (kW/m^2)'
+figure
+hold on
+plot(time,solar,'LineWidth',2)
+set(gca,'XTick',[round(time(1),0)+.5:round(time(end),0)+.5],'FontSize',14)
+box on
+grid on
+datetick('x','ddd','keepticks')
+xlim([time(stpts(3)) time(stpts(3)+96*7)])
+ylabel('Solar Potential (kW/m^2)','FontSize',18)
+set(gcf,'Position',[650 100 500 275])
+hold off
+
+close all
+
 
 %% DERopt
 if opt_now
@@ -450,10 +492,92 @@ if opt_now
     finish = datetime('now') ; totalelapsed = toc(startsim)
     
     %% Variable Conversion
-    variable_values
+%     variable_values
     
 end
 
+ %% Plot 'LCOE ($/kWh)'
+    figure
+    hold on
+    plot(rec.co2_emissions_red,rec.financials.lcoe,'LineWidth',2)
+    box on
+    grid on
+    ylabel('LCOE ($/kWh)','FontSize',18)
+    xlabel('CO_2 Reduction (%)','FontSize',18)
+     set(gcf,'Position',[100 100 500 275])
+     xlim([0 50])
+    hold off
 
+    
+    %% Plot 'Cost of Carbon'
+    close all
+    figure
+    hold on
+    plot(rec.co2_emissions_red,rec.financials.cost_of_co2,'LineWidth',2)
+    plot(rec.co2_emissions_red,rec.financials.cost_of_co2_marginal,'LineWidth',2)
+    box on
+    grid on
+    ylabel('Cost of CO_2 ($/tonne)','FontSize',18)
+    xlabel('CO_2 Reduction (%)','FontSize',18)
+     set(gcf,'Position',[100 100 500 275])
+     xlim([5 50])
+     legend('Average Cost','Marginal Cost','Location','NorthWest')
+    hold off
 
+%% Plot 'Capital Requirements'
+    close all
+    figure
+    hold on
+    plot(rec.co2_emissions_red,sum(rec.financials.cap_cost,2)./1000000,'LineWidth',2)
+%     plot(rec.co2_emissions_red,rec.financials.cost_of_co2_marginal,'LineWidth',2)
+    box on
+    grid on
+    ylabel('Capital Cost ($MM)','FontSize',18)
+    xlabel('CO_2 Reduction (%)','FontSize',18)
+     set(gcf,'Position',[100 100 500 275])
+     xlim([5 50])
+%      legend('Average Cost','Marginal Cost','Location','NorthWest')
+    hold off
 
+%% Dispatch Plots
+close all
+idx = 1
+
+ dt1 = [sum(rec.ldg.ldg_elec(:,idx),2)...
+            sum(rec.utility.import(:,idx),2)...
+            sum(rec.solar.pv_elec(:,idx),2) + sum(rec.rees.rees_chrg(:,idx),2)...
+            sum(rec.ees.ees_dchrg(:,idx),2) + sum(rec.rees.rees_dchrg(:,idx),2) + sum(rec.lees.ees_dchrg(:,idx),2)];
+     
+    dt2 = [elec ...
+            sum(rec.ees.ees_chrg(:,idx),2) + sum(rec.lees.ees_chrg(:,idx),2) + sum(rec.rees.rees_chrg(:,idx),2)...
+            sum(el_eff.*rec.el.el_prod(:,idx),2) + sum(h2_chrg_eff.*rec.h2es.h2es_chrg(:,idx),2) + sum(rel_eff.*rec.rel.rel_prod(:,idx),2) ...
+            rec.solar.pv_nem(:,idx)];
+        
+        
+        %%% Plot 'Electric Sources (MW)'
+    figure
+    hold on
+    area(time,dt1.*4./1000)
+    set(gca,'XTick',[round(time(1),0)+.5:round(time(end),0)+.5],'FontSize',14)
+    box on
+    grid on
+    datetick('x','ddd','keepticks')
+    xlim([time(stpts(3)) time(stpts(3)+96*7)])
+    ylabel('Electric Sources (MW)','FontSize',18)
+    legend('Gas Turbine','Utility Import','Solar','Battery Discharge','Location','Best')
+    set(gcf,'Position',[100 450 500 275])
+    hold off
+    
+     %%% Plot 'Electric Loads (MW)'
+    figure
+    hold on
+    area(time,dt2.*4./1000)
+    set(gca,'XTick',[round(time(1),0)+.5:round(time(end),0)+.5],'FontSize',14)
+    box on
+    grid on
+    datetick('x','ddd','keepticks')
+    xlim([time(stpts(3)) time(stpts(3)+96*7)])
+    ylabel('Electric Loads (MW)','FontSize',18)
+    legend('Campus','Battery Charging','H_2 Production','Export','Location','Best')
+    set(gcf,'Position',[100 100 500 275])
+    hold off

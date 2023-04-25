@@ -119,7 +119,8 @@ if el_on
     el_fin = [-0.02; ... %%%Scaling linear factor - Based on CA Roadmap - 2k H2 per day vs. 20k H2 per day
         5; ... %%%MACRS Schedule
         1]; ... %%%ITC Benefit
-        
+      
+    el_cap = el_v;
 else
     el_v = []
     % h2es_v = [];
@@ -138,6 +139,7 @@ if h2es_on
     %%% (9) Discharging efficiency
     %%% (10) State of charge holdover
     h2es_v = [60;0.001;0.001;0.01;1;1;1;0.95;1;1];
+    h2es_cap = h2es_v(1);
 else
     h2es_v = [];
 end
