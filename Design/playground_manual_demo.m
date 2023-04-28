@@ -7,7 +7,7 @@ clc;
 
 
 %% temporary solution to run in different installs...
-demo_files_location = 2;    % 1 - Robert's PC
+demo_files_location = 1;    % 1 - Robert's PC
                             % 2 - Roman's Laptop
                             % 3 - Roman's Desktop
 
