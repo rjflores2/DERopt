@@ -91,15 +91,38 @@ end
 
 
 
+%%-------------------------------------------------------------------------
+%--------------------------------------------------------------------------
+%        
+%--------------------------------------------------------------------------
+%--------------------------------------------------------------------------
+
+
 %% Run DERopt optimization
 
 optRec = playground_demo_function(playground_run_cfg);
 
 
-%% Plot data
+
+%%-------------------------------------------------------------------------
+%--------------------------------------------------------------------------
+%        
+%--------------------------------------------------------------------------
+%--------------------------------------------------------------------------
 
 
-%% Plot 'LCOE ($/kWh)'
+
+
+
+
+
+%%-------------------------------------------------------------------------
+%--------------------------------------------------------------------------
+%        SHOW RESULTS (Plot data)
+%--------------------------------------------------------------------------
+%--------------------------------------------------------------------------
+
+%%% Plot 'LCOE ($/kWh)'
 figure
 hold on
 plot(optRec.co2_emissions_red,optRec.financials.lcoe,'LineWidth',2)
@@ -112,7 +135,7 @@ xlim([0 50])
 hold off
     
         
-%% Plot 'Cost of Carbon'
+%%% Plot 'Cost of Carbon'
 close all
 figure
 hold on
@@ -128,63 +151,61 @@ legend('Average Cost','Marginal Cost','Location','NorthWest')
 hold off
 
 
-%% Plot 'Capital Requirements'
+%%% Plot 'Capital Requirements'
 close all
 figure
 hold on
 plot(optRec.co2_emissions_red,sum(optRec.financials.cap_cost,2)./1000000,'LineWidth',2)
-%     plot(optRec.co2_emissions_red,optRec.financials.cost_of_co2_marginal,'LineWidth',2)
+% plot(optRec.co2_emissions_red,optRec.financials.cost_of_co2_marginal,'LineWidth',2)
 box on
 grid on
 ylabel('Capital Cost ($MM)','FontSize',18)
 xlabel('CO_2 Reduction (%)','FontSize',18)
- set(gcf,'Position',[100 100 500 275])
- xlim([5 50])
-%      legend('Average Cost','Marginal Cost','Location','NorthWest')
+set(gcf,'Position',[100 100 500 275])
+xlim([5 50])
+% legend('Average Cost','Marginal Cost','Location','NorthWest')
 hold off
 
 
-    %% Dispatch Plots
-    close all
-    idx = 1;
+%%% Dispatch Plots
+close all
+idx = 1;
     
-     dt1 = [sum(optRec.ldg.ldg_elec(:,idx),2)...
-                sum(optRec.utility.import(:,idx),2)...
-                sum(optRec.solar.pv_elec(:,idx),2) + sum(optRec.rees.rees_chrg(:,idx),2)...
-                sum(optRec.ees.ees_dchrg(:,idx),2) + sum(optRec.rees.rees_dchrg(:,idx),2) + sum(optRec.lees.ees_dchrg(:,idx),2)];
+dt1 = [sum(optRec.ldg.ldg_elec(:,idx),2)...
+        sum(optRec.utility.import(:,idx),2)...
+        sum(optRec.solar.pv_elec(:,idx),2) + sum(optRec.rees.rees_chrg(:,idx),2)...
+        sum(optRec.ees.ees_dchrg(:,idx),2) + sum(optRec.rees.rees_dchrg(:,idx),2) + sum(optRec.lees.ees_dchrg(:,idx),2)];
          
-        dt2 = [optRec.elec ...
-                sum(optRec.ees.ees_chrg(:,idx),2) + sum(optRec.lees.ees_chrg(:,idx),2) + sum(optRec.rees.rees_chrg(:,idx),2)...
-                sum(optRec.el_eff.*optRec.el.el_prod(:,idx),2) + sum(optRec.h2_chrg_eff.*optRec.h2es.h2es_chrg(:,idx),2) + sum(optRec.rel_eff.*optRec.rel.rel_prod(:,idx),2) ...
-                optRec.solar.pv_nem(:,idx)];
-            
-            
-            %%% Plot 'Electric Sources (MW)'
-        figure
-        hold on
-        area(optRec.time,dt1.*4./1000)
-        set(gca,'XTick', round(optRec.time(1),0)+.5:round(optRec.time(end),0)+.5,'FontSize',14)
-        box on
-        grid on
-        datetick('x','ddd','keepticks')
-        xlim([optRec.time(optRec.stpts(3)) optRec.time(optRec.stpts(3)+96*7)])
-        ylabel('Electric Sources (MW)','FontSize',18)
-        legend('Gas Turbine','Utility Import','Solar','Battery Discharge','Location','Best')
-        set(gcf,'Position',[100 450 500 275])
-        hold off
-        
-         %%% Plot 'Electric Loads (MW)'
-        figure
-        hold on
-        area(optRec.time,dt2.*4./1000)
-        set(gca,'XTick', round(optRec.time(1),0)+.5:round(optRec.time(end),0)+.5, 'FontSize',14)
-        box on
-        grid on
-        datetick('x','ddd','keepticks')
-        xlim([optRec.time(optRec.stpts(3)) optRec.time(optRec.stpts(3)+96*7)])
-        ylabel('Electric Loads (MW)','FontSize',18)
-        legend('Campus','Battery Charging','H_2 Production','Export','Location','Best')
-        set(gcf,'Position',[100 100 500 275])
-        hold off
+dt2 = [optRec.elec ...
+        sum(optRec.ees.ees_chrg(:,idx),2) + sum(optRec.lees.ees_chrg(:,idx),2) + sum(optRec.rees.rees_chrg(:,idx),2)...
+        sum(optRec.el_eff.*optRec.el.el_prod(:,idx),2) + sum(optRec.h2_chrg_eff.*optRec.h2es.h2es_chrg(:,idx),2) + sum(optRec.rel_eff.*optRec.rel.rel_prod(:,idx),2) ...
+        optRec.solar.pv_nem(:,idx)];
 
-        
+
+%%% Plot 'Electric Sources (MW)'
+figure
+hold on
+area(optRec.time,dt1.*4./1000)
+set(gca,'XTick', round(optRec.time(1),0)+.5:round(optRec.time(end),0)+.5,'FontSize',14)
+box on
+grid on
+datetick('x','ddd','keepticks')
+xlim([optRec.time(optRec.stpts(3)) optRec.time(optRec.stpts(3)+96*7)])
+ylabel('Electric Sources (MW)','FontSize',18)
+legend('Gas Turbine','Utility Import','Solar','Battery Discharge','Location','Best')
+set(gcf,'Position',[100 450 500 275])
+hold off
+
+%%% Plot 'Electric Loads (MW)'
+figure
+hold on
+area(optRec.time,dt2.*4./1000)
+set(gca,'XTick', round(optRec.time(1),0)+.5:round(optRec.time(end),0)+.5, 'FontSize',14)
+box on
+grid on
+datetick('x','ddd','keepticks')
+xlim([optRec.time(optRec.stpts(3)) optRec.time(optRec.stpts(3)+96*7)])
+ylabel('Electric Loads (MW)','FontSize',18)
+legend('Campus','Battery Charging','H_2 Production','Export','Location','Best')
+set(gcf,'Position',[100 100 500 275])
+hold off
