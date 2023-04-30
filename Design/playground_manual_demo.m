@@ -49,9 +49,9 @@ elseif demo_files_location == 2   % 2 - Roman's Laptop
 
 else                                % 3 - Roman's Desktop
 
-    playground_run_cfg.files_path = 'H:\MotusVentures';
-    playground_run_cfg.data_path = 'H:\MotusVentures\DERopt\Data';
-    playground_run_cfg.results_path = 'H:\MotusVentures\DERopt\SolveResults';
+    playground_run_cfg.files_path = 'E:\MotusVentures';
+    playground_run_cfg.data_path = 'E:\MotusVentures\DERopt\Data';
+    playground_run_cfg.results_path = 'E:\MotusVentures\DERopt\SolveResults';
 
     playground_run_cfg.yalmip_master_path = 'C:\MotusVentures\YALMIP-master';
     playground_run_cfg.matlab_path = 'C:\Program Files\MATLAB\R2023a\YALMIP-master';

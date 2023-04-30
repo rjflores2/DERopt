@@ -449,7 +449,7 @@ function [optimizationRecordings] = playground_demo_function(runConfiguration)
     rec.stpts = stpts;
 
     %% SAVE Resuts to file
-    % save(strcat(runConfiguration.results_path,'\deropt_results.mat'), "rec")
+    save(strcat(runConfiguration.results_path,'\deropt_results.mat'), "rec")
 
     optimizationRecordings = rec;
 
