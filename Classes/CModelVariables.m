@@ -123,10 +123,13 @@ classdef CModelVariables < handle
 
     end
 
+    properties (SetAccess = public)
+        Objective
+    end
+
     properties (SetAccess = private)
         T
-        M
-        Objective
+        M        
     end
     
     properties (Constant)

@@ -1,11 +1,11 @@
 
 %%                 ZERO CARBON FUTURE
 %
-%%              DER Optimizer Demonstration
+%%              DER Optimizer Demonstration Script
 %
 %   New complete demo script file (prior to coding App)
 %
-%   Created: May 3rd 2023
+%   Created: May 3rd 2023               Version 0.6
 %
 %   Last Modified: May 10th 2023
 %
@@ -38,8 +38,8 @@ configurationData.year_idx = 2018;
 % Demo files location
 if demo_files_location == 1       % 1 - Robert's PC
 
-    configurationData.files_path = 'H:\_Tools_';
-    configurationData.data_path = 'H:\Data\UCI';
+    configurationData.files_path = 'H:\_Tools_\DERopt';
+    configurationData.data_path = 'H:\_Tools_\DERopt\Data';
     configurationData.results_path = 'H:\_Tools_\UCI_Results\Sc19';
 
     configurationData.yalmip_master_path = 'H:\Matlab_Paths\YALMIP-master';
@@ -278,7 +278,10 @@ if bldgData.LoadData(append(demo_data_path, '\Campus_Loads_2014_2019.mat'), chil
     
 else
 
-    % TODO: stop... couldn't load data!
+    dataFilePath = append(demo_data_path, '\Campus_Loads_2014_2019.mat');
+
+    f = msgbox(append("Could not load Building Data File: ", dataFilePath),"0CF DERoptimizer","warn");
+    return
 
 end
 
@@ -305,13 +308,6 @@ utilInfo = CUtilityInfo(uci_rate, export_on, gen_export_on, bldgData.lmp_uci, bl
 techSelOnSite = CTechnologySelection();
 
 techSelOnSite.CalculateAllParams(pv_on, ees_on, el_on, h2es_on, rel_on, hrs_on, h2_inject_on);
-
-% Erase Later...
-pv_v = techSelOnSite.pv_v;
-ees_v = techSelOnSite.ees_v;
-el_v = techSelOnSite.el_v;
-h2es_v = techSelOnSite.h2es_v;
-rel_v = techSelOnSite.rel_v;
 
 
 
@@ -353,12 +349,6 @@ capCostMods.CalcCostScalars_UtilityScaleElectrolyzer(techSelOffSite.util_el_v, t
 %--------------------------------------------------------------------------
 legacyTech = CLegacyTechnologies(lpv_on, ldg_on, lbot_on, lhr_on, ldb_on, lboil_on, lees_on, ltes_on, dg_legacy_cyc);
 dg_legacy_cyc = legacyTech.updatedDgLegacyCyc;
-
-% Erase Later...
-
-ees_legacy = legacyTech.ees_legacy;
-
-
 
 
 %% Plotting loads & Costs for demo purpose
@@ -463,7 +453,7 @@ fprintf('Took %.2f seconds \n', elapsed)
 %--------------------------------------------------------------------------
 %--------------------------------------------------------------------------
 
-modelConstraints = CModelConstraints();
+modelConstraints = CModelConstraints(bldgData.GetTimeLen(), bldgData.GetEndPointsLen());
 
 
 %% General Equality Constraints
@@ -518,27 +508,14 @@ fprintf('Took %.2f seconds \n', elapsed)
 %% EES Constraints
 fprintf('%s: EES Constraints.', datetime("now","InputFormat",'HH:MM:SS'))
 
-
-Constraints = modelConstraints.Constraints;
-T = bldgData.GetTimeLen();
-opt_ees_0cf                                         %% URGENT!
-modelConstraints.Constraints = Constraints;
-
-
-%elapsed = modelConstraints.Calculate_EES(modelVars, techSelOnSite.ees_v, techSelOnSite>pv_v, rees_on);
+elapsed = modelConstraints.Calculate_EES(modelVars, techSelOnSite.ees_v, techSelOnSite.pv_v, rees_on);
 fprintf('Took %.2f seconds \n', elapsed)
 
 
 %% Legacy EES Constraints
 fprintf('%s: Legacy EES Constraints.', datetime("now","InputFormat",'HH:MM:SS'))
 
-
-Constraints = modelConstraints.Constraints;
-opt_ees_legacy_0cf                                  %% URGENT!
-modelConstraints.Constraints = Constraints;
-
-
-%elapsed = modelConstraints.Calculate_LegacyEES(modelVars, legacyTech.ees_legacy);
+elapsed = modelConstraints.Calculate_LegacyEES(modelVars, legacyTech.ees_legacy);
 fprintf('Took %.2f seconds \n', elapsed)
 
 
@@ -566,14 +543,7 @@ fprintf('Took %.2f seconds \n', elapsed)
 %% H2 production Constraints
 fprintf('%s: Electrolyzer and H2 Storage Constraints.', datetime("now","InputFormat",'HH:MM:SS'))
 
-
-Constraints = modelConstraints.Constraints;
-e_adjust = bldgData.e_adjust;
-opt_h2_production_0cf                               %% URGENT!
-modelConstraints.Constraints = Constraints;
-
-
-%elapsed = modelConstraints.Calculate_H2production(modelVars, techSelOnSite.el_v, techSelOnSite.rel_v, techSelOnSite.h2es_v, bldgData.e_adjust);
+elapsed = modelConstraints.Calculate_H2production(modelVars, techSelOnSite.el_v, techSelOnSite.rel_v, techSelOnSite.h2es_v, bldgData.e_adjust);
 fprintf('Took %.2f seconds \n', elapsed)
 
 
@@ -714,7 +684,7 @@ fprintf('Took %.2f seconds \n', elapsed)
         rec.boil.boil_hfuel(:,ii) = lanin.boiler_hfuel;
 
         %% EES
-        if ~isempty(ees_legacy)
+        if ~isempty(legacyTech.ees_legacy)
             rec.lees.ees_chrg(:,ii) = lanin.lees_chrg;
             rec.lees.ees_dchrg(:,ii) = lanin.lees_dchrg;
             rec.lees.ees_soc(:,ii) = lanin.lees_soc;

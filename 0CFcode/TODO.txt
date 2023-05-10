@@ -1,9 +1,6 @@
 
 NEXT STEPS:
 
-
-(find "URGENT" within the code and review)
-
 (find "TODO:" within the code and review)
 
 

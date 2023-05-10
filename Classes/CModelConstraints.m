@@ -6,7 +6,7 @@ classdef CModelConstraints < handle
     end
 
     properties (SetAccess = public)
-        Constraints = [];
+        Constraints
     end
 
     properties (Constant)
@@ -15,9 +15,15 @@ classdef CModelConstraints < handle
     end
 
     methods
-        function obj = CModelConstraints()
 
+        function obj = CModelConstraints(timeInterval, numberOfMonthsInSim)
+
+            obj.T = timeInterval;
+            obj.M = numberOfMonthsInSim;
+            obj.Constraints = [];
+            
         end
+
 
         %% General Equality Constraints
         %--------------------------------------------------------------------------
@@ -394,7 +400,7 @@ classdef CModelConstraints < handle
                     %%%SOC Equality / Energy Balance
                     obj.Constraints = [obj.Constraints
                         (modelVars.eesSoc(1,ii) <= modelVars.eesSoc(obj.T,ii)):'Initial EES SOC <= Final SOC'
-                        (modelVars.eesSoc(2:obj.T,ii) == ees_v(10,ii)*modelVars.eesSoc(1:obj.T-1,ii) + ees_v(8,ii)*modelVars.eesChrg(2:obj.T,ii)  - (1/ees_v(9,ii))*modelVars.eesDchrg(2:T,ii)):'EES Balance'  %%%Minus discharging of battery
+                        (modelVars.eesSoc(2:obj.T,ii) == ees_v(10,ii)*modelVars.eesSoc(1:obj.T-1,ii) + ees_v(8,ii)*modelVars.eesChrg(2:obj.T,ii)  - (1/ees_v(9,ii))*modelVars.eesDchrg(2:obj.T,ii)):'EES Balance'  %%%Minus discharging of battery
                         (ees_v(4,ii)*modelVars.eesAdopt(ii) <= modelVars.eesSoc(:,ii) <= ees_v(5,ii)*modelVars.eesAdopt(ii)):'EES Min/Max SOC' %%%Min/Max SOC
                         (modelVars.eesChrg(:,ii) <= ees_v(6,ii)*modelVars.eesAdopt(ii)):'EES Max Chrg'  %%%Max Charge Rate
                         (modelVars.eesDchrg(:,ii) <= ees_v(7,ii)*modelVars.eesAdopt(ii)):'EES Max Dchrg']; %%%Max Discharge Rate
@@ -406,7 +412,7 @@ classdef CModelConstraints < handle
                         obj.Constraints = [obj.Constraints
                             (modelVars.reesSoc(1,ii) <= modelVars.reesSoc(obj.T,ii)):'Initial REES SOC <= Final SOC'
                             (modelVars.reesDchrgNem(1,ii) == 0):'No REES NEM in 1st time step'
-                            (modelVars.reesSoc(2:obj.T,ii) == ees_v(10,ii)*modelVars.reesSoc(1:obj.T-1,ii) + ees_v(8,ii)*modelVars.reesChrg(2:obj.T,ii)  - (1/ees_v(9,ii))*(modelVars.reesDchrg(2:T,ii) + modelVars.reesDchrgNem(2:T,ii))):'REES Balance'  %%%Minus discharging of battery
+                            (modelVars.reesSoc(2:obj.T,ii) == ees_v(10,ii)*modelVars.reesSoc(1:obj.T-1,ii) + ees_v(8,ii)*modelVars.reesChrg(2:obj.T,ii)  - (1/ees_v(9,ii))*(modelVars.reesDchrg(2:obj.T,ii) + modelVars.reesDchrgNem(2:obj.T,ii))):'REES Balance'  %%%Minus discharging of battery
                             (ees_v(4,ii)*modelVars.reesAdopt(ii) <= modelVars.reesSoc(:,ii) <= ees_v(5,ii)*modelVars.reesAdopt(ii)):'REES Min/Max SOC' %%%Min/Max SOC
                             (modelVars.reesChrg(:,ii) <= ees_v(6,ii)*modelVars.reesAdopt(ii)):'REES Max Chrg' %%%Max Charge Rate
                             (modelVars.reesDchrg(:,ii) <= ees_v(7,ii)*modelVars.reesAdopt(ii)):'REES Max Dchrg']; %%%Max Discharge Rate
