@@ -1,0 +1,18 @@
+
+NEXT STEPS:
+
+
+(find "URGENT" within the code and review)
+
+(find "TODO:" within the code and review)
+
+
+
+
+
+
+
+TO REVIEW:
+
+This line of code "index = find(ismember(obj.rate_labels,obj.rate(1)));"  always returns 1
+

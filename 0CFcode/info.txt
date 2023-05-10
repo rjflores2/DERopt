@@ -1,0 +1,14 @@
+   	  		   ZERO CARBON FUTURE
+
+	              DER Optimizer Demonstration
+
+The complete new code is contained in the following folders:
+
+Classes		Definition of all objects used (most of the code in the scripts has been migrated here)
+
+0CFcode		Main demo file to test the code and Matlab App
+
+Data		Shared folder with the original matlab code
+
+
+
