@@ -9,6 +9,7 @@ classdef CBuildingDataManager < handle
         elec
         cool
         solar
+        elec_dump       % Variable to "dump" electricity
 
         e_adjust        % demandChargeAdjustment
         co2_import
@@ -36,6 +37,7 @@ classdef CBuildingDataManager < handle
             obj.elec = [];
             obj.cool = [];
             obj.solar = [];
+            obj.elec_dump = [];
 
         end
         
