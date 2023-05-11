@@ -13,7 +13,7 @@
 clear;
 close all;
 clc;
-SetCodePaths(3)
+SetCodePaths(1)
 
 
 %% Create all default configuration values
@@ -21,7 +21,7 @@ cfg = CConfigurationManager();
 
 
 %% Select which computer your are running this script
-cfg.SetRunningEnvironment(3);   % 1 - Robert's PC
+cfg.SetRunningEnvironment(1);   % 1 - Robert's PC
                                 % 2 - Roman's Laptop
                                 % 3 - Roman's Desktop
 
@@ -32,11 +32,10 @@ cfg.SetRunningEnvironment(3);   % 1 - Robert's PC
     %cfg.year_idx = 2018;
     %cfg.month_idx = [1 4 7 10];
 
-co2_base = cfg.co2_base;
-co2_red = cfg.co2_red;
 
 
 
+    
 
 %%-------------------------------------------------------------------------
 %--------------------------------------------------------------------------
@@ -229,12 +228,12 @@ else
 
 end
 
-if isempty(co2_base)
-    co2_base = bldgData.EstimateBaseCO2Emissions();
+if isempty(cfg.co2_base)
+    cfg.co2_base = bldgData.EstimateBaseCO2Emissions();
 end
 
 % Setting up the first CO2 limit
-co2_lim = co2_base*(1-co2_red(1));
+co2_lim = cfg.co2_base*(1-cfg.co2_red(1));
 
 
 %--------------------------------------------------------------------------
@@ -465,17 +464,17 @@ elapsed = lanin.CreateModel(modelConstraints.Constraints, modelVars.Objective, c
 
 fprintf('Model Export took %.2f seconds \n', elapsed)
 
-if lanin.SetupFirstSolve(co2_lim, co2_base, sum(bldgData.elec), bldgData.co2_import, bldgData.co2_ng, bldgData.co2_rng)
+if lanin.SetupFirstSolve(co2_lim, cfg.co2_base, sum(bldgData.elec), bldgData.co2_import, bldgData.co2_ng, bldgData.co2_rng)
 
 end
 
 %% Loop to rerun optimization
 
-for ii = 1:length(co2_red)
+for ii = 1:length(cfg.co2_red)
 
     fprintf('%s Starting CPLEX Solver \n', datetime("now",'InputFormat','HH:MM:SS'))
 
-    elapsed = lanin.SolveModel(ii, co2_red(ii), modelVars);
+    elapsed = lanin.SolveModel(ii, cfg.co2_red(ii), modelVars);
 
     fprintf('CPLEX took %.2f seconds \n', elapsed)
 
