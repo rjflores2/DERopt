@@ -240,30 +240,30 @@ classdef CModelSolver < handle
             %% Optimized Variables -  Utilities
             
             % Utility Variables
-            obj.utilityImport = value(modelVars.utilImport);
-            obj.utilityNontouDc = value(modelVars.utilNontouDc);
-            obj.utilityOnpeakDc = value(modelVars.utilOnpeakDc);
-            obj.utilityMidpeakDc = value(modelVars.utilMidpeakDc);
-            obj.utilityGenExport = value(modelVars.utilGeneralExport);
+            obj.utilityImport = value(modelVars.util_import);
+            obj.utilityNontouDc = value(modelVars.util_nontou_dc);
+            obj.utilityOnpeakDc = value(modelVars.util_onpeak_dc);
+            obj.utilityMidpeakDc = value(modelVars.util_midpeak_dc);
+            obj.utilityGenExport = value(modelVars.util_gen_export);
             
             %% Optimized Variables - New Technologies
             % Solar Variables
-            obj.solarPhotoVoltaicAdopt = value(modelVars.pvAdopt);
-            obj.solarPhotoVoltaicElec = value(modelVars.pvElect);
-            obj.solarPhotoVoltaicNem = value(modelVars.pvNem);
+            obj.solarPhotoVoltaicAdopt = value(modelVars.pv_adopt);
+            obj.solarPhotoVoltaicElec = value(modelVars.pv_elec);
+            obj.solarPhotoVoltaicNem = value(modelVars.pv_nem);
 
             % Electrical Energy Storage
-            obj.electricalEnergyStorage_adopt = value(modelVars.eesAdopt);
-            obj.electricalEnergyStorage_chrg = value(modelVars.eesChrg);
-            obj.electricalEnergyStorage_dchrg = value(modelVars.eesDchrg);
-            obj.electricalEnergyStorage_soc = value(modelVars.eesSoc);
+            obj.electricalEnergyStorage_adopt = value(modelVars.ees_adopt);
+            obj.electricalEnergyStorage_chrg = value(modelVars.ees_chrg);
+            obj.electricalEnergyStorage_dchrg = value(modelVars.ees_dchrg);
+            obj.electricalEnergyStorage_soc = value(modelVars.ees_soc);
             
             % Renewable Electrical Energy Storage
-            obj.renewableElectricalEnergyStorage_adopt = value(modelVars.reesAdopt);
-            obj.renewableElectricalEnergyStorage_chrg = value(modelVars.reesChrg);
-            obj.renewableElectricalEnergyStorage_dchrg = value(modelVars.reesDchrg);
-            obj.renewableElectricalEnergyStorage_soc = value(modelVars.reesSoc);
-            obj.renewableElectricalEnergyStorage_dchrg_nem = value(modelVars.reesDchrgNem);
+            obj.renewableElectricalEnergyStorage_adopt = value(modelVars.rees_adopt);
+            obj.renewableElectricalEnergyStorage_chrg = value(modelVars.rees_chrg);
+            obj.renewableElectricalEnergyStorage_dchrg = value(modelVars.rees_dchrg);
+            obj.renewableElectricalEnergyStorage_soc = value(modelVars.rees_soc);
+            obj.renewableElectricalEnergyStorage_dchrg_nem = value(modelVars.rees_dchrg_nem);
 
             % H2 Production - Electrolyzer
             obj.h2ProductionElectrolyzer_adopt = value(modelVars.el_adopt);

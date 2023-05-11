@@ -3,31 +3,31 @@ classdef CModelVariables < handle
     % Symbolic Variables
     properties (SetAccess = public)
 
-        utilImport              % var_util.import
-        utilNontouDc            % var_util.nontou_dc
-        utilOnpeakDc            % var_util.onpeak_dc
-        utilMidpeakDc           % var_util.midpeak_dc
-        utilGeneralExport       % var_util.gen_export
-        utilImportState         % var_util.import_state
+        util_import              % var_util.import
+        util_nontou_dc            % var_util.nontou_dc
+        util_onpeak_dc            % var_util.onpeak_dc
+        util_midpeak_dc         % var_util.midpeak_dc
+        util_gen_export         % var_util.gen_export
+        util_import_state       % var_util.import_state
 
-        pvElect                 % var_pv.pv_elec
-        pvAdopt                 % var_pv.pv_adopt
-        pvNem                   % var_pv.pv_nem
+        pv_elec                 % var_pv.pv_elec
+        pv_adopt                % var_pv.pv_adopt
+        pv_nem                  % var_pv.pv_nem
 
-        reesAdopt               % var_rees.rees_adopt
-        reesChrg                % var_rees.rees_chrg
-        reesDchrg               % var_rees.rees_dchrg
-        reesSoc                 % var_rees.rees_soc
-        reesDchrgNem            % var_rees.rees_dchrg_nem
+        rees_adopt              % var_rees.rees_adopt
+        rees_chrg               % var_rees.rees_chrg
+        rees_dchrg              % var_rees.rees_dchrg
+        rees_soc                % var_rees.rees_soc
+        rees_dchrg_nem          % var_rees.rees_dchrg_nem
 
-        eesAdopt                % var_ees.ees_adopt
-        eesChrg                 % var_ees.ees_chrg
-        eesDchrg                % var_ees.ees_dchrg
-        eesSoc                  % var_ees.ees_soc
+        ees_adopt               % var_ees.ees_adopt
+        ees_chrg                % var_ees.ees_chrg
+        ees_dchrg               % var_ees.ees_dchrg
+        ees_soc                 % var_ees.ees_soc
         
-        sgipEesPbi              % var_sgip.sgip_ees_pbi
-        sgipEesNpbi             % var_sgip.sgip_ees_npbi
-        sgipEesNpbiEquity       % var_sgip.sgip_ees_npbi_equity
+        sgip_ees_pbi            % var_sgip.sgip_ees_pbi
+        sgip_ees_npbi           % var_sgip.sgip_ees_npbi
+        sgip_ees_npbi_equity    % var_sgip.sgip_ees_npbi_equity
 
         rel_adopt               % var_rel.rel_adopt
         rel_prod                % var_rel.rel_prod
@@ -156,7 +156,7 @@ classdef CModelVariables < handle
             if utility_exists 
 
                 %%%Electrical Import Variables
-                obj.utilImport = sdpvar(obj.T,1,'full');
+                obj.util_import = sdpvar(obj.T,1,'full');
                 
                 %%%Demand Charge Variables
                 %%%Only creating variables for # of months and number of applicable
@@ -164,15 +164,15 @@ classdef CModelVariables < handle
                 if sum(dc_exist) > 0
 
                     %%%Non TOU DC
-                    obj.utilNontouDc = sdpvar(obj.M,1,'full');
+                    obj.util_nontou_dc = sdpvar(obj.M,1,'full');
                     
                     %%%On Peak/ Mid Peak TOU DC
                     if utilityInfo.onpeak_count > 0
-                        obj.utilOnpeakDc = sdpvar(onpeak_count,1,'full');
-                        obj.utilMidpeakDc = sdpvar(midpeak_count,1,'full');
+                        obj.util_onpeak_dc = sdpvar(onpeak_count,1,'full');
+                        obj.util_midpeak_dc = sdpvar(midpeak_count,1,'full');
                     else
-                        obj.utilOnpeakDc = 0;
-                        obj.utilMidpeakDc = 0;
+                        obj.util_onpeak_dc = 0;
+                        obj.util_midpeak_dc = 0;
                     end
 
                 end
@@ -184,8 +184,8 @@ classdef CModelVariables < handle
                 index = find(ismember(obj.rate_labels,obj.rate(1)));
                 
                 %%%Import Energy charges
-                %     Objective = sum(sum(obj.utilImport.*temp_cf));
-                obj.Objective = sum(sum(obj.utilImport.*(dayMultiplier.*utilityInfo.import_price(:,index))));
+                %     Objective = sum(sum(obj.util_import.*temp_cf));
+                obj.Objective = sum(sum(obj.util_import.*(dayMultiplier.*utilityInfo.import_price(:,index))));
 
                 if dc_exist == 1
 
@@ -193,9 +193,9 @@ classdef CModelVariables < handle
                     index = find(ismember(obj.rate_labels,obj.rate(1)));
                     
                     obj.Objective =  obj.Objective ...
-                        + sum(utilityInfo.dc_nontou(index)*obj.utilNontouDc(:,dc_count))... %%%non TOU DC
-                        + sum(utilityInfo.dc_on(index)*obj.utilOnpeakDc(:,dc_count)) ... %%%On Peak DC
-                        + sum(utilityInfo.dc_mid(index)*obj.utilMidpeakDc(:,dc_count)); %%%Mid Peak DC
+                        + sum(utilityInfo.dc_nontou(index)*obj.util_nontou_dc(:,dc_count))... %%%non TOU DC
+                        + sum(utilityInfo.dc_on(index)*obj.util_onpeak_dc(:,dc_count)) ... %%%On Peak DC
+                        + sum(utilityInfo.dc_mid(index)*obj.util_midpeak_dc(:,dc_count)); %%%Mid Peak DC
                     
                     %%% Utility_import * Demand_charge_rate
 
@@ -203,14 +203,14 @@ classdef CModelVariables < handle
             else
 
                 %%%Electrical Import Variables
-                obj.utilImport = zeros(obj.T,1);
+                obj.util_import = zeros(obj.T,1);
                 
                 %%%Non TOU DC
-                obj.utilNontouDc = zeros(obj.M,1);
+                obj.util_nontou_dc = zeros(obj.M,1);
                 
                 %%%On Peak/ Mid Peak TOU DC
-                obj.utilOnpeakDc = zeros(onpeak_count,1);
-                obj.utilMidpeakDc = zeros(midpeak_count,1);
+                obj.util_onpeak_dc = zeros(onpeak_count,1);
+                obj.util_midpeak_dc = zeros(midpeak_count,1);
 
             end
         end
@@ -222,13 +222,13 @@ classdef CModelVariables < handle
             % General export allows export from any onsite resource, regardless of fuel source
             if gen_export_on
 
-                obj.utilGeneralExport = sdpvar(obj.T,1,'full');
-                obj.utilImportState = binvar(obj.T,1,'full');
-                obj.Objective = obj.Objective + -sum(obj.utilGeneralExport.*utilityInfo.export_price);
+                obj.util_gen_export = sdpvar(obj.T,1,'full');
+                obj.util_import_state = binvar(obj.T,1,'full');
+                obj.Objective = obj.Objective + -sum(obj.util_gen_export.*utilityInfo.export_price);
             else
 
-                obj.utilGeneralExport = zeros(obj.T,1);
-                obj.utilImportState = ones(obj.T,1);
+                obj.util_gen_export = zeros(obj.T,1);
+                obj.util_import_state = ones(obj.T,1);
 
             end
         end
@@ -242,15 +242,15 @@ classdef CModelVariables < handle
             if isempty(techSelOnSite.pv_v) == 0
                 
                 %%%PV Generation to meet building demand (kWh)
-                obj.pvElect = sdpvar(obj.T,1,'full'); %%% PV Production sent to the building
+                obj.pv_elec = sdpvar(obj.T,1,'full'); %%% PV Production sent to the building
                 
                 %%%Size of installed System (kW)
-                obj.pvAdopt = sdpvar(1,size(techSelOnSite.pv_v,2),'full'); %%%PV Size
+                obj.pv_adopt = sdpvar(1,size(techSelOnSite.pv_v,2),'full'); %%%PV Size
                 
                 if ~isempty(utility_exists) && utility_exists && export_on %If grid tied, then include NEM and wholesale export
                     
                     %%% Variables that exist when grid tied
-                    obj.pvNem = sdpvar(obj.T,1,'full'); %%% PV Production exported w/ NEM
+                    obj.pv_nem = sdpvar(obj.T,1,'full'); %%% PV Production exported w/ NEM
                     
                     %%%PV Export - NEM (kWh)
                     %%%Utility rates for building k
@@ -258,45 +258,45 @@ classdef CModelVariables < handle
                         
                     %%%Adding values to the cost function
                      obj.Objective = obj.Objective...
-                         + sum(sum((-dayMultiplier.*utilityInfo.export_price(:,index)).*obj.pvNem)); %%%NEM Revenue Cost
+                         + sum(sum((-dayMultiplier.*utilityInfo.export_price(:,index)).*obj.pv_nem)); %%%NEM Revenue Cost
                      
                 else
-                    obj.pvNem = zeros(obj.T,1);
+                    obj.pv_nem = zeros(obj.T,1);
                 end
                 
                 %%%PV Cost
             
                 obj.Objective = obj.Objective ...
-                    + sum(obj.M*capCostMods.pv_mthly_debt'.*capCostMods.pv_cap_mod.*obj.pvAdopt)... %%%PV Capital Cost ($/kW installed)
-                    + techSelOnSite.pv_v(3)*(sum(sum(dayMultiplier.*(obj.pvElect)))) ... %%%PV O&M Cost ($/kWh generated)    
-                    + techSelOnSite.pv_v(3)*(sum(sum(dayMultiplier.*(obj.pvNem)))); %%%PV O&M Cost ($/kWh generated)
-                    % + techSelOnSite.pv_v(3)*(sum(sum(repmat(dayMultiplier,1,K).*(obj.pvElect + obj.pvNem + pv_wholesale))) ); %%%PV O&M Cost ($/kWh generated)
+                    + sum(obj.M*capCostMods.pv_mthly_debt'.*capCostMods.pv_cap_mod.*obj.pv_adopt)... %%%PV Capital Cost ($/kW installed)
+                    + techSelOnSite.pv_v(3)*(sum(sum(dayMultiplier.*(obj.pv_elec)))) ... %%%PV O&M Cost ($/kWh generated)    
+                    + techSelOnSite.pv_v(3)*(sum(sum(dayMultiplier.*(obj.pv_nem)))); %%%PV O&M Cost ($/kWh generated)
+                    % + techSelOnSite.pv_v(3)*(sum(sum(repmat(dayMultiplier,1,K).*(obj.pv_elec + obj.pv_nem + pv_wholesale))) ); %%%PV O&M Cost ($/kWh generated)
             
                 %%% Allow for adoption of Renewable paired storage when enabled (REES)
                 if isempty(techSelOnSite.ees_v) == 0 && rees_on == 1
                     
                     %%%Adopted REES Size
-                    obj.reesAdopt = sdpvar(1,size(techSelOnSite.ees_v,2),'full');
+                    obj.rees_adopt = sdpvar(1,size(techSelOnSite.ees_v,2),'full');
                     %%%REES Charging
-                    obj.reesChrg = sdpvar(obj.T,size(techSelOnSite.ees_v,2),'full');
+                    obj.rees_chrg = sdpvar(obj.T,size(techSelOnSite.ees_v,2),'full');
                     %%%REES discharging
-                    obj.reesDchrg = sdpvar(obj.T,size(techSelOnSite.ees_v,2),'full');                    
+                    obj.rees_dchrg = sdpvar(obj.T,size(techSelOnSite.ees_v,2),'full');                    
                     %%%REES SOC
-                    obj.reesSoc = sdpvar(obj.T,size(techSelOnSite.ees_v,2),'full');
+                    obj.rees_soc = sdpvar(obj.T,size(techSelOnSite.ees_v,2),'full');
 
                     %%%REES Cost Functions 
                     for ii = 1:size(techSelOnSite.ees_v,2)
                         
                         obj.Objective = obj.Objective...
-                            + sum(capCostMods.rees_mthly_debt(ii)*obj.M.*capCostMods.rees_cap_mod(ii)'.*obj.reesAdopt(ii)) ...%%%Capital Cost
-                            + techSelOnSite.ees_v(2,ii)*sum(sum(dayMultiplier.*obj.reesChrg(:,ii)))... %%%Charging O&M
-                            + techSelOnSite.ees_v(3,ii)*(sum(sum(dayMultiplier.*(obj.reesDchrg(:,ii)))));%%%Discharging O&M
+                            + sum(capCostMods.rees_mthly_debt(ii)*obj.M.*capCostMods.rees_cap_mod(ii)'.*obj.rees_adopt(ii)) ...%%%Capital Cost
+                            + techSelOnSite.ees_v(2,ii)*sum(sum(dayMultiplier.*obj.rees_chrg(:,ii)))... %%%Charging O&M
+                            + techSelOnSite.ees_v(3,ii)*(sum(sum(dayMultiplier.*(obj.rees_dchrg(:,ii)))));%%%Discharging O&M
                         
                         if island ~= 1 % If not islanded, AEC can export NEM and wholesale for revenue
 
                             %%%REES NEM Export
                             %%%REES discharging to grid
-                            obj.reesDchrgNem = sdpvar(obj.T,size(techSelOnSite.ees_v,2),'full');
+                            obj.rees_dchrg_nem = sdpvar(obj.T,size(techSelOnSite.ees_v,2),'full');
 
                             %             for k = 1:K
                             %%%Applicable utility rate
@@ -306,32 +306,32 @@ classdef CModelVariables < handle
 
                             %%% Setting objective function
                             obj.Objective = obj.Objective...
-                                + sum(sum((dayMultiplier.*(techSelOnSite.ees_v(3,ii) - utilityInfo.export_price(:,index))).*obj.reesDchrgNem(:,ii)));
+                                + sum(sum((dayMultiplier.*(techSelOnSite.ees_v(3,ii) - utilityInfo.export_price(:,index))).*obj.rees_dchrg_nem(:,ii)));
                             
                         else
-                            obj.reesDchrgNem = zeros(obj.T,1);
+                            obj.rees_dchrg_nem = zeros(obj.T,1);
                         end
                     end
                 else
-                    obj.reesAdopt = zeros(1,1);
-                    obj.reesChrg = zeros(obj.T,1);
-                    obj.reesDchrg = zeros(obj.T,1);
-                    obj.reesDchrgNem = zeros(obj.T,1);
-                    obj.reesSoc = zeros(obj.T,1);
+                    obj.rees_adopt = zeros(1,1);
+                    obj.rees_chrg = zeros(obj.T,1);
+                    obj.rees_dchrg = zeros(obj.T,1);
+                    obj.rees_dchrg_nem = zeros(obj.T,1);
+                    obj.rees_soc = zeros(obj.T,1);
                 end
                 
             else
-                obj.pvAdopt = zeros([1 1]);
-                obj.pvElect = zeros([obj.T 1]);
-                obj.pvNem = zeros([obj.T 1]);
+                obj.pv_adopt = zeros([1 1]);
+                obj.pv_elec = zeros([obj.T 1]);
+                obj.pv_nem = zeros([obj.T 1]);
 
                 % pv_wholesale = zeros([obj.T 1]);
 
-                obj.reesAdopt = zeros(1,1);
-                obj.reesChrg = zeros(obj.T,1);
-                obj.reesDchrg = zeros(obj.T,1);
-                obj.reesDchrgNem = zeros(obj.T,1);
-                obj.reesSoc = zeros(obj.T,1);
+                obj.rees_adopt = zeros(1,1);
+                obj.rees_chrg = zeros(obj.T,1);
+                obj.rees_dchrg = zeros(obj.T,1);
+                obj.rees_dchrg_nem = zeros(obj.T,1);
+                obj.rees_soc = zeros(obj.T,1);
             end
         end
 
@@ -342,60 +342,60 @@ classdef CModelVariables < handle
             if isempty(techSelOnSite.ees_v) == 0
                 
                 %%%Adopted EES Size
-                obj.eesAdopt = sdpvar(1,size(techSelOnSite.ees_v,2),'full');
+                obj.ees_adopt = sdpvar(1,size(techSelOnSite.ees_v,2),'full');
                 %%%EES Charging
-                obj.eesChrg = sdpvar(obj.T,size(techSelOnSite.ees_v,2),'full');
+                obj.ees_chrg = sdpvar(obj.T,size(techSelOnSite.ees_v,2),'full');
                 %%%EES discharging
-                obj.eesDchrg = sdpvar(obj.T,size(techSelOnSite.ees_v,2),'full');
+                obj.ees_dchrg = sdpvar(obj.T,size(techSelOnSite.ees_v,2),'full');
                 %%%EES SOC
-                obj.eesSoc = sdpvar(obj.T,size(techSelOnSite.ees_v,2),'full');
+                obj.ees_soc = sdpvar(obj.T,size(techSelOnSite.ees_v,2),'full');
 
                 for ii = 1:size(techSelOnSite.ees_v,2)
 
                     %%%EES Cost Functions
                     obj.Objective = obj.Objective...
-                        + sum(capCostMods.ees_mthly_debt(ii)*obj.M.*capCostMods.ees_cap_mod(ii)'.*obj.eesAdopt(ii)) ...%%%Capital Cost
-                        + techSelOnSite.ees_v(2,ii)*sum(sum(dayMultiplier.*obj.eesChrg(:,ii))) ...%%%Charging O&M
-                        + techSelOnSite.ees_v(3,ii)*sum(sum(dayMultiplier.*obj.eesDchrg(:,ii)));%%%Discharging O&M
+                        + sum(capCostMods.ees_mthly_debt(ii)*obj.M.*capCostMods.ees_cap_mod(ii)'.*obj.ees_adopt(ii)) ...%%%Capital Cost
+                        + techSelOnSite.ees_v(2,ii)*sum(sum(dayMultiplier.*obj.ees_chrg(:,ii))) ...%%%Charging O&M
+                        + techSelOnSite.ees_v(3,ii)*sum(sum(dayMultiplier.*obj.ees_dchrg(:,ii)));%%%Discharging O&M
                 end
 
                 %%%SGIP rates
                 if sgip_on
 
                     % % Residential Credits
-                    % obj.sgipEesNpbi = sdpvar(1,sum((res_units>0).*(~low_income>0)),'full');
+                    % obj.sgip_ees_npbi = sdpvar(1,sum((res_units>0).*(~low_income>0)),'full');
                     % 
                     % % Residential Equity Credits
-                    % obj.sgipEesNpbiEquity = sdpvar(1,sum(low_income>0),'full');
+                    % obj.sgip_ees_npbi_equity = sdpvar(1,sum(low_income>0),'full');
                     % 
                     % obj.Objective = obj.Objective ...
-                    %     - sum(sgip(3)*obj.M*obj.sgipEesNpbi) ...
-                    %     - sum(sgip(4)*obj.M*obj.sgipEesNpbiEquity);
+                    %     - sum(sgip(3)*obj.M*obj.sgip_ees_npbi) ...
+                    %     - sum(sgip(4)*obj.M*obj.sgip_ees_npbi_equity);
                     % 
                     % if sum(sgip_pbi) > 0
                     % 
                     %     %  Performance based incentives
-                    %     obj.sgipEesPbi = sdpvar(3,sum(sgip_pbi),'full');
+                    %     obj.sgip_ees_pbi = sdpvar(3,sum(sgip_pbi),'full');
                     % 
                     %     obj.Objective = obj.Objective ...
-                    %         - sum(sgip(2)*obj.M*obj.sgipEesPbi(1,:)) ...
-                    %         - sum(sgip(2)*0.5*obj.M*obj.sgipEesPbi(2,:)) ...
-                    %         - sum(sgip(2)*0.25*obj.M*obj.sgipEesPbi(3,:));
+                    %         - sum(sgip(2)*obj.M*obj.sgip_ees_pbi(1,:)) ...
+                    %         - sum(sgip(2)*0.5*obj.M*obj.sgip_ees_pbi(2,:)) ...
+                    %         - sum(sgip(2)*0.25*obj.M*obj.sgip_ees_pbi(3,:));
                     % else
-                    %     obj.sgipEesPbi = zeros(3,1);
+                    %     obj.sgip_ees_pbi = zeros(3,1);
                     % end
 
                 else
-                    obj.sgipEesPbi = zeros(3,1);
-                    obj.sgipEesNpbi = 0;
-                    obj.sgipEesNpbiEquity = 0;
+                    obj.sgip_ees_pbi = zeros(3,1);
+                    obj.sgip_ees_npbi = 0;
+                    obj.sgip_ees_npbi_equity = 0;
                 end
                 
             else
-                obj.eesAdopt = zeros(1,1);
-                obj.eesSoc = zeros(obj.T,1);
-                obj.eesChrg = zeros(obj.T,1);
-                obj.eesDchrg = zeros(obj.T,1);
+                obj.ees_adopt = zeros(1,1);
+                obj.ees_soc = zeros(obj.T,1);
+                obj.ees_chrg = zeros(obj.T,1);
+                obj.ees_dchrg = zeros(obj.T,1);
             end
         end
 
@@ -633,21 +633,21 @@ classdef CModelVariables < handle
                 if island == 0 && export_on == 1 %If grid tied, then include NEM and wholesale export
 
                     % Variables that exist when grid tied
-                    obj.pvNem = sdpvar(obj.T,1,'full'); %%% PV Production exported w/ NEM
+                    obj.pv_nem = sdpvar(obj.T,1,'full'); %%% PV Production exported w/ NEM
             
                     % Utility rates for building k
                     index = find(ismember(obj.rate_labels,obj.rate(1)));
                         
                     % Adding values to the cost function
                     obj.Objective = obj.Objective...
-                            + sum(sum(-day_multi.*utilityInfo.export_price(:,index).*obj.pvNem)); %%%NEM Revenue Cost
+                            + sum(sum(-day_multi.*utilityInfo.export_price(:,index).*obj.pv_nem)); %%%NEM Revenue Cost
                     
                 else
-                    obj.pvNem=zeros(obj.T,1);
+                    obj.pv_nem=zeros(obj.T,1);
                 end
                 
                 %%%PV Generation to meet building demand (kWh)
-                obj.pvElect = sdpvar(obj.T,1,'full'); %%% PV Production sent to the building
+                obj.pv_elec = sdpvar(obj.T,1,'full'); %%% PV Production sent to the building
                 
                 % if ~iesmpty(el_v)
                 %     modelVars.pv_h2 = sdpvar(obj.T,1,'full'); %%% PV Production sent to the building
@@ -655,7 +655,7 @@ classdef CModelVariables < handle
 
                 %%%Operating Costs
                 obj.Objective = obj.Objective ...
-                    + pv_legacy(1,1)*(sum(sum(dayMultiplier.*(obj.pvElect + obj.pvNem))));
+                    + pv_legacy(1,1)*(sum(sum(dayMultiplier.*(obj.pv_elec + obj.pv_nem))));
                 
             elseif isempty(pv_legacy) == 1
 

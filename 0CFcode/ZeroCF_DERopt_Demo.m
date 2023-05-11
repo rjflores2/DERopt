@@ -33,9 +33,9 @@ cfg.AddMatlabPaths()
 
 %% OVERWRITE DEFAULT CONFIGURATION       
 
-    %cfg.co2_red = [0 0.05];
-    %cfg.year_idx = 2018;
-    %cfg.month_idx = [1 4 7 10];
+cfg.co2_red = [0 0.25 0.5];
+%cfg.year_idx = 2018;
+%cfg.month_idx = [1 4 7 10];
     
 
 

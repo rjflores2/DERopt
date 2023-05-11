@@ -40,9 +40,9 @@ classdef CModelConstraints < handle
             %% Building Electrical Energy Balances
             % (For  all timesteps t Vectorized ??)
             obj.Constraints = [obj.Constraints
-                (sum(modelVars.utilImport,2) + sum(modelVars.pvElect,2) + sum(modelVars.eesDchrg,2) + sum(modelVars.lees_dchrg,2) + sum(modelVars.reesDchrg,2) + sum(modelVars.ldg_elec,2) + sum(modelVars.lbot_elec,2) + sum(modelVars.pp_elec_wheel,2)... %%%Production
+                (sum(modelVars.util_import,2) + sum(modelVars.pv_elec,2) + sum(modelVars.ees_dchrg,2) + sum(modelVars.lees_dchrg,2) + sum(modelVars.rees_dchrg,2) + sum(modelVars.ldg_elec,2) + sum(modelVars.lbot_elec,2) + sum(modelVars.pp_elec_wheel,2)... %%%Production
                 ==...
-                elec + sum(modelVars.eesChrg,2) + sum(modelVars.lees_chrg,2) + modelVars.generic_cool./4  + sum(modelVars.lvc_cool.*modelVars.vc_cop,2) + sum(modelVars.el_eff.*modelVars.el_prod,2) + sum(modelVars.h2_chrg_eff.*modelVars.h2es_chrg,2) + modelVars.utilGeneralExport + modelVars.hrs_supply.*modelVars.hrs_chrg_eff + modelVars.elec_dump):'Electricity Balance']; %%%Demand
+                elec + sum(modelVars.ees_chrg,2) + sum(modelVars.lees_chrg,2) + modelVars.generic_cool./4  + sum(modelVars.lvc_cool.*modelVars.vc_cop,2) + sum(modelVars.el_eff.*modelVars.el_prod,2) + sum(modelVars.h2_chrg_eff.*modelVars.h2es_chrg,2) + modelVars.util_gen_export + modelVars.hrs_supply.*modelVars.hrs_chrg_eff + modelVars.elec_dump):'Electricity Balance']; %%%Demand
             
             %% Heat Balance
             if ~isempty(heat) && sum(heat > 0) > 0
@@ -104,10 +104,10 @@ classdef CModelConstraints < handle
 
                         if i==1 % for January
                             obj.Constraints=[obj.Constraints
-                                (modelVars.utilImport(1:endpts(1)).*e_adjust <= modelVars.utilNontouDc(i)):'Non TOU DC January'];
+                                (modelVars.util_import(1:endpts(1)).*e_adjust <= modelVars.util_nontou_dc(i)):'Non TOU DC January'];
                         else % for all other months
                             obj.Constraints=[obj.Constraints
-                                (modelVars.utilImport(endpts(i-1)+1:endpts(i)).*e_adjust <= modelVars.utilNontouDc(i)):'Non TOU DC'];
+                                (modelVars.util_import(endpts(i-1)+1:endpts(i)).*e_adjust <= modelVars.util_nontou_dc(i)):'Non TOU DC'];
                         end
                     end
                     
@@ -136,7 +136,7 @@ classdef CModelConstraints < handle
                             
                             %%%Setting Cosntraints
                             obj.Constraints=[obj.Constraints
-                                (modelVars.utilImport(on_index).*e_adjust <= modelVars.utilOnpeakDc(on_dc_count)):'TOU DC Onpeak'];
+                                (modelVars.util_import(on_index).*e_adjust <= modelVars.util_onpeak_dc(on_dc_count)):'TOU DC Onpeak'];
                             
                             %%%Advancing on peak counter
                             on_dc_count = on_dc_count + 1;
@@ -150,7 +150,7 @@ classdef CModelConstraints < handle
                             
                             %%%Setting Cosntraints
                             obj.Constraints=[obj.Constraints
-                                (modelVars.utilImport(mid_index).*e_adjust <= modelVars.utilMidpeakDc(mid_dc_count)):'TOU DC Midpeak'];
+                                (modelVars.util_import(mid_index).*e_adjust <= modelVars.util_midpeak_dc(mid_dc_count)):'TOU DC Midpeak'];
                             
                             %%%Advancing on peak counter
                             mid_dc_count = mid_dc_count + 1;
@@ -166,18 +166,18 @@ classdef CModelConstraints < handle
                 index = find(ismember(obj.rate_labels,obj.rate(1)));
                 
                 obj.Constraints = [obj.Constraints
-                    (export_price(:,index)'*(sum(modelVars.reesDchrgNem,2) + modelVars.pvNem) <= import_price(:,index)'*modelVars.utilImport):'NEM Credits < Import Cost'
-                    (sum(sum(modelVars.reesDchrgNem,2) + modelVars.pvNem) <= sum(modelVars.utilImport)):'NEM Energy < Import Energy'];
+                    (export_price(:,index)'*(sum(modelVars.rees_dchrg_nem,2) + modelVars.pv_nem) <= import_price(:,index)'*modelVars.util_import):'NEM Credits < Import Cost'
+                    (sum(sum(modelVars.rees_dchrg_nem,2) + modelVars.pv_nem) <= sum(modelVars.util_import)):'NEM Energy < Import Energy'];
             end
             
             %% General import / export limits
             if exist('fac_prop') && (~isempty(utility_exists) || util_pv_wheel)
 
                 obj.Constraints = [obj.Constraints
-                    (modelVars.utilImport + modelVars.pp_elec_wheel + modelVars.pp_elec_wheel_lts <= modelVars.utilImportState .*fac_prop(1)./e_adjust):'General Import Limits'];
+                    (modelVars.util_import + modelVars.pp_elec_wheel + modelVars.pp_elec_wheel_lts <= modelVars.util_import_state .*fac_prop(1)./e_adjust):'General Import Limits'];
                 if gen_export_on || export_on
                     obj.Constraints = [obj.Constraints
-                        (modelVars.utilGeneralExport <= (1 - modelVars.utilImportState) .*fac_prop(1)./e_adjust):'General Export Limits'];
+                        (modelVars.util_gen_export <= (1 - modelVars.util_import_state) .*fac_prop(1)./e_adjust):'General Export Limits'];
                 end
             end
             
@@ -208,7 +208,7 @@ classdef CModelConstraints < handle
             if ~isempty(co2_lim)
                 
                 obj.Constraints = [obj.Constraints
-                    ( sum(modelVars.utilImport.*co2_import) ... %%%CO2 from imports
+                    ( sum(modelVars.util_import.*co2_import) ... %%%CO2 from imports
                     + co2_ng*(sum(sum(modelVars.ldg_fuel)) + sum(sum(modelVars.db_fire)) + sum(sum(modelVars.boil_fuel)))... %%%CO2 from NG combustion
                     + co2_rng*(sum(sum(modelVars.ldg_rfuel)) + sum(sum(modelVars.db_rfire)) + sum(sum(modelVars.boil_rfuel))) ... %%%CO2 from rNG combustion
                     <= ...
@@ -351,17 +351,17 @@ classdef CModelConstraints < handle
                 %% PV Energy balance when curtailment is allowed
                 if curtail
                     obj.Constraints = [obj.Constraints
-                        (modelVars.pvElect + modelVars.pvNem + sum(modelVars.reesChrg,2) + sum(modelVars.rel_eff.*modelVars.rel_prod,2) <= (sum(pv_legacy(2,:))/e_adjust)*solar + (sum(modelVars.pvAdopt))/e_adjust*solar) :'PV Energy Balance'];
+                        (modelVars.pv_elec + modelVars.pv_nem + sum(modelVars.rees_chrg,2) + sum(modelVars.rel_eff.*modelVars.rel_prod,2) <= (sum(pv_legacy(2,:))/e_adjust)*solar + (sum(modelVars.pv_adopt))/e_adjust*solar) :'PV Energy Balance'];
                     % Constraints = [Constraints, (pv_wholesale + pv_elec + pv_nem + rees_chrg <= repmat(solar,1,K).*repmat(pv_adopt,T,1)):'PV Energy Balance'];
                 else
                     obj.Constraints = [obj.Constraints
-                        (modelVars.pvElect + modelVars.pvNem + sum(modelVars.reesChrg,2) + sum(modelVars.rel_eff.*modelVars.rel_prod,2)  == (sum(pv_legacy(2,:))/e_adjust)*solar + (sum(modelVars.pvAdopt))/e_adjust*solar) :'PV Energy Balance'];
+                        (modelVars.pv_elec + modelVars.pv_nem + sum(modelVars.rees_chrg,2) + sum(modelVars.rel_eff.*modelVars.rel_prod,2)  == (sum(pv_legacy(2,:))/e_adjust)*solar + (sum(modelVars.pv_adopt))/e_adjust*solar) :'PV Energy Balance'];
                     % Constraints = [Constraints, (pv_wholesale + pv_elec + pv_nem + rees_chrg == repmat(solar,1,K).*repmat(pv_adopt,T,1)):'PV Energy Balance'];
                 end
 
                 %% Min PV to adopt: Forces 3 kW Adopted
                 if toolittle_pv ~= 0
-                    obj.Constraints = [obj.Constraints,(toolittle_pv <= sum(modelVars.pvAdopt)):'toolittle_pv'];
+                    obj.Constraints = [obj.Constraints,(toolittle_pv <= sum(modelVars.pv_adopt)):'toolittle_pv'];
                     
                     % for k=1:K
                     %    Constraints = [Constraints, (implies(pv_adopt(k) <= toolittle_pv, pv_adopt(k) == 0)):'toolittle_pv'];
@@ -372,8 +372,8 @@ classdef CModelConstraints < handle
                 if ~isempty(maxpv) && ~isempty(pv_v) 
 
                     obj.Constraints = [obj.Constraints
-                        (modelVars.pvAdopt' <= maxpv'):'Mav PV Capacity'];  
-                    % Constraints = [Constraints, (sum(modelVars.pvAdopt) <= maxpv'):'Mav PV Capacity'];
+                        (modelVars.pv_adopt' <= maxpv'):'Mav PV Capacity'];  
+                    % Constraints = [Constraints, (sum(modelVars.pv_adopt) <= maxpv'):'Mav PV Capacity'];
                 end
                 
                 %% Don't curtail for residential
@@ -399,27 +399,27 @@ classdef CModelConstraints < handle
 
                     %%%SOC Equality / Energy Balance
                     obj.Constraints = [obj.Constraints
-                        (modelVars.eesSoc(1,ii) <= modelVars.eesSoc(obj.T,ii)):'Initial EES SOC <= Final SOC'
-                        (modelVars.eesSoc(2:obj.T,ii) == ees_v(10,ii)*modelVars.eesSoc(1:obj.T-1,ii) + ees_v(8,ii)*modelVars.eesChrg(2:obj.T,ii)  - (1/ees_v(9,ii))*modelVars.eesDchrg(2:obj.T,ii)):'EES Balance'  %%%Minus discharging of battery
-                        (ees_v(4,ii)*modelVars.eesAdopt(ii) <= modelVars.eesSoc(:,ii) <= ees_v(5,ii)*modelVars.eesAdopt(ii)):'EES Min/Max SOC' %%%Min/Max SOC
-                        (modelVars.eesChrg(:,ii) <= ees_v(6,ii)*modelVars.eesAdopt(ii)):'EES Max Chrg'  %%%Max Charge Rate
-                        (modelVars.eesDchrg(:,ii) <= ees_v(7,ii)*modelVars.eesAdopt(ii)):'EES Max Dchrg']; %%%Max Discharge Rate
+                        (modelVars.ees_soc(1,ii) <= modelVars.ees_soc(obj.T,ii)):'Initial EES SOC <= Final SOC'
+                        (modelVars.ees_soc(2:obj.T,ii) == ees_v(10,ii)*modelVars.ees_soc(1:obj.T-1,ii) + ees_v(8,ii)*modelVars.ees_chrg(2:obj.T,ii)  - (1/ees_v(9,ii))*modelVars.ees_dchrg(2:obj.T,ii)):'EES Balance'  %%%Minus discharging of battery
+                        (ees_v(4,ii)*modelVars.ees_adopt(ii) <= modelVars.ees_soc(:,ii) <= ees_v(5,ii)*modelVars.ees_adopt(ii)):'EES Min/Max SOC' %%%Min/Max SOC
+                        (modelVars.ees_chrg(:,ii) <= ees_v(6,ii)*modelVars.ees_adopt(ii)):'EES Max Chrg'  %%%Max Charge Rate
+                        (modelVars.ees_dchrg(:,ii) <= ees_v(7,ii)*modelVars.ees_adopt(ii)):'EES Max Dchrg']; %%%Max Discharge Rate
                     
                     %% Renewable Tied EES
                     if isempty(pv_v) == 0 && rees_on
 
                         %%%SOC Equality / Energy Balance
                         obj.Constraints = [obj.Constraints
-                            (modelVars.reesSoc(1,ii) <= modelVars.reesSoc(obj.T,ii)):'Initial REES SOC <= Final SOC'
-                            (modelVars.reesDchrgNem(1,ii) == 0):'No REES NEM in 1st time step'
-                            (modelVars.reesSoc(2:obj.T,ii) == ees_v(10,ii)*modelVars.reesSoc(1:obj.T-1,ii) + ees_v(8,ii)*modelVars.reesChrg(2:obj.T,ii)  - (1/ees_v(9,ii))*(modelVars.reesDchrg(2:obj.T,ii) + modelVars.reesDchrgNem(2:obj.T,ii))):'REES Balance'  %%%Minus discharging of battery
-                            (ees_v(4,ii)*modelVars.reesAdopt(ii) <= modelVars.reesSoc(:,ii) <= ees_v(5,ii)*modelVars.reesAdopt(ii)):'REES Min/Max SOC' %%%Min/Max SOC
-                            (modelVars.reesChrg(:,ii) <= ees_v(6,ii)*modelVars.reesAdopt(ii)):'REES Max Chrg' %%%Max Charge Rate
-                            (modelVars.reesDchrg(:,ii) <= ees_v(7,ii)*modelVars.reesAdopt(ii)):'REES Max Dchrg']; %%%Max Discharge Rate
+                            (modelVars.rees_soc(1,ii) <= modelVars.rees_soc(obj.T,ii)):'Initial REES SOC <= Final SOC'
+                            (modelVars.rees_dchrg_nem(1,ii) == 0):'No REES NEM in 1st time step'
+                            (modelVars.rees_soc(2:obj.T,ii) == ees_v(10,ii)*modelVars.rees_soc(1:obj.T-1,ii) + ees_v(8,ii)*modelVars.rees_chrg(2:obj.T,ii)  - (1/ees_v(9,ii))*(modelVars.rees_dchrg(2:obj.T,ii) + modelVars.rees_dchrg_nem(2:obj.T,ii))):'REES Balance'  %%%Minus discharging of battery
+                            (ees_v(4,ii)*modelVars.rees_adopt(ii) <= modelVars.rees_soc(:,ii) <= ees_v(5,ii)*modelVars.rees_adopt(ii)):'REES Min/Max SOC' %%%Min/Max SOC
+                            (modelVars.rees_chrg(:,ii) <= ees_v(6,ii)*modelVars.rees_adopt(ii)):'REES Max Chrg' %%%Max Charge Rate
+                            (modelVars.rees_dchrg(:,ii) <= ees_v(7,ii)*modelVars.rees_adopt(ii)):'REES Max Dchrg']; %%%Max Discharge Rate
                         
                         %%%Adding sgip constraints
                         %             if sgip_on && ~isempty(find(non_res_rates == find(ismember(rate_labels,rate(1))))) %%%IS nonresidential
-                        %                 Constraints = [Constraints;(-modelVars.reesChrg(:,ii)'*sgip_signal(:,2) +  modelVars.reesDchrg(:,ii)'*sgip_signal(:,2) >= modelVars.reesAdopt(ii)*sgip(1)):'SGIP CO2 Reduciton'];
+                        %                 Constraints = [Constraints;(-modelVars.rees_chrg(:,ii)'*sgip_signal(:,2) +  modelVars.rees_dchrg(:,ii)'*sgip_signal(:,2) >= modelVars.rees_adopt(ii)*sgip(1)):'SGIP CO2 Reduciton'];
                         %             end
                     end
                 end
@@ -452,16 +452,16 @@ classdef CModelConstraints < handle
                     % 
                     %     %%%SOC Equality / Energy Balance
                     %     obj.Constraints = [obj.Constraints
-                    %         (modelVars.reesDchrgNem(1,ii) == 0):'Initial REES SOC'
-                    %         (modelVars.reesSoc(2:obj.T,ii) == ees_v(10,ii)*modelVars.reesSoc(1:obj.T-1,ii) + ees_v(8,ii)*var_rees.rees_chrg(2:obj.T,ii)  - (1/ees_v(9,ii))*(modelVars.reesDchrg(2:T,ii) + modelVars.reesDchrgNem(2:T,ii))):'REES Balance'  %%%Minus discharging of battery
-                    %         (ees_v(4,ii)*var_rees.rees_adopt(ii) <= modelVars.reesSoc(:,ii) <= ees_v(5,ii)*var_rees.rees_adopt(ii)):'REES Min/Max SOC' %%%Min/Max SOC
+                    %         (modelVars.rees_dchrg_nem(1,ii) == 0):'Initial REES SOC'
+                    %         (modelVars.rees_soc(2:obj.T,ii) == ees_v(10,ii)*modelVars.rees_soc(1:obj.T-1,ii) + ees_v(8,ii)*var_rees.rees_chrg(2:obj.T,ii)  - (1/ees_v(9,ii))*(modelVars.rees_dchrg(2:T,ii) + modelVars.rees_dchrg_nem(2:T,ii))):'REES Balance'  %%%Minus discharging of battery
+                    %         (ees_v(4,ii)*var_rees.rees_adopt(ii) <= modelVars.rees_soc(:,ii) <= ees_v(5,ii)*var_rees.rees_adopt(ii)):'REES Min/Max SOC' %%%Min/Max SOC
                     %         (var_rees.rees_chrg(:,ii) <= ees_v(6,ii)*var_rees.rees_adopt(ii)):'REES Max Chrg' %%%Max Charge Rate
-                    %         (modelVars.reesDchrg(:,ii) <= ees_v(7,ii)*var_rees.rees_adopt(ii)):'REES Max Dchrg']; %%%Max Discharge Rate
+                    %         (modelVars.rees_dchrg(:,ii) <= ees_v(7,ii)*var_rees.rees_adopt(ii)):'REES Max Dchrg']; %%%Max Discharge Rate
                     % 
                     %     %%%Adding sgip constraints
                     %     % if sgip_on && ~isempty(find(non_res_rates == find(ismember(obj.rate_labels,obj.rate(1))))) %%%IS nonresidential
                     %     %     obj.Constraints = [obj.Constraints;...
-                    %     %         (-var_rees.rees_chrg(:,ii)'*sgip_signal(:,2) +  modelVars.reesDchrg(:,ii)'*sgip_signal(:,2) >= var_rees.rees_adopt(ii)*sgip(1)):'SGIP CO2 Reduciton'];
+                    %     %         (-var_rees.rees_chrg(:,ii)'*sgip_signal(:,2) +  modelVars.rees_dchrg(:,ii)'*sgip_signal(:,2) >= var_rees.rees_adopt(ii)*sgip(1)):'SGIP CO2 Reduciton'];
                     %     % end
                     % end
                 end
@@ -544,9 +544,9 @@ classdef CModelConstraints < handle
                 %%%Limiting SGIP incentivized storage
                 %%%Constraints
                 obj.Constraints = [obj.Constraints
-                    modelVars.sgipEesPbi(1,:) <= sgip(end)
-                    modelVars.sgipEesPbi(2,:) <= sgip(end)
-                    modelVars.sgipEesPbi(3,:) <= sgip(end)];
+                    modelVars.sgip_ees_pbi(1,:) <= sgip(end)
+                    modelVars.sgip_ees_pbi(2,:) <= sgip(end)
+                    modelVars.sgip_ees_pbi(3,:) <= sgip(end)];
                 
                 %%%Going through all buildings
                 ind = 1; %%%Comercial/industrial index
@@ -558,17 +558,17 @@ classdef CModelConstraints < handle
 
                     %%%Requiring for PBI systems to reduce CO2 emissions scaled by
                     %%%adopted battery size
-                    obj.Constraints = [obj.Constraints;(-(sum(modelVars.reesChrg,2)' + sum(modelVars.eesChrg,2)')*sgip_signal(:,2) +  (sum(modelVars.reesDchrg,2)' + sum(obj.eesDchrg,2)')*sgip_signal(:,2) >= (sum(modelVars.eesAdopt) + sum(modelVars.reesAdopt))*sgip(1)):'SGIP CO2 Reduciton'];
-                    obj.Constraints = [obj.Constraints;(modelVars.sgipEesPbi(1,ind) + modelVars.sgipEesPbi(2,ind) + modelVars.sgipEesPbi(3,ind)<= (modelVars.eesAdopt(k) + modelVars.reesAdopt(k))):'SGIP based on adopted battery'];
+                    obj.Constraints = [obj.Constraints;(-(sum(modelVars.rees_chrg,2)' + sum(modelVars.ees_chrg,2)')*sgip_signal(:,2) +  (sum(modelVars.rees_dchrg,2)' + sum(obj.ees_dchrg,2)')*sgip_signal(:,2) >= (sum(modelVars.ees_adopt) + sum(modelVars.rees_adopt))*sgip(1)):'SGIP CO2 Reduciton'];
+                    obj.Constraints = [obj.Constraints;(modelVars.sgip_ees_pbi(1,ind) + modelVars.sgip_ees_pbi(2,ind) + modelVars.sgip_ees_pbi(3,ind)<= (modelVars.ees_adopt(k) + modelVars.rees_adopt(k))):'SGIP based on adopted battery'];
                     %             Constraints = [Constraints;(sgip_rees_pbi(1,ind) + sgip_rees_pbi(2,ind) + sgip_rees_pbi(3,ind) <= rees_adopt(k)):'SGIP based on adopted renewable battery'];
                     % ind = ind + 1;
                     
                 elseif res_units(1)>0 && ~low_income(1)
-                    obj.Constraints = [obj.Constraints; (modelVars.sgipEesNpbi(ind_r) <= (sum(modelVars.eesAdopt) + sum(modelVars.reesAdopt))):'SGIP system limit'];
-                    obj.Constraints = [obj.Constraints; (ees_v(7)*(modelVars.sgipEesNpbi(ind_r)) <= 5*res_units):'SGIP nonPBI residential unity limit'];
+                    obj.Constraints = [obj.Constraints; (modelVars.sgip_ees_npbi(ind_r) <= (sum(modelVars.ees_adopt) + sum(modelVars.rees_adopt))):'SGIP system limit'];
+                    obj.Constraints = [obj.Constraints; (ees_v(7)*(modelVars.sgip_ees_npbi(ind_r)) <= 5*res_units):'SGIP nonPBI residential unity limit'];
                     % ind_r = ind_r + 1;
                 elseif low_income(1)
-                    obj.Constraints = [obj.Constraints; (modelVars.sgipEesNpbiEquity(ind_re) <= (sum(modelVars.eesAdopt) + sum(modelVars.reesAdopt))):'SGIP system limit'];
+                    obj.Constraints = [obj.Constraints; (modelVars.sgip_ees_npbi_equity(ind_re) <= (sum(modelVars.ees_adopt) + sum(modelVars.rees_adopt))):'SGIP system limit'];
                     obj.Constraints = [obj.Constraints; (ees_v(7)*(sgip_ees_npbi_equity(ind_re)) <= 5*res_units(k)):'SGIP nonPBI residential unity limit'];
                     % ind_re = ind_re + 1;                    
                 end
