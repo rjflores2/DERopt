@@ -33,7 +33,7 @@ cfg.AddMatlabPaths()
 
 %% OVERWRITE DEFAULT CONFIGURATION       
 
-cfg.co2_red = [0 0.25 0.5];
+cfg.co2_red = [0 0.1 0.2 0.3 0.4 0.5];
 %cfg.year_idx = 2018;
 %cfg.month_idx = [1 4 7 10];
     
@@ -303,14 +303,14 @@ fprintf('%s: Utility Scale Electrolyzer Constraints -> %.3f seconds \n', datetim
 elapsed = modelConstraints.Calculate_H2PipelineInjection(modelVars, cfg.h2_inject_on);
 fprintf('%s: H2 Pipeline Injection Constraints -> %.3f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
 
-lanin = CModelSolver;
+mSolver = CModelSolver;
 
 %% Export Model
-elapsed = lanin.CreateModel(modelConstraints.Constraints, modelVars.Objective, cfg.co2_lim);
+elapsed = mSolver.CreateModel(modelConstraints.Constraints, modelVars.Objective, cfg.co2_lim);
 
 fprintf('%s: Model Export took %.3f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
 
-if lanin.SetupFirstSolve(cfg.co2_lim, cfg.co2_base, sum(bldgData.elec), bldgData.co2_import, bldgData.co2_ng, bldgData.co2_rng)
+if mSolver.SetupFirstSolve(cfg.co2_lim, cfg.co2_base, sum(bldgData.elec), bldgData.co2_import, bldgData.co2_ng, bldgData.co2_rng)
 
 end
 
@@ -320,116 +320,118 @@ fprintf('\n%s: Optimizing...\n\n', datetime("now","InputFormat",'HH:MM:SS'))
 
 %% Loop to rerun optimization
 
+rec = [];
+
 for ii = 1:length(cfg.co2_red)
 
     fprintf('%s Starting CPLEX Solver \n', datetime("now",'InputFormat','HH:MM:SS'))
 
-    elapsed = lanin.SolveModel(ii, cfg.co2_red(ii), modelVars);
+    elapsed = mSolver.SolveModel(ii, cfg.co2_red(ii), modelVars);
 
     fprintf('CPLEX took %.3f seconds \n', elapsed)
 
 
     %% Starting Recorder Structure - Model Outputs
-    rec.solver.x(ii,:) = lanin.lastSolveX;
-    rec.solver.fval(ii,1) = lanin.lastSolveFval;
-    rec.solver.exitflag(ii,1) = lanin.lastSolveExitFlag;
-    rec.solver.output(ii,1) = lanin.lastSolveExitFlag;
+    rec.solver.x(ii,:) = mSolver.lastSolveX;
+    rec.solver.fval(ii,1) = mSolver.lastSolveFval;
+    rec.solver.exitflag(ii,1) = mSolver.lastSolveExitFlag;
+    rec.solver.output(ii,1) = mSolver.lastSolveExitFlag;
 
     %% Optimized Variables -  Utilities
 
     %%% Utility Variables
-    rec.utility.import(:,ii) = lanin.utilityImport;
-    rec.utility.nontou_dc(:,ii) = lanin.utilityNontouDc;
-    rec.utility.onpeak_dc(:,ii) = lanin.utilityOnpeakDc;
-    rec.utility.midpeak_dc(:,ii) = lanin.utilityMidpeakDc;
-    rec.utility.gen_export(:,ii) = lanin.utilityGenExport;
+    rec.utility.import(:,ii) = mSolver.utilityImport;
+    rec.utility.nontou_dc(:,ii) = mSolver.utilityNontouDc;
+    rec.utility.onpeak_dc(:,ii) = mSolver.utilityOnpeakDc;
+    rec.utility.midpeak_dc(:,ii) = mSolver.utilityMidpeakDc;
+    rec.utility.gen_export(:,ii) = mSolver.utilityGenExport;
 
     %% Optimized Variables - New Technologies
     %%% Solar Variables
-    rec.solar.pv_adopt(:,ii) = lanin.solarPhotoVoltaicAdopt;
-    rec.solar.pv_elec(:,ii) = lanin.solarPhotoVoltaicElec;
-    rec.solar.pv_nem(:,ii) = lanin.solarPhotoVoltaicNem;
+    rec.solar.pv_adopt(:,ii) = mSolver.solarPhotoVoltaicAdopt;
+    rec.solar.pv_elec(:,ii) = mSolver.solarPhotoVoltaicElec;
+    rec.solar.pv_nem(:,ii) = mSolver.solarPhotoVoltaicNem;
 
     %%% Electrical Energy Storage
-    rec.ees.ees_adopt(:,ii) = lanin.electricalEnergyStorage_adopt;
-    rec.ees.ees_chrg(:,ii) = lanin.electricalEnergyStorage_chrg;
-    rec.ees.ees_dchrg(:,ii) = lanin.electricalEnergyStorage_dchrg;
-    rec.ees.ees_soc(:,ii) = lanin.electricalEnergyStorage_soc;
+    rec.ees.ees_adopt(:,ii) = mSolver.electricalEnergyStorage_adopt;
+    rec.ees.ees_chrg(:,ii) = mSolver.electricalEnergyStorage_chrg;
+    rec.ees.ees_dchrg(:,ii) = mSolver.electricalEnergyStorage_dchrg;
+    rec.ees.ees_soc(:,ii) = mSolver.electricalEnergyStorage_soc;
 
     %%% Renewable Electrical Energy Storage
-    rec.rees.rees_adopt(:,ii) = lanin.renewableElectricalEnergyStorage_adopt;
-    rec.rees.rees_chrg(:,ii) = lanin.renewableElectricalEnergyStorage_chrg;
-    rec.rees.rees_dchrg(:,ii) = lanin.renewableElectricalEnergyStorage_dchrg;
-    rec.rees.rees_soc(:,ii) = lanin.renewableElectricalEnergyStorage_soc;
-    rec.rees.rees_dchrg_nem(:,ii) = lanin.renewableElectricalEnergyStorage_dchrg_nem;
+    rec.rees.rees_adopt(:,ii) = mSolver.renewableElectricalEnergyStorage_adopt;
+    rec.rees.rees_chrg(:,ii) = mSolver.renewableElectricalEnergyStorage_chrg;
+    rec.rees.rees_dchrg(:,ii) = mSolver.renewableElectricalEnergyStorage_dchrg;
+    rec.rees.rees_soc(:,ii) = mSolver.renewableElectricalEnergyStorage_soc;
+    rec.rees.rees_dchrg_nem(:,ii) = mSolver.renewableElectricalEnergyStorage_dchrg_nem;
 
     %%% H2 Production - Electrolyzer
-    rec.el.el_adopt(:,ii) = lanin.h2ProductionElectrolyzer_adopt;
-    rec.el.el_prod(:,ii) = lanin.h2ProductionElectrolyzer_prod;
+    rec.el.el_adopt(:,ii) = mSolver.h2ProductionElectrolyzer_adopt;
+    rec.el.el_prod(:,ii) = mSolver.h2ProductionElectrolyzer_prod;
 
     %%% H2 Production - Renewable Electrolyzer
-    rec.rel.rel_adopt(:,ii) = lanin.h2ProductionRenewableElectrolyzer_adopt;
-    rec.rel.rel_prod(:,ii) = lanin.h2ProductionRenewableElectrolyzer_prod;
-    rec.rel.rel_prod_wheel(:,ii) = lanin.h2ProductionRenewableElectrolyzer_prod;
+    rec.rel.rel_adopt(:,ii) = mSolver.h2ProductionRenewableElectrolyzer_adopt;
+    rec.rel.rel_prod(:,ii) = mSolver.h2ProductionRenewableElectrolyzer_prod;
+    rec.rel.rel_prod_wheel(:,ii) = mSolver.h2ProductionRenewableElectrolyzer_prod;
 
     %%% H2 Production - Storage
-    rec.h2es.h2es_adopt(:,ii) = lanin.h2ProductionEnergyStorage_adopt;
-    rec.h2es.h2es_chrg(:,ii) = lanin.h2ProductionEnergyStorage_chrg;
-    rec.h2es.h2es_dchrg(:,ii) = lanin.h2ProductionEnergyStorage_dchrg;
-    rec.h2es.h2es_soc(:,ii) = lanin.h2ProductionEnergyStorage_soc;
-    rec.h2es.h2es_bin(:,ii) = lanin.h2ProductionEnergyStorage_bin;
+    rec.h2es.h2es_adopt(:,ii) = mSolver.h2ProductionEnergyStorage_adopt;
+    rec.h2es.h2es_chrg(:,ii) = mSolver.h2ProductionEnergyStorage_chrg;
+    rec.h2es.h2es_dchrg(:,ii) = mSolver.h2ProductionEnergyStorage_dchrg;
+    rec.h2es.h2es_soc(:,ii) = mSolver.h2ProductionEnergyStorage_soc;
+    rec.h2es.h2es_bin(:,ii) = mSolver.h2ProductionEnergyStorage_bin;
 
     %% Optimized Variables -  Legacy technologies %%
     %% DG - Topping Cycle
-    rec.ldg.ldg_elec(:,ii) = lanin.ldg_elec;
-    rec.ldg.ldg_fuel(:,ii) = lanin.ldg_fuel;
-    rec.ldg.ldg_rfuel(:,ii) = lanin.ldg_rfuel;
-    rec.ldg.ldg_hfuel(:,ii) = lanin.ldg_hfuel;
-    rec.ldg.ldg_sfuel(:,ii) = lanin.ldg_sfuel;
-    rec.ldg.ldg_dfuel(:,ii) = lanin.ldg_dfuel;
-    rec.ldg.ldg_elec_ramp(:,ii) = lanin.ldg_elec_ramp;
-    % var_ldg.ldg_off(:,ii) = lanin.ldg_off;
-    rec.ldg.ldg_opstate(:,ii) = lanin.ldg_opstate;
+    rec.ldg.ldg_elec(:,ii) = mSolver.ldg_elec;
+    rec.ldg.ldg_fuel(:,ii) = mSolver.ldg_fuel;
+    rec.ldg.ldg_rfuel(:,ii) = mSolver.ldg_rfuel;
+    rec.ldg.ldg_hfuel(:,ii) = mSolver.ldg_hfuel;
+    rec.ldg.ldg_sfuel(:,ii) = mSolver.ldg_sfuel;
+    rec.ldg.ldg_dfuel(:,ii) = mSolver.ldg_dfuel;
+    rec.ldg.ldg_elec_ramp(:,ii) = mSolver.ldg_elec_ramp;
+    % var_ldg.ldg_off(:,ii) = mSolver.ldg_off;
+    rec.ldg.ldg_opstate(:,ii) = mSolver.ldg_opstate;
     %% Bottoming Cycle
-    rec.lbot.lbot_elec(:,ii) = lanin.lbot_elec;
-    rec.lbot.lbot_on(:,ii) = lanin.lbot_on;
+    rec.lbot.lbot_elec(:,ii) = mSolver.lbot_elec;
+    rec.lbot.lbot_on(:,ii) = mSolver.lbot_on;
 
     %% Heat Recovery Systems
-    rec.ldg.hr_heat(:,ii) = lanin.ldg_hr_heat;
-    rec.ldg.db_fire(:,ii) = lanin.ldg_db_fire;
-    rec.ldg.db_rfire(:,ii) = lanin.ldg_db_rfire;
-    rec.ldg.db_hfire(:,ii) = lanin.ldg_db_hfire;
+    rec.ldg.hr_heat(:,ii) = mSolver.ldg_hr_heat;
+    rec.ldg.db_fire(:,ii) = mSolver.ldg_db_fire;
+    rec.ldg.db_rfire(:,ii) = mSolver.ldg_db_rfire;
+    rec.ldg.db_hfire(:,ii) = mSolver.ldg_db_hfire;
 
     %% Boiler
-    rec.boil.boil_fuel(:,ii) = lanin.boiler_fuel;
-    rec.boil.boil_rfuel(:,ii) = lanin.boiler_rfuel;
-    rec.boil.boil_hfuel(:,ii) = lanin.boiler_hfuel;
+    rec.boil.boil_fuel(:,ii) = mSolver.boiler_fuel;
+    rec.boil.boil_rfuel(:,ii) = mSolver.boiler_rfuel;
+    rec.boil.boil_hfuel(:,ii) = mSolver.boiler_hfuel;
 
     %% EES
     if ~isempty(legacyTech.ees_legacy)
-        rec.lees.ees_chrg(:,ii) = lanin.lees_chrg;
-        rec.lees.ees_dchrg(:,ii) = lanin.lees_dchrg;
-        rec.lees.ees_soc(:,ii) = lanin.lees_soc;
+        rec.lees.ees_chrg(:,ii) = mSolver.lees_chrg;
+        rec.lees.ees_dchrg(:,ii) = mSolver.lees_dchrg;
+        rec.lees.ees_soc(:,ii) = mSolver.lees_soc;
     end
 
     %% Carbon Emissions
     % Carbon emissions from 1) utility electiricity, 2) natural gas, 3) renewable natural gas
-    rec.co2_emissions(1,ii) = lanin.co2EmissionsUtilityElect;
-    rec.co2_emissions(2,ii) = lanin.co2EmissionsNaturalGas;
-    rec.co2_emissions(3,ii) = lanin.co2EmissionsRenewableNaturalGas;
+    rec.co2_emissions(1,ii) = mSolver.co2EmissionsUtilityElect;
+    rec.co2_emissions(2,ii) = mSolver.co2EmissionsNaturalGas;
+    rec.co2_emissions(3,ii) = mSolver.co2EmissionsRenewableNaturalGas;
 
     % Total carbon emissions
-    rec.co2_emissions(4,ii) =   lanin.co2TotalEmissions;
+    rec.co2_emissions(4,ii) =   mSolver.co2TotalEmissions;
 
     % Percent reduction
-    rec.co2_emissions_red(1,ii) = lanin.co2EmissionsReductionPercentaje;
+    rec.co2_emissions_red(1,ii) = mSolver.co2EmissionsReductionPercentaje;
 
     %% Financials
     %%%($/kWh)
-    rec.financials.lcoe(ii,1) = lanin.levelizedCostOfElectricityInKWh;
+    rec.financials.lcoe(ii,1) = mSolver.levelizedCostOfElectricityInKWh;
 
     %%%Bulk cost of carbon ($/tonne)
-    rec.financials.cost_of_co2(ii,1) = lanin.BulkCostOfCarbonByTonne;
+    rec.financials.cost_of_co2(ii,1) = mSolver.BulkCostOfCarbonByTonne;
 
     %%%Marginal cost of carbon ($/tonne)
     if ii > 1
@@ -439,28 +441,14 @@ for ii = 1:length(cfg.co2_red)
     end
 
     %%%Capital Cost Requirements
-    rec.financials.cap_cost(ii,:) = [lanin.solarPhotoVoltaicAdopt.*techSelOnSite.pv_cap*capCostMods.pv_cap_mod
-                                    lanin.electricalEnergyStorage_adopt.*techSelOnSite.ees_cap.*capCostMods.ees_cap_mod
-                                    lanin.renewableElectricalEnergyStorage_adopt.*techSelOnSite.ees_cap.*capCostMods.rees_cap_mod
-                                    lanin.h2ProductionElectrolyzer_adopt.*techSelOnSite.el_cap.*capCostMods.el_cap_mod
-                                    lanin.h2ProductionRenewableElectrolyzer_adopt.*techSelOnSite.el_cap.*capCostMods.rel_cap_mod
-                                    lanin.h2ProductionEnergyStorage_adopt.*techSelOnSite.h2es_cap];
+    rec.financials.cap_cost(ii,:) = [mSolver.solarPhotoVoltaicAdopt.*techSelOnSite.pv_cap*capCostMods.pv_cap_mod
+                                    mSolver.electricalEnergyStorage_adopt.*techSelOnSite.ees_cap.*capCostMods.ees_cap_mod
+                                    mSolver.renewableElectricalEnergyStorage_adopt.*techSelOnSite.ees_cap.*capCostMods.rees_cap_mod
+                                    mSolver.h2ProductionElectrolyzer_adopt.*techSelOnSite.el_cap.*capCostMods.el_cap_mod
+                                    mSolver.h2ProductionRenewableElectrolyzer_adopt.*techSelOnSite.el_cap.*capCostMods.rel_cap_mod
+                                    mSolver.h2ProductionEnergyStorage_adopt.*techSelOnSite.h2es_cap];
 
 end
-
-
-
-
-%% Add local variables Results
-%--------------------------------------------------------------------------
-%--------------------------------------------------------------------------
-
-rec.el_eff = modelVars.el_eff;
-rec.rel_eff = modelVars.rel_eff;
-rec.h2_chrg_eff = modelVars.h2_chrg_eff;
-rec.time = bldgData.time;
-rec.elec = bldgData.elec;
-rec.stpts = bldgData.stpts;
 
 
 %% SAVE Resuts to file
@@ -470,103 +458,99 @@ end
 
 
 
-
 %%        SHOW RESULTS (Plot data)
 %--------------------------------------------------------------------------
 %--------------------------------------------------------------------------
-optRec = rec;
 
 
 %%% Plot 'LCOE ($/kWh)'
 figure
 hold on
-plot(optRec.co2_emissions_red,optRec.financials.lcoe,'LineWidth',2)
+plot(rec.co2_emissions_red,rec.financials.lcoe,'LineWidth',2)
 box on
 grid on
 ylabel('LCOE ($/kWh)','FontSize',18)
 xlabel('CO_2 Reduction (%)','FontSize',18)
-set(gcf,'Position',[100 100 500 275])
+set(gcf,'Position',[50 50 500 275])
 xlim([0 50])
 hold off
     
         
 %%% Plot 'Cost of Carbon'
-close all
 figure
 hold on
-plot(optRec.co2_emissions_red,optRec.financials.cost_of_co2,'LineWidth',2)
-plot(optRec.co2_emissions_red,optRec.financials.cost_of_co2_marginal,'LineWidth',2)
+plot(rec.co2_emissions_red,rec.financials.cost_of_co2,'LineWidth',2)
+plot(rec.co2_emissions_red,rec.financials.cost_of_co2_marginal,'LineWidth',2)
 box on
 grid on
 ylabel('Cost of CO_2 ($/tonne)','FontSize',18)
 xlabel('CO_2 Reduction (%)','FontSize',18)
-set(gcf,'Position',[100 100 500 275])
+set(gcf,'Position',[50 300 500 275])
 xlim([5 50])
 legend('Average Cost','Marginal Cost','Location','NorthWest')
 hold off
 
 
 %%% Plot 'Capital Requirements'
-close all
 figure
 hold on
-plot(optRec.co2_emissions_red,sum(optRec.financials.cap_cost,2)./1000000,'LineWidth',2)
-% plot(optRec.co2_emissions_red,optRec.financials.cost_of_co2_marginal,'LineWidth',2)
+plot(rec.co2_emissions_red,sum(rec.financials.cap_cost,2)./1000000,'LineWidth',2)
+% plot(rec.co2_emissions_red,rec.financials.cost_of_co2_marginal,'LineWidth',2)
 box on
 grid on
 ylabel('Capital Cost ($MM)','FontSize',18)
 xlabel('CO_2 Reduction (%)','FontSize',18)
-set(gcf,'Position',[100 100 500 275])
+set(gcf,'Position',[50 600 500 275])
 xlim([5 50])
 % legend('Average Cost','Marginal Cost','Location','NorthWest')
 hold off
 
 
 %%% Dispatch Plots
-%close all
 
 
 for idx = 1:length(cfg.co2_red)
-    
-    idx = 1;
-        
-    dt1 = [sum(optRec.ldg.ldg_elec(:,idx),2)...
-            sum(optRec.utility.import(:,idx),2)...
-            sum(optRec.solar.pv_elec(:,idx),2) + sum(optRec.rees.rees_chrg(:,idx),2)...
-            sum(optRec.ees.ees_dchrg(:,idx),2) + sum(optRec.rees.rees_dchrg(:,idx),2) + sum(optRec.lees.ees_dchrg(:,idx),2)];
+
+    co2_red_text = ['CO2 Reduction:' num2str((cfg.co2_red(idx)*100),'%02d') '%'];
+
+
+    dt1 = [sum(rec.ldg.ldg_elec(:,idx),2)...
+            sum(rec.utility.import(:,idx),2)...
+            sum(rec.solar.pv_elec(:,idx),2) + sum(rec.rees.rees_chrg(:,idx),2)...
+            sum(rec.ees.ees_dchrg(:,idx),2) + sum(rec.rees.rees_dchrg(:,idx),2) + sum(rec.lees.ees_dchrg(:,idx),2)];
              
-    dt2 = [optRec.elec ...
-            sum(optRec.ees.ees_chrg(:,idx),2) + sum(optRec.lees.ees_chrg(:,idx),2) + sum(optRec.rees.rees_chrg(:,idx),2)...
-            sum(optRec.el_eff.*optRec.el.el_prod(:,idx),2) + sum(optRec.h2_chrg_eff.*optRec.h2es.h2es_chrg(:,idx),2) + sum(optRec.rel_eff.*optRec.rel.rel_prod(:,idx),2) ...
-            optRec.solar.pv_nem(:,idx)];
+    dt2 = [bldgData.elec ...
+            sum(rec.ees.ees_chrg(:,idx),2) + sum(rec.lees.ees_chrg(:,idx),2) + sum(rec.rees.rees_chrg(:,idx),2)...
+            sum(modelVars.el_eff.*rec.el.el_prod(:,idx),2) + sum(modelVars.h2_chrg_eff.*rec.h2es.h2es_chrg(:,idx),2) + sum(modelVars.rel_eff.*rec.rel.rel_prod(:,idx),2) ...
+            rec.solar.pv_nem(:,idx)];
     
     
     %%% Plot 'Electric Sources (MW)'
-    figure
+    figure('Name', co2_red_text);
     hold on
-    area(optRec.time,dt1.*4./1000)
-    set(gca,'XTick', round(optRec.time(1),0)+.5:round(optRec.time(end),0)+.5,'FontSize',14)
+    area(bldgData.time,dt1.*4./1000)
+    set(gca,'XTick', round(bldgData.time(1),0)+.5:round(bldgData.time(end),0)+.5,'FontSize',14)
     box on
     grid on
     datetick('x','ddd','keepticks')
-    xlim([optRec.time(optRec.stpts(3)) optRec.time(optRec.stpts(3)+96*7)])
+    xlim([bldgData.time(bldgData.stpts(3)) bldgData.time(bldgData.stpts(3)+96*7)])
     ylabel('Electric Sources (MW)','FontSize',18)
     legend('Gas Turbine','Utility Import','Solar','Battery Discharge','Location','Best')
-    set(gcf,'Position',[100 450 500 275])
+    set(gcf,'Position',[(600 + idx*20) (450 + idx*20) 500 275])
     hold off
     
     %%% Plot 'Electric Loads (MW)'
-    figure
+    figure('Name',co2_red_text);
     hold on
-    area(optRec.time,dt2.*4./1000)
-    set(gca,'XTick', round(optRec.time(1),0)+.5:round(optRec.time(end),0)+.5, 'FontSize',14)
+    area(bldgData.time,dt2.*4./1000)
+    set(gca,'XTick', round(bldgData.time(1),0)+.5:round(bldgData.time(end),0)+.5, 'FontSize',14)
     box on
     grid on
     datetick('x','ddd','keepticks')
-    xlim([optRec.time(optRec.stpts(3)) optRec.time(optRec.stpts(3)+96*7)])
+    xlim([bldgData.time(bldgData.stpts(3)) bldgData.time(bldgData.stpts(3)+96*7)])
     ylabel('Electric Loads (MW)','FontSize',18)
     legend('Campus','Battery Charging','H_2 Production','Export','Location','Best')
-    set(gcf,'Position',[100 100 500 275])
+    set(gcf,'Position',[(600 + idx*20) (50 + idx*10) 500 275])
     hold off
 
 end
