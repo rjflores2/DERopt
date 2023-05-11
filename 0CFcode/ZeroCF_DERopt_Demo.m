@@ -13,7 +13,10 @@
 clear;
 close all;
 clc;
-SetCodePaths(1)
+SetCodePaths(1)                 % 1 - Robert's PC
+                                % 2 - Roman's Laptop
+                                % 3 - Roman's Desktop
+
 
 
 %% Create all default configuration values
@@ -30,11 +33,10 @@ cfg.AddMatlabPaths()
 
 %% OVERWRITE DEFAULT CONFIGURATION       
 
-    %cfg.co2_red = 0;
+    %cfg.co2_red = [0 0.05];
     %cfg.year_idx = 2018;
     %cfg.month_idx = [1 4 7 10];
-
-
+    
 
 
 
@@ -42,14 +44,25 @@ cfg.AddMatlabPaths()
 %%  START SIMULATION
 
 startsim = tic;
+
 fprintf('%s: START SIMULATION \n', datetime("now","InputFormat",'HH:MM:SS'))
 
 bldgData = CBuildingDataManager("UCI Labs");
 
+fprintf('%s: Loading Building Data ', datetime("now","InputFormat",'HH:MM:SS'))
+tic
+
 if bldgData.LoadData(append(cfg.demo_data_path, '\Campus_Loads_2014_2019.mat'), cfg.chiller_plant_opt)
 
+    fprintf('Took %.3f seconds \n', toc)
+
+    fprintf('%s: Streamlining Building Data ', datetime("now","InputFormat",'HH:MM:SS'))
+    tic
+
     bldgData.FormatData(cfg.month_idx, cfg.year_idx, cfg.demo_data_path, cfg.util_solar_on, cfg.util_wind_on, cfg.hrs_on);
-    
+
+    fprintf('Took %.3f seconds \n', toc)
+
 else
 
     f = msgbox(append("Could not load Building Data File: ", append(cfg.demo_data_path, '\Campus_Loads_2014_2019.mat')),"0CF DERoptimizer","warn");
@@ -61,34 +74,59 @@ if isempty(cfg.co2_base)
     cfg.co2_base = bldgData.EstimateBaseCO2Emissions();
 end
 
-% Setting up the first CO2 limit
-co2_lim = cfg.co2_base*(1-cfg.co2_red(1));
+cfg.SetUpFirstCO2Limit();
 
 
 %--------------------------------------------------------------------------
 % Loading Utility Data and Generating Energy Charge Vectors
 %--------------------------------------------------------------------------
 
+fprintf('%s: Loading Utility Data ', datetime("now","InputFormat",'HH:MM:SS'))
+tic
 utilInfo = CUtilityInfo(cfg.uci_rate, cfg.export_on, cfg.gen_export_on, bldgData.lmp_uci, bldgData.GetElecLen());
+fprintf('Took %.3f seconds \n', toc)
 
 
 %--------------------------------------------------------------------------
 % Technology Parameters/Costs
 %--------------------------------------------------------------------------
+
+fprintf('%s: Calculating OnSite Technology Parameters & Costs ', datetime("now","InputFormat",'HH:MM:SS'))
+tic
 techSelOnSite = CTechnologySelection();
 techSelOnSite.CalculateAllParams(cfg.pv_on, cfg.ees_on, cfg.el_on, cfg.h2es_on, cfg.rel_on, cfg.hrs_on, cfg.h2_inject_on);
+fprintf('Took %.3f seconds \n', toc)
 
 
 %--------------------------------------------------------------------------
 % Technology Parameters/Costs for offsite resources
 %--------------------------------------------------------------------------
+
+fprintf('%s: Calculating OffSite Technology Parameters & Costs', datetime("now","InputFormat",'HH:MM:SS'))
+tic
 techSelOffSite = CTechnologySelectionOffSite();
 techSelOffSite.CalculateAllParams(cfg.util_solar_on, cfg.util_wind_on, cfg.util_ees_on, cfg.util_el_on, cfg.util_h2_inject_on);
+fprintf('Took %.3f seconds \n', toc)
+
+
+%--------------------------------------------------------------------------
+% Legacy Technologies
+%--------------------------------------------------------------------------
+
+fprintf('%s: Calculating Legacy Technology Parameters & Costs ', datetime("now","InputFormat",'HH:MM:SS'))
+tic
+legacyTech = CLegacyTechnologies(cfg.lpv_on, cfg.ldg_on, cfg.lbot_on, cfg.lhr_on, cfg.ldb_on, cfg.lboil_on, cfg.lees_on, cfg.ltes_on, cfg.dg_legacy_cyc);
+
+cfg.dg_legacy_cyc = legacyTech.updatedDgLegacyCyc;      % TODO: review
+fprintf('Took %.3f seconds \n', toc)
 
 
 %--------------------------------------------------------------------------
 % Capital Cost Modifications
 %--------------------------------------------------------------------------
+
+fprintf('%s: Calculating Capital Costs Modifications ', datetime("now","InputFormat",'HH:MM:SS'))
+tic
 capCostMods = CCapitalCostCalculator(cfg.interestRateOnLoans, cfg.lengthOfLoansYears, cfg.req_return_on);
 
 capCostMods.DebtPaymentsFullCostSystem(techSelOnSite.pv_v, techSelOnSite.ees_v, techSelOnSite.el_v, ...
@@ -108,14 +146,7 @@ capCostMods.CalcCostScalars_UtilityScaleWind(techSelOffSite.util_wind_v, techSel
 capCostMods.CalcCostScalars_UtilityScaleBatteryStorage(techSelOffSite.util_ees_v, techSelOffSite.util_ees_fin, bldgData.elec, techSelOnSite.somah)
 capCostMods.CalcCostScalars_UtilityScaleElectrolyzer(techSelOffSite.util_el_v, techSelOffSite.util_el_fin, bldgData.elec)
 
-
-%--------------------------------------------------------------------------
-% Legacy Technologies
-%--------------------------------------------------------------------------
-legacyTech = CLegacyTechnologies(cfg.lpv_on, cfg.ldg_on, cfg.lbot_on, cfg.lhr_on, cfg.ldb_on, cfg.lboil_on, cfg.lees_on, cfg.ltes_on, cfg.dg_legacy_cyc);
-
-cfg.dg_legacy_cyc = legacyTech.updatedDgLegacyCyc;      % TODO: review
-
+fprintf('Took %.3f seconds \n', toc)
 
 
 %--------------------------------------------------------------------------
@@ -169,7 +200,7 @@ cfg.dg_legacy_cyc = legacyTech.updatedDgLegacyCyc;      % TODO: review
 %--------------------------------------------------------------------------
 % Setting up variables and cost function
 %--------------------------------------------------------------------------
-fprintf('%s: Objective Function.', datetime("now","InputFormat",'HH:MM:SS'))
+fprintf('%s: Generating Model Variables. ', datetime("now","InputFormat",'HH:MM:SS'))
 tic
 
 modelVars = CModelVariables(bldgData.GetTimeLen(), bldgData.GetEndPointsLen());
@@ -197,15 +228,9 @@ modelVars.SetupLegacyColdTES(bldgData.cool, legacyTech.tes_legacy)
 modelVars.SetupLegacyChillers(cfg.onoff_model, bldgData.cool, legacyTech.vc_legacy)
 modelVars.SetupDumpVariables(bldgData.elec_dump)
 
-fprintf('Took %.2f seconds \n', toc)
-
-
 % Off Site
 
 %% Setting up variables and cost function for offsite resources
-fprintf('%s: Off-site variables.', datetime("now","InputFormat",'HH:MM:SS'))
-tic
-
 modelVars.SetupPowerPlantExports(cfg.util_solar_on, cfg.util_ees_on, cfg.util_pp_export, cfg.util_pp_import, cfg.util_pv_wheel, cfg.util_pv_wheel_lts)
 modelVars.SetupCommunityScaleSolar(techSelOffSite.utilpv_v)
 modelVars.SetupCommunityScaleWind(techSelOffSite.util_wind_v)
@@ -214,8 +239,7 @@ modelVars.SetupRemoteElectrolyzer(techSelOffSite.util_el_v, bldgData.elec)
 modelVars.SetupUtilH2PipelineInjection(cfg.util_h2_inject_on)
 
 elapsed = toc;
-fprintf('Took %.2f seconds \n', elapsed)
-
+fprintf('Took %.3f seconds \n', elapsed)
 
 
 %--------------------------------------------------------------------------
@@ -225,77 +249,74 @@ fprintf('Took %.2f seconds \n', elapsed)
 modelConstraints = CModelConstraints(bldgData.GetTimeLen(), bldgData.GetEndPointsLen());
 
 elapsed = modelConstraints.Calculate_GeneralEquality(cfg.onoff_model, modelVars, bldgData.heat, bldgData.cool, bldgData.elec, techSelOnSite.el_v, techSelOnSite.rel_v, cfg.hrs_on, cfg.util_solar_on, cfg.util_ees_on, cfg.util_pv_wheel_lts);
-fprintf('%s: General Equality -> %.2f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
+fprintf('%s: General Equality -> %.3f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
 
 elapsed = modelConstraints.Calculate_GeneralInequality(modelVars, bldgData.e_adjust, cfg.utility_exists, cfg.dc_exist,...
                                                 bldgData.endpts, utilInfo.onpeak_index, utilInfo.midpeak_index, cfg.export_on, utilInfo.export_price,...
                                                 utilInfo.import_price, legacyTech.fac_prop, cfg.util_pv_wheel, cfg.util_ees_on, cfg.util_pp_import,...
-                                                cfg.h2_fuel_forced_fraction, techSelOnSite.el_v, cfg.h2_fuel_limit, cfg.ldg_on, co2_lim,...
+                                                cfg.h2_fuel_forced_fraction, techSelOnSite.el_v, cfg.h2_fuel_limit, cfg.ldg_on, cfg.co2_lim,...
                                                 cfg.biogas_limit, cfg.h2_charging_rec, cfg.gen_export_on, bldgData.co2_import, bldgData.co2_ng, bldgData.co2_rng);
-fprintf('%s: General Inequality -> %.2f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
+fprintf('%s: General Inequality -> %.3f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
 
 elapsed = modelConstraints.Calculate_HeatRecoveryInequality(modelVars, legacyTech.dg_legacy, legacyTech.hr_legacy, legacyTech.bot_legacy);
-fprintf('%s: Heat Recovery Inequalities -> %.2f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
+fprintf('%s: Heat Recovery Inequalities -> %.3f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
 
 elapsed = modelConstraints.Calculate_LegacyDG(modelVars, legacyTech.dg_legacy, bldgData.e_adjust, cfg.dg_legacy_cyc);
-fprintf('%s: Legacy DG Constraints -> %.2f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
+fprintf('%s: Legacy DG Constraints -> %.3f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
 
 elapsed = modelConstraints.Calculate_LegacyST(modelVars, legacyTech.bot_legacy);
-fprintf('%s: Legacy ST Constraints -> %.2f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
+fprintf('%s: Legacy ST Constraints -> %.3f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
     
 elapsed = modelConstraints.Calculate_SolarPV(modelVars, techSelOnSite.pv_v, bldgData.solar, legacyTech.pv_legacy, cfg.toolittle_pv, cfg.maxpv, cfg.curtail, bldgData.e_adjust);
-fprintf('%s: PV Constraints -> %.2f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
+fprintf('%s: PV Constraints -> %.3f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
 
 elapsed = modelConstraints.Calculate_EES(modelVars, techSelOnSite.ees_v, techSelOnSite.pv_v, cfg.rees_on);
-fprintf('%s: EES Constraints -> %.2f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
+fprintf('%s: EES Constraints -> %.3f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
 
 elapsed = modelConstraints.Calculate_LegacyEES(modelVars, legacyTech.ees_legacy);
-fprintf('%s: Legacy EES Constraints -> %.2f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
+fprintf('%s: Legacy EES Constraints -> %.3f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
 
 elapsed = modelConstraints.Calculate_LegacyVC(modelVars, cfg.onoff_model, bldgData.cool, legacyTech.vc_legacy);
-fprintf('%s: Legacy VC Constraints -> %.2f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
+fprintf('%s: Legacy VC Constraints -> %.3f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
 
 elapsed = modelConstraints.Calculate_LegacyTES(modelVars, bldgData.cool, legacyTech.tes_legacy);
-fprintf('%s: Legacy TES Constraints -> %.2f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
+fprintf('%s: Legacy TES Constraints -> %.3f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
 
 elapsed = modelConstraints.Calculate_DERIncentives(modelVars, techSelOnSite.ees_v, cfg.sgip_on);%% DER Incentives
-fprintf('%s: DER Incentives Constraints -> %.2f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
+fprintf('%s: DER Incentives Constraints -> %.3f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
 
 elapsed = modelConstraints.Calculate_H2production(modelVars, techSelOnSite.el_v, techSelOnSite.rel_v, techSelOnSite.h2es_v, bldgData.e_adjust);
-fprintf('%s: Electrolyzer and H2 Storage Constraints -> %.2f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
+fprintf('%s: Electrolyzer and H2 Storage Constraints -> %.3f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
 
 elapsed = modelConstraints.Calculate_UtilitySolar(modelVars, techSelOffSite.utilpv_v, bldgData.e_adjust);
-fprintf('%s: Utility Scale Solar Constraints -> %.2f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
+fprintf('%s: Utility Scale Solar Constraints -> %.3f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
 
 elapsed = modelConstraints.Calculate_UtilityWind(modelVars, techSelOffSite.util_wind_v, bldgData.e_adjust);
-fprintf('%s: Utility Scale Wind Constraints -> %.2f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
+fprintf('%s: Utility Scale Wind Constraints -> %.3f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
 
 elapsed = modelConstraints.Calculate_UtilityEESStorage(modelVars, techSelOffSite.util_ees_v);
-fprintf('%s: Utility Scale Battery Storage Constraints -> %.2f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
+fprintf('%s: Utility Scale Battery Storage Constraints -> %.3f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
 
 elapsed = modelConstraints.Calculate_UtilityElectrolyzer(modelVars, techSelOffSite.util_el_v);
-fprintf('%s: Utility Scale Electrolyzer Constraints -> %.2f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
+fprintf('%s: Utility Scale Electrolyzer Constraints -> %.3f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
 
 elapsed = modelConstraints.Calculate_H2PipelineInjection(modelVars, cfg.h2_inject_on);
-fprintf('%s: H2 Pipeline Injection Constraints -> %.2f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
-
-
-%return
-
-
-%% Optimize
-fprintf('%s: Optimizing \n....', datetime("now","InputFormat",'HH:MM:SS'))
+fprintf('%s: H2 Pipeline Injection Constraints -> %.3f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
 
 lanin = CModelSolver;
 
 %% Export Model
-elapsed = lanin.CreateModel(modelConstraints.Constraints, modelVars.Objective, co2_lim);
+elapsed = lanin.CreateModel(modelConstraints.Constraints, modelVars.Objective, cfg.co2_lim);
 
-fprintf('Model Export took %.2f seconds \n', elapsed)
+fprintf('%s: Model Export took %.3f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
 
-if lanin.SetupFirstSolve(co2_lim, cfg.co2_base, sum(bldgData.elec), bldgData.co2_import, bldgData.co2_ng, bldgData.co2_rng)
+if lanin.SetupFirstSolve(cfg.co2_lim, cfg.co2_base, sum(bldgData.elec), bldgData.co2_import, bldgData.co2_ng, bldgData.co2_rng)
 
 end
+
+%% Optimize
+fprintf('\n%s: Optimizing...\n\n', datetime("now","InputFormat",'HH:MM:SS'))
+
 
 %% Loop to rerun optimization
 
@@ -305,7 +326,7 @@ for ii = 1:length(cfg.co2_red)
 
     elapsed = lanin.SolveModel(ii, cfg.co2_red(ii), modelVars);
 
-    fprintf('CPLEX took %.2f seconds \n', elapsed)
+    fprintf('CPLEX took %.3f seconds \n', elapsed)
 
 
     %% Starting Recorder Structure - Model Outputs
@@ -427,8 +448,7 @@ for ii = 1:length(cfg.co2_red)
 
 end
 
-% Timer
-finish = datetime('now') ; totalelapsed = toc(startsim);
+
 
 
 %% Add local variables Results
@@ -447,8 +467,6 @@ rec.stpts = bldgData.stpts;
 if cfg.saveResultsToFile
     save(strcat(results_path,'\deropt_results.mat'), "rec")
 end
-
-
 
 
 
@@ -505,44 +523,50 @@ hold off
 
 
 %%% Dispatch Plots
-close all
-idx = 1;
+%close all
+
+
+for idx = 1:length(cfg.co2_red)
     
-dt1 = [sum(optRec.ldg.ldg_elec(:,idx),2)...
-        sum(optRec.utility.import(:,idx),2)...
-        sum(optRec.solar.pv_elec(:,idx),2) + sum(optRec.rees.rees_chrg(:,idx),2)...
-        sum(optRec.ees.ees_dchrg(:,idx),2) + sum(optRec.rees.rees_dchrg(:,idx),2) + sum(optRec.lees.ees_dchrg(:,idx),2)];
-         
-dt2 = [optRec.elec ...
-        sum(optRec.ees.ees_chrg(:,idx),2) + sum(optRec.lees.ees_chrg(:,idx),2) + sum(optRec.rees.rees_chrg(:,idx),2)...
-        sum(optRec.el_eff.*optRec.el.el_prod(:,idx),2) + sum(optRec.h2_chrg_eff.*optRec.h2es.h2es_chrg(:,idx),2) + sum(optRec.rel_eff.*optRec.rel.rel_prod(:,idx),2) ...
-        optRec.solar.pv_nem(:,idx)];
+    idx = 1;
+        
+    dt1 = [sum(optRec.ldg.ldg_elec(:,idx),2)...
+            sum(optRec.utility.import(:,idx),2)...
+            sum(optRec.solar.pv_elec(:,idx),2) + sum(optRec.rees.rees_chrg(:,idx),2)...
+            sum(optRec.ees.ees_dchrg(:,idx),2) + sum(optRec.rees.rees_dchrg(:,idx),2) + sum(optRec.lees.ees_dchrg(:,idx),2)];
+             
+    dt2 = [optRec.elec ...
+            sum(optRec.ees.ees_chrg(:,idx),2) + sum(optRec.lees.ees_chrg(:,idx),2) + sum(optRec.rees.rees_chrg(:,idx),2)...
+            sum(optRec.el_eff.*optRec.el.el_prod(:,idx),2) + sum(optRec.h2_chrg_eff.*optRec.h2es.h2es_chrg(:,idx),2) + sum(optRec.rel_eff.*optRec.rel.rel_prod(:,idx),2) ...
+            optRec.solar.pv_nem(:,idx)];
+    
+    
+    %%% Plot 'Electric Sources (MW)'
+    figure
+    hold on
+    area(optRec.time,dt1.*4./1000)
+    set(gca,'XTick', round(optRec.time(1),0)+.5:round(optRec.time(end),0)+.5,'FontSize',14)
+    box on
+    grid on
+    datetick('x','ddd','keepticks')
+    xlim([optRec.time(optRec.stpts(3)) optRec.time(optRec.stpts(3)+96*7)])
+    ylabel('Electric Sources (MW)','FontSize',18)
+    legend('Gas Turbine','Utility Import','Solar','Battery Discharge','Location','Best')
+    set(gcf,'Position',[100 450 500 275])
+    hold off
+    
+    %%% Plot 'Electric Loads (MW)'
+    figure
+    hold on
+    area(optRec.time,dt2.*4./1000)
+    set(gca,'XTick', round(optRec.time(1),0)+.5:round(optRec.time(end),0)+.5, 'FontSize',14)
+    box on
+    grid on
+    datetick('x','ddd','keepticks')
+    xlim([optRec.time(optRec.stpts(3)) optRec.time(optRec.stpts(3)+96*7)])
+    ylabel('Electric Loads (MW)','FontSize',18)
+    legend('Campus','Battery Charging','H_2 Production','Export','Location','Best')
+    set(gcf,'Position',[100 100 500 275])
+    hold off
 
-
-%%% Plot 'Electric Sources (MW)'
-figure
-hold on
-area(optRec.time,dt1.*4./1000)
-set(gca,'XTick', round(optRec.time(1),0)+.5:round(optRec.time(end),0)+.5,'FontSize',14)
-box on
-grid on
-datetick('x','ddd','keepticks')
-xlim([optRec.time(optRec.stpts(3)) optRec.time(optRec.stpts(3)+96*7)])
-ylabel('Electric Sources (MW)','FontSize',18)
-legend('Gas Turbine','Utility Import','Solar','Battery Discharge','Location','Best')
-set(gcf,'Position',[100 450 500 275])
-hold off
-
-%%% Plot 'Electric Loads (MW)'
-figure
-hold on
-area(optRec.time,dt2.*4./1000)
-set(gca,'XTick', round(optRec.time(1),0)+.5:round(optRec.time(end),0)+.5, 'FontSize',14)
-box on
-grid on
-datetick('x','ddd','keepticks')
-xlim([optRec.time(optRec.stpts(3)) optRec.time(optRec.stpts(3)+96*7)])
-ylabel('Electric Loads (MW)','FontSize',18)
-legend('Campus','Battery Charging','H_2 Production','Export','Location','Best')
-set(gcf,'Position',[100 100 500 275])
-hold off
+end

@@ -145,10 +145,9 @@ classdef CBuildingDataManager < handle
             %%%Extracting solar data from the loaded normalized factor
             obj.solar = interp1(norm_slr(:,1), norm_slr(:,2), obj.time);
             
-            %% Loadings Emission Factors
-            
-            %%%Grid emission factors
-            grid_co2 = xlsread('grid_co2_factors.xlsx'); 
+            %% Loadings Emission Factors            
+            grid_co2 = obj.LoadGridEmissionFactors(demo_data_path);
+
             yr_shift = 12 + (year_idx(1) - 2018);
             grid_co2(:,1) = grid_co2(:,1) - yr_shift;
             co2_time = datenum(grid_co2(:,1:6));
@@ -287,9 +286,6 @@ classdef CBuildingDataManager < handle
         %--------------------------------------------------------------------------
         function [co2_base] = SetUpFirstCO2Limit(obj)
 
-            co2_lim = cfg.co2_base*(1-cfg.co2_red(1));
-
-            
             co2_base = obj.elec'*obj.co2_import ...         % Assume all electricity is met using grid electricity
                         + sum((obj.heat./0.8)*obj.co2_ng);  % Assume all heating is met using an 80% AFUE heater
 
@@ -309,6 +305,18 @@ classdef CBuildingDataManager < handle
             endPointsVectorLength = length(obj.endpts);
         end
 
+        function [emissionFactors] = LoadGridEmissionFactors(obj, demo_data_path)
+            
+            % If it's not in Matlab format => load XLSX and save a Matlab file
+            if isfile(append(demo_data_path, '\Emission_Factors\grid_co2_factors.mat'))
+                emissionFactors = load(append(demo_data_path, '\Emission_Factors\grid_co2_factors.mat'),"emissionFactors");
+
+                emissionFactors = struct2array(emissionFactors);
+            else        
+                emissionFactors = xlsread(append(demo_data_path, '\Emission_Factors\grid_co2_factors.xlsx'));
+                save(append(demo_data_path, '\Emission_Factors\grid_co2_factors.mat'), "emissionFactors")
+            end
+        end
 
     end
 end

@@ -10,6 +10,7 @@ classdef CConfigurationManager < handle
 
         co2_base                    % Baseline CO2 emissions [Kg]
         co2_red                     % CO2 Desired reduction [%]
+        co2_lim
 
         year_idx
         month_idx
@@ -172,6 +173,7 @@ classdef CConfigurationManager < handle
 
             obj.co2_base = [];
             obj.co2_red = 0;                    % [0 0.05];
+            obj.co2_lim = 0;
             obj.year_idx = 2018;
             obj.month_idx = [1 4 7 10];
             obj.saveResultsToFile = false;
@@ -325,9 +327,9 @@ classdef CConfigurationManager < handle
 
 
         %--------------------------------------------------------------------------
-        function [co2Limit] = SetUpFirstCO2Limit(obj)
+        function SetUpFirstCO2Limit(obj)
 
-            co2Limit = obj.co2_base * (1 - obj.co2_red(1));
+            obj.co2_lim = obj.co2_base * (1 - obj.co2_red(1));
 
         end
 
