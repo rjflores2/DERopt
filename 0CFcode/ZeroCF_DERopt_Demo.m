@@ -7,13 +7,13 @@
 %
 %   Created: May 3rd 2023               Version 0.6
 %
-%   Last Modified: May 10th 2023
+%   Last Modified: May 11th 2023
 %
 
 clear;
 close all;
 clc;
-SetCodePaths(3)
+SetCodePaths(1)
 
 
 %% Create all default configuration values
@@ -21,9 +21,11 @@ cfg = CConfigurationManager();
 
 
 %% Select which computer your are running this script
-cfg.SetRunningEnvironment(3);   % 1 - Robert's PC
+cfg.SetRunningEnvironment(1);   % 1 - Robert's PC
                                 % 2 - Roman's Laptop
                                 % 3 - Roman's Desktop
+
+cfg.AddMatlabPaths()
 
 
 %% OVERWRITE DEFAULT CONFIGURATION       
@@ -35,112 +37,9 @@ cfg.SetRunningEnvironment(3);   % 1 - Robert's PC
 
 
 
-    
-
-%%-------------------------------------------------------------------------
-%--------------------------------------------------------------------------
-%%          OTHER PARAMETERS CONFIGURATION       
-%--------------------------------------------------------------------------
-%--------------------------------------------------------------------------
 
 
-%% Adoptable technologies toggles (opt_var_cf.m and tech_select.m)
-utility_exists = 1; % Utility access
-pv_on = 1;          %Turn on PV
-ees_on = 1;         %Turn on EES/REES
-rees_on = 1;        %Turn on REES
-
-%% Community/Utility Scale systems
-util_solar_on = 0;
-util_wind_on = 0;
-util_ees_on = 0;
-util_el_on = 0;
-util_h2_inject_on = 0;
-
-%% Hydrogen technologies
-el_on = 1; %Turn on generic electrolyer
-rel_on = 1; %Turn on renewable tied electrolyzer
-h2es_on = 1; %Hydrogen energy storage
-hrs_on = 0; %Turn on hydrogen fueling station
-h2_inject_on = 0; %Turn on H2 injection into pipeline
-
-%% Legacy System Toggles
-lpv_on = 1; %Turn on legacy PV
-lees_on = 1; %Legacy EES
-ltes_on = 1; %Legacy TES
-ldg_on = 1; %Turn on legacy GT
-lbot_on = 0; %Turn on legacy bottoming cycle / Steam turbine
-lhr_on = 0; %Legacy HR
-ldb_on = 0; %Legacy Duct Burner
-lboil_on = 0; %Legacy boilers
-
-%% Utility PV Solar
-util_pv_wheel = 0; %General Wheeling Capabilities
-util_pv_wheel_lts = 0; %Wheeling for long term storage
-util_pp_import = 0; %Can import power at power plant node
-util_pp_export = 0; %Can import power at power plant node
-
-%% Utility H2 production
-util_h2_sale = 0;
-util_h2_pipe_store = 0;
-
-%% Strict storage design
-strict_h2es = 0;
-
-%% Legacy Generator Options
-ldg_op_state = 0; %%%Generator can turn on/off
-lbot_op_state = 0; %%%Steam turbine can turn on/off
-
-%% Gas turbine cycling costs
-dg_legacy_cyc = 1;
-
-%% H2 fuel limit in legacy generator
-% Used in opt_gen_inequalities
-h2_fuel_limit = 1;          %0.1; %%%Fuel limit on an energy basis - should be 0.1
-
-%% Island operation (opt_nem.m)
-
-%%%Electric rates for UCI
-%%% 1: current rate, which does not value export
-%%% 2: current import rate + LMP export rate
-%%% 3: LMP Rate + 0.2 and LMP Export
-uci_rate = 3;
-
-island = 0;
-
-%%%Toggles NEM/Wholesale export (1 = on, 0 = off)
-export_on = 0; %%%Tied to PV and REES export under current utility rates (opt_PV, opt_ees)
-
-%%%General export
-gen_export_on = 0; %%%Placed a "general export" capability in the general electrical energy equality system (opt_gen_equalities)
-
-
-
-
-%% Adding paths
-%--------------------------------------------------------------------------
-%--------------------------------------------------------------------------
-
-%%%YALMIP Master Path
-addpath(genpath(cfg.yalmip_master_path)) %rjf path
-addpath(genpath(cfg.matlab_path)) %cyc path
-
-%%%CPLEX Path
-addpath(genpath('C:\Program Files\IBM\ILOG\CPLEX_Studio128\cplex\matlab\x64_win64')) %rjf path
-addpath(genpath('C:\Program Files\IBM\ILOG\CPLEX_Studio1263\cplex\matlab\x64_win64')) %cyc path
-
-%%%DERopt paths
-addpath(genpath(append(cfg.demo_files_path, '\0CFcode')))
-addpath(genpath(append(cfg.demo_files_path, '\Classes')))
-addpath(genpath(append(cfg.demo_files_path, '\Data')))
-
-
-
-%%-------------------------------------------------------------------------
-%--------------------------------------------------------------------------
-%%                  START SIMULATION
-%--------------------------------------------------------------------------
-%--------------------------------------------------------------------------
+%%  START SIMULATION
 
 startsim = tic;
 fprintf('%s: START SIMULATION \n', datetime("now","InputFormat",'HH:MM:SS'))
@@ -149,13 +48,11 @@ bldgData = CBuildingDataManager("UCI Labs");
 
 if bldgData.LoadData(append(cfg.demo_data_path, '\Campus_Loads_2014_2019.mat'), cfg.chiller_plant_opt)
 
-    bldgData.FormatData(cfg.month_idx, cfg.year_idx, cfg.demo_data_path, util_solar_on, util_wind_on, hrs_on);
+    bldgData.FormatData(cfg.month_idx, cfg.year_idx, cfg.demo_data_path, cfg.util_solar_on, cfg.util_wind_on, cfg.hrs_on);
     
 else
 
-    dataFilePath = append(demo_data_path, '\Campus_Loads_2014_2019.mat');
-
-    f = msgbox(append("Could not load Building Data File: ", dataFilePath),"0CF DERoptimizer","warn");
+    f = msgbox(append("Could not load Building Data File: ", append(cfg.demo_data_path, '\Campus_Loads_2014_2019.mat')),"0CF DERoptimizer","warn");
     return
 
 end
@@ -172,21 +69,21 @@ co2_lim = cfg.co2_base*(1-cfg.co2_red(1));
 % Loading Utility Data and Generating Energy Charge Vectors
 %--------------------------------------------------------------------------
 
-utilInfo = CUtilityInfo(uci_rate, export_on, gen_export_on, bldgData.lmp_uci, bldgData.GetElecLen());
+utilInfo = CUtilityInfo(cfg.uci_rate, cfg.export_on, cfg.gen_export_on, bldgData.lmp_uci, bldgData.GetElecLen());
 
 
 %--------------------------------------------------------------------------
 % Technology Parameters/Costs
 %--------------------------------------------------------------------------
 techSelOnSite = CTechnologySelection();
-techSelOnSite.CalculateAllParams(pv_on, ees_on, el_on, h2es_on, rel_on, hrs_on, h2_inject_on);
+techSelOnSite.CalculateAllParams(cfg.pv_on, cfg.ees_on, cfg.el_on, cfg.h2es_on, cfg.rel_on, cfg.hrs_on, cfg.h2_inject_on);
 
 
 %--------------------------------------------------------------------------
 % Technology Parameters/Costs for offsite resources
 %--------------------------------------------------------------------------
 techSelOffSite = CTechnologySelectionOffSite();
-techSelOffSite.CalculateAllParams(util_solar_on, util_wind_on, util_ees_on, util_el_on, util_h2_inject_on);
+techSelOffSite.CalculateAllParams(cfg.util_solar_on, cfg.util_wind_on, cfg.util_ees_on, cfg.util_el_on, cfg.util_h2_inject_on);
 
 
 %--------------------------------------------------------------------------
@@ -197,12 +94,12 @@ capCostMods = CCapitalCostCalculator(cfg.interestRateOnLoans, cfg.lengthOfLoansY
 capCostMods.DebtPaymentsFullCostSystem(techSelOnSite.pv_v, techSelOnSite.ees_v, techSelOnSite.el_v, ...
                                         techSelOnSite.rel_v, techSelOnSite.h2es_v, techSelOnSite.hrs_v, techSelOnSite.h2_inject_v,...
                                         techSelOffSite.utilpv_v, techSelOffSite.util_wind_v, techSelOffSite.util_ees_v, ...
-                                        util_el_on, techSelOffSite.util_h2_inject_v, rees_on)
+                                        cfg.util_el_on, techSelOffSite.util_h2_inject_v, cfg.rees_on)
 
 capCostMods.ConvertIncentivesToReductions(techSelOnSite.sgip, techSelOnSite.ees_v)
 
 capCostMods.CalcCostScalars_SolarPV(techSelOnSite.pv_v, techSelOnSite.pv_fin, techSelOnSite.somah, bldgData.elec, cfg.maxpv, cfg.low_income)
-capCostMods.CalcCostScalars_EES(techSelOnSite.ees_v, techSelOnSite.ees_fin, techSelOnSite.rees_fin, techSelOnSite.pv_v, bldgData.elec, cfg.maxpv, rees_on)
+capCostMods.CalcCostScalars_EES(techSelOnSite.ees_v, techSelOnSite.ees_fin, techSelOnSite.rees_fin, techSelOnSite.pv_v, bldgData.elec, cfg.maxpv, cfg.rees_on)
 capCostMods.CalcCostScalars_Electrolizer(techSelOnSite.el_v, techSelOnSite.el_fin, bldgData.elec, cfg.h2_fuel_forced_fraction, cfg.low_income, bldgData.e_adjust)
 capCostMods.CalcCostScalars_RenewableElectrolizer(techSelOnSite.rel_v, techSelOnSite.rel_fin, bldgData.elec, cfg.h2_fuel_forced_fraction, cfg.low_income, bldgData.e_adjust)
 
@@ -215,9 +112,9 @@ capCostMods.CalcCostScalars_UtilityScaleElectrolyzer(techSelOffSite.util_el_v, t
 %--------------------------------------------------------------------------
 % Legacy Technologies
 %--------------------------------------------------------------------------
-legacyTech = CLegacyTechnologies(lpv_on, ldg_on, lbot_on, lhr_on, ldb_on, lboil_on, lees_on, ltes_on, dg_legacy_cyc);
+legacyTech = CLegacyTechnologies(cfg.lpv_on, cfg.ldg_on, cfg.lbot_on, cfg.lhr_on, cfg.ldb_on, cfg.lboil_on, cfg.lees_on, cfg.ltes_on, cfg.dg_legacy_cyc);
 
-dg_legacy_cyc = legacyTech.updatedDgLegacyCyc;
+cfg.dg_legacy_cyc = legacyTech.updatedDgLegacyCyc;      % TODO: review
 
 
 
@@ -279,18 +176,18 @@ modelVars = CModelVariables(bldgData.GetTimeLen(), bldgData.GetEndPointsLen());
 
 % On Site
 
-modelVars.SetupUtilityElectricity(utility_exists, cfg.dc_exist, bldgData.day_multi, utilInfo)
-modelVars.SetupGeneralExport(gen_export_on, utilInfo)
+modelVars.SetupUtilityElectricity(cfg.utility_exists, cfg.dc_exist, bldgData.day_multi, utilInfo)
+modelVars.SetupGeneralExport(cfg.gen_export_on, utilInfo)
 
 % Added NEM and wholesale export to the PV Section
-modelVars.SetupSolarPV(utility_exists, export_on, rees_on, island, bldgData.day_multi, techSelOnSite, utilInfo, capCostMods)
+modelVars.SetupSolarPV(cfg.utility_exists, cfg.export_on, cfg.rees_on, cfg.island, bldgData.day_multi, techSelOnSite, utilInfo, capCostMods)
 modelVars.SetupElectricalEnergyStorage(cfg.sgip_on, bldgData.day_multi, techSelOnSite, capCostMods)
-modelVars.SetupRenewableElectrolyzer(util_pv_wheel_lts, strict_h2es, techSelOnSite.rel_v, techSelOnSite.el_v, techSelOnSite.h2es_v, capCostMods)
-modelVars.SetupH2ProductionAndStorage(util_pv_wheel_lts, strict_h2es, techSelOnSite.el_v, techSelOnSite.h2es_v, capCostMods)
-modelVars.SetupHRSEquipment(hrs_on, techSelOnSite.hrs_v, capCostMods)
-modelVars.SetupH2PipelineInjection(h2_inject_on, cfg.ng_inject, cfg.rng_storage_cost, capCostMods)
-modelVars.SetupLegacyPv(island, export_on, bldgData.day_multi, legacyTech.pv_legacy, techSelOnSite.pv_v, utilInfo)
-modelVars.SetupLegacyGenerator(h2_inject_on, util_h2_inject_on, ldg_op_state, legacyTech.dg_legacy, dg_legacy_cyc, techSelOnSite.el_v, techSelOnSite.rel_v, cfg.ng_cost, cfg.rng_cost)
+modelVars.SetupRenewableElectrolyzer(cfg.util_pv_wheel_lts, cfg.strict_h2es, techSelOnSite.rel_v, techSelOnSite.el_v, techSelOnSite.h2es_v, capCostMods)
+modelVars.SetupH2ProductionAndStorage(cfg.util_pv_wheel_lts, cfg.strict_h2es, techSelOnSite.el_v, techSelOnSite.h2es_v, capCostMods)
+modelVars.SetupHRSEquipment(cfg.hrs_on, techSelOnSite.hrs_v, capCostMods)
+modelVars.SetupH2PipelineInjection(cfg.h2_inject_on, cfg.ng_inject, cfg.rng_storage_cost, capCostMods)
+modelVars.SetupLegacyPv(cfg.island, cfg.export_on, bldgData.day_multi, legacyTech.pv_legacy, techSelOnSite.pv_v, utilInfo)
+modelVars.SetupLegacyGenerator(cfg.h2_inject_on, cfg.util_h2_inject_on, cfg.ldg_op_state, legacyTech.dg_legacy, cfg.dg_legacy_cyc, techSelOnSite.el_v, techSelOnSite.rel_v, cfg.ng_cost, cfg.rng_cost)
 modelVars.SetupLegacyBottomingSystems(legacyTech.bot_legacy)
 modelVars.SetupLegacyHeatRecovery(legacyTech.dg_legacy, legacyTech.hr_legacy, cfg.ng_cost, cfg.rng_cost)
 modelVars.SetupLegacyBoiler(legacyTech.boil_legacy, cfg.ng_cost, cfg.rng_cost)
@@ -309,12 +206,12 @@ fprintf('Took %.2f seconds \n', toc)
 fprintf('%s: Off-site variables.', datetime("now","InputFormat",'HH:MM:SS'))
 tic
 
-modelVars.SetupPowerPlantExports(util_solar_on, util_ees_on, util_pp_export, util_pp_import, util_pv_wheel, util_pv_wheel_lts)
+modelVars.SetupPowerPlantExports(cfg.util_solar_on, cfg.util_ees_on, cfg.util_pp_export, cfg.util_pp_import, cfg.util_pv_wheel, cfg.util_pv_wheel_lts)
 modelVars.SetupCommunityScaleSolar(techSelOffSite.utilpv_v)
 modelVars.SetupCommunityScaleWind(techSelOffSite.util_wind_v)
 modelVars.SetupCommunityScaleStorage(techSelOffSite.util_ees_v)
 modelVars.SetupRemoteElectrolyzer(techSelOffSite.util_el_v, bldgData.elec)
-modelVars.SetupUtilH2PipelineInjection(util_h2_inject_on)
+modelVars.SetupUtilH2PipelineInjection(cfg.util_h2_inject_on)
 
 elapsed = toc;
 fprintf('Took %.2f seconds \n', elapsed)
@@ -327,20 +224,20 @@ fprintf('Took %.2f seconds \n', elapsed)
 
 modelConstraints = CModelConstraints(bldgData.GetTimeLen(), bldgData.GetEndPointsLen());
 
-elapsed = modelConstraints.Calculate_GeneralEquality(cfg.onoff_model, modelVars, bldgData.heat, bldgData.cool, bldgData.elec, techSelOnSite.el_v, techSelOnSite.rel_v, hrs_on, util_solar_on, util_ees_on, util_pv_wheel_lts);
+elapsed = modelConstraints.Calculate_GeneralEquality(cfg.onoff_model, modelVars, bldgData.heat, bldgData.cool, bldgData.elec, techSelOnSite.el_v, techSelOnSite.rel_v, cfg.hrs_on, cfg.util_solar_on, cfg.util_ees_on, cfg.util_pv_wheel_lts);
 fprintf('%s: General Equality -> %.2f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
 
-elapsed = modelConstraints.Calculate_GeneralInequality(modelVars, bldgData.e_adjust, utility_exists, cfg.dc_exist,...
-                                                bldgData.endpts, utilInfo.onpeak_index, utilInfo.midpeak_index, export_on, utilInfo.export_price,...
-                                                utilInfo.import_price, legacyTech.fac_prop, util_pv_wheel, util_ees_on, util_pp_import,...
-                                                cfg.h2_fuel_forced_fraction, techSelOnSite.el_v, h2_fuel_limit, ldg_on, co2_lim,...
-                                                cfg.biogas_limit, cfg.h2_charging_rec, gen_export_on, bldgData.co2_import, bldgData.co2_ng, bldgData.co2_rng);
+elapsed = modelConstraints.Calculate_GeneralInequality(modelVars, bldgData.e_adjust, cfg.utility_exists, cfg.dc_exist,...
+                                                bldgData.endpts, utilInfo.onpeak_index, utilInfo.midpeak_index, cfg.export_on, utilInfo.export_price,...
+                                                utilInfo.import_price, legacyTech.fac_prop, cfg.util_pv_wheel, cfg.util_ees_on, cfg.util_pp_import,...
+                                                cfg.h2_fuel_forced_fraction, techSelOnSite.el_v, cfg.h2_fuel_limit, cfg.ldg_on, co2_lim,...
+                                                cfg.biogas_limit, cfg.h2_charging_rec, cfg.gen_export_on, bldgData.co2_import, bldgData.co2_ng, bldgData.co2_rng);
 fprintf('%s: General Inequality -> %.2f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
 
 elapsed = modelConstraints.Calculate_HeatRecoveryInequality(modelVars, legacyTech.dg_legacy, legacyTech.hr_legacy, legacyTech.bot_legacy);
 fprintf('%s: Heat Recovery Inequalities -> %.2f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
 
-elapsed = modelConstraints.Calculate_LegacyDG(modelVars, legacyTech.dg_legacy, bldgData.e_adjust, dg_legacy_cyc);
+elapsed = modelConstraints.Calculate_LegacyDG(modelVars, legacyTech.dg_legacy, bldgData.e_adjust, cfg.dg_legacy_cyc);
 fprintf('%s: Legacy DG Constraints -> %.2f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
 
 elapsed = modelConstraints.Calculate_LegacyST(modelVars, legacyTech.bot_legacy);
@@ -349,7 +246,7 @@ fprintf('%s: Legacy ST Constraints -> %.2f seconds \n', datetime("now","InputFor
 elapsed = modelConstraints.Calculate_SolarPV(modelVars, techSelOnSite.pv_v, bldgData.solar, legacyTech.pv_legacy, cfg.toolittle_pv, cfg.maxpv, cfg.curtail, bldgData.e_adjust);
 fprintf('%s: PV Constraints -> %.2f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
 
-elapsed = modelConstraints.Calculate_EES(modelVars, techSelOnSite.ees_v, techSelOnSite.pv_v, rees_on);
+elapsed = modelConstraints.Calculate_EES(modelVars, techSelOnSite.ees_v, techSelOnSite.pv_v, cfg.rees_on);
 fprintf('%s: EES Constraints -> %.2f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
 
 elapsed = modelConstraints.Calculate_LegacyEES(modelVars, legacyTech.ees_legacy);
@@ -379,7 +276,7 @@ fprintf('%s: Utility Scale Battery Storage Constraints -> %.2f seconds \n', date
 elapsed = modelConstraints.Calculate_UtilityElectrolyzer(modelVars, techSelOffSite.util_el_v);
 fprintf('%s: Utility Scale Electrolyzer Constraints -> %.2f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
 
-elapsed = modelConstraints.Calculate_H2PipelineInjection(modelVars, h2_inject_on);
+elapsed = modelConstraints.Calculate_H2PipelineInjection(modelVars, cfg.h2_inject_on);
 fprintf('%s: H2 Pipeline Injection Constraints -> %.2f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
 
 
