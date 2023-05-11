@@ -272,7 +272,6 @@ classdef CBuildingDataManager < handle
         end
 
             
-        %% CO2 Toggles
         %--------------------------------------------------------------------------
         %--------------------------------------------------------------------------
         function [co2_base] = EstimateBaseCO2Emissions(obj)
@@ -281,6 +280,19 @@ classdef CBuildingDataManager < handle
                         + sum((obj.heat./0.8)*obj.co2_ng);  % Assume all heating is met using an 80% AFUE heater
 
         end
+
+        %--------------------------------------------------------------------------
+        %--------------------------------------------------------------------------
+        function [co2_base] = SetUpFirstCO2Limit(obj)
+
+            co2_lim = cfg.co2_base*(1-cfg.co2_red(1));
+
+            
+            co2_base = obj.elec'*obj.co2_import ...         % Assume all electricity is met using grid electricity
+                        + sum((obj.heat./0.8)*obj.co2_ng);  % Assume all heating is met using an 80% AFUE heater
+
+        end
+
 
 
         function [electricityVectorLength] = GetElecLen(obj)

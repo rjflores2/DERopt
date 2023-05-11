@@ -13,84 +13,28 @@
 clear;
 close all;
 clc;
+SetCodePaths(3)
+
+
+%% Create all default configuration values
+cfg = CConfigurationManager();
+
 
 %% Select which computer your are running this script
-demo_files_location = 1;    % 1 - Robert's PC
-                            % 2 - Roman's Laptop
-                            % 3 - Roman's Desktop
+cfg.SetRunningEnvironment(3);   % 1 - Robert's PC
+                                % 2 - Roman's Laptop
+                                % 3 - Roman's Desktop
 
 
-%% Define all default configuration values (idem manual UI app)
+%% OVERWRITE DEFAULT CONFIGURATION       
 
-% Baseline CO2 emissions [kg]
-configurationData.co2_baseline_emissions_kg = [];
+    %cfg.co2_red = 0;
+    %cfg.year_idx = 2018;
+    %cfg.month_idx = [1 4 7 10];
 
-% Desired reduction
-%configurationData.co2_desired_amount_reduction = [0:0.05:.5];
-%configurationData.co2_desired_amount_reduction = [0 0.05];
-configurationData.co2_desired_amount_reduction = 0;
+co2_base = cfg.co2_base;
+co2_red = cfg.co2_red;
 
-% Building DataValues to filter data by
-configurationData.month_idx = [1 4 7 10];
-configurationData.year_idx = 2018;
-
-
-% Demo files location
-if demo_files_location == 1       % 1 - Robert's PC
-
-    configurationData.files_path = 'H:\_Tools_\DERopt';
-    configurationData.data_path = 'H:\_Tools_\DERopt\Data';
-    configurationData.results_path = 'H:\_Tools_\UCI_Results\Sc19';
-
-    configurationData.yalmip_master_path = 'H:\Matlab_Paths\YALMIP-master';
-    configurationData.matlab_path = 'C:\Program Files\MATLAB\R2014b\YALMIP-master';
-
-
-elseif demo_files_location == 2   % 2 - Roman's Laptop
-
-    configurationData.files_path = 'C:\MotusVentures\DERopt';
-    configurationData.data_path = 'C:\MotusVentures\DERopt\Data';
-    configurationData.results_path = 'C:\MotusVentures\DERopt\SolveResults';
-
-    configurationData.yalmip_master_path = 'C:\MotusVentures\YALMIP-master';
-    configurationData.matlab_path = 'C:\Program Files\MATLAB\R2023a\YALMIP-master';
-
-
-else                                % 3 - Roman's Desktop
-
-    configurationData.files_path = 'E:\MotusVentures\DERopt';
-    configurationData.data_path = 'E:\MotusVentures\DERopt\Data';
-    configurationData.results_path = 'E:\MotusVentures\DERopt\SolveResults';
-
-    configurationData.yalmip_master_path = 'C:\MotusVentures\YALMIP-master';
-    configurationData.matlab_path = 'C:\Program Files\MATLAB\R2023a\YALMIP-master';
-
-end
-
-
-%%-------------------------------------------------------------------------
-%--------------------------------------------------------------------------
-%%          OTHER PARAMETERS CONFIGURATION       
-%--------------------------------------------------------------------------
-%--------------------------------------------------------------------------
-
-    % Baseline CO2 emissions
-    co2_base = configurationData.co2_baseline_emissions_kg;
-
-    % Desired reduction
-    co2_red = configurationData.co2_desired_amount_reduction;
-
-    % Files paths
-    demo_files_path = configurationData.files_path;
-    demo_data_path = configurationData.data_path;
-    yalmip_master_path = configurationData.yalmip_master_path;
-    matlab_path = configurationData.matlab_path;
-    results_path = configurationData.results_path;
-
-
-    % Building Data Values to filter data by
-    year_idx = configurationData.year_idx;
-    month_idx = configurationData.month_idx;
 
 
 
@@ -247,18 +191,18 @@ onoff_model = 1;
 %--------------------------------------------------------------------------
 
 %%%YALMIP Master Path
-addpath(genpath(yalmip_master_path)) %rjf path
-addpath(genpath(matlab_path)) %cyc path
+addpath(genpath(cfg.yalmip_master_path)) %rjf path
+addpath(genpath(cfg.matlab_path)) %cyc path
 
 %%%CPLEX Path
 addpath(genpath('C:\Program Files\IBM\ILOG\CPLEX_Studio128\cplex\matlab\x64_win64')) %rjf path
 addpath(genpath('C:\Program Files\IBM\ILOG\CPLEX_Studio1263\cplex\matlab\x64_win64')) %cyc path
 
 %%%DERopt paths
-addpath(genpath(append(demo_files_path, '\0CFcode')))
-addpath(genpath(append(demo_files_path, '\Classes')))
-addpath(genpath(append(demo_files_path, '\Data')))
-addpath(genpath(append(demo_files_path, '\Problem_Formulation_Single_Node')))
+addpath(genpath(append(cfg.demo_files_path, '\0CFcode')))
+addpath(genpath(append(cfg.demo_files_path, '\Classes')))
+addpath(genpath(append(cfg.demo_files_path, '\Data')))
+
 
 
 %%-------------------------------------------------------------------------
@@ -272,9 +216,9 @@ fprintf('%s: START SIMULATION \n', datetime("now","InputFormat",'HH:MM:SS'))
 
 bldgData = CBuildingDataManager("UCI Labs");
 
-if bldgData.LoadData(append(demo_data_path, '\Campus_Loads_2014_2019.mat'), chiller_plant_opt)
+if bldgData.LoadData(append(cfg.demo_data_path, '\Campus_Loads_2014_2019.mat'), chiller_plant_opt)
 
-    bldgData.FormatData(month_idx, year_idx, demo_data_path, util_solar_on, util_wind_on, hrs_on);
+    bldgData.FormatData(cfg.month_idx, cfg.year_idx, cfg.demo_data_path, util_solar_on, util_wind_on, hrs_on);
     
 else
 
@@ -285,7 +229,6 @@ else
 
 end
 
-% CO2 Toggles ??
 if isempty(co2_base)
     co2_base = bldgData.EstimateBaseCO2Emissions();
 end
@@ -294,7 +237,6 @@ end
 co2_lim = co2_base*(1-co2_red(1));
 
 
-%% Utility Data
 %--------------------------------------------------------------------------
 % Loading Utility Data and Generating Energy Charge Vectors
 %--------------------------------------------------------------------------
@@ -302,26 +244,22 @@ co2_lim = co2_base*(1-co2_red(1));
 utilInfo = CUtilityInfo(uci_rate, export_on, gen_export_on, bldgData.lmp_uci, bldgData.GetElecLen());
 
 
-%% Technology Parameters/Costs
 %--------------------------------------------------------------------------
+% Technology Parameters/Costs
 %--------------------------------------------------------------------------
 techSelOnSite = CTechnologySelection();
-
 techSelOnSite.CalculateAllParams(pv_on, ees_on, el_on, h2es_on, rel_on, hrs_on, h2_inject_on);
 
 
-
-%% Technology Parameters/Costs for offsite resources
 %--------------------------------------------------------------------------
+% Technology Parameters/Costs for offsite resources
 %--------------------------------------------------------------------------
 techSelOffSite = CTechnologySelectionOffSite();
-
 techSelOffSite.CalculateAllParams(util_solar_on, util_wind_on, util_ees_on, util_el_on, util_h2_inject_on);
 
 
-
-%% Capital Cost Modifications
 %--------------------------------------------------------------------------
+% Capital Cost Modifications
 %--------------------------------------------------------------------------
 capCostMods = CCapitalCostCalculator(0.08, 10, req_return_on);
 
@@ -343,16 +281,17 @@ capCostMods.CalcCostScalars_UtilityScaleBatteryStorage(techSelOffSite.util_ees_v
 capCostMods.CalcCostScalars_UtilityScaleElectrolyzer(techSelOffSite.util_el_v, techSelOffSite.util_el_fin, bldgData.elec)
 
 
-
-%% Legacy Technologies
 %--------------------------------------------------------------------------
+% Legacy Technologies
 %--------------------------------------------------------------------------
 legacyTech = CLegacyTechnologies(lpv_on, ldg_on, lbot_on, lhr_on, ldb_on, lboil_on, lees_on, ltes_on, dg_legacy_cyc);
+
 dg_legacy_cyc = legacyTech.updatedDgLegacyCyc;
 
 
-%% Plotting loads & Costs for demo purpose
+
 %--------------------------------------------------------------------------
+% Plotting loads & Costs for demo purpose
 %--------------------------------------------------------------------------
 % %%% 'Electric Demand (MW)'
 % figure
@@ -398,8 +337,9 @@ dg_legacy_cyc = legacyTech.updatedDgLegacyCyc;
 % close all
 
 
-%% Setting up variables and cost function
+
 %--------------------------------------------------------------------------
+% Setting up variables and cost function
 %--------------------------------------------------------------------------
 fprintf('%s: Objective Function.', datetime("now","InputFormat",'HH:MM:SS'))
 tic
@@ -449,283 +389,218 @@ elapsed = toc;
 fprintf('Took %.2f seconds \n', elapsed)
 
 
-%%                  MODEL CONSTRAINTS
+
 %--------------------------------------------------------------------------
+%                  MODEL CONSTRAINTS
 %--------------------------------------------------------------------------
 
 modelConstraints = CModelConstraints(bldgData.GetTimeLen(), bldgData.GetEndPointsLen());
 
-
-%% General Equality Constraints
-fprintf('%s: General Equalities.', datetime("now","InputFormat",'HH:MM:SS'))
-
 elapsed = modelConstraints.Calculate_GeneralEquality(onoff_model, modelVars, bldgData.heat, bldgData.cool, bldgData.elec, techSelOnSite.el_v, techSelOnSite.rel_v, hrs_on, util_solar_on, util_ees_on, util_pv_wheel_lts);
-
-fprintf('Took %.2f seconds \n', elapsed)
-
-
-%% General Inequality Constraints
-        
-fprintf('%s: General Inequalities. ', datetime("now","InputFormat",'HH:MM:SS'))
+fprintf('%s: General Equality -> %.2f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
 
 elapsed = modelConstraints.Calculate_GeneralInequality(modelVars, bldgData.e_adjust, utility_exists, dc_exist,...
                                                 bldgData.endpts, utilInfo.onpeak_index, utilInfo.midpeak_index, export_on, utilInfo.export_price,...
                                                 utilInfo.import_price, legacyTech.fac_prop, util_pv_wheel, util_ees_on, util_pp_import,...
                                                 h2_fuel_forced_fraction, techSelOnSite.el_v, h2_fuel_limit, ldg_on, co2_lim,...
                                                 biogas_limit, h2_charging_rec, gen_export_on, bldgData.co2_import, bldgData.co2_ng, bldgData.co2_rng);
-
-fprintf('Took %.2f seconds \n', elapsed)
-
-
-%% Heat Recovery Inequality Constraints
-fprintf('%s: Heat Recovery Inequalities. ', datetime("now","InputFormat",'HH:MM:SS'))
+fprintf('%s: General Inequality -> %.2f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
 
 elapsed = modelConstraints.Calculate_HeatRecoveryInequality(modelVars, legacyTech.dg_legacy, legacyTech.hr_legacy, legacyTech.bot_legacy);
-fprintf('Took %.2f seconds \n', elapsed)
-
-
-%% Legacy DG Constraints
-fprintf('%s: Legacy DG Constraints. ', datetime("now","InputFormat",'HH:MM:SS'))
+fprintf('%s: Heat Recovery Inequalities -> %.2f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
 
 elapsed = modelConstraints.Calculate_LegacyDG(modelVars, legacyTech.dg_legacy, bldgData.e_adjust, dg_legacy_cyc);
-fprintf('Took %.2f seconds \n', elapsed)
-
-
-%% Legacy ST Constraints
-fprintf('%s: Legacy ST Constraints. ', datetime("now","InputFormat",'HH:MM:SS'))
+fprintf('%s: Legacy DG Constraints -> %.2f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
 
 elapsed = modelConstraints.Calculate_LegacyST(modelVars, legacyTech.bot_legacy);
-fprintf('Took %.2f seconds \n', elapsed)
-
+fprintf('%s: Legacy ST Constraints -> %.2f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
     
-%% Solar PV Constraints
-fprintf('%s: PV Constraints.', datetime("now","InputFormat",'HH:MM:SS'))
-
 elapsed = modelConstraints.Calculate_SolarPV(modelVars, techSelOnSite.pv_v, bldgData.solar, legacyTech.pv_legacy, toolittle_pv, maxpv, curtail, bldgData.e_adjust);
-fprintf('Took %.2f seconds \n', elapsed)
-
-
-%% EES Constraints
-fprintf('%s: EES Constraints.', datetime("now","InputFormat",'HH:MM:SS'))
+fprintf('%s: PV Constraints -> %.2f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
 
 elapsed = modelConstraints.Calculate_EES(modelVars, techSelOnSite.ees_v, techSelOnSite.pv_v, rees_on);
-fprintf('Took %.2f seconds \n', elapsed)
-
-
-%% Legacy EES Constraints
-fprintf('%s: Legacy EES Constraints.', datetime("now","InputFormat",'HH:MM:SS'))
+fprintf('%s: EES Constraints -> %.2f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
 
 elapsed = modelConstraints.Calculate_LegacyEES(modelVars, legacyTech.ees_legacy);
-fprintf('Took %.2f seconds \n', elapsed)
-
-
-%% Legacy VC Constraints
-fprintf('%s: Legacy VC Constraints.', datetime("now","InputFormat",'HH:MM:SS'))
+fprintf('%s: Legacy EES Constraints -> %.2f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
 
 elapsed = modelConstraints.Calculate_LegacyVC(modelVars, onoff_model, bldgData.cool, legacyTech.vc_legacy);
-fprintf('Took %.2f seconds \n', elapsed)
-
-
-%% Legacy TES Constraints
-fprintf('%s: Legacy TES Constraints.', datetime("now","InputFormat",'HH:MM:SS'))
+fprintf('%s: Legacy VC Constraints -> %.2f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
 
 elapsed = modelConstraints.Calculate_LegacyTES(modelVars, bldgData.cool, legacyTech.tes_legacy);
-fprintf('Took %.2f seconds \n', elapsed)
+fprintf('%s: Legacy TES Constraints -> %.2f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
 
-
-%% DER Incentives
-fprintf('%s: DER Incentives Constraints.', datetime("now","InputFormat",'HH:MM:SS'))
-
-elapsed = modelConstraints.Calculate_DERIncentives(modelVars, techSelOnSite.ees_v, sgip_on);
-fprintf('Took %.2f seconds \n', elapsed)
-
-
-%% H2 production Constraints
-fprintf('%s: Electrolyzer and H2 Storage Constraints.', datetime("now","InputFormat",'HH:MM:SS'))
+elapsed = modelConstraints.Calculate_DERIncentives(modelVars, techSelOnSite.ees_v, sgip_on);%% DER Incentives
+fprintf('%s: DER Incentives Constraints -> %.2f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
 
 elapsed = modelConstraints.Calculate_H2production(modelVars, techSelOnSite.el_v, techSelOnSite.rel_v, techSelOnSite.h2es_v, bldgData.e_adjust);
-fprintf('Took %.2f seconds \n', elapsed)
-
-
-%% Utility Solar
-fprintf('%s: Utility Scale Solar Constraints.', datetime("now","InputFormat",'HH:MM:SS'))
+fprintf('%s: Electrolyzer and H2 Storage Constraints -> %.2f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
 
 elapsed = modelConstraints.Calculate_UtilitySolar(modelVars, techSelOffSite.utilpv_v, bldgData.e_adjust);
-fprintf('Took %.2f seconds \n', elapsed)
-
-
-%% Utility Wind
-fprintf('%s: Utility Scale Wind Constraints.', datetime("now","InputFormat",'HH:MM:SS'))
+fprintf('%s: Utility Scale Solar Constraints -> %.2f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
 
 elapsed = modelConstraints.Calculate_UtilityWind(modelVars, techSelOffSite.util_wind_v, bldgData.e_adjust);
-fprintf('Took %.2f seconds \n', elapsed)
-
-
-%% Utility EES Storage
-fprintf('%s: Utility Scale Battery Storage Constraints.', datetime("now","InputFormat",'HH:MM:SS'))
+fprintf('%s: Utility Scale Wind Constraints -> %.2f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
 
 elapsed = modelConstraints.Calculate_UtilityEESStorage(modelVars, techSelOffSite.util_ees_v);
-fprintf('Took %.2f seconds \n', elapsed)
-
-
-%% Utility Electrolyzer
-fprintf('%s: Utility Scale Electrolyzer Constraints.', datetime("now","InputFormat",'HH:MM:SS'))
+fprintf('%s: Utility Scale Battery Storage Constraints -> %.2f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
 
 elapsed = modelConstraints.Calculate_UtilityElectrolyzer(modelVars, techSelOffSite.util_el_v);
-fprintf('Took %.2f seconds \n', elapsed)
-
-
-%% H2 Pipeline Injection
-fprintf('%s: H2 Pipeline Injection Constraints.', datetime("now","InputFormat",'HH:MM:SS'))
+fprintf('%s: Utility Scale Electrolyzer Constraints -> %.2f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
 
 elapsed = modelConstraints.Calculate_H2PipelineInjection(modelVars, h2_inject_on);
-fprintf('Took %.2f seconds \n', elapsed)
+fprintf('%s: H2 Pipeline Injection Constraints -> %.2f seconds \n', datetime("now","InputFormat",'HH:MM:SS'), elapsed)
 
 
-    %% Optimize
-    fprintf('%s: Optimizing \n....', datetime("now","InputFormat",'HH:MM:SS'))
-    
-    lanin = CModelSolver;
+%return
 
-    %% Export Model
-    elapsed = lanin.CreateModel(modelConstraints.Constraints, modelVars.Objective, co2_lim);
 
-    fprintf('Model Export took %.2f seconds \n', elapsed)
+%% Optimize
+fprintf('%s: Optimizing \n....', datetime("now","InputFormat",'HH:MM:SS'))
 
-    if lanin.SetupFirstSolve(co2_lim, co2_base, sum(bldgData.elec), bldgData.co2_import, bldgData.co2_ng, bldgData.co2_rng)
+lanin = CModelSolver;
 
+%% Export Model
+elapsed = lanin.CreateModel(modelConstraints.Constraints, modelVars.Objective, co2_lim);
+
+fprintf('Model Export took %.2f seconds \n', elapsed)
+
+if lanin.SetupFirstSolve(co2_lim, co2_base, sum(bldgData.elec), bldgData.co2_import, bldgData.co2_ng, bldgData.co2_rng)
+
+end
+
+%% Loop to rerun optimization
+
+for ii = 1:length(co2_red)
+
+    fprintf('%s Starting CPLEX Solver \n', datetime("now",'InputFormat','HH:MM:SS'))
+
+    elapsed = lanin.SolveModel(ii, co2_red(ii), modelVars);
+
+    fprintf('CPLEX took %.2f seconds \n', elapsed)
+
+
+    %% Starting Recorder Structure - Model Outputs
+    rec.solver.x(ii,:) = lanin.lastSolveX;
+    rec.solver.fval(ii,1) = lanin.lastSolveFval;
+    rec.solver.exitflag(ii,1) = lanin.lastSolveExitFlag;
+    rec.solver.output(ii,1) = lanin.lastSolveExitFlag;
+
+    %% Optimized Variables -  Utilities
+
+    %%% Utility Variables
+    rec.utility.import(:,ii) = lanin.utilityImport;
+    rec.utility.nontou_dc(:,ii) = lanin.utilityNontouDc;
+    rec.utility.onpeak_dc(:,ii) = lanin.utilityOnpeakDc;
+    rec.utility.midpeak_dc(:,ii) = lanin.utilityMidpeakDc;
+    rec.utility.gen_export(:,ii) = lanin.utilityGenExport;
+
+    %% Optimized Variables - New Technologies
+    %%% Solar Variables
+    rec.solar.pv_adopt(:,ii) = lanin.solarPhotoVoltaicAdopt;
+    rec.solar.pv_elec(:,ii) = lanin.solarPhotoVoltaicElec;
+    rec.solar.pv_nem(:,ii) = lanin.solarPhotoVoltaicNem;
+
+    %%% Electrical Energy Storage
+    rec.ees.ees_adopt(:,ii) = lanin.electricalEnergyStorage_adopt;
+    rec.ees.ees_chrg(:,ii) = lanin.electricalEnergyStorage_chrg;
+    rec.ees.ees_dchrg(:,ii) = lanin.electricalEnergyStorage_dchrg;
+    rec.ees.ees_soc(:,ii) = lanin.electricalEnergyStorage_soc;
+
+    %%% Renewable Electrical Energy Storage
+    rec.rees.rees_adopt(:,ii) = lanin.renewableElectricalEnergyStorage_adopt;
+    rec.rees.rees_chrg(:,ii) = lanin.renewableElectricalEnergyStorage_chrg;
+    rec.rees.rees_dchrg(:,ii) = lanin.renewableElectricalEnergyStorage_dchrg;
+    rec.rees.rees_soc(:,ii) = lanin.renewableElectricalEnergyStorage_soc;
+    rec.rees.rees_dchrg_nem(:,ii) = lanin.renewableElectricalEnergyStorage_dchrg_nem;
+
+    %%% H2 Production - Electrolyzer
+    rec.el.el_adopt(:,ii) = lanin.h2ProductionElectrolyzer_adopt;
+    rec.el.el_prod(:,ii) = lanin.h2ProductionElectrolyzer_prod;
+
+    %%% H2 Production - Renewable Electrolyzer
+    rec.rel.rel_adopt(:,ii) = lanin.h2ProductionRenewableElectrolyzer_adopt;
+    rec.rel.rel_prod(:,ii) = lanin.h2ProductionRenewableElectrolyzer_prod;
+    rec.rel.rel_prod_wheel(:,ii) = lanin.h2ProductionRenewableElectrolyzer_prod;
+
+    %%% H2 Production - Storage
+    rec.h2es.h2es_adopt(:,ii) = lanin.h2ProductionEnergyStorage_adopt;
+    rec.h2es.h2es_chrg(:,ii) = lanin.h2ProductionEnergyStorage_chrg;
+    rec.h2es.h2es_dchrg(:,ii) = lanin.h2ProductionEnergyStorage_dchrg;
+    rec.h2es.h2es_soc(:,ii) = lanin.h2ProductionEnergyStorage_soc;
+    rec.h2es.h2es_bin(:,ii) = lanin.h2ProductionEnergyStorage_bin;
+
+    %% Optimized Variables -  Legacy technologies %%
+    %% DG - Topping Cycle
+    rec.ldg.ldg_elec(:,ii) = lanin.ldg_elec;
+    rec.ldg.ldg_fuel(:,ii) = lanin.ldg_fuel;
+    rec.ldg.ldg_rfuel(:,ii) = lanin.ldg_rfuel;
+    rec.ldg.ldg_hfuel(:,ii) = lanin.ldg_hfuel;
+    rec.ldg.ldg_sfuel(:,ii) = lanin.ldg_sfuel;
+    rec.ldg.ldg_dfuel(:,ii) = lanin.ldg_dfuel;
+    rec.ldg.ldg_elec_ramp(:,ii) = lanin.ldg_elec_ramp;
+    % var_ldg.ldg_off(:,ii) = lanin.ldg_off;
+    rec.ldg.ldg_opstate(:,ii) = lanin.ldg_opstate;
+    %% Bottoming Cycle
+    rec.lbot.lbot_elec(:,ii) = lanin.lbot_elec;
+    rec.lbot.lbot_on(:,ii) = lanin.lbot_on;
+
+    %% Heat Recovery Systems
+    rec.ldg.hr_heat(:,ii) = lanin.ldg_hr_heat;
+    rec.ldg.db_fire(:,ii) = lanin.ldg_db_fire;
+    rec.ldg.db_rfire(:,ii) = lanin.ldg_db_rfire;
+    rec.ldg.db_hfire(:,ii) = lanin.ldg_db_hfire;
+
+    %% Boiler
+    rec.boil.boil_fuel(:,ii) = lanin.boiler_fuel;
+    rec.boil.boil_rfuel(:,ii) = lanin.boiler_rfuel;
+    rec.boil.boil_hfuel(:,ii) = lanin.boiler_hfuel;
+
+    %% EES
+    if ~isempty(legacyTech.ees_legacy)
+        rec.lees.ees_chrg(:,ii) = lanin.lees_chrg;
+        rec.lees.ees_dchrg(:,ii) = lanin.lees_dchrg;
+        rec.lees.ees_soc(:,ii) = lanin.lees_soc;
     end
 
-    %% Loop to rerun optimization
+    %% Carbon Emissions
+    % Carbon emissions from 1) utility electiricity, 2) natural gas, 3) renewable natural gas
+    rec.co2_emissions(1,ii) = lanin.co2EmissionsUtilityElect;
+    rec.co2_emissions(2,ii) = lanin.co2EmissionsNaturalGas;
+    rec.co2_emissions(3,ii) = lanin.co2EmissionsRenewableNaturalGas;
 
-    for ii = 1:length(co2_red)
+    % Total carbon emissions
+    rec.co2_emissions(4,ii) =   lanin.co2TotalEmissions;
 
-        fprintf('%s Starting CPLEX Solver \n', datetime("now",'InputFormat','HH:MM:SS'))
+    % Percent reduction
+    rec.co2_emissions_red(1,ii) = lanin.co2EmissionsReductionPercentaje;
 
-        elapsed = lanin.SolveModel(ii, co2_red(ii), modelVars);
+    %% Financials
+    %%%($/kWh)
+    rec.financials.lcoe(ii,1) = lanin.levelizedCostOfElectricityInKWh;
 
-        fprintf('CPLEX took %.2f seconds \n', elapsed)
+    %%%Bulk cost of carbon ($/tonne)
+    rec.financials.cost_of_co2(ii,1) = lanin.BulkCostOfCarbonByTonne;
 
-
-        %% Starting Recorder Structure - Model Outputs
-        rec.solver.x(ii,:) = lanin.lastSolveX;
-        rec.solver.fval(ii,1) = lanin.lastSolveFval;
-        rec.solver.exitflag(ii,1) = lanin.lastSolveExitFlag;
-        rec.solver.output(ii,1) = lanin.lastSolveExitFlag;
-
-        %% Optimized Variables -  Utilities
-
-        %%% Utility Variables
-        rec.utility.import(:,ii) = lanin.utilityImport;
-        rec.utility.nontou_dc(:,ii) = lanin.utilityNontouDc;
-        rec.utility.onpeak_dc(:,ii) = lanin.utilityOnpeakDc;
-        rec.utility.midpeak_dc(:,ii) = lanin.utilityMidpeakDc;
-        rec.utility.gen_export(:,ii) = lanin.utilityGenExport;
-
-        %% Optimized Variables - New Technologies
-        %%% Solar Variables
-        rec.solar.pv_adopt(:,ii) = lanin.solarPhotoVoltaicAdopt;
-        rec.solar.pv_elec(:,ii) = lanin.solarPhotoVoltaicElec;
-        rec.solar.pv_nem(:,ii) = lanin.solarPhotoVoltaicNem;
-
-        %%% Electrical Energy Storage
-        rec.ees.ees_adopt(:,ii) = lanin.electricalEnergyStorage_adopt;
-        rec.ees.ees_chrg(:,ii) = lanin.electricalEnergyStorage_chrg;
-        rec.ees.ees_dchrg(:,ii) = lanin.electricalEnergyStorage_dchrg;
-        rec.ees.ees_soc(:,ii) = lanin.electricalEnergyStorage_soc;
-
-        %%% Renewable Electrical Energy Storage
-        rec.rees.rees_adopt(:,ii) = lanin.renewableElectricalEnergyStorage_adopt;
-        rec.rees.rees_chrg(:,ii) = lanin.renewableElectricalEnergyStorage_chrg;
-        rec.rees.rees_dchrg(:,ii) = lanin.renewableElectricalEnergyStorage_dchrg;
-        rec.rees.rees_soc(:,ii) = lanin.renewableElectricalEnergyStorage_soc;
-        rec.rees.rees_dchrg_nem(:,ii) = lanin.renewableElectricalEnergyStorage_dchrg_nem;
-
-        %%% H2 Production - Electrolyzer
-        rec.el.el_adopt(:,ii) = lanin.h2ProductionElectrolyzer_adopt;
-        rec.el.el_prod(:,ii) = lanin.h2ProductionElectrolyzer_prod;
-
-        %%% H2 Production - Renewable Electrolyzer
-        rec.rel.rel_adopt(:,ii) = lanin.h2ProductionRenewableElectrolyzer_adopt;
-        rec.rel.rel_prod(:,ii) = lanin.h2ProductionRenewableElectrolyzer_prod;
-        rec.rel.rel_prod_wheel(:,ii) = lanin.h2ProductionRenewableElectrolyzer_prod;
-
-        %%% H2 Production - Storage
-        rec.h2es.h2es_adopt(:,ii) = lanin.h2ProductionEnergyStorage_adopt;
-        rec.h2es.h2es_chrg(:,ii) = lanin.h2ProductionEnergyStorage_chrg;
-        rec.h2es.h2es_dchrg(:,ii) = lanin.h2ProductionEnergyStorage_dchrg;
-        rec.h2es.h2es_soc(:,ii) = lanin.h2ProductionEnergyStorage_soc;
-        rec.h2es.h2es_bin(:,ii) = lanin.h2ProductionEnergyStorage_bin;
-
-        %% Optimized Variables -  Legacy technologies %%
-        %% DG - Topping Cycle
-        rec.ldg.ldg_elec(:,ii) = lanin.ldg_elec;
-        rec.ldg.ldg_fuel(:,ii) = lanin.ldg_fuel;
-        rec.ldg.ldg_rfuel(:,ii) = lanin.ldg_rfuel;
-        rec.ldg.ldg_hfuel(:,ii) = lanin.ldg_hfuel;
-        rec.ldg.ldg_sfuel(:,ii) = lanin.ldg_sfuel;
-        rec.ldg.ldg_dfuel(:,ii) = lanin.ldg_dfuel;
-        rec.ldg.ldg_elec_ramp(:,ii) = lanin.ldg_elec_ramp;
-        % var_ldg.ldg_off(:,ii) = lanin.ldg_off;
-        rec.ldg.ldg_opstate(:,ii) = lanin.ldg_opstate;
-        %% Bottoming Cycle
-        rec.lbot.lbot_elec(:,ii) = lanin.lbot_elec;
-        rec.lbot.lbot_on(:,ii) = lanin.lbot_on;
-
-        %% Heat Recovery Systems
-        rec.ldg.hr_heat(:,ii) = lanin.ldg_hr_heat;
-        rec.ldg.db_fire(:,ii) = lanin.ldg_db_fire;
-        rec.ldg.db_rfire(:,ii) = lanin.ldg_db_rfire;
-        rec.ldg.db_hfire(:,ii) = lanin.ldg_db_hfire;
-
-        %% Boiler
-        rec.boil.boil_fuel(:,ii) = lanin.boiler_fuel;
-        rec.boil.boil_rfuel(:,ii) = lanin.boiler_rfuel;
-        rec.boil.boil_hfuel(:,ii) = lanin.boiler_hfuel;
-
-        %% EES
-        if ~isempty(legacyTech.ees_legacy)
-            rec.lees.ees_chrg(:,ii) = lanin.lees_chrg;
-            rec.lees.ees_dchrg(:,ii) = lanin.lees_dchrg;
-            rec.lees.ees_soc(:,ii) = lanin.lees_soc;
-        end
-
-        %% Carbon Emissions
-        % Carbon emissions from 1) utility electiricity, 2) natural gas, 3) renewable natural gas
-        rec.co2_emissions(1,ii) = lanin.co2EmissionsUtilityElect;
-        rec.co2_emissions(2,ii) = lanin.co2EmissionsNaturalGas;
-        rec.co2_emissions(3,ii) = lanin.co2EmissionsRenewableNaturalGas;
-
-        % Total carbon emissions
-        rec.co2_emissions(4,ii) =   lanin.co2TotalEmissions;
-
-        % Percent reduction
-        rec.co2_emissions_red(1,ii) = lanin.co2EmissionsReductionPercentaje;
-
-        %% Financials
-        %%%($/kWh)
-        rec.financials.lcoe(ii,1) = lanin.levelizedCostOfElectricityInKWh;
-
-        %%%Bulk cost of carbon ($/tonne)
-        rec.financials.cost_of_co2(ii,1) = lanin.BulkCostOfCarbonByTonne;
-
-        %%%Marginal cost of carbon ($/tonne)
-        if ii > 1
-            rec.financials.cost_of_co2_marginal(ii,1) = abs((rec.solver.fval(ii,1) - rec.solver.fval(ii-1,1))/((rec.co2_emissions(4,ii) - rec.co2_emissions(4,ii-1))./1000));
-        else 
-            rec.financials.cost_of_co2_marginal(ii,1) = NaN;
-        end
-
-        %%%Capital Cost Requirements
-        rec.financials.cap_cost(ii,:) = [lanin.solarPhotoVoltaicAdopt.*techSelOnSite.pv_cap*capCostMods.pv_cap_mod
-                                        lanin.electricalEnergyStorage_adopt.*techSelOnSite.ees_cap.*capCostMods.ees_cap_mod
-                                        lanin.renewableElectricalEnergyStorage_adopt.*techSelOnSite.ees_cap.*capCostMods.rees_cap_mod
-                                        lanin.h2ProductionElectrolyzer_adopt.*techSelOnSite.el_cap.*capCostMods.el_cap_mod
-                                        lanin.h2ProductionRenewableElectrolyzer_adopt.*techSelOnSite.el_cap.*capCostMods.rel_cap_mod
-                                        lanin.h2ProductionEnergyStorage_adopt.*techSelOnSite.h2es_cap];
-
+    %%%Marginal cost of carbon ($/tonne)
+    if ii > 1
+        rec.financials.cost_of_co2_marginal(ii,1) = abs((rec.solver.fval(ii,1) - rec.solver.fval(ii-1,1))/((rec.co2_emissions(4,ii) - rec.co2_emissions(4,ii-1))./1000));
+    else 
+        rec.financials.cost_of_co2_marginal(ii,1) = NaN;
     end
 
+    %%%Capital Cost Requirements
+    rec.financials.cap_cost(ii,:) = [lanin.solarPhotoVoltaicAdopt.*techSelOnSite.pv_cap*capCostMods.pv_cap_mod
+                                    lanin.electricalEnergyStorage_adopt.*techSelOnSite.ees_cap.*capCostMods.ees_cap_mod
+                                    lanin.renewableElectricalEnergyStorage_adopt.*techSelOnSite.ees_cap.*capCostMods.rees_cap_mod
+                                    lanin.h2ProductionElectrolyzer_adopt.*techSelOnSite.el_cap.*capCostMods.el_cap_mod
+                                    lanin.h2ProductionRenewableElectrolyzer_adopt.*techSelOnSite.el_cap.*capCostMods.rel_cap_mod
+                                    lanin.h2ProductionEnergyStorage_adopt.*techSelOnSite.h2es_cap];
+
+end
+
+% Timer
+finish = datetime('now') ; totalelapsed = toc(startsim);
 
 
 %% Add local variables Results
@@ -741,20 +616,20 @@ rec.stpts = bldgData.stpts;
 
 
 %% SAVE Resuts to file
-% save(strcat(results_path,'\deropt_results.mat'), "rec")
+if cfg.saveResultsToFile
+    save(strcat(results_path,'\deropt_results.mat'), "rec")
+end
 
 
 
-% Timer
-finish = datetime('now') ; totalelapsed = toc(startsim);
-
-optRec = rec;
 
 
 
 %%        SHOW RESULTS (Plot data)
 %--------------------------------------------------------------------------
 %--------------------------------------------------------------------------
+optRec = rec;
+
 
 %%% Plot 'LCOE ($/kWh)'
 figure
