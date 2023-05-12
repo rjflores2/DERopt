@@ -7,8 +7,6 @@ NEXT STEPS:
 
 
 
-
-
 TO REVIEW:
 
 This line of code "index = find(ismember(obj.rate_labels,obj.rate(1)));"  always returns 1
