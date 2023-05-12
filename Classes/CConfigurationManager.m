@@ -172,7 +172,7 @@ classdef CConfigurationManager < handle
             obj.SetRunningEnvironment(1);       % 1 - Robert's PC
 
             obj.co2_base = [];
-            obj.co2_red = 0;                    % [0 0.05];
+            obj.co2_red = 0;
             obj.co2_lim = 0;
             obj.year_idx = 2018;
             obj.month_idx = [1 4 7 10];
@@ -351,6 +351,14 @@ classdef CConfigurationManager < handle
 
         end
 
+
+        %--------------------------------------------------------------------------
+        function [numberSteps] = CalculateInitialPathCO2Reduction(obj, reductionBegin, reductionFinish, reductionStep)
+
+            obj.co2_red = reductionBegin/100:reductionStep/100:reductionFinish/100;
+
+            numberSteps = length(obj.co2_red);
+        end
 
     end
 end

@@ -5,7 +5,7 @@
 %
 %   New complete demo script file (prior to coding App)
 %
-%   Created: May 3rd 2023               Version 0.6
+%   Created: May 3rd 2023               Version 0.9
 %
 %   Last Modified: May 11th 2023
 %
@@ -33,8 +33,8 @@ cfg.AddMatlabPaths()
 
 %% OVERWRITE DEFAULT CONFIGURATION       
 
-cfg.co2_red = [0 0.1 0.2 0.3 0.4 0.5];
-%cfg.year_idx = 2018;
+%cfg.co2_red = [0 0.1 0.2 0.3 0.4 0.5];
+cfg.co2_red = [0 0.5];
 %cfg.month_idx = [1 4 7 10];
     
 
@@ -448,6 +448,55 @@ for ii = 1:length(cfg.co2_red)
                                     mSolver.h2ProductionRenewableElectrolyzer_adopt.*techSelOnSite.el_cap.*capCostMods.rel_cap_mod
                                     mSolver.h2ProductionEnergyStorage_adopt.*techSelOnSite.h2es_cap];
 
+
+
+
+    % Dispatch Plots
+
+    idx = ii;
+
+    co2_red_text = ['CO2 Reduction:' num2str((cfg.co2_red(idx)*100),'%2d') '%'];
+
+    dt1 = [sum(rec.ldg.ldg_elec(:,idx),2)...
+            sum(rec.utility.import(:,idx),2)...
+            sum(rec.solar.pv_elec(:,idx),2) + sum(rec.rees.rees_chrg(:,idx),2)...
+            sum(rec.ees.ees_dchrg(:,idx),2) + sum(rec.rees.rees_dchrg(:,idx),2) + sum(rec.lees.ees_dchrg(:,idx),2)];
+             
+    dt2 = [bldgData.elec ...
+            sum(rec.ees.ees_chrg(:,idx),2) + sum(rec.lees.ees_chrg(:,idx),2) + sum(rec.rees.rees_chrg(:,idx),2)...
+            sum(modelVars.el_eff.*rec.el.el_prod(:,idx),2) + sum(modelVars.h2_chrg_eff.*rec.h2es.h2es_chrg(:,idx),2) + sum(modelVars.rel_eff.*rec.rel.rel_prod(:,idx),2) ...
+            rec.solar.pv_nem(:,idx)];
+    
+    
+    %%% Plot 'Electric Sources (MW)'
+    figure('Name', co2_red_text);
+    hold on
+    area(bldgData.time,dt1.*4./1000)
+    set(gca,'XTick', round(bldgData.time(1),0)+.5:round(bldgData.time(end),0)+.5,'FontSize',14)
+    box on
+    grid on
+    datetick('x','ddd','keepticks')
+    xlim([bldgData.time(bldgData.stpts(3)) bldgData.time(bldgData.stpts(3)+96*7)])
+    ylabel('Electric Sources (MW)','FontSize',18)
+    legend('Gas Turbine','Utility Import','Solar','Battery Discharge','Location','Best')
+    set(gcf,'Position',[(600 + idx*20) (450 + idx*20) 500 275])
+    hold off
+    
+    %%% Plot 'Electric Loads (MW)'
+    figure('Name',co2_red_text);
+    hold on
+    area(bldgData.time,dt2.*4./1000)
+    set(gca,'XTick', round(bldgData.time(1),0)+.5:round(bldgData.time(end),0)+.5, 'FontSize',14)
+    box on
+    grid on
+    datetick('x','ddd','keepticks')
+    xlim([bldgData.time(bldgData.stpts(3)) bldgData.time(bldgData.stpts(3)+96*7)])
+    ylabel('Electric Loads (MW)','FontSize',18)
+    legend('Campus','Battery Charging','H_2 Production','Export','Location','Best')
+    set(gcf,'Position',[(600 + idx*20) (50 + idx*10) 500 275])
+    hold off
+
+
 end
 
 
@@ -505,52 +554,52 @@ xlim([5 50])
 % legend('Average Cost','Marginal Cost','Location','NorthWest')
 hold off
 
-
-%%% Dispatch Plots
-
-
-for idx = 1:length(cfg.co2_red)
-
-    co2_red_text = ['CO2 Reduction:' num2str((cfg.co2_red(idx)*100),'%02d') '%'];
-
-
-    dt1 = [sum(rec.ldg.ldg_elec(:,idx),2)...
-            sum(rec.utility.import(:,idx),2)...
-            sum(rec.solar.pv_elec(:,idx),2) + sum(rec.rees.rees_chrg(:,idx),2)...
-            sum(rec.ees.ees_dchrg(:,idx),2) + sum(rec.rees.rees_dchrg(:,idx),2) + sum(rec.lees.ees_dchrg(:,idx),2)];
-             
-    dt2 = [bldgData.elec ...
-            sum(rec.ees.ees_chrg(:,idx),2) + sum(rec.lees.ees_chrg(:,idx),2) + sum(rec.rees.rees_chrg(:,idx),2)...
-            sum(modelVars.el_eff.*rec.el.el_prod(:,idx),2) + sum(modelVars.h2_chrg_eff.*rec.h2es.h2es_chrg(:,idx),2) + sum(modelVars.rel_eff.*rec.rel.rel_prod(:,idx),2) ...
-            rec.solar.pv_nem(:,idx)];
-    
-    
-    %%% Plot 'Electric Sources (MW)'
-    figure('Name', co2_red_text);
-    hold on
-    area(bldgData.time,dt1.*4./1000)
-    set(gca,'XTick', round(bldgData.time(1),0)+.5:round(bldgData.time(end),0)+.5,'FontSize',14)
-    box on
-    grid on
-    datetick('x','ddd','keepticks')
-    xlim([bldgData.time(bldgData.stpts(3)) bldgData.time(bldgData.stpts(3)+96*7)])
-    ylabel('Electric Sources (MW)','FontSize',18)
-    legend('Gas Turbine','Utility Import','Solar','Battery Discharge','Location','Best')
-    set(gcf,'Position',[(600 + idx*20) (450 + idx*20) 500 275])
-    hold off
-    
-    %%% Plot 'Electric Loads (MW)'
-    figure('Name',co2_red_text);
-    hold on
-    area(bldgData.time,dt2.*4./1000)
-    set(gca,'XTick', round(bldgData.time(1),0)+.5:round(bldgData.time(end),0)+.5, 'FontSize',14)
-    box on
-    grid on
-    datetick('x','ddd','keepticks')
-    xlim([bldgData.time(bldgData.stpts(3)) bldgData.time(bldgData.stpts(3)+96*7)])
-    ylabel('Electric Loads (MW)','FontSize',18)
-    legend('Campus','Battery Charging','H_2 Production','Export','Location','Best')
-    set(gcf,'Position',[(600 + idx*20) (50 + idx*10) 500 275])
-    hold off
-
-end
+% 
+% %%% Dispatch Plots
+% 
+% 
+% for idx = 1:length(cfg.co2_red)
+% 
+%     co2_red_text = ['CO2 Reduction:' num2str((cfg.co2_red(idx)*100),'%02d') '%'];
+% 
+% 
+%     dt1 = [sum(rec.ldg.ldg_elec(:,idx),2)...
+%             sum(rec.utility.import(:,idx),2)...
+%             sum(rec.solar.pv_elec(:,idx),2) + sum(rec.rees.rees_chrg(:,idx),2)...
+%             sum(rec.ees.ees_dchrg(:,idx),2) + sum(rec.rees.rees_dchrg(:,idx),2) + sum(rec.lees.ees_dchrg(:,idx),2)];
+% 
+%     dt2 = [bldgData.elec ...
+%             sum(rec.ees.ees_chrg(:,idx),2) + sum(rec.lees.ees_chrg(:,idx),2) + sum(rec.rees.rees_chrg(:,idx),2)...
+%             sum(modelVars.el_eff.*rec.el.el_prod(:,idx),2) + sum(modelVars.h2_chrg_eff.*rec.h2es.h2es_chrg(:,idx),2) + sum(modelVars.rel_eff.*rec.rel.rel_prod(:,idx),2) ...
+%             rec.solar.pv_nem(:,idx)];
+% 
+% 
+%     %%% Plot 'Electric Sources (MW)'
+%     figure('Name', co2_red_text);
+%     hold on
+%     area(bldgData.time,dt1.*4./1000)
+%     set(gca,'XTick', round(bldgData.time(1),0)+.5:round(bldgData.time(end),0)+.5,'FontSize',14)
+%     box on
+%     grid on
+%     datetick('x','ddd','keepticks')
+%     xlim([bldgData.time(bldgData.stpts(3)) bldgData.time(bldgData.stpts(3)+96*7)])
+%     ylabel('Electric Sources (MW)','FontSize',18)
+%     legend('Gas Turbine','Utility Import','Solar','Battery Discharge','Location','Best')
+%     set(gcf,'Position',[(600 + idx*20) (450 + idx*20) 500 275])
+%     hold off
+% 
+%     %%% Plot 'Electric Loads (MW)'
+%     figure('Name',co2_red_text);
+%     hold on
+%     area(bldgData.time,dt2.*4./1000)
+%     set(gca,'XTick', round(bldgData.time(1),0)+.5:round(bldgData.time(end),0)+.5, 'FontSize',14)
+%     box on
+%     grid on
+%     datetick('x','ddd','keepticks')
+%     xlim([bldgData.time(bldgData.stpts(3)) bldgData.time(bldgData.stpts(3)+96*7)])
+%     ylabel('Electric Loads (MW)','FontSize',18)
+%     legend('Campus','Battery Charging','H_2 Production','Export','Location','Best')
+%     set(gcf,'Position',[(600 + idx*20) (50 + idx*10) 500 275])
+%     hold off
+% 
+% end
