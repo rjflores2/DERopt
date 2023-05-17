@@ -421,7 +421,7 @@ classdef CModelVariables < handle
                 if util_pv_wheel_lts
                     obj.rel_prod_wheel = sdpvar(obj.T,size(el_v,2),'full');
                 else
-                    obj.rel_prod_wheel = zeros(obj.T,size(el_v,2));
+                    obj.rel_prod_wheel = zeros(obj.T,size(rel_v,2));
                 end
                 
                 for ii = 1:size(rel_v,2)
@@ -470,13 +470,15 @@ classdef CModelVariables < handle
                 obj.rel_prod_wheel = zeros(obj.T,1);
                 obj.rel_eff = 0;
 
-                obj.h2es_adopt = 0;
-                obj.h2es_chrg = zeros(obj.T,1);
-                obj.h2es_dchrg = zeros(obj.T,1);
-                obj.h2es_bin = zeros(obj.T,1);
-                obj.h2es_soc = zeros(obj.T,1);                
-                obj.h2_chrg_eff = 0;
-
+                
+                if isempty(h2es_v)
+                    obj.h2es_adopt = 0;
+                    obj.h2es_chrg = zeros(obj.T,1);
+                    obj.h2es_dchrg = zeros(obj.T,1);
+                    obj.h2es_bin = zeros(obj.T,1);
+                    obj.h2es_soc = zeros(obj.T,1);
+                    obj.h2_chrg_eff = 0;
+                end
             end
         end
 
@@ -552,12 +554,15 @@ classdef CModelVariables < handle
                 obj.el_prod_wheel = zeros(obj.T,1);
                 obj.el_eff = zeros(obj.T,1);
 
-                obj.h2es_adopt = 0;
-                obj.h2es_chrg = zeros(obj.T,1);
-                obj.h2es_dchrg = zeros(obj.T,1);
-                obj.h2es_bin = zeros(obj.T,1);
-                obj.h2es_soc = zeros(obj.T,1);                
-                obj.h2_chrg_eff = 0;
+                
+                if isempty(h2es_v)
+                    obj.h2es_adopt = 0;
+                    obj.h2es_chrg = zeros(obj.T,1);
+                    obj.h2es_dchrg = zeros(obj.T,1);
+                    obj.h2es_bin = zeros(obj.T,1);
+                    obj.h2es_soc = zeros(obj.T,1);
+                    obj.h2_chrg_eff = 0;
+                end
             end
 
         end

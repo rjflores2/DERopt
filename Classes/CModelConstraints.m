@@ -596,6 +596,7 @@ classdef CModelConstraints < handle
                 
                 if  ~isempty(rel_v)
                     for i = 1:size(rel_v,2)
+                                               
                         obj.Constraints = [obj.Constraints
                             (0 <= modelVars.rel_prod(:,i) + modelVars.rel_prod_wheel(:,i) <= modelVars.rel_adopt(i).*(1/e_adjust)):'Renewable Electrolyzer Min/Max Output']; %%%Production is limited by adopted capacity
                     end
