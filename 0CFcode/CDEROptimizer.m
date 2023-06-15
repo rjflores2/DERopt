@@ -1,8 +1,13 @@
 classdef CDEROptimizer < handle
     
-    properties
+    properties (SetAccess = public)
 
         cfgManager
+
+    end
+
+    properties (SetAccess = private)
+
         optimizationRecordings
 
         plotData_text

@@ -150,7 +150,7 @@ classdef CCapitalCostCalculator < handle
             %%%Generic electrolyzer
             if ~isempty(util_el_on)
                 for ii=1:size(util_el_on,2)
-                    obj.util_el_mthly_debt(ii,1) = util_el_on(1,ii)*obj.debtCoeficient;
+                    obj.util_el_mthly_debt(ii,1) = util_el_on(1,ii)*obj.debtCoeficient;         % QUESTION: shouldn't this be "util_el_v"
                 end
             end
             %%%H2 Pipeline Injeciton
