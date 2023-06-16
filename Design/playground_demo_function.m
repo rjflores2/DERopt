@@ -44,6 +44,9 @@ function [optimizationRecordings] = playground_demo_function(runConfiguration)
     pv_on = 1;          %Turn on PV
     ees_on = 1;         %Turn on EES/REES
     rees_on = 1;        %Turn on REES
+
+    dgb_on = 0;
+    dgc_on = 0;
     
     %%%Community/Utility Scale systems
     util_solar_on = 0;
