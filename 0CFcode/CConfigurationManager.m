@@ -182,9 +182,9 @@ classdef CConfigurationManager < handle
             
             % Adoptable technologies toggles
             obj.utility_exists = 1;
-            obj.pv_on = 0;
-            obj.ees_on = 0;
-            obj.rees_on = 0;
+            obj.pv_on = 1;
+            obj.ees_on = 1;
+            obj.rees_on = 1;
             
             % Community/Utility Scale systems
             obj.util_solar_on = 0;
@@ -194,9 +194,9 @@ classdef CConfigurationManager < handle
             obj.util_h2_inject_on = 0;
 
             % Hydrogen technologies
-            obj.el_on = 0;
-            obj.rel_on = 0;
-            obj.h2es_on = 0;
+            obj.el_on = 1;
+            obj.rel_on = 1;
+            obj.h2es_on = 1;
             obj.hrs_on = 0;
             obj.h2_inject_on = 0;
             
