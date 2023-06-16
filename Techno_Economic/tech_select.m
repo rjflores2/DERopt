@@ -53,8 +53,9 @@ if ees_on
     
  
 %         Original one
-%         ees_v=[830; 0.001; 0.001; 0.1; 0.95; 0.5; 0.5; .90; .90; .9999];
-ees_v=[162; 0.001; 0.001; 0.05; 0.98; 0.9; 0.2; .95; .99; .9999];
+        ees_v=[830; 0.001; 0.001; 0.1; 0.95; 0.5; 0.5; .90; .90; .9999];
+        ees_v=[1200; 0.001; 0.001; 0.1; 0.95; 0.5; 0.5; .90; .90; .9999];
+% ees_v=[162; 0.001; 0.001; 0.05; 0.98; 0.9; 0.2; .95; .99; .9999];
     ees_cap=ees_v(1);
     
     %%%How pv capital cost is modified for different types of buildings
@@ -87,19 +88,46 @@ end
 %% SOFC
 if  sofc_on
 
-    sofc_v = [2500   %%% 1: Capital cost ($/kWel)
-          0.06*2500  %%% 2: O&M ($/kWh generated) 6 Yearly % of TIC(Total Installed Cost) % of the purchasing cost (4–10%) 
+    sofc_v = [4588.5   %%% 1: Capital cost ($/kWel)
+          1454.3  %%% 2: O&M ($/kWh generated) 6 Yearly % of TIC(Total Installed Cost) % of the purchasing cost (4–10%) 
           0.6        %%% 3: SOFC electrical efficiency at nominal condition (fraction)     
           0.28]      %%% 4: SOFC thermal efficiency at nominal condition (fraction)
                   
     % Find these numbers !   
     %%%Financial Aspects - SOFC 
-%     sofc_fin = [-0.4648; ... %%%Scaling linear factor - Based on Lazards cost of electricity
-%         5; ... %%%MACRS Schedule Modified Accelerated Cost Recovery System (tax)
-%         1]; ... %%% SOFC Investment Tax Credit (ITC)   
+    sofc_fin = [-0.4648; ... %%%Scaling linear factor - Based on Lazards cost of electricity
+        5; ... %%%MACRS Schedule Modified Accelerated Cost Recovery System (tax)
+        1]; ... %%% SOFC Investment Tax Credit (ITC)   
         
     
 end    
+
+%% Binary/Continuous DG
+if dgb_on
+    dgb_v = [4588.5   %%% 1: Capital cost ($/kWel)
+          1454.3  %%% 2: O&M ($/kWh generated) 6 Yearly % of TIC(Total Installed Cost) % of the purchasing cost (4–10%) 
+          0.5       %%% 3: SOFC electrical efficiency at nominal condition (fraction) 
+          0.8];     %%% 4: Minimum output
+      
+      dgb_fin = [-40.6
+          5; ... %%%MACRS Schedule Modified Accelerated Cost Recovery System (tax)
+          1]; ... %%% SOFC Investment Tax Credit (ITC)
+else
+dgb_v = [];
+end
+%% Continuous DG
+if dgc_on
+    dgc_v = [5500   %%% 1: Capital cost ($/kWel)
+          0.01  %%% 2: O&M ($/kWh generated) 6 Yearly % of TIC(Total Installed Cost) % of the purchasing cost (4–10%) 
+          0.6       %%% 3: SOFC electrical efficiency at nominal condition (fraction) 
+          0.8];     %%% 4: Minimum output
+      
+      dgc_fin = [0
+          5; ... %%%MACRS Schedule Modified Accelerated Cost Recovery System (tax)
+          1]; ... %%% SOFC Investment Tax Credit (ITC)
+else 
+dgc_v = [];
+end
 
 %% SGIP incentives
 if sgip_on

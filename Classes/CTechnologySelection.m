@@ -80,7 +80,7 @@ classdef CTechnologySelection < handle
             %%% Efficiency / Conversion Percent at 1 kW/m^2
             %%% O&M ($/kWh generated)
             
-            obj.pv_v = [3000; 0.2 ; 0.001];
+            obj.pv_v = [0; 0.2 ; 0.03];
             
             %%%How pv capital cost is modified for different types of buildings
             obj.pv_cap_mod = [2/2.65 %%%Commercial/industrial
@@ -235,6 +235,19 @@ classdef CTechnologySelection < handle
 
         end
 
+        
+        function CalcDiscreteGenerator(obj)
+
+            %%% Discrete Generator
+            %%% (1) Generator Capacity (kW)
+            %%% (2)            Capital Cost ($ installed)
+            %%% (2) Compression efficiency
+            %%% (3) O&M
+            %%% (4) Competing H2 cost ($/kWh
+            obj.hrs_v  = [300000000; .95; 0.01; 11/121*3.6];
+
+        end
+        
 
         function CalcH2PipelineInjection(obj)
 

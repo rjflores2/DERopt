@@ -10,6 +10,16 @@ var_pv.pv_adopt = value(var_pv.pv_adopt);
 var_pv.pv_nem = value(var_pv.pv_nem);
 %     pv_wholesale = value(pv_wholesale);
 
+%% dgb Values
+var_dgb.dgb_adopt = value(var_dgb.dgb_adopt);
+var_dgb.dgb_capacity = value(var_dgb.dgb_capacity);
+var_dgb.dgb_elec = value(var_dgb.dgb_elec);
+var_dgb.dgb_fuel = value(var_dgb.dgb_fuel);
+
+%% dgc Values
+var_dgc.dgc_adopt = value(var_dgc.dgc_adopt);
+var_dgc.dgc_elec = value(var_dgc.dgc_elec);
+var_dgc.dgc_fuel = value(var_dgc.dgc_fuel);
 %% EES Values
 var_ees.ees_adopt = value(var_ees.ees_adopt);
 var_ees.ees_soc = value(var_ees.ees_soc);
@@ -37,6 +47,12 @@ var_lrees.rees_dchrg_nem = value(var_lrees.rees_dchrg_nem);
 %% Resiliency Values
 if ~isempty(crit_load_lvl) && crit_load_lvl >0
     var_resiliency.pv_elec =value( var_resiliency.pv_elec );
+    var_resiliency.dgb_elec = value(var_resiliency.dgb_elec);
+    var_resiliency.dgb_real = value(var_resiliency.dgb_real);
+    var_resiliency.dgb_reactive = value(var_resiliency.dgb_reactive);
+    var_resiliency.dgc_elec = value(var_resiliency.dgc_elec);
+    var_resiliency.dgc_real = value(var_resiliency.dgc_real);
+    var_resiliency.dgc_reactive = value(var_resiliency.dgc_reactive);
     var_resiliency.ees_chrg = value(var_resiliency.ees_chrg);
     var_resiliency.ees_dchrg = value(var_resiliency.ees_dchrg);
     var_resiliency.ees_soc = value(var_resiliency.ees_soc);

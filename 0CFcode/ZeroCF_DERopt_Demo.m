@@ -34,12 +34,8 @@ cfg.AddMatlabPaths()
 %% OVERWRITE DEFAULT CONFIGURATION       
 
 %cfg.co2_red = [0 0.1 0.2 0.3 0.4 0.5];
-cfg.co2_red = [0 0.5];
+cfg.co2_red = [0];
 %cfg.month_idx = [1 4 7 10];
-    
-
-
-
 
 %%  START SIMULATION
 

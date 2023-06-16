@@ -20,8 +20,16 @@ if utility_exists
         var_util.nontou_dc=sdpvar(M,sum(dc_exist),'full');
         
         %%%On Peak/ Mid Peak TOU DC
-        var_util.onpeak_dc=sdpvar(onpeak_count,sum(dc_exist),'full');
-        var_util.midpeak_dc=sdpvar(midpeak_count,sum(dc_exist),'full');
+        if onpeak_count > 0
+            var_util.onpeak_dc = sdpvar(onpeak_count,sum(dc_exist),'full');
+        else
+            var_util.onpeak_dc = 0;
+        end
+        if midpeak_count > 0
+            var_util.midpeak_dc=sdpvar(midpeak_count,sum(dc_exist),'full');
+        else
+            var_util.midpeak_dc = 0;
+        end
     else
         var_util.nontou_dc = 0;
         var_util.onpeak_dc = 0;
@@ -435,9 +443,62 @@ if sofc_on
     % SOFC cost function
     
 else
-     var_sofc.sofc_adopt = zeros(1,1);      %%%SOFC installed capacity (kW)
-    var_sofc.sofc_elec = zeros(T,K);       %%%SOFC electricity produced (kWh) 
-    var_sofc.sofc_heat = zeros(T,1);       %%%SOFC heat produced (kWh) 
-    var_sofc.sofc_fuel = zeros(T,1);       %%%Fuel consumption (kWh) 
+    var_sofc.sofc_adopt = zeros(1,1);      %%%SOFC installed capacity (kW)
+    var_sofc.sofc_elec = zeros(T,K);       %%%SOFC electricity produced (kWh)
+    var_sofc.sofc_heat = zeros(T,1);       %%%SOFC heat produced (kWh)
+    var_sofc.sofc_fuel = zeros(T,1);       %%%Fuel consumption (kWh)
     var_sofc.sofc_CO2 = zeros(T,1);        %%%CO2 saving (kg)
-end    
+end
+
+%% DG - Continuous Capacity after Binary Adoption
+if dgb_on
+    %Variables
+    %     var_dgb.dgb_adopt = binvar(1,K,'full');      %%%SOFC installed capacity (kW)
+    %     var_dgb.dgb_capacity = sdpvar(1,K,'full');      %%%SOFC installed capacity (kW)
+    %     var_dgb.dgb_elec = sdpvar(T,K,'full');       %%%SOFC electricity produced (kWh)
+    %     var_dgb.dgb_fuel = sdpvar(T,K,'full');       %%%Fuel consumption (kWh)
+    
+    
+    var_dgb.dgb_adopt = binvar(1,1,'full');      %%%SOFC installed capacity (kW)
+    var_dgb.dgb_capacity = sdpvar(1,1,'full');      %%%SOFC installed capacity (kW)
+    var_dgb.dgb_elec = sdpvar(T,1,'full');       %%%SOFC electricity produced (kWh)
+    var_dgb.dgb_fuel = sdpvar(T,1,'full');       %%%Fuel consumption (kWh)
+    
+    
+    var_dgb.dgb_adopt = [var_dgb.dgb_adopt zeros(1,K-1)];
+    var_dgb.dgb_capacity = [var_dgb.dgb_capacity zeros(1,K-1)];
+    var_dgb.dgb_elec = [var_dgb.dgb_elec zeros(T,K-1)];
+    var_dgb.dgb_fuel = [var_dgb.dgb_fuel zeros(T,K-1)];
+    
+    %%%Cost funciton
+    Objective = Objective...
+        + sum(dgb_mthly_fixed_debt*M.*var_dgb.dgb_adopt) ...%%%Capital Cost - Capacity
+        + sum(dgb_mthly_var_debt*M.*var_dgb.dgb_capacity) ...%%%Capital Cost - Capacity
+        + 0.*sum(sum(var_dgb.dgb_elec)) ... %%% O&M Cost
+        + sum(ng_cost'.*sum(var_dgb.dgb_fuel)); %%%Fuel Costs
+    
+else
+    %Variables
+    var_dgb.dgb_adopt = zeros(1,1);     %%%SOFC installed capacity (kW)
+    var_dgb.dgb_capacity = zeros(1,1);
+    var_dgb.dgb_elec = zeros(1,1);       %%%SOFC electricity produced (kWh)
+    var_dgb.dgb_fuel = zeros(1,1);       %%%Fuel consumption (kWh)
+end
+
+%% DG - Continuous
+if dgc_on
+    var_dgc.dgc_adopt = sdpvar(1,K,'full');      %%%SOFC installed capacity (kW)
+    var_dgc.dgc_elec = sdpvar(T,K,'full');       %%%SOFC electricity produced (kWh)
+    var_dgc.dgc_fuel = sdpvar(T,K,'full');       %%%Fuel consumption (kWh)
+    
+    %%%Cost funciton
+    Objective = Objective...
+        + sum(dgc_mthly_debt*M.*var_dgc.dgc_adopt) ...%%%Capital Cost - Capacity
+        + dgc_v(2).*sum(sum(var_dgc.dgc_elec)) ... %%% O&M Cost
+        + sum(ng_cost'.*sum(var_dgc.dgc_fuel)); %%%Fuel Costs
+    
+else
+    var_dgc.dgc_adopt = zeros(1,1);     %%%SOFC installed capacity (kW)
+    var_dgc.dgc_elec = zeros(1,1);       %%%SOFC electricity produced (kWh)
+    var_dgc.dgc_fuel = zeros(1,1);       %%%Fuel consumption (kWh)
+end

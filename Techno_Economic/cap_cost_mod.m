@@ -41,6 +41,30 @@ if ~isempty(ees_v)
     end
 end
 
+%%%Generator with continuous capacity after binary adoption
+if ~isempty(dgb_v)
+    for ii=1:size(dgb_v,2)
+        dgb_mthly_fixed_debt(ii,1)=dgb_v(1,ii)*((1-equity)*(interest*(1+interest)^(period*12))...
+            /((1+interest)^(period*12)-1)+...%%%Money to pay back bank
+            req_return_on*(equity)*(required_return*(1+required_return)^(period*12))...
+            /((1+required_return)^(period*12)-1));
+        dgb_mthly_var_debt(ii,1)=dgb_v(2,ii)*((1-equity)*(interest*(1+interest)^(period*12))...
+            /((1+interest)^(period*12)-1)+...%%%Money to pay back bank
+            req_return_on*(equity)*(required_return*(1+required_return)^(period*12))...
+            /((1+required_return)^(period*12)-1));
+    end
+end
+
+%%%Generator with continuous capacity 
+if ~isempty(dgc_v)
+    for ii=1:size(dgc_v,2)
+        dgc_mthly_debt(ii,1)=dgc_v(1,ii)*((1-equity)*(interest*(1+interest)^(period*12))...
+            /((1+interest)^(period*12)-1)+...%%%Money to pay back bank
+            req_return_on*(equity)*(required_return*(1+required_return)^(period*12))...
+            /((1+required_return)^(period*12)-1));        
+    end
+end
+
 %%%Generic electrolyzer
 if ~isempty(el_v)
     for ii=1:size(el_v,2)
@@ -137,31 +161,6 @@ if exist('util_h2_inject_v','var') && ~isempty(util_h2_inject_v)
             req_return_on*(equity)*(required_return*(1+required_return)^(period*12))...
             /((1+required_return)^(period*12)-1))
     end
-end
-
-%% Converting incentives to reductions in debt payments
-if ~isempty(sgip)
-    
-    %%%Adjsut SGIP benefits if they are larger than the capital cost
-    sgip(sgip(1:4) > ees_v(1)) = ees_v(1);
-    
-    %%%Large storage benefit
-     sgip_mthly_benefit(1)=sgip(2)*((1-equity)*(interest*(1+interest)^(period*12))...
-            /((1+interest)^(period*12)-1)+...%%%Money to pay back bank
-            req_return_on*(equity)*(required_return*(1+required_return)^(period*12))...
-            /((1+required_return)^(period*12)-1));        
-        
-    %%%Residential storage benefit
-     sgip_mthly_benefit(2)=sgip(3)*((1-equity)*(interest*(1+interest)^(period*12))...
-            /((1+interest)^(period*12)-1)+...%%%Money to pay back bank
-            req_return_on*(equity)*(required_return*(1+required_return)^(period*12))...
-            /((1+required_return)^(period*12)-1));        
-        
-    %%% Equity storage benefit
-     sgip_mthly_benefit(3)=sgip(4)*((1-equity)*(interest*(1+interest)^(period*12))...
-            /((1+interest)^(period*12)-1)+...%%%Money to pay back bank
-            req_return_on*(equity)*(required_return*(1+required_return)^(period*12))...
-            /((1+required_return)^(period*12)-1));
 end
 
 %% Calculating cost scalars for various technologies
@@ -270,6 +269,78 @@ if ~isempty(ees_v)
             if ~isempty(pv_v) && rees_on == 1
                 rees_cap_mod(i,ii) = cap_cost_scaling(tr,ees_v(:,ii),rees_fin(:,ii),ees_scale_factor,debt,discount_rate);
             end
+            
+        end
+    end
+end
+%% DG - Continuous after binary adoption
+dgb_cap_mod = [];
+if ~isempty(dgb_v)
+    for i = 1:size(elec,2)
+        for ii = 1:size(dgb_v,2)
+            %%%Applicable tax rate
+            if strcmp(rate{i},'R1')
+                tr = tax_rates(1);
+            else
+                tr = tax_rates(2);
+            end
+            
+            %%% Continuous PV Examination
+            dgb_scale_factor = mean(elec(:,i));
+            
+            %%% Apply scaling factor only if we could have a larger fuel cell system
+            if dgb_scale_factor > 20
+                dgb_scale_factor = dgb_scale_factor*dgb_fin(1,ii);
+            else
+                dgb_scale_factor = 0;
+            end
+            
+            
+            
+            %%%Adjsuted PV Costs
+            debt=12.*ones(10,1).*(dgb_v(1,ii) + dgb_scale_factor)*((1-equity)*(interest*(1+interest)^(period*12))...
+                /((1+interest)^(period*12)-1)+...%%%Money to pay back bank
+                req_return_on*(equity)*(required_return*(1+required_return)^(period*12))...
+                /((1+required_return)^(period*12)-1));
+            
+            dgb_cap_mod(i,ii) = cap_cost_scaling(tr,dgb_v(:,ii),dgb_fin(:,ii),dgb_scale_factor,debt,discount_rate);
+            
+            
+        end
+    end
+end
+%% DG - Continuous
+dgc_cap_mod = [];
+if ~isempty(dgc_v)
+    for i = 1:size(elec,2)
+        for ii = 1:size(dgc_v,2)
+            %%%Applicable tax rate
+            if strcmp(rate{i},'R1')
+                tr = tax_rates(1);
+            else
+                tr = tax_rates(2);
+            end
+            
+            %%% Continuous PV Examination
+            dgc_scale_factor = mean(elec(:,i));
+            
+            %%% Apply scaling factor only if we could have a larger fuel cell system
+            if dgc_scale_factor > 20
+                dgc_scale_factor = dgc_scale_factor*dgc_fin(1,ii);
+            else
+                dgc_scale_factor = 0;
+            end
+            
+            
+            
+            %%%Adjsuted PV Costs
+            debt=12.*ones(10,1).*(dgc_v(1,ii) + dgc_scale_factor)*((1-equity)*(interest*(1+interest)^(period*12))...
+                /((1+interest)^(period*12)-1)+...%%%Money to pay back bank
+                req_return_on*(equity)*(required_return*(1+required_return)^(period*12))...
+                /((1+required_return)^(period*12)-1));
+            
+            dgc_cap_mod(i,ii) = cap_cost_scaling(tr,dgc_v(:,ii),dgc_fin(:,ii),dgc_scale_factor,debt,discount_rate);
+            
             
         end
     end
@@ -551,4 +622,32 @@ util_el_scale_factor = 28000
          end
         
     end
+end
+
+%% Converting incentives to reductions in debt payments
+if ~isempty(sgip)
+    
+    %%%Adjsut SGIP benefits if they are larger than the capital cost
+    sgip(sgip(1:4) > ees_v(1)) = ees_v(1);
+    
+    %%%Large storage benefit
+     sgip_mthly_benefit(1)=sgip(2)*((1-equity)*(interest*(1+interest)^(period*12))...
+            /((1+interest)^(period*12)-1)+...%%%Money to pay back bank
+            req_return_on*(equity)*(required_return*(1+required_return)^(period*12))...
+            /((1+required_return)^(period*12)-1));        
+        
+    %%%Residential storage benefit
+     sgip_mthly_benefit(2)=sgip(3)*((1-equity)*(interest*(1+interest)^(period*12))...
+            /((1+interest)^(period*12)-1)+...%%%Money to pay back bank
+            req_return_on*(equity)*(required_return*(1+required_return)^(period*12))...
+            /((1+required_return)^(period*12)-1));        
+        
+    %%% Equity storage benefit
+     sgip_mthly_benefit(3)=sgip(4)*((1-equity)*(interest*(1+interest)^(period*12))...
+            /((1+interest)^(period*12)-1)+...%%%Money to pay back bank
+            req_return_on*(equity)*(required_return*(1+required_return)^(period*12))...
+            /((1+required_return)^(period*12)-1));
+        
+        %%%Adjusting SGIP benefits if they are larger after tax breaks
+        
 end

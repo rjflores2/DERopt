@@ -1,15 +1,11 @@
 %% Playground file for OVMG Project
 clear all; close all; clc ; started_at = datetime('now'); startsim = tic;
 
-
-
-for crit_load_lvl = [7];%%[4 5 6 7] %%% Corresponding END around line 500 - after files have been saved
+for crit_load_lvl = [7]%%[4 5 6 7] %%% Corresponding END around line 500 - after files have been saved
     clearvars -except crit_load_lvl crit_load_lvl started_at startsim
 % crit_load_lvl = 5;
 % crit_load_lvl = [];
 % %%
-
-
 %% Parameters
 
 %%% opt.m parameters
@@ -23,6 +19,8 @@ opt_now_yalmip = 0; %YALMIP
 %%% 3) = at the circuit
 sim_lvl = 3;
 
+%%%Include pumping station? yes or no
+include_pump_station = 1;
 %% Infrastructure Cosntraints
 %%%AC Power Flow Simulation
 %%% 1) LinDistFlow
@@ -34,7 +32,7 @@ acpf_xfmr_on = 0;
 %% Downselection of building energy data?
 testing = 0;
 if ~testing
-    downselection = 2;
+    downselection = 0;
     if downselection == 1
         sz_on = 1;
     else
@@ -44,6 +42,8 @@ if ~testing
     pv_on = sz_on;
     ees_on = sz_on;
     rees_on = sz_on;
+    dgb_on = 1;
+    dgc_on = 1;
     sofc_on = 0;
     lpv_on = 1-sz_on;
     lees_on = 1-sz_on;
@@ -157,7 +157,7 @@ scenario = 'ues_baseline_update'
 
 % scenario = 'UES_1b'
 % scenario = 'ues_1a_v2'
-scenario = 'UES_2b'
+% scenario = 'UES_2b'
 
 fprintf('%s: Loading UO Data.', datestr(now,'HH:MM:SS'))
 tic
@@ -214,10 +214,18 @@ elseif sim_lvl == 3 && acpf_sim %%%If resiliency is examined on each individual 
     sim_end = width(xfmr_2_circuit) - 1;
 end
 
+%% Loading water pumping station data
+if include_pump_station
+    load('H:\_Research_\CEC_OVMG\URBANopt\Resiliency\HB_Water_Pumping_Station\pump_station_2018.mat');
+    pump_station_index = 5;
+    xfmr_map{318} = 'T20';
+    elec_resiliency_full(:,318) = pump_elec;
+end
+
+
+
 %%
-
-
-for sim_idx = 1%:sim_end
+for sim_idx = 5%:sim_end
    %% Building indicies in the current simulation
     if sim_lvl == 1 && (acpf_sim == 0 || isempty(acpf_sim))
         bldg_ind = [st_idx(sim_idx):end_idx(sim_idx)];
@@ -231,6 +239,7 @@ for sim_idx = 1%:sim_end
         %%%Finding building indicies
         bldg_ind = [];
         for kk = 1:length(xfmrs)
+            xfmrs(kk)
             find(strcmp(xfmrs(kk),xfmr_map))
             bldg_ind = [bldg_ind
                 find(strcmp(xfmrs(kk),xfmr_map))];
@@ -324,7 +333,15 @@ for sim_idx = 1%:sim_end
         res_units_total = res_units;
     end
         
-    
+    %% Adding pumping station
+    if include_pump_station
+        elec(:,318) =  pump_elec;
+        dc_exist(318) = 1;
+        rate{318} = 'TOU8';
+        low_income(318) = 0;
+        res_units(318) = 0;
+        maxpv(318) = 20;
+    end
     %% Reducing scope for testing
     if ~isempty(bldg_ind)
         elec = elec(:,bldg_ind);
@@ -339,11 +356,45 @@ for sim_idx = 1%:sim_end
         xfmr_subset = xfmr_map(bldg_ind);
     end
     
+    
+    %%
+    xfmrs_loads = unique(xfmr_subset)
+    elec_red = [];
+    elec_res_red = [];
+    dc_exist_red = [];
+    rate_red = [];
+    
+    for ii = 1:length(xfmrs_loads)
+        idx = find(strcmp(xfmrs_loads(ii),xfmr_subset))
+        
+        
+        elec_red(:,ii) = sum(elec(:,idx),2);
+        if crit_load_lvl > 0
+            elec_res_red(:,ii) = sum(elec_res(:,idx),2);
+        end
+        dc_exist_red(ii,1) = sum(dc_exist(idx));
+        rate_red{ii,1} = rate{idx(1)};
+        low_income_red(ii,1) = round(sum(low_income(idx))/length(idx));
+        res_units_red(ii,1) = sum(res_units(idx));
+        maxpv_red(ii,1) = sum(maxpv(idx));
+        
+    end
+    
+    elec = elec_red;
+    elec_res = elec_res_red;
+    dc_exist = dc_exist_red;
+    rate = rate_red;
+    low_income = low_income_red;
+    res_units = res_units_red;
+    maxpv = maxpv_red;
+    xfmr_subset = xfmrs_loads;
+    %%
+    
     %%%Buildings that fall under PBI SGIP program
     sgip_pbi = strcmp(rate,'TOU8') + strcmp(rate,'GS1');
     
     %% Formatting Building Data
-    mth = [6];
+    mth = [2];
     bldg_loader_OVMG
     
     %% Determining Resiliency Data for Examination
@@ -353,6 +404,9 @@ for sim_idx = 1%:sim_end
     %%%Loading Utility Data and Generating Energy Charge Vectors
     utility_SCE_2020
     
+%% Gas Costs - only when a fuel cell is available
+ng_cost = (1.*(strcmp(rate,'TOU8') + strcmp(rate,'GS1')) + 1.5.*strcmp(rate,'R1'))./29.3;
+% ng_cost = (2/120*105.5 + 0.6)/29.3;
     %% Reducing size for testing
 %     time = time(1:endpts(2));
 %     elec = elec(1:endpts(2),:);
@@ -422,7 +476,18 @@ for sim_idx = 1%:sim_end
         opt_ees
         elapsed = toc;
         fprintf('Took %.2f seconds \n', elapsed)
-        
+         %% DGB Constraints
+        fprintf('%s: DGB Constraints.', datestr(now,'HH:MM:SS'))
+        tic
+        opt_dgb
+        elapsed = toc;
+        fprintf('Took %.2f seconds \n', elapsed)
+         %% DGC Constraints
+        fprintf('%s: DGC Constraints.', datestr(now,'HH:MM:SS'))
+        tic
+        opt_dgc
+        elapsed = toc;
+        fprintf('Took %.2f seconds \n', elapsed)
         %% DER Incentives
         fprintf('%s: DER Incentives Constraints.', datestr(now,'HH:MM:SS'))
         tic

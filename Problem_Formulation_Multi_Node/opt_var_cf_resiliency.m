@@ -4,7 +4,10 @@ if ~isempty(crit_load_lvl) && crit_load_lvl >0
     
     xfmr_subset_unique = unique(xfmr_subset);
     
-%     T_res = [1 endpts(end)];
+    %     T_res = [1 endpts(end)];
+    if downselection == 2
+        T_res = [1 24*14];
+    end
     elec_res = elec_res(T_res(1):T_res(2),:);
     if sim_lvl == 3
         pf = 0.95.*ones(1,size(elec_res,2));
@@ -25,6 +28,38 @@ if ~isempty(crit_load_lvl) && crit_load_lvl >0
         end
     else
         var_resiliency.pv_elec = zeros(size(elec_res,1),K);
+    end
+
+%%% DGB exists
+    if ~isempty(dgb_v) 
+        var_resiliency.dgb_elec = sdpvar(size(elec_res,1),K,'full');
+        if sim_lvl == 3
+            var_resiliency.dgb_real = sdpvar(size(elec_res,1),K,'full');
+            var_resiliency.dgb_reactive = sdpvar(size(elec_res,1),K,'full');
+        else
+            var_resiliency.dgb_real = 0;
+            var_resiliency.dgb_reactive = 0;
+        end
+    else
+        var_resiliency.dgb_elec = zeros(size(elec_res,1),K);
+        var_resiliency.dgb_real = 0;
+            var_resiliency.dgb_reactive = 0;
+    end
+    
+    %%% DGC exists
+    if ~isempty(dgc_v) 
+        var_resiliency.dgc_elec = sdpvar(size(elec_res,1),K,'full');
+        if sim_lvl == 3
+            var_resiliency.dgc_real = sdpvar(size(elec_res,1),K,'full');
+            var_resiliency.dgc_reactive = sdpvar(size(elec_res,1),K,'full');
+        else
+            var_resiliency.dgc_real = 0;
+            var_resiliency.dgc_reactive = 0;
+        end
+    else
+        var_resiliency.dgc_elec = zeros(size(elec_res,1),K);
+        var_resiliency.dgc_real = 0;
+            var_resiliency.dgc_reactive = 0;
     end
     
     %%%If Storage Exists

@@ -486,6 +486,38 @@ classdef CModelVariables < handle
         %% H2 Production and Storage
         function SetupH2ProductionAndStorage(obj, util_pv_wheel_lts, strict_h2es, el_v, h2es_v, capCostMods)
             
+            %% H2 energy storage
+            if ~isempty(h2es_v)
+                 %%%H2 Storage
+                    %%%Adopted EES Size
+                    obj.h2es_adopt = sdpvar(1,size(h2es_v,2),'full');
+                    %%%EES Charging
+                    obj.h2es_chrg = sdpvar(obj.T,size(h2es_v,2),'full');
+                    %%%EES discharging
+                    obj.h2es_dchrg = sdpvar(obj.T,size(h2es_v,2),'full');
+                    
+                    %%%H2ES Operational State Binary Variables
+                    if strict_h2es
+                        obj.h2es_bin = binvar(obj.T,size(h2es_v,2),'full');
+                    else
+                        obj.h2es_bin = sdpvar(obj.T,size(h2es_v,2),'full');
+                    end
+                    
+                    %%%EES SOC
+                    obj.h2es_soc = sdpvar(obj.T,size(h2es_v,2),'full');
+
+                    for ii = 1:size(h2es_v,2)
+                        
+                        %%%Electrolyzer Cost Functions
+                        obj.Objective = obj.Objective...
+                            + sum(obj.M.*capCostMods.h2es_mthly_debt.*obj.h2es_adopt) ... %%%Capital Cost
+                            + sum(sum(obj.h2es_chrg).*h2es_v(2,:)) ... %%%Charging Cost
+                            + sum(sum(obj.h2es_dchrg).*h2es_v(3,:)); %%%Discharging Cost
+                    end
+                    
+                    obj.h2_chrg_eff = 1 - h2es_v(8,:);
+            end
+            
             % Electrolyzer
             if ~isempty(el_v)
                 

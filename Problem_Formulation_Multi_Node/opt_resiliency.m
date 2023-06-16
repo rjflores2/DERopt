@@ -3,7 +3,7 @@ if ~isempty(crit_load_lvl) && crit_load_lvl >0
     %% Electrical Energy Balance
     if sim_lvl == 1 || sim_lvl == 2
         Constraints = [Constraints
-            (var_resiliency.pv_elec + var_resiliency.ees_dchrg + var_resiliency.import == var_resiliency.export + var_resiliency.ees_chrg + elec_res):'Critical Electric Energy Balance'];
+            (var_resiliency.pv_elec + var_resiliency.ees_dchrg + var_resiliency.dgc_elec + var_resiliency.import== var_resiliency.export + var_resiliency.ees_chrg + elec_res):'Critical Electric Energy Balance'];
     elseif sim_lvl == 3
         %%%Polygon constraints
         L = 30;%%%Number of polygons
@@ -13,8 +13,8 @@ if ~isempty(crit_load_lvl) && crit_load_lvl >0
         C_gen = [cos(theta)' sin(theta)']; %cos/sin of theta for each polygon
 
         Constraints = [Constraints
-            (var_resiliency.pv_real + var_resiliency.ees_dchrg_real + var_resiliency.import == var_resiliency.export + var_resiliency.ees_chrg + elec_res):'Critical Electric Energy Balance'
-            (var_resiliency.pv_reactive + var_resiliency.ees_dchrg_reactive + var_resiliency.import_reactive== var_resiliency.export_reactive + elec_res_reactive):'Critical Reactive Electric Energy Balance'];
+            (var_resiliency.pv_real + var_resiliency.ees_dchrg_real + var_resiliency.dgb_real + var_resiliency.import == var_resiliency.export + var_resiliency.ees_chrg + elec_res):'Critical Electric Energy Balance'
+            (var_resiliency.pv_reactive + var_resiliency.ees_dchrg_reactive + var_resiliency.dgb_reactive + var_resiliency.import_reactive== var_resiliency.export_reactive + elec_res_reactive):'Critical Reactive Electric Energy Balance'];
     end
     %% PV Production
     if ~isempty(pv_v) || ~isempty(pv_legacy)
@@ -29,6 +29,33 @@ if ~isempty(crit_load_lvl) && crit_load_lvl >0
         end
     end
     
+%% DGB Production
+if ~isempty(dgb_v)
+    Constraints = [Constraints
+        (var_resiliency.dgb_elec <= repmat(var_dgb.dgb_capacity,size(var_resiliency.dgb_elec,1),1)):'Resiliency dgb Output Limits'];
+    
+        if sim_lvl == 3
+            for ii = 1:size(elec,2)
+                Constraints = [Constraints
+                    (C_gen*[var_resiliency.dgb_real(:,ii)'; var_resiliency.dgb_reactive(:,ii)'] <= repmat(var_resiliency.dgb_elec(:,ii)',size(C_gen,1),1)):'PV Resiliency Real and Reactive Power'];
+            end
+            
+        end
+    end
+
+%% DGC Production
+if ~isempty(dgc_v)
+    Constraints = [Constraints
+        (repmat(var_dgc.dgc_adopt.*dgc_v(4),size(var_resiliency.dgc_elec,1),1) <= var_resiliency.dgc_elec <= repmat(var_dgc.dgc_adopt,size(var_resiliency.dgc_elec,1),1)):'Resiliency dgc Output Limits'];
+    
+        if sim_lvl == 3
+            for ii = 1:size(elec,2)
+                Constraints = [Constraints
+                    (C_gen*[var_resiliency.dgc_real(:,ii)'; var_resiliency.dgc_reactive(:,ii)'] <= repmat(var_resiliency.dgc_elec(:,ii)',size(C_gen,1),1)):'PV Resiliency Real and Reactive Power'];
+            end
+            
+        end
+    end
     %% Storage
     if lees_on || lrees_on || ~isempty(ees_v)
         for k=1:K

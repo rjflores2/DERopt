@@ -12,7 +12,7 @@ if opt_now==1
     elapsed = toc;
     fprintf('Model Export took %.2f seconds \n', elapsed)
     
-ops = sdpsettings('solver','cplex','verbose',1)
+ops = sdpsettings('solver','cplex','verbose',1);
 
     % options = cplexoptimset;
     % options.Display='on';

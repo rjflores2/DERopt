@@ -176,14 +176,15 @@ classdef CConfigurationManager < handle
             obj.co2_lim = 0;
             obj.year_idx = 2018;
             obj.month_idx = [1 4 7 10];
+%             obj.month_idx = [1];
             obj.saveResultsToFile = false;
             obj.chiller_plant_opt = 0;          % what is 0 o 1??
             
             % Adoptable technologies toggles
             obj.utility_exists = 1;
-            obj.pv_on = 1;
-            obj.ees_on = 1;
-            obj.rees_on = 1;
+            obj.pv_on = 0;
+            obj.ees_on = 0;
+            obj.rees_on = 0;
             
             % Community/Utility Scale systems
             obj.util_solar_on = 0;
@@ -193,9 +194,9 @@ classdef CConfigurationManager < handle
             obj.util_h2_inject_on = 0;
 
             % Hydrogen technologies
-            obj.el_on = 1;
-            obj.rel_on = 1;
-            obj.h2es_on = 1;
+            obj.el_on = 0;
+            obj.rel_on = 0;
+            obj.h2es_on = 0;
             obj.hrs_on = 0;
             obj.h2_inject_on = 0;
             
