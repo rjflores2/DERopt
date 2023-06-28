@@ -1,4 +1,8 @@
 %% Technology Selection
+
+dgb_v = [];
+dgc_v = [];
+
 %% Solar PV
 if pv_on
     %%% Cap cost ($/kW)
@@ -181,6 +185,8 @@ if h2_inject_on
 else
     h2_inject_v = [];
 end
+
+
 %% Building space
 %%%[space available for PV (m^2)
 %%%Cooling loop input (C)
