@@ -44,6 +44,8 @@ function [optimizationRecordings] = playground_demo_function(runConfiguration)
     pv_on = 1;          %Turn on PV
     ees_on = 1;         %Turn on EES/REES
     rees_on = 1;        %Turn on REES
+    dgb_on = 0; % Binary generator
+    dgc_on = 0; % Continuous generator
     
     %%%Community/Utility Scale systems
     util_solar_on = 0;
@@ -241,46 +243,46 @@ function [optimizationRecordings] = playground_demo_function(runConfiguration)
     tech_legacy_UCI
     
     %% Plotting loads & Costs for demo purpose
-    %%% 'Electric Demand (MW)'
-    figure
-    hold on
-    plot(time,elec.*4./1000,'LineWidth',2)
-    set(gca,'XTick',[round(time(1),0)+.5:round(time(end),0)+.5],'FontSize',14)
-    box on
-    grid on
-    datetick('x','ddd','keepticks')
-    xlim([time(stpts(3)) time(stpts(3)+96*7)])
-    ylabel('Electric Demand (MW)','FontSize',18)
-    set(gcf,'Position',[100 450 500 275])
-    hold off
-    
-    %%% 'Electric Price ($/kWh)'
-    figure
-    hold on
-    plot(time,import_price,'LineWidth',2)
-    set(gca,'XTick',[round(time(1),0)+.5:round(time(end),0)+.5],'FontSize',14)
-    box on
-    grid on
-    datetick('x','ddd','keepticks')
-    xlim([time(stpts(3)) time(stpts(3)+96*7)])
-    ylabel('Electric Price ($/kWh)','FontSize',18)
-    set(gcf,'Position',[100 100 500 275])
-    hold off
-    
-    %%% 'Solar Potential (kW/m^2)'
-    figure
-    hold on
-    plot(time,solar,'LineWidth',2)
-    set(gca,'XTick',[round(time(1),0)+.5:round(time(end),0)+.5],'FontSize',14)
-    box on
-    grid on
-    datetick('x','ddd','keepticks')
-    xlim([time(stpts(3)) time(stpts(3)+96*7)])
-    ylabel('Solar Potential (kW/m^2)','FontSize',18)
-    set(gcf,'Position',[650 100 500 275])
-    hold off
-    
-    close all
+%     %%% 'Electric Demand (MW)'
+%     figure
+%     hold on
+%     plot(time,elec.*4./1000,'LineWidth',2)
+%     set(gca,'XTick',[round(time(1),0)+.5:round(time(end),0)+.5],'FontSize',14)
+%     box on
+%     grid on
+%     datetick('x','ddd','keepticks')
+%     xlim([time(stpts(3)) time(stpts(3)+96*7)])
+%     ylabel('Electric Demand (MW)','FontSize',18)
+%     set(gcf,'Position',[100 450 500 275])
+%     hold off
+%     
+%     %%% 'Electric Price ($/kWh)'
+%     figure
+%     hold on
+%     plot(time,import_price,'LineWidth',2)
+%     set(gca,'XTick',[round(time(1),0)+.5:round(time(end),0)+.5],'FontSize',14)
+%     box on
+%     grid on
+%     datetick('x','ddd','keepticks')
+%     xlim([time(stpts(3)) time(stpts(3)+96*7)])
+%     ylabel('Electric Price ($/kWh)','FontSize',18)
+%     set(gcf,'Position',[100 100 500 275])
+%     hold off
+%     
+%     %%% 'Solar Potential (kW/m^2)'
+%     figure
+%     hold on
+%     plot(time,solar,'LineWidth',2)
+%     set(gca,'XTick',[round(time(1),0)+.5:round(time(end),0)+.5],'FontSize',14)
+%     box on
+%     grid on
+%     datetick('x','ddd','keepticks')
+%     xlim([time(stpts(3)) time(stpts(3)+96*7)])
+%     ylabel('Solar Potential (kW/m^2)','FontSize',18)
+%     set(gcf,'Position',[650 100 500 275])
+%     hold off
+%     
+%     close all
     
     
     %% DERopt

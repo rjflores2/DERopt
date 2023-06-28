@@ -8,6 +8,9 @@ classdef CTechnologySelection < handle
         pv_fin = [];
         somah = [];
 
+FuelCellBinary_v = [];
+FuelCellBinary_fin = [];
+
         ees_v = [];
         ees_cap = [];
         ees_cap_mod = [];
@@ -39,7 +42,7 @@ classdef CTechnologySelection < handle
 
         end
 
-        function CalculateAllParams(obj, pv_on, ees_on, el_on, h2es_on, rel_on, hrs_on, h2_inject_on)
+        function CalculateAllParams(obj, pv_on, ees_on, el_on, h2es_on, rel_on, hrs_on, h2_inject_on, fuel_cell_binary_on)
 
             if pv_on
                 obj.CalcSolarPV()
@@ -69,7 +72,26 @@ classdef CTechnologySelection < handle
                 obj.CalcH2PipelineInjection()
             end
             
+            if fuel_cell_binary_on
+                obj.CalcFuelCellBinaryOption
+            end
+            
             obj.CalcOther()
+
+        end
+        
+        
+        function CalcFuelCellBinaryOption(obj)
+            
+            obj.FuelCellBinary_v = [4588.5   %%% 1: Initial Capital cost ($/Unit)
+                1454.3  %%% 2: Per unit capital cost ($/kW)
+                0.01 %%%3 Variable O&M ($/kWh elec)
+                0.6       %%% 4:  electrical efficiency at nominal condition (fraction)
+                0.8];    %%% 5: Minimum output
+            
+           obj.FuelCellBinary_fin = [-40.6
+                5; ... %%%MACRS Schedule Modified Accelerated Cost Recovery System (tax)
+                1]; ... %%% SOFC Investment Tax Credit (ITC)
 
         end
 
@@ -80,7 +102,7 @@ classdef CTechnologySelection < handle
             %%% Efficiency / Conversion Percent at 1 kW/m^2
             %%% O&M ($/kWh generated)
             
-            obj.pv_v = [0; 0.2 ; 0.03];
+            obj.pv_v = [2000; 0.2 ; 0.03];
             
             %%%How pv capital cost is modified for different types of buildings
             obj.pv_cap_mod = [2/2.65 %%%Commercial/industrial

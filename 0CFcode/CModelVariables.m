@@ -14,6 +14,14 @@ classdef CModelVariables < handle
         pv_adopt                % var_pv.pv_adopt
         pv_nem                  % var_pv.pv_nem
 
+fuel_cell_binary_adopt
+fuel_cell_binary_capacity
+fuel_cell_binary_elec
+fuel_cell_binary_fuel
+fuel_cell_binary_hfuel
+
+util_h2
+
         rees_adopt              % var_rees.rees_adopt
         rees_chrg               % var_rees.rees_chrg
         rees_dchrg              % var_rees.rees_dchrg
@@ -211,16 +219,25 @@ classdef CModelVariables < handle
                 %%%On Peak/ Mid Peak TOU DC
                 obj.util_onpeak_dc = zeros(onpeak_count,1);
                 obj.util_midpeak_dc = zeros(midpeak_count,1);
-
+                
             end
         end
-
-
-        %% General export
-        function SetupGeneralExport(obj, gen_export_on, utilityInfo)
-
-            % General export allows export from any onsite resource, regardless of fuel source
-            if gen_export_on
+        
+        %% Utility Hydrogen
+        function SetupUtilityHydrogen(obj,h2_cost)
+            if h2_cost>0
+                obj.util_h2 = sdpvar(obj.T,1,'full');
+                obj.Objective = obj.Objective ...
+                    + sum(h2_cost.*obj.util_h2);
+            else
+                obj.util_h2 = zeros(obj.T,1);
+            end
+        end
+            %% General export
+            function SetupGeneralExport(obj, gen_export_on, utilityInfo)
+                
+                % General export allows export from any onsite resource, regardless of fuel source
+                if gen_export_on
 
                 obj.util_gen_export = sdpvar(obj.T,1,'full');
                 obj.util_import_state = binvar(obj.T,1,'full');
@@ -233,6 +250,35 @@ classdef CModelVariables < handle
             end
         end
 
+
+        %% General export
+        function SetupFuelCellBinary(obj, techSelOnSite, capCostMods, dayMultiplier, ng_cost)
+            
+            
+            if isempty(techSelOnSite.FuelCellBinary_v) == 0
+                obj.fuel_cell_binary_adopt =  binvar(1,1,'full');      %%%Is the fuel cell adopted?
+                obj.fuel_cell_binary_capacity = sdpvar(1,1,'full'); %%%Fuel Cell Capacity
+                obj.fuel_cell_binary_elec = sdpvar(obj.T,1,'full'); %%%Fuel Cell Output
+                obj.fuel_cell_binary_fuel = sdpvar(obj.T,1,'full'); %%%Fuel Cell Fuel Input
+                obj.fuel_cell_binary_hfuel = sdpvar(obj.T,1,'full'); %%%Fuel Cell Fuel Output
+                
+                obj.Objective = obj.Objective ...
+                    + sum(obj.M*capCostMods.fuel_cell_binary_mthly_debt(1)'*obj.fuel_cell_binary_adopt)... %%%Fuel Cell Initial Install Cost ($)
+                    + sum(obj.M*capCostMods.fuel_cell_binary_mthly_debt(2)'*obj.fuel_cell_binary_capacity)... %%%Fuel Cell Capital Cost ($/kW installed)
+                    + techSelOnSite.FuelCellBinary_v(3)*(sum(sum(dayMultiplier.*(obj.fuel_cell_binary_elec)))); %%%Fuel Cell O&M Cost ($/kWh generated)
+
+
+            else
+                obj.fuel_cell_binary_adopt =  zeros(1);      %%%Is the fuel cell adopted?
+                obj.fuel_cell_binary_capacity = zeros(1); %%%Fuel Cell Capacity
+                obj.fuel_cell_binary_elec = zeros(obj.T,1); %%%Fuel Cell Output
+                obj.fuel_cell_binary_fuel = zeros(obj.T,1); %%%Fuel Cell Fuel Input
+                obj.fuel_cell_binary_hfuel = zeros(obj.T,1); %%%Fuel Cell Fuel Output
+            end
+            
+            
+            
+        end
 
         %% Solar PV
         function SetupSolarPV(obj, utility_exists, export_on, rees_on, island, dayMultiplier, techSelOnSite, utilityInfo, capCostMods) %, gen_export_on, utilityInfo)
@@ -292,7 +338,7 @@ classdef CModelVariables < handle
                             + techSelOnSite.ees_v(2,ii)*sum(sum(dayMultiplier.*obj.rees_chrg(:,ii)))... %%%Charging O&M
                             + techSelOnSite.ees_v(3,ii)*(sum(sum(dayMultiplier.*(obj.rees_dchrg(:,ii)))));%%%Discharging O&M
                         
-                        if island ~= 1 % If not islanded, AEC can export NEM and wholesale for revenue
+                        if export_on ~= 1 % If not islanded, AEC can export NEM and wholesale for revenue
 
                             %%%REES NEM Export
                             %%%REES discharging to grid
@@ -307,6 +353,8 @@ classdef CModelVariables < handle
                             %%% Setting objective function
                             obj.Objective = obj.Objective...
                                 + sum(sum((dayMultiplier.*(techSelOnSite.ees_v(3,ii) - utilityInfo.export_price(:,index))).*obj.rees_dchrg_nem(:,ii)));
+                            
+                            obj.rees_dchrg_nem = zeros(obj.T,1);
                             
                         else
                             obj.rees_dchrg_nem = zeros(obj.T,1);
@@ -777,13 +825,13 @@ classdef CModelVariables < handle
 
             else
                 obj.ldg_elec = zeros(obj.T,1);
-                obj.ldg_fuel = [];
+                obj.ldg_fuel = zeros(obj.T,1);
                 obj.ldg_rfuel = zeros(obj.T,1);
                 obj.ldg_sfuel = zeros(obj.T,1);
                 obj.ldg_dfuel = zeros(obj.T,1);
                 obj.ldg_opstate = 1;
                 obj.ldg_hfuel = zeros(obj.T,1);
-                obj.ldg_elec_ramp = [];
+                obj.ldg_elec_ramp = zeros(obj.T,1);
                 obj.ldg_off = 1;
                 
             end

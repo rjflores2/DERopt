@@ -25,6 +25,8 @@ classdef CConfigurationManager < handle
         ees_on                      % Turn on EES/REES
         rees_on                     % Turn on REES
 
+fuel_cell_binary_on %Turn on DG with binary purchase option
+
         % Community/Utility Scale systems
         util_solar_on
         util_wind_on
@@ -139,6 +141,9 @@ classdef CConfigurationManager < handle
         rng_cost
         rng_storage_cost
         ng_inject
+        
+        %Placeholder for H2 cost that is purchased form another source
+        h2_cost
 
         % Including Required Return with Capital Payment (1 = Yes)
         req_return_on
@@ -184,7 +189,9 @@ classdef CConfigurationManager < handle
             obj.utility_exists = 1;
             obj.pv_on = 1;
             obj.ees_on = 1;
-            obj.rees_on = 1;
+            obj.rees_on = 0;
+            
+            obj.fuel_cell_binary_on = 1; %Fuel Cell with binary option
             
             % Community/Utility Scale systems
             obj.util_solar_on = 0;
@@ -201,10 +208,10 @@ classdef CConfigurationManager < handle
             obj.h2_inject_on = 0;
             
             % Legacy System Toggles
-            obj.lpv_on = 1;
-            obj.lees_on = 1;
-            obj.ltes_on = 1;
-            obj.ldg_on = 1;
+            obj.lpv_on = 0;
+            obj.lees_on = 0;
+            obj.ltes_on = 0;
+            obj.ldg_on = 0;
             obj.lbot_on = 0;
             obj.lhr_on = 0;
             obj.ldb_on = 0;
@@ -256,7 +263,7 @@ classdef CConfigurationManager < handle
 
             obj.maxpv = 300000;
             obj.toolittle_pv = 0;
-            obj.curtail = 0;
+            obj.curtail = 1;
 
             obj.toolittle_storage = 1;
             obj.socc = 0;
@@ -278,6 +285,9 @@ classdef CConfigurationManager < handle
             obj.rng_cost = 2.*obj.ng_cost;
             obj.rng_storage_cost = 0.2/29.3;
             obj.ng_inject = 0.05/29.3; %$/kWh --> Converted from $/therm to $/kWh, 29.3 kWh / 1 Therm
+
+%%%Regular H2 cost
+obj.h2_cost = (2/120*105.5 + 0.6)/29.3;
 
             % Including Required Return with Capital Payment (1 = Yes)
             obj.req_return_on = 1;

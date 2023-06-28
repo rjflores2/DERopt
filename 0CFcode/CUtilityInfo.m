@@ -22,6 +22,7 @@ classdef CUtilityInfo
             %%% 1: current rate, which does not value export
             %%% 2: current import rate + LMP export rate
             %%% 3: LMP Rate + 0.2 and LMP Export
+             
             if rateType == 1
 
                 obj.energy_charge = 0.21;   %$/kWh
@@ -56,7 +57,7 @@ classdef CUtilityInfo
                 obj.dc_nontou = 9.16; %$/kW - facility related demand charge
                 obj.dc_on = 0;
                 obj.dc_mid = 0;
-                obj.import_price = lmpData + .10;
+                obj.import_price = lmpData;
                 
                 if exportOn || genExportOn
                     obj.export_price = lmpData;

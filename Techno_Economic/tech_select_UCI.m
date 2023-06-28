@@ -206,6 +206,13 @@ if ~ees_on
     ees_v =[];
 end
 
+if ~dgb_on
+    dgb_v = [];
+end
+
+if ~dgc_on
+    dgc_v = [];
+end
 
 % pv_v = [];
 % ees_v = [];

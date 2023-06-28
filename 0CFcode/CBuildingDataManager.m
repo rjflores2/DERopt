@@ -95,9 +95,25 @@ classdef CBuildingDataManager < handle
             %%% change IDX to a specific month to allow for faster testing %%%
             if ~isempty(year_idx) && ~isempty(month_idx)
                 idx = (obj.lDateTimeVector(:,1) == year_idx & ismember(obj.lDateTimeVector(:,2),month_idx));
-            elseif ~isempty(year_idx) 
+            elseif ~isempty(year_idx)
                 idx = (obj.lDateTimeVector(:,1) == year_idx);
             end
+            
+%             cntr = 0;
+%             
+%             sum(idx)
+%             for ii = 1:length(idx)
+%                 if idx(ii) > 0
+%                     if cntr < 96*2
+%                         cntr = cntr + 1;
+%                     else
+%                         idx(ii) = 0;
+%                     end
+%                     
+%                 end
+%                 
+%             end
+%             sum(idx)
 
             obj.elec = obj.elec(idx);
             obj.heat = obj.heat(idx);

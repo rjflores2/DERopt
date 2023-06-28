@@ -20,7 +20,7 @@ derOpt = CDEROptimizer();
 
 derOpt.SetMonthsSelection(7);                       % default: [1 4 7 10]
 
-derOpt.CalculateInitialPathCO2Reduction(0, 50, 25);
+derOpt.CalculateInitialPathCO2Reduction(0, 75, 25);
 
 
 %% Optimize and show results

@@ -1,7 +1,7 @@
 %% Playground file for OVMG Project
 clear all; close all; clc ; started_at = datetime('now'); startsim = tic;
 
-co2_lim_loop = [0 .10 .25 .50 .60 .65 .675 .7 .725 .75 .775 .8 .85 .9 .95 .99];
+co2_lim_loop = [0 .25];%.10 .25 .50 .60 .65 .675 .7 .725 .75 .775 .8 .85 .9 .95 .99];
 % co2_lim_loop = [0 .10 .25 .50];
 % co2_lim_loop = [0 .60 .65 .675 .7 .725 .75 .775 .8 .85 .9 .95 .99];
 % co2_lim_loop = [0];
@@ -34,11 +34,11 @@ ees_on = 1;       %Turn on EES/REES
 rees_on = 1;  %Turn on REES
 
 %%%Community/Utility Scale systems
-util_solar_on = 1;
-util_wind_on = 1;
-util_ees_on = 1;
-util_el_on = 1;
-util_h2_inject_on = 1;
+util_solar_on = 0;
+util_wind_on = 0;
+util_ees_on = 0;
+util_el_on = 0;
+util_h2_inject_on = 0;
 
 %%%Hydrogen technologies
 el_on = 1; %Turn on generic electrolyer
@@ -52,25 +52,25 @@ lees_on = 1; %Legacy EES
 ltes_on = 1; %Legacy TES
 
 ldg_on = 1; %Turn on legacy GT
-lbot_on = 1; %Turn on legacy bottoming cycle / Steam turbine
-lhr_on = 1; %Legacy HR
-ldb_on = 1; %Legacy Duct Burner
+lbot_on = 0; %Turn on legacy bottoming cycle / Steam turbine
+lhr_on = 0; %Legacy HR
+ldb_on = 0; %Legacy Duct Burner
 lboil_on = 1; %Legacy boilers
 
 %% Utility PV Solar
-util_pv_wheel = 1; %General Wheeling Capabilities
+util_pv_wheel = 0; %General Wheeling Capabilities
 util_pv_wheel_lts = 0; %Wheeling for long term storage
 util_pp_import = 0; %Can import power at power plant node
 util_pp_export = 0; %Can import power at power plant node
 
 %% Utility H2 production
 util_h2_sale = 0;
-util_h2_pipe_store = 1;
+util_h2_pipe_store = 0;
 %% Strict storage design
 strict_h2es = 0;
 
 %% Legacy Generator Options
-ldg_op_state = 1; %%%Generator can turn on/off
+ldg_op_state = 0; %%%Generator can turn on/off
 lbot_op_state = 0; %%%Steam turbine can turn on/off
 %%%Gas turbine cycling costs
 dg_legacy_cyc = 1;
@@ -226,6 +226,7 @@ month_idx = [1 4 7 10];
 month_idx = [2 9];
 month_idx = [1 3 6 7 9 11];
 month_idx = [1 4 7 10];
+month_idx = 7;
 
 
 

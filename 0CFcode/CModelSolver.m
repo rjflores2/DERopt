@@ -24,6 +24,16 @@ classdef CModelSolver < handle
         solarPhotoVoltaicElec
         solarPhotoVoltaicNem
     
+%Fuel Cell Binary Adoption Variables
+fuelCellAdopt
+fuelCellCapacity
+fuelCellElectricity
+fuelCellFuelIn
+fuelCellH2In
+
+%Utility H2
+utilityH2
+
         % Electrical Energy Storage
         electricalEnergyStorage_adopt
         electricalEnergyStorage_chrg
@@ -245,6 +255,17 @@ classdef CModelSolver < handle
             obj.utilityOnpeakDc = value(modelVars.util_onpeak_dc);
             obj.utilityMidpeakDc = value(modelVars.util_midpeak_dc);
             obj.utilityGenExport = value(modelVars.util_gen_export);
+            
+            %% Newly Added Variables
+            %Fuel Cell Binary Adoption Variables.
+            obj.fuelCellAdopt = value(modelVars.fuel_cell_binary_adopt);
+            obj.fuelCellCapacity = value(modelVars.fuel_cell_binary_capacity);
+            obj.fuelCellElectricity = value(modelVars.fuel_cell_binary_elec);
+            obj.fuelCellFuelIn = value(modelVars.fuel_cell_binary_fuel);
+            obj.fuelCellH2In = value(modelVars.fuel_cell_binary_hfuel);
+            
+            %Utility H2
+            obj.utilityH2 = value(modelVars.util_h2);
             
             %% Optimized Variables - New Technologies
             % Solar Variables

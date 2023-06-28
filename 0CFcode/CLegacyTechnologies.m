@@ -25,6 +25,8 @@ classdef CLegacyTechnologies
                 %%%[O&M ($/kWh)  -  1
                 %%%  PV Capacity (kW)] - 2
                 obj.pv_legacy = [0.001; 4000];
+            else
+                obj.pv_legacy = [0; 0];                
             end
 
             

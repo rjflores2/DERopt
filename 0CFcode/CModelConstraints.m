@@ -40,7 +40,7 @@ classdef CModelConstraints < handle
             %% Building Electrical Energy Balances
             % (For  all timesteps t Vectorized ??)
             obj.Constraints = [obj.Constraints
-                (sum(modelVars.util_import,2) + sum(modelVars.pv_elec,2) + sum(modelVars.ees_dchrg,2) + sum(modelVars.lees_dchrg,2) + sum(modelVars.rees_dchrg,2) + sum(modelVars.ldg_elec,2) + sum(modelVars.lbot_elec,2) + sum(modelVars.pp_elec_wheel,2)... %%%Production
+                (sum(modelVars.fuel_cell_binary_elec,2) + sum(modelVars.util_import,2) + sum(modelVars.pv_elec,2) + sum(modelVars.ees_dchrg,2) + sum(modelVars.lees_dchrg,2) + sum(modelVars.rees_dchrg,2) + sum(modelVars.ldg_elec,2) + sum(modelVars.lbot_elec,2) + sum(modelVars.pp_elec_wheel,2)... %%%Production
                 ==...
                 elec + sum(modelVars.ees_chrg,2) + sum(modelVars.lees_chrg,2) + modelVars.generic_cool./4  + sum(modelVars.lvc_cool.*modelVars.vc_cop,2) + sum(modelVars.el_eff.*modelVars.el_prod,2) + sum(modelVars.h2_chrg_eff.*modelVars.h2es_chrg,2) + modelVars.util_gen_export + modelVars.hrs_supply.*modelVars.hrs_chrg_eff + modelVars.elec_dump):'Electricity Balance']; %%%Demand
             
@@ -62,7 +62,7 @@ classdef CModelConstraints < handle
             %% Chemical ennergy conversion balance - Hydrogen
             if ~isempty(el_v) || ~isempty(rel_v)
                 obj.Constraints = [obj.Constraints
-                   (sum(modelVars.rel_prod,2) + sum(modelVars.el_prod,2) + sum(modelVars.rel_prod_wheel,2) + sum(modelVars.el_prod_wheel,2) + sum(modelVars.h2es_dchrg,2) == sum(modelVars.ldg_hfuel,2) + sum(modelVars.db_hfire,2) + sum(modelVars.boil_hfuel,2) + sum(modelVars.h2es_chrg,2) + modelVars.hrs_supply + modelVars.h2_inject + modelVars.h2_store):'Hydrogen Balance'];
+                   (sum(modelVars.util_h2,2) + sum(modelVars.rel_prod,2) + sum(modelVars.el_prod,2) + sum(modelVars.rel_prod_wheel,2) + sum(modelVars.el_prod_wheel,2) + sum(modelVars.h2es_dchrg,2) == sum(modelVars.fuel_cell_binary_hfuel,2) + sum(modelVars.ldg_hfuel,2) + sum(modelVars.db_hfire,2) + sum(modelVars.boil_hfuel,2) + sum(modelVars.h2es_chrg,2) + modelVars.hrs_supply + modelVars.h2_inject + modelVars.h2_store):'Hydrogen Balance'];
             end
             
             %% H2 Transportation
@@ -72,16 +72,7 @@ classdef CModelConstraints < handle
                 modelVars.hrs_supply <=1.5*max(hrs_demand)*modelVars.hrs_supply_adopt];
             end
             
-            %% POWERPLANTS
-            if util_solar_on || util_ees_on
-                obj.Constraints = [obj.Constraints
-                    (sum(modelVars.pp_elec_import,2) + sum(modelVars.util_ees_dchrg,2) + sum(modelVars.util_pv_elec,2) + sum(modelVars.util_wind_elec,2) == sum(modelVars.pp_elec_wheel,2) + sum(modelVars.pp_elec_wheel_lts,2) + sum(modelVars.pp_elec_export,2) + sum(modelVars.util_ees_chrg,2) + sum(modelVars.util_el_eff.*modelVars.util_el_prod,2)):'PP Electricity Balance'];
-                
-                if util_pv_wheel_lts
-                    obj.Constraints = [obj.Constraints
-                        (sum(el_eff.*modelVars.el_prod_wheel,2) + sum(el_eff.*modelVars.rel_prod_wheel,2) == sum(modelVars.pp_elec_wheel_lts,2)):'PP to LTS Wheeling Electricity Balance'];
-                end
-            end            
+                   
 
             elapsedTime = toc;
         end
@@ -171,24 +162,18 @@ classdef CModelConstraints < handle
             end
             
             %% General import / export limits
-            if exist('fac_prop') && (~isempty(utility_exists) || util_pv_wheel)
+            utility_exists
+%             if exist('fac_prop') && (~isempty(utility_exists) || util_pv_wheel)
 
-                obj.Constraints = [obj.Constraints
-                    (modelVars.util_import + modelVars.pp_elec_wheel + modelVars.pp_elec_wheel_lts <= modelVars.util_import_state .*fac_prop(1)./e_adjust):'General Import Limits'];
-                if gen_export_on || export_on
-                    obj.Constraints = [obj.Constraints
-                        (modelVars.util_gen_export <= (1 - modelVars.util_import_state) .*fac_prop(1)./e_adjust):'General Export Limits'];
-                end
-            end
+%                 obj.Constraints = [obj.Constraints
+%                     (modelVars.util_import + modelVars.pp_elec_wheel + modelVars.pp_elec_wheel_lts <= modelVars.util_import_state .*fac_prop(1)./e_adjust):'General Import Limits'];
+%                 if gen_export_on || export_on
+%                     obj.Constraints = [obj.Constraints
+%                         (modelVars.util_gen_export <= (1 - modelVars.util_import_state) .*fac_prop(1)./e_adjust):'General Export Limits'];
+%                 end
+%             end
             
-            %% Power Plant import/export limits
-            if util_ees_on && util_pp_import
-
-                obj.Constraints = [obj.Constraints
-                (modelVars.pp_elec_import <= modelVars.import_state.*1e6):'Power Plant Import State'
-                (modelVars.pp_elec_export + modelVars.pp_elec_wheel + modelVars.pp_elec_wheel_lts <= (1 - modelVars.import_state).*1e6):'Power Plant Export State'];
-                
-            end
+            
             %% Gas Turbine Forced Fuel Input Constraint - Hydrogen
             if ~isempty(h2_fuel_forced_fraction) && ~isempty(el_v)
                 
@@ -209,7 +194,7 @@ classdef CModelConstraints < handle
                 
                 obj.Constraints = [obj.Constraints
                     ( sum(modelVars.util_import.*co2_import) ... %%%CO2 from imports
-                    + co2_ng*(sum(sum(modelVars.ldg_fuel)) + sum(sum(modelVars.db_fire)) + sum(sum(modelVars.boil_fuel)))... %%%CO2 from NG combustion
+                    + co2_ng*(sum(sum(modelVars.fuel_cell_binary_fuel)) + sum(sum(modelVars.ldg_fuel)) + sum(sum(modelVars.db_fire)) + sum(sum(modelVars.boil_fuel)))... %%%CO2 from NG combustion
                     + co2_rng*(sum(sum(modelVars.ldg_rfuel)) + sum(sum(modelVars.db_rfire)) + sum(sum(modelVars.boil_rfuel))) ... %%%CO2 from rNG combustion
                     <= ...
                     co2_lim):'CO2 Limit'];
@@ -217,7 +202,7 @@ classdef CModelConstraints < handle
             end
             
             %% Renewable biogas limit
-            if ~isempty(biogas_limit)
+            if ~isempty(biogas_limit) && ldg_on
                 
                 %%%(length(endpts)/12) term prorates available biogas to the simulation
                 %%%period
@@ -281,7 +266,17 @@ classdef CModelConstraints < handle
             elapsedTime = toc;
         end
         
-        
+        %% Fuel Cell Binary Adoption Constraints
+        function [elapsedTime] = Calculate_FuelCellBinary(obj, modelVars, e_adjust, FuelCellBinary_v, elec)
+            obj.Constraints = [obj.Constraints
+                (modelVars.fuel_cell_binary_capacity <= modelVars.fuel_cell_binary_adopt.*max(elec)*e_adjust):'Fuel Cell Binary Adoption'
+                (repmat(modelVars.fuel_cell_binary_capacity./e_adjust,size(modelVars.fuel_cell_binary_elec,1),1).*FuelCellBinary_v(5) <= modelVars.fuel_cell_binary_elec <= repmat(modelVars.fuel_cell_binary_capacity./e_adjust,size(modelVars.fuel_cell_binary_elec,1),1)):'Fuel Cell Output Limits'
+                (modelVars.fuel_cell_binary_elec./FuelCellBinary_v(4) == modelVars.fuel_cell_binary_fuel + modelVars.fuel_cell_binary_hfuel):'Fuel Cell Fuel Input'];
+            
+            % (var_dgb.dgb_capacity <= var_dgb.dgb_adopt.*1000):'dgb Adoption'
+            %         (var_dgb.dgb_elec  <= repmat(var_dgb.dgb_capacity,size(var_dgb.dgb_elec,1),1)):'dgb Output Limits'
+%         (var_dgb.dgb_elec./dgb_v(3) == var_dgb.dgb_fuel):'dgb Fuel'];
+end
         %% Legacy DG Constraints
         %--------------------------------------------------------------------------
         %--------------------------------------------------------------------------
@@ -351,30 +346,20 @@ classdef CModelConstraints < handle
                 %% PV Energy balance when curtailment is allowed
                 if curtail
                     obj.Constraints = [obj.Constraints
-                        (modelVars.pv_elec + modelVars.pv_nem + sum(modelVars.rees_chrg,2) + sum(modelVars.rel_eff.*modelVars.rel_prod,2) <= (sum(pv_legacy(2,:))/e_adjust)*solar + (sum(modelVars.pv_adopt))/e_adjust*solar) :'PV Energy Balance'];
+                        (modelVars.pv_elec + modelVars.pv_nem + sum(modelVars.rees_chrg,2) + sum(modelVars.rel_eff.*modelVars.rel_prod,2) <= (sum(pv_legacy(2,:))/e_adjust)*solar + (sum(modelVars.pv_adopt))/e_adjust*solar) :'PV Energy Balance - Curtailment Allowed'];
                     % Constraints = [Constraints, (pv_wholesale + pv_elec + pv_nem + rees_chrg <= repmat(solar,1,K).*repmat(pv_adopt,T,1)):'PV Energy Balance'];
                 else
                     obj.Constraints = [obj.Constraints
-                        (modelVars.pv_elec + modelVars.pv_nem + sum(modelVars.rees_chrg,2) + sum(modelVars.rel_eff.*modelVars.rel_prod,2)  == (sum(pv_legacy(2,:))/e_adjust)*solar + (sum(modelVars.pv_adopt))/e_adjust*solar) :'PV Energy Balance'];
+                        (modelVars.pv_elec + modelVars.pv_nem + sum(modelVars.rees_chrg,2) + sum(modelVars.rel_eff.*modelVars.rel_prod,2)  == (sum(pv_legacy(2,:))/e_adjust)*solar + (sum(modelVars.pv_adopt))/e_adjust*solar) :'PV Energy Balance - No Curtailment'];
                     % Constraints = [Constraints, (pv_wholesale + pv_elec + pv_nem + rees_chrg == repmat(solar,1,K).*repmat(pv_adopt,T,1)):'PV Energy Balance'];
                 end
 
-                %% Min PV to adopt: Forces 3 kW Adopted
-                if toolittle_pv ~= 0
-                    obj.Constraints = [obj.Constraints,(toolittle_pv <= sum(modelVars.pv_adopt)):'toolittle_pv'];
-                    
-                    % for k=1:K
-                    %    Constraints = [Constraints, (implies(pv_adopt(k) <= toolittle_pv, pv_adopt(k) == 0)):'toolittle_pv'];
-                    % end
-                end
-                
                 %% Max PV to adopt (capacity constrained)
-                if ~isempty(maxpv) && ~isempty(pv_v) 
-
-                    obj.Constraints = [obj.Constraints
-                        (modelVars.pv_adopt' <= maxpv'):'Mav PV Capacity'];  
-                    % Constraints = [Constraints, (sum(modelVars.pv_adopt) <= maxpv'):'Mav PV Capacity'];
-                end
+%                 if ~isempty(maxpv) && ~isempty(pv_v) 
+% 
+%                     obj.Constraints = [obj.Constraints
+%                         (modelVars.pv_adopt' <= maxpv'):'Mav PV Capacity'];  
+%                 end
                 
                 %% Don't curtail for residential
                 % residential = find(strcmp(rate,'R1') |strcmp(rate,'R2') | strcmp(rate,'R3')| strcmp(rate,'R4'));   
@@ -389,7 +374,7 @@ classdef CModelConstraints < handle
         %% EES Constraints
         %--------------------------------------------------------------------------
         %--------------------------------------------------------------------------
-        function [elapsedTime] = Calculate_EES(obj, modelVars, ees_v, pv_v, rees_on)
+        function [elapsedTime] = Calculate_EES(obj, modelVars, ees_v, pv_v, rees_on,export_on)
             tic
 
             %% Grid tied EES
@@ -411,12 +396,16 @@ classdef CModelConstraints < handle
                         %%%SOC Equality / Energy Balance
                         obj.Constraints = [obj.Constraints
                             (modelVars.rees_soc(1,ii) <= modelVars.rees_soc(obj.T,ii)):'Initial REES SOC <= Final SOC'
-                            (modelVars.rees_dchrg_nem(1,ii) == 0):'No REES NEM in 1st time step'
                             (modelVars.rees_soc(2:obj.T,ii) == ees_v(10,ii)*modelVars.rees_soc(1:obj.T-1,ii) + ees_v(8,ii)*modelVars.rees_chrg(2:obj.T,ii)  - (1/ees_v(9,ii))*(modelVars.rees_dchrg(2:obj.T,ii) + modelVars.rees_dchrg_nem(2:obj.T,ii))):'REES Balance'  %%%Minus discharging of battery
                             (ees_v(4,ii)*modelVars.rees_adopt(ii) <= modelVars.rees_soc(:,ii) <= ees_v(5,ii)*modelVars.rees_adopt(ii)):'REES Min/Max SOC' %%%Min/Max SOC
                             (modelVars.rees_chrg(:,ii) <= ees_v(6,ii)*modelVars.rees_adopt(ii)):'REES Max Chrg' %%%Max Charge Rate
                             (modelVars.rees_dchrg(:,ii) <= ees_v(7,ii)*modelVars.rees_adopt(ii)):'REES Max Dchrg']; %%%Max Discharge Rate
                         
+                        
+                        if export_on
+                            obj.Constraints = [obj.Constraints
+                                (modelVars.rees_dchrg_nem(1,ii) == 0):'No REES NEM in 1st time step'];
+                        end
                         %%%Adding sgip constraints
                         %             if sgip_on && ~isempty(find(non_res_rates == find(ismember(rate_labels,rate(1))))) %%%IS nonresidential
                         %                 Constraints = [Constraints;(-modelVars.rees_chrg(:,ii)'*sgip_signal(:,2) +  modelVars.rees_dchrg(:,ii)'*sgip_signal(:,2) >= modelVars.rees_adopt(ii)*sgip(1)):'SGIP CO2 Reduciton'];
@@ -620,95 +609,7 @@ classdef CModelConstraints < handle
             elapsedTime = toc;
         end
         
-        
-        %% Utility Solar PV
-        %--------------------------------------------------------------------------
-        %--------------------------------------------------------------------------
-        function [elapsedTime] = Calculate_UtilitySolar(obj, modelVars, utilpv_v, e_adjust)
-            tic
-
-            if ~isempty(utilpv_v)
-
-                %%% PV Energy Balance
-                obj.Constraints = [obj.Constraints
-                    (modelVars.util_pv_elec <= modelVars.util_pv_adopt/e_adjust.*solar_util):'Utility PV Energy Balance'
-                    (modelVars.util_pv_adopt <= 10*60000):'Max Utility PV'];
-                
-            end
-
-            elapsedTime = toc;
-        end
-        
-        
-        %% Utility Wind
-        %--------------------------------------------------------------------------
-        %--------------------------------------------------------------------------
-        function [elapsedTime] = Calculate_UtilityWind(obj, modelVars, util_wind_v, e_adjust)
-            tic
-
-            if ~isempty(util_wind_v)
-                
-                %%% PV Energy Balance
-                obj.Constraints = [obj.Constraints
-                    (modelVars.util_wind_elec <= modelVars.util_wind_adopt/e_adjust.*wind_util):'Utility WIND Energy Balance'
-                    (modelVars.util_wind_adopt <= 10*60000):'Max Utility PV'];
-            end
-
-            elapsedTime = toc;
-        end
-        
-        
-        %% Utility EES Storage
-        %--------------------------------------------------------------------------
-        %--------------------------------------------------------------------------
-        function [elapsedTime] = Calculate_UtilityEESStorage(obj, modelVars, util_ees_v)
-            tic
-
-            if ~isempty(util_ees_v)
-
-                % TODO: what value should ii have???
-
-                obj.Constraints = [obj.Constraints
-                        (modelVars.util_ees_soc(1,ii) <= modelVars.util_ees_soc(obj.T,ii)):'Initial Utility EES SOC <= Final SOC'
-                        (modelVars.util_ees_soc(2:obj.T,ii) == util_ees_v(10,ii)*modelVars.util_ees_soc(1:obj.T-1,ii) + util_ees_v(8,ii)*modelVars.util_ees_chrg(2:obj.T,ii)  - (1/util_ees_v(9,ii))*modelVars.util_ees_dchrg(2:T,ii)):'Utility EES Balance'  %%%Minus discharging of battery
-                        (util_ees_v(4,ii)*modelVars.util_ees_adopt(ii) <= modelVars.util_ees_soc(:,ii) <= util_ees_v(5,ii)*modelVars.util_ees_adopt(ii)):'Utility EES Min/Max SOC' %%%Min/Max SOC
-                        (modelVars.util_ees_chrg(:,ii) <= util_ees_v(6,ii)*modelVars.util_ees_adopt(ii)):'Utility EES Max Chrg'  %%%Max Charge Rate
-                        (modelVars.util_ees_dchrg(:,ii) <= util_ees_v(7,ii)*modelVars.util_ees_adopt(ii)):'Utility EES Max Dchrg']; %%%Max Discharge Rate
-                
-            end
-
-            elapsedTime = toc;
-        end
-        
-        
-        %% Utility Electrolyzer
-        %--------------------------------------------------------------------------
-        %--------------------------------------------------------------------------
-        function [elapsedTime] = Calculate_UtilityElectrolyzer(obj, modelVars, util_el_v)
-            tic
-
-            if ~isempty(util_el_v)
-
-                for i = 1:size(util_el_v,2)
-                    obj.Constraints = [obj.Constraints
-                        (0 <= modelVars.util_el_prod(:,i) <= modelVars.util_el_adopt(i).*(1/e_adjust)):'Electrolyzer Min/Max Output' %%%Production is limited by adopted capacity
-                        (modelVars.util_h2_store(:,i) + modelVars.util_h2_inject(:,i) == modelVars.util_el_prod(:,i)):'Electrolyzer output direciton'];
-                end
-                
-                %%%H2 Pipeline Injection
-                if util_h2_inject_on
-
-                    obj.Constraints = [obj.Constraints
-                        (modelVars.util_h2_inject + modelVars.util_h2_store <= 1e6*modelVars.util_h2_inject_adopt):'H2 Injection is Adopted'
-                        (modelVars.util_h2_inject + modelVars.util_h2_store <= modelVars.util_h2_inject_size.*(1/e_adjust)):'H2 Injection Capacity'
-                        (sum(modelVars.ldg_dfuel) <= sum(modelVars.util_h2_store)):'Fuel pulled from storage is less than equal what has been stored'];
-                end
-                
-            end
-
-            elapsedTime = toc;
-        end
-
+       
         
         %% H2 Pipeline Injection
         %--------------------------------------------------------------------------

@@ -11,6 +11,8 @@ classdef CCapitalCostCalculator < handle
         hrs_mthly_debt = [];
         h2_inject_mthly_debt = [];
 
+fuel_cell_binary_mthly_debt = [];
+
         utilpv_mthly_debt = [];
         util_wind_mthly_debt = [];
         util_ees_mthly_debt = [];
@@ -73,11 +75,19 @@ classdef CCapitalCostCalculator < handle
                                 requiredReturnCapitalPayment*(obj.equity)*(obj.required_return*(1+obj.required_return)^(obj.period*12))...
                                 /((1+obj.required_return)^(obj.period*12)-1));
 
-
+                            
         end
         
-        function DebtPaymentsFullCostSystem(obj, pv_v, ees_v, el_v, rel_v, h2es_v, hrs_v, h2_inject_v, utilpv_v, util_wind_v, util_ees_v, util_el_on, util_h2_inject_v, rees_on)
-
+        function DebtPaymentsFullCostSystem(obj, pv_v, ees_v, el_v, rel_v, h2es_v, hrs_v, h2_inject_v, utilpv_v, util_wind_v, util_ees_v, util_el_on, util_h2_inject_v, rees_on, FuelCellBinary_v)
+            
+            %%%Fuel Cell binary option
+            if ~isempty(FuelCellBinary_v)
+                for ii=1:size(FuelCellBinary_v,2)
+                    obj.fuel_cell_binary_mthly_debt(ii,1) = FuelCellBinary_v(1,ii) * obj.debtCoeficient;
+                    obj.fuel_cell_binary_mthly_debt(ii,2) = FuelCellBinary_v(2,ii) * obj.debtCoeficient;
+                end
+            end
+            
             % Solar PV
             if ~isempty(pv_v)
                 for ii=1:size(pv_v,2)

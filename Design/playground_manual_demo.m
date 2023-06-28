@@ -25,7 +25,7 @@ playground_run_cfg.co2_baseline_emissions_kg = [];
 playground_run_cfg.co2_desired_amount_reduction = [0 0.05];
 
 % Building DataValues to filter data by
-playground_run_cfg.month_idx = [1 4 7 10];
+playground_run_cfg.month_idx = [7];
 playground_run_cfg.year_idx = 2018;
 
 
