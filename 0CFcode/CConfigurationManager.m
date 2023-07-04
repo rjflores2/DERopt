@@ -287,7 +287,7 @@ fuel_cell_binary_on %Turn on DG with binary purchase option
             obj.ng_inject = 0.05/29.3; %$/kWh --> Converted from $/therm to $/kWh, 29.3 kWh / 1 Therm
 
 %%%Regular H2 cost
-obj.h2_cost = (2/120*105.5 + 0.6)/29.3;
+obj.h2_cost = 4/120*105.5 + 0*(8/120*105.5 + 0.6)/29.3;
 
             % Including Required Return with Capital Payment (1 = Yes)
             obj.req_return_on = 1;
