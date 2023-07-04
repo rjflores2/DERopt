@@ -25,7 +25,7 @@ playground_run_cfg.co2_baseline_emissions_kg = [];
 playground_run_cfg.co2_desired_amount_reduction = [0 0.05];
 
 % Building DataValues to filter data by
-playground_run_cfg.month_idx = [7];
+playground_run_cfg.month_idx = [1 4 7 10];
 playground_run_cfg.year_idx = 2018;
 
 
@@ -185,6 +185,14 @@ dt2 = [optRec.elec ...
         optRec.solar.pv_nem(:,idx)];
 
 
+
+graphIndex = find(playground_run_cfg.month_idx == 7);
+            
+if isempty(graphIndex)
+    graphIndex = 1;
+end
+
+
 %%% Plot 'Electric Sources (MW)'
 figure
 hold on
@@ -193,7 +201,7 @@ set(gca,'XTick', round(optRec.time(1),0)+.5:round(optRec.time(end),0)+.5,'FontSi
 box on
 grid on
 datetick('x','ddd','keepticks')
-xlim([optRec.time(optRec.stpts(3)) optRec.time(optRec.stpts(3)+96*7)])
+xlim([optRec.time(optRec.stpts(graphIndex)) optRec.time(optRec.stpts(graphIndex)+96*7)])
 ylabel('Electric Sources (MW)','FontSize',18)
 legend('Gas Turbine','Utility Import','Solar','Battery Discharge','Location','Best')
 set(gcf,'Position',[100 450 500 275])
@@ -207,7 +215,7 @@ set(gca,'XTick', round(optRec.time(1),0)+.5:round(optRec.time(end),0)+.5, 'FontS
 box on
 grid on
 datetick('x','ddd','keepticks')
-xlim([optRec.time(optRec.stpts(3)) optRec.time(optRec.stpts(3)+96*7)])
+xlim([optRec.time(optRec.stpts(graphIndex)) optRec.time(optRec.stpts(graphIndex)+96*7)])
 ylabel('Electric Loads (MW)','FontSize',18)
 legend('Campus','Battery Charging','H_2 Production','Export','Location','Best')
 set(gcf,'Position',[100 100 500 275])

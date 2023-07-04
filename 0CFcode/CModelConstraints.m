@@ -268,15 +268,25 @@ classdef CModelConstraints < handle
         
         %% Fuel Cell Binary Adoption Constraints
         function [elapsedTime] = Calculate_FuelCellBinary(obj, modelVars, e_adjust, FuelCellBinary_v, elec)
-            obj.Constraints = [obj.Constraints
-                (modelVars.fuel_cell_binary_capacity <= modelVars.fuel_cell_binary_adopt.*max(elec)*e_adjust):'Fuel Cell Binary Adoption'
-                (repmat(modelVars.fuel_cell_binary_capacity./e_adjust,size(modelVars.fuel_cell_binary_elec,1),1).*FuelCellBinary_v(5) <= modelVars.fuel_cell_binary_elec <= repmat(modelVars.fuel_cell_binary_capacity./e_adjust,size(modelVars.fuel_cell_binary_elec,1),1)):'Fuel Cell Output Limits'
-                (modelVars.fuel_cell_binary_elec./FuelCellBinary_v(4) == modelVars.fuel_cell_binary_fuel + modelVars.fuel_cell_binary_hfuel):'Fuel Cell Fuel Input'];
+
+            tic
+
+            if ~isempty(FuelCellBinary_v)
+
+                obj.Constraints = [obj.Constraints
+                    (modelVars.fuel_cell_binary_capacity <= modelVars.fuel_cell_binary_adopt.*max(elec)*e_adjust):'Fuel Cell Binary Adoption'
+                    (repmat(modelVars.fuel_cell_binary_capacity./e_adjust,size(modelVars.fuel_cell_binary_elec,1),1).*FuelCellBinary_v(5) <= modelVars.fuel_cell_binary_elec <= repmat(modelVars.fuel_cell_binary_capacity./e_adjust,size(modelVars.fuel_cell_binary_elec,1),1)):'Fuel Cell Output Limits'
+                    (modelVars.fuel_cell_binary_elec./FuelCellBinary_v(4) == modelVars.fuel_cell_binary_fuel + modelVars.fuel_cell_binary_hfuel):'Fuel Cell Fuel Input'];
             
-            % (var_dgb.dgb_capacity <= var_dgb.dgb_adopt.*1000):'dgb Adoption'
-            %         (var_dgb.dgb_elec  <= repmat(var_dgb.dgb_capacity,size(var_dgb.dgb_elec,1),1)):'dgb Output Limits'
-%         (var_dgb.dgb_elec./dgb_v(3) == var_dgb.dgb_fuel):'dgb Fuel'];
-end
+                    % (var_dgb.dgb_capacity <= var_dgb.dgb_adopt.*1000):'dgb Adoption'
+                    % (var_dgb.dgb_elec  <= repmat(var_dgb.dgb_capacity,size(var_dgb.dgb_elec,1),1)):'dgb Output Limits'
+                    % (var_dgb.dgb_elec./dgb_v(3) == var_dgb.dgb_fuel):'dgb Fuel'];
+            end
+
+            elapsedTime = toc;
+        end
+
+
         %% Legacy DG Constraints
         %--------------------------------------------------------------------------
         %--------------------------------------------------------------------------

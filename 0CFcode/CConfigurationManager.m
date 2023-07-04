@@ -25,7 +25,7 @@ classdef CConfigurationManager < handle
         ees_on                      % Turn on EES/REES
         rees_on                     % Turn on REES
 
-fuel_cell_binary_on %Turn on DG with binary purchase option
+        fuel_cell_binary_on         %Turn on DG with binary purchase option
 
         % Community/Utility Scale systems
         util_solar_on
