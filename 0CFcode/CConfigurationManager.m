@@ -25,7 +25,7 @@ classdef CConfigurationManager < handle
         ees_on                      % Turn on EES/REES
         rees_on                     % Turn on REES
 
-fuel_cell_binary_on %Turn on DG with binary purchase option
+        fuel_cell_binary_on         %Turn on DG with binary purchase option
 
         % Community/Utility Scale systems
         util_solar_on
@@ -286,8 +286,8 @@ fuel_cell_binary_on %Turn on DG with binary purchase option
             obj.rng_storage_cost = 0.2/29.3;
             obj.ng_inject = 0.05/29.3; %$/kWh --> Converted from $/therm to $/kWh, 29.3 kWh / 1 Therm
 
-%%%Regular H2 cost
-obj.h2_cost = (2/120*105.5 + 0.6)/29.3;
+            %%%Regular H2 cost
+            obj.h2_cost = (2/120*105.5 + 0.6)/29.3;
 
             % Including Required Return with Capital Payment (1 = Yes)
             obj.req_return_on = 1;

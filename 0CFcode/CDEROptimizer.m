@@ -28,8 +28,6 @@ classdef CDEROptimizer < handle
             
             [obj.environmentIndex,~] = listdlg('ListString',opList,'SelectionMode','single', 'InitialValue',1,'PromptString','Select Environment','ListSize',[160 60]);
             
-            obj.environmentIndex = 1;
-            
             if isempty(obj.environmentIndex)
                 obj.environmentIndex = 1;
             end
