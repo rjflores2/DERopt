@@ -323,7 +323,7 @@ obj.h2_cost = 4/120*105.5 + 0*(8/120*105.5 + 0.6)/29.3;
                 obj.yalmip_master_path = 'C:\MotusVentures\YALMIP-master';
                 obj.matlab_path = 'C:\Program Files\MATLAB\R2023a\YALMIP-master';
 
-            else                                % 3 - Roman's Desktop
+            elseif mode == 3                    % 3 - Roman's Desktop
             
                 obj.demo_files_path = 'E:\MotusVentures\DERopt';
                 obj.demo_data_path = 'E:\MotusVentures\DERopt\Data';
@@ -332,6 +332,15 @@ obj.h2_cost = 4/120*105.5 + 0*(8/120*105.5 + 0.6)/29.3;
                 obj.yalmip_master_path = 'C:\MotusVentures\YALMIP-master';
                 obj.matlab_path = 'C:\Program Files\MATLAB\R2023a\YALMIP-master';
             
+           	else                                % 4 - Bruce's PC
+            
+                obj.demo_files_path = 'E:\MotusVentures\DERopt';
+                obj.demo_data_path = 'E:\MotusVentures\DERopt\Data';
+                obj.results_path = 'E:\MotusVentures\DERopt\SolveResults';
+            
+                obj.yalmip_master_path = 'C:\MotusVentures\YALMIP-master';
+                obj.matlab_path = 'C:\Program Files\MATLAB\R2019b\YALMIP-master';
+  
             end
 
         end

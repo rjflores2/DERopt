@@ -24,7 +24,7 @@ classdef CDEROptimizer < handle
         
         function obj = CDEROptimizer()
             
-            opList = {'1 - Robert''s PC', '2 - Roman''s Laptop', '3 - Roman''s Desktop'};
+            opList = {'1 - Robert''s PC', '2 - Roman''s Laptop', '3 - Roman''s Desktop', '4 - Bruce''s PC'};
             
             [obj.environmentIndex,~] = listdlg('ListString',opList,'SelectionMode','single', 'InitialValue',1,'PromptString','Select Environment','ListSize',[160 60]);
             
