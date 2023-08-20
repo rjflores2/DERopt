@@ -338,7 +338,7 @@ obj.h2_cost = 4/120*105.5 + 0*(8/120*105.5 + 0.6)/29.3;
                 obj.demo_data_path = 'C:\Users\Bruce Bateman\OneDrive\Google Drive\Documents\GitHub\DERopt\Data';
                 obj.results_path = 'C:\Users\Bruce Bateman\OneDrive\Google Drive\Documents\GitHub\DERopt\SolveResults';
             
-                obj.yalmip_master_path = 'C:\0cf\YALMIP-master';
+                obj.yalmip_master_path = 'D:\0cf\YALMIP-master';
                 obj.matlab_path = 'C:\Program Files\MATLAB\R2019b\YALMIP-master';
   
             end
