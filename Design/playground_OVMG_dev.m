@@ -3,7 +3,7 @@ clear all; close all; clc ; started_at = datetime('now'); startsim = tic;
 
 
 
-for crit_load_lvl = [7]%[0 1 2 3 4 5 6 7];%%[4 5 6 7] %%% Corresponding END around line 500 - after files have been saved
+for crit_load_lvl = [3]%[0 1 2 3 4 5 6 7];%%[4 5 6 7] %%% Corresponding END around line 500 - after files have been saved
     clearvars -except crit_load_lvl crit_load_lvl started_at startsim
 % crit_load_lvl = 5;
 % crit_load_lvl = [];
@@ -25,8 +25,12 @@ sim_lvl = 3;
 %% Infrastructure Cosntraints
 %%%AC Power Flow Simulation
 %%% 1) LinDistFlow
+if sim_lvl == 1 || sim_lvl == 3
+    acpf_sim = 0;
+else
+    acpf_sim = 1; %%Turn on for
+end
 acpf_sim = 1;
-
 %%%Are the transformer limits on or off?
 acpf_xfmr_on = 0;
 
@@ -43,6 +47,8 @@ if ~testing
     pv_on = sz_on;
     ees_on = sz_on;
     rees_on = sz_on;
+        dgb_on = 1;
+    dgc_on = 1;
     sofc_on = 0;
     lpv_on = 1-sz_on;
     lees_on = 1-sz_on;
@@ -153,7 +159,7 @@ addpath(genpath('H:\_Research_\CEC_OVMG\Rates'))
 %% Loading/seperating building demand
 
 scenario = 'ues_baseline_update'
-
+scenario = 'baseline_retest_2B_v2'
 % scenario = 'UES_1b'
 % scenario = 'ues_1a_v2'
 % scenario = 'UES_2b'
@@ -274,6 +280,13 @@ for sim_idx = 1:sim_end
     dc_exist = ri_num; %%%DC Exist - 1 = yes, 0 = no
     rate = ri_txt(2:end,2); %%%Rate info for each building
     
+    %%%Loading in NEM 3.0 data
+    export_energy_credits = xlsread('Export_Energy_Credit_2023.xlsx');
+    
+    %%%Credit for NEM 3.0 customers
+    nem3_0_credit = 0.04;
+    nem3_0_credit_low_income = 0.09;
+    
     %%%Low income properties
     [~,low_income_names] = xlsread('OV_Affordable_Housing.xlsx');
     
@@ -349,8 +362,10 @@ for sim_idx = 1:sim_end
     
     %% Utility Data
     %%%Loading Utility Data and Generating Energy Charge Vectors
-    utility_SCE_2020
-    
+    utility_SCE_2023
+    %% Gas Costs - only when a fuel cell is available
+    ng_cost = (1.*(strcmp(rate,'TOU8') + strcmp(rate,'GS1')) + 1.5.*strcmp(rate,'R1'))./29.3;
+    % ng_cost = (2/120*105.5 + 0.6)/29.3;
     %% Reducing size for testing
 %     time = time(1:endpts(2));
 %     elec = elec(1:endpts(2),:);

@@ -12,27 +12,32 @@ if opt_now==1
     ub=inf(size(lb));
     elapsed = toc;
     fprintf('Model Export took %.2f seconds \n', elapsed)
-%      opt = cplexoptimset('cplex'); 
+    %      opt = cplexoptimset('cplex');
     options = cplexoptimset;
-%     options.Display='on';
-%         options.MaxTime = 2*3600;
-%     options.MaxNodes = 100;
-ops = sdpsettings('solver','cplex','verbose',1,'showprogress',1);
-%     ops.cplex.MaxNodes = 100;
-%     ops.mip.strategy.file =  2
-%     ops.display = 'on';
-%     ops.Diagnostics = 'on';
-
-options = cplexoptimset('mip.strategy.file', 2,...
-    'mip.limits.nodes', 100);
-options.Display='on';
-options.Diagnostics='on';
-
+    %     options.Display='on';
+    %         options.MaxTime = 2*3600;
+    %     options.MaxNodes = 100;
+    ops = sdpsettings('solver','cplex','verbose',1,'showprogress',1);
+    %     ops.cplex.MaxNodes = 100;
+    %     ops.mip.strategy.file =  2
+    %     ops.display = 'on';
+    %     ops.Diagnostics = 'on';
+    
+    
+    options.Display='on';
+    options.Diagnostics='on';
+    
     fprintf('%s Starting CPLEX Solver \n', datestr(now,'HH:MM:SS'))
     tic
-%         [x, fval, exitflag, output, lambda] = cplexlp(model.f, model.Aineq, model.bineq, model.Aeq, model.beq, lb, ub, [], ops);
-    [x, fval, exitflag, output] = cplexmilp(model.f, model.Aineq, model.bineq, model.Aeq, model.beq, [],[],[],lb,ub,model.ctype,[],options);
-%     [x, fval, exitflag, output] = cplexmilp(model.f, model.Aineq, model.bineq, model.Aeq, model.beq, [],[],[],lb,ub,model.ctype,[],options);
+    %         [x, fval, exitflag, output, lambda] = cplexlp(model.f, model.Aineq, model.bineq, model.Aeq, model.beq, lb, ub, [], ops);
+    if isempty(strfind(model.ctype,'I')) && isempty(strfind(model.ctype,'B'))
+        [x, fval, exitflag, output, lambda] = cplexlp(model.f, model.Aineq, model.bineq, model.Aeq, model.beq, lb, ub, [], options);
+    else
+        options = cplexoptimset('mip.strategy.file', 2,...
+            'mip.limits.nodes', 100);
+        [x, fval, exitflag, output] = cplexmilp(model.f, model.Aineq, model.bineq, model.Aeq, model.beq, [],[],[],lb,ub,model.ctype,[],options);
+    end
+    %     [x, fval, exitflag, output] = cplexmilp(model.f, model.Aineq, model.bineq, model.Aeq, model.beq, [],[],[],lb,ub,model.ctype,[],options);
     elapsed = toc;
     fprintf('CPLEX took %.2f seconds \n', elapsed)
     
@@ -42,10 +47,10 @@ options.Diagnostics='on';
     
     
     
-%     cplex = Cplex(model); %instantiate object cplex of class Cplex 
-%     cplex.solve() %metod solve() to create Solution dynamic property
-%     cplex.Solution.status
-%     cplex.Solution.miprelgap
+    %     cplex = Cplex(model); %instantiate object cplex of class Cplex
+    %     cplex.solve() %metod solve() to create Solution dynamic property
+    %     cplex.Solution.status
+    %     cplex.Solution.miprelgap
     
     % Recovering data and assigning to the YALMIP variables
     assign(recover(recoverymodel.used_variables),x)

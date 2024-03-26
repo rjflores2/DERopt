@@ -126,9 +126,11 @@ if isempty(pv_v) == 0
         if ~esa_on
             esa_frac = 0;
         end
+        
+        nem3_0_credit_low_income - nem3_0_credit
             %%%Filling in temp cost function arrays
-            temp_cf1(:,k) = -day_multi.*export_price(:,index).*(1-care_energy_rebate*esa_frac);
-            temp_cf1(:,k) = -day_multi.*export_price(:,index);
+%             temp_cf1(:,k) = -day_multi.*export_price(:,index).*(1-care_energy_rebate*esa_frac) - (nem3_0_credit_low_income - nem3_0_credit)*esa_frac;
+            temp_cf1(:,k) = -day_multi.*export_price(:,index) - (nem3_0_credit_low_income - nem3_0_credit)*esa_frac;
             %             temp_cf2(:,k) = -day_multi.*ex_wholesale;
             
         end

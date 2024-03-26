@@ -72,14 +72,14 @@ else
     var_util.nontou_dc=zeros(M,1);
     
     %%%On Peak/ Mid Peak TOU DC
-    var_util.onpeak_dc=zeros(onpeak_count,1);
-    var_util.midpeak_dc=zeros(midpeak_count,1);
+    var_util.onpeak_dc=zeros(T,1);
+    var_util.midpeak_dc=zeros(T,1);
 end
 
 %% General export
 %%% General export allows export from any onsite resource, regardless of
 %%% fuel source
-if gen_export_on
+if exist('gen_export_on') && gen_export_on
     var_util.gen_export = sdpvar(T,1,'full');
     var_util.import_state = binvar(T,1,'full');
     Objective =  Objective ...
@@ -94,7 +94,7 @@ end
 if isempty(pv_v) == 0
     
     %%%PV Generation to meet building demand (kWh)
-    var_pv.pv_elec = sdpvar(T,1,'full'); %%% PV Production sent to the building
+    var_pv.pv_elec = sdpvar(T,size(pv_v,2),'full'); %%% PV Production sent to the building
     
     %%%Size of installed System (kW)
     var_pv.pv_adopt= sdpvar(1,size(pv_v,2),'full'); %%%PV Size
@@ -102,7 +102,7 @@ if isempty(pv_v) == 0
     if ~isempty(utility_exists) && utility_exists && export_on %If grid tied, then include NEM and wholesale export
         
         %%% Variables that exist when grid tied
-        var_pv.pv_nem = sdpvar(T,1,'full'); %%% PV Production exported w/ NEM
+        var_pv.pv_nem = sdpvar(T,size(pv_v,2),'full'); %%% PV Production exported w/ NEM
         
         %%%PV Export - NEM (kWh)
         %%%Utility rates for building k
@@ -114,15 +114,15 @@ if isempty(pv_v) == 0
              + sum(sum((-day_multi.*export_price(:,index)).*var_pv.pv_nem)); %%%NEM Revenue Cost
          
     else
-        var_pv.pv_nem = zeros(T,1);
+        var_pv.pv_nem = zeros(T,size(pv_v,2));
     end
     
     %%%PV Cost
 
     Objective = Objective ...
-        + sum(M*pv_mthly_debt'.*pv_cap_mod.*var_pv.pv_adopt)... %%%PV Capital Cost ($/kW installed)
-        + pv_v(3)*(sum(sum(day_multi.*(var_pv.pv_elec)))) ... %%%PV O&M Cost ($/kWh generated)    
-        + pv_v(3)*(sum(sum(day_multi.*(var_pv.pv_nem)))); %%%PV O&M Cost ($/kWh generated)
+        + sum(M*pv_mthly_debt.*pv_cap_mod.*var_pv.pv_adopt)... %%%PV Capital Cost ($/kW installed)
+        + sum(sum((pv_v(3,:).*day_multi).*(var_pv.pv_elec))) ... %%%PV O&M Cost ($/kWh generated)    
+        + sum(sum((pv_v(3,:).*day_multi).*(var_pv.pv_nem))); %%%PV O&M Cost ($/kWh generated)
 %         + pv_v(3)*(sum(sum(repmat(day_multi,1,K).*(var_pv.pv_elec + var_pv.pv_nem + pv_wholesale))) ); %%%PV O&M Cost ($/kWh generated)
 
     %%% Allow for adoption of Renewable paired storage when enabled (REES)
@@ -170,7 +170,7 @@ if isempty(pv_v) == 0
         end
     else
         var_rees.rees_adopt=zeros(1,1);
-        var_rees.rees_chrg=zeros(T,1);
+        var_rees.rees_chrg=zeros(T,size(pv_v,2));
         var_rees.rees_dchrg=zeros(T,1);
         var_rees.rees_dchrg_nem=zeros(T,1);
         var_rees.rees_soc=zeros(T,1);
@@ -187,8 +187,6 @@ else
     var_rees.rees_dchrg_nem=zeros(T,1);
     var_rees.rees_soc=zeros(T,1);
 end
-toc
-
 %% Electrical Energy Storage
 if isempty(ees_v) == 0
     
@@ -211,7 +209,7 @@ if isempty(ees_v) == 0
             + ees_v(3,ii)*sum(sum(day_multi.*var_ees.ees_dchrg(:,ii)));%%%Discharging O&M
     end
     %%%SGIP rates
-    if sgip_on
+    if exist('sgip_on') && sgip_on
         
 % % %         Begin comments here
 %         %%%Residential Credits
@@ -248,7 +246,7 @@ else
     var_ees.ees_chrg = zeros(T,1);
     var_ees.ees_dchrg = zeros(T,1);
 end
-toc
+
 
 %% Renewable Electrolyzer
 if ~isempty(rel_v)
@@ -314,7 +312,7 @@ if ~isempty(rel_v)
     
 else
     var_rel.rel_adopt = 0;
-    var_rel.rel_prod = zeros(T,1);
+    var_rel.rel_prod = zeros(T,size(pv_v,2));
     var_rel.rel_prod_wheel = zeros(T,1);
     var_h2es.h2es_chrg = zeros(T,1);
     var_h2es.h2es_dchrg = zeros(T,1);
@@ -337,7 +335,7 @@ if ~isempty(el_v)
     %%%Electrolyzer production
     var_el.el_prod = sdpvar(T,size(el_v,2),'full');
     
-    if util_pv_wheel_lts
+    if exist('util_pv_wheel_lts') && util_pv_wheel_lts
         var_el.el_prod_wheel = sdpvar(T,size(el_v,2),'full');
     else
         var_el.el_prod_wheel = zeros(T,size(el_v,2));
@@ -361,7 +359,7 @@ if ~isempty(el_v)
         var_h2es.h2es_dchrg = sdpvar(T,size(h2es_v,2),'full');
         
         %%%H2ES Operational State Binary Variables
-        if strict_h2es
+        if exist('strict_h2es') && strict_h2es
             var_h2es.h2es_bin = binvar(T,size(h2es_v,2),'full');
         else
             var_h2es.h2es_bin = sdpvar(T,size(h2es_v,2),'full');
@@ -394,7 +392,7 @@ else
 end
 
 %% HRS equipment
-if hrs_on
+if exist('hrs_on') && hrs_on
     %%%Adopt hrs supply equipment?
     var_hrs.hrs_supply_adopt = binvar(1,1,'full');
     
@@ -418,7 +416,7 @@ else
 end
 
 %% H2 Pipeline Injection
-if h2_inject_on
+if exist('h2_inject_on') && h2_inject_on
     %%%Adopt HRS Equipment
     var_h2_inject.h2_inject_adopt = binvar(1,1,'full');
     %%%Size of adopted HRS Equipment
@@ -443,9 +441,19 @@ end
     
 %% Renewable Electrolyze
 %% Legacy Technologies
+%% Legacy Generic generator 
+if exist('ldiesel_on') && ldiesel_on
+    var_legacy_diesel.electricity = sdpvar(T,size(ldiesel_v,2),'full');
+    
+    Objective = Objective ...
+       + sum(sum(var_legacy_diesel.electricity,1).*(ldiesel_v(3,:) + (1./ldiesel_v(2,:)).*diesel_cost));
+else
+    var_legacy_diesel.electricity = zeros(T,1);
+end
+
 %% Legacy PV
 %%%Only need to add variables if new PV is not considered
-if isempty(pv_legacy) == 0 && sum(pv_legacy(2,:)) > 0 &&  isempty(pv_v)
+if exist('pv_legacy') && isempty(pv_legacy) == 0 && sum(pv_legacy(2,:)) > 0 &&  isempty(pv_v)
     
     if island == 0 && export_on == 1 %If grid tied, then include NEM and wholesale export
         %%% Variables that exist when grid tied
@@ -467,22 +475,28 @@ if isempty(pv_legacy) == 0 && sum(pv_legacy(2,:)) > 0 &&  isempty(pv_v)
     var_pv.pv_elec = [];
     var_pv.pv_elec = sdpvar(T,1,'full'); %%% PV Production sent to the building
     
-%     if ~iesmpty(el_v)
-%         var_pv.pv_h2 = sdpvar(T,1,'full'); %%% PV Production sent to the building
-%     end
-    
-    
     %%%Operating Costs
     Objective=Objective ...
         + pv_legacy(1,1)*(sum(sum(day_multi.*(var_pv.pv_elec + var_pv.pv_nem))));
     
-elseif isempty(pv_legacy) == 1
+else
     %%%If Legacy PV does not exist, then make the existing pv value zero
-    pv_legacy = zeros(2,1);
+%     pv_legacy = zeros(1,size(pv_v,2));
+end
+
+%% LEgacy Run-of-river system
+if exist('river_power_potential')
+   var_run_of_river.electricity = sdpvar(T,size(river_power_potential,2),'full');
+   
+    Objective=Objective ...
+        + sum(sum(l_run_of_river_v.*var_run_of_river.electricity));
+   
+else
+    var_run_of_river.electricity = zeros(T,1);
 end
 
 %% Legacy generator
-if ~isempty(dg_legacy)
+if exist('dg_legacy') &&  ~isempty(dg_legacy)
     %%%DG Electrical Output
     var_ldg.ldg_elec = sdpvar(T,size(dg_legacy,2),'full');
     %%%DG Fuel Input
@@ -563,7 +577,7 @@ end
 %%%Bottoming generator is any electricity producing device that operates
 %%%based on heat recovered from another generator
 
-if ~isempty(bot_legacy)
+if exist('bot_legacy') && ~isempty(bot_legacy)
     %%%Bottom electrical output
     var_lbot.lbot_elec = sdpvar(length(elec),size(bot_legacy,2),'full');
     %%%Bottom operational state
@@ -581,7 +595,7 @@ else
     var_lbot.lbot_on = zeros(T,1);
 end
 %% Legacy Heat recovery
-if ~isempty(dg_legacy) && ~isempty(hr_legacy)
+if exist('dg_legacy') && ~isempty(dg_legacy) && ~isempty(hr_legacy)
     %%%Heat recovery output
     var_ldg.hr_heat=sdpvar(length(elec),size(hr_legacy,2),'full');
     
@@ -619,7 +633,7 @@ else
         var_ldg.db_hfire = zeros(T,1);
 end
 %% Legacy boiler
-if ~isempty(boil_legacy)
+if exist('boil_legacy') && ~isempty(boil_legacy)
     %%%Basic boiler
     var_boil.boil_fuel = sdpvar(length(elec),size(boil_legacy,2),'full');
     var_boil.boil_rfuel = sdpvar(length(elec),size(boil_legacy,2),'full');

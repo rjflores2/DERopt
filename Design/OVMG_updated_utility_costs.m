@@ -1,4 +1,4 @@
-for ii = 1:length(bldg_base)
+for ii = 1%:length(bldg_base)
     %%%Apply Residential Rates
     if strcmp(bldg_type(ii),'MFm') || strcmp(bldg_type(ii),'Single-Family Detached') || strcmp(bldg_type(ii),'Residential')
         %         for ii = 1:length(endpts)
@@ -68,4 +68,16 @@ for ii = 1:length(bldg_base)
     bldg_base(ii).costs_elec.total = bldg_base(ii).costs_elec.ec + bldg_base(ii).costs_elec.fc + bldg_base(ii).costs_elec.dc;
     
     cost_compare(ii,:) = sum(bldg_base(ii).costs_elec.total)./sum(bldg(ii).costs_elec.total);
+
+
+    if adopted.pv(ii) >0 || adopted.ees(ii)>0
+    cost_components(ii,:) = [sum(base_energy_costs(:,1)) sum(bldg(ii).costs_gas.total(:,1))...
+        sum(energy_costs(:,1)) sum(bldg(ii).costs_gas.total(:,1)) ...
+        M*pv_mthly_debt*bldg_base(ii).der_systems.pv_adopt.*bldg_base(ii).der_systems.cap_mods(1) M*ees_mthly_debt*bldg_base(ii).der_systems.cap_mods(2)*(bldg_base(ii).der_systems.ees_adopt+bldg_base(ii).der_systems.rees_adopt-bldg_base(ii).der_systems.sgip_equity)];
+    else
+    cost_components(ii,:) = [sum(base_energy_costs(:,1)) sum(bldg(ii).costs_gas.total(:,1))...
+        sum(base_energy_costs(:,1)) sum(bldg(ii).costs_gas.total(:,1)) ...
+        M*pv_mthly_debt*bldg_base(ii).der_systems.pv_adopt.*bldg_base(ii).der_systems.cap_mods(1) M*ees_mthly_debt*bldg_base(ii).der_systems.cap_mods(2)*(bldg_base(ii).der_systems.ees_adopt+bldg_base(ii).der_systems.rees_adopt-bldg_base(ii).der_systems.sgip_equity)];
+    end
+
 end

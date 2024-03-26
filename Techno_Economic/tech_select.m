@@ -8,13 +8,13 @@ utility_exists=1;
 %%% O&M ($/kWh generated)
 if pv_on
     %pv_v=[3500; 0.2 ; 0.001];
-    pv_v=[2650; 0.2 ; 0.001]; %pv_v=[2650; 0.2 ; 0.001];
+    pv_v=[3190; 0.2 ; 0.001]; %pv_v=[2650; 0.2 ; 0.001];
      
     pv_cap=pv_v(1,:);
     
     %%%How pv capital cost is modified for different types of buildings
-    pv_cap_mod = [2/2.65 %%%Commercial/industrial
-        2.65/2.65]; %%%Residential
+    pv_cap_mod = [2/3.19 %%%Commercial/industrial
+        3.19/3.19]; %%%Residential
     
     %%%Financial Aspects - Solar PV 
     pv_fin = [-0.4648; ... %%%Scaling linear factor - Based on Lazards cost of electricity
@@ -54,13 +54,13 @@ if ees_on
  
 %         Original one
         ees_v=[830; 0.001; 0.001; 0.1; 0.95; 0.5; 0.5; .90; .90; .9999];
-        ees_v=[1200; 0.001; 0.001; 0.1; 0.95; 0.5; 0.5; .90; .90; .9999];
+        ees_v=[1218; 0.00; 0.00; 0.1; 0.95; 0.5; 0.5; .90; .90; .9999];
 % ees_v=[162; 0.001; 0.001; 0.05; 0.98; 0.9; 0.2; .95; .99; .9999];
     ees_cap=ees_v(1);
     
     %%%How pv capital cost is modified for different types of buildings
-    ees_cap_mod = [575/830 %%%Commercial/industrial
-        830/830]; %%%Residential
+    ees_cap_mod = [400/1218 %%%Commercial/industrial
+        1218/1218]; %%%Residential
     
     %%%Financial Aspects - EES
     ees_fin = [-0.4648;... %%%Scaling linear factor - Based on Lazards cost of electricity
@@ -70,11 +70,11 @@ if ees_on
     %%%Financial Aspects - EES
     rees_fin = [-0.4648;... %%%Scaling linear factor - Based on Lazards cost of electricity
         5; ... %%%MACRS Schedule
-        0]; ... %%%ITC Benefit
+        1]; ... %%%ITC Benefit
         
     ees_fin = [-0.1306;... %%%Scaling linear factor - Based on Lazards cost of electricity
         7; ... %%%MACRS Schedule
-        0]; ... %%%ITC Benefit
+        1]; ... %%%ITC Benefit
         
     %%%Financial Aspects - EES
     rees_fin = [-0.1306;... %%%Scaling linear factor - Based on Lazards cost of electricity
@@ -133,8 +133,8 @@ end
 if sgip_on
     %%%Self generation incentive program (SGIP) values
     sgip = [5 %%% 1:CO2 reduction required per kWh for large scale systems
-        350 %%% 2: Large storage incentive($/kWh)
-        200 %%% 3: Residential storage incentive ($/kWh)
+        0 %%% 2: Large storage incentive($/kWh)
+        150 %%% 3: Residential storage incentive ($/kWh)
         850 %%% 4: Equity rate ($/kWh)
         2000]; %%% 5: kWh incriment at which SGIP decreases
     sgip_o = sgip;

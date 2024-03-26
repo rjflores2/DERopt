@@ -76,7 +76,7 @@ if ~isempty(el_v)
 end
 
 %%%Renewable Generic Electrolyzer
-if ~isempty(rel_v)
+if exist('rel_v') && ~isempty(rel_v)
     for ii=1:size(rel_v,2)
         rel_mthly_debt(ii,1)=rel_v(1,ii)*((1-equity)*(interest*(1+interest)^(period*12))...
             /((1+interest)^(period*12)-1)+...%%%Money to pay back bank
@@ -97,7 +97,7 @@ end
 
 
 %%%Hydrogen fueling station
-if hrs_on
+if exist('hrs_on') && hrs_on
     hrs_mthly_debt = hrs_v(1)*((1-equity)*(interest*(1+interest)^(period*12))...
         /((1+interest)^(period*12)-1)+...%%%Money to pay back bank
         req_return_on*(equity)*(required_return*(1+required_return)^(period*12))...
@@ -105,7 +105,7 @@ if hrs_on
 end
 
 %%%Utility Scale Solar
-if ~isempty(utilpv_v)
+if exist('utilpv_v') && ~isempty(utilpv_v)
     for ii=1:size(utilpv_v,2)
         utilpv_mthly_debt(ii,1)=utilpv_v(1,ii)*((1-equity)*(interest*(1+interest)^(period*12))...
             /((1+interest)^(period*12)-1)+...%%%Money to pay back bank
@@ -125,7 +125,7 @@ if exist('util_wind_v') && ~isempty(util_wind_v)
 end
 
 %%%Utility Battery Storage
-if ~isempty(util_ees_v)
+if  exist('util_ees_v') && ~isempty(util_ees_v)
     for ii=1:size(util_ees_v,2)
         util_ees_mthly_debt(ii,1)=util_ees_v(1,ii)*((1-equity)*(interest*(1+interest)^(period*12))...
             /((1+interest)^(period*12)-1)+...%%%Money to pay back bank
@@ -171,10 +171,14 @@ if ~isempty(pv_v)
     for i = 1:size(elec,2)
         for ii = 1:size(pv_v,2)
             %%%Applicable tax rate
-            if strcmp(rate{i},'R1')
-                tr = tax_rates(1);
+            if exist('rate')
+                if strcmp(rate{i},'R1')
+                    tr = tax_rates(1);
+                else
+                    tr = tax_rates(2);
+                end
             else
-                tr = tax_rates(2);
+                tr = max(tax_rates)
             end
             %%% Solar PV Examination
             %%%Maximum PV estimated by either reaching net zero electrical energy
@@ -194,7 +198,7 @@ if ~isempty(pv_v)
             
             %%%Scaling Factor
             %%%If is low income
-            if low_income(i) ~= 1
+            if exist('low_income') && low_income(i) ~= 1
 %                 for ii = 1:length(pv_scale_factor)
                     %%%Decrease in cost due to scale
                     pv_scale_factor = pv_scale_factor*pv_fin(1,ii);

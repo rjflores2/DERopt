@@ -6,8 +6,9 @@ if lpv_on
     %%%  PV Capacity (kW)] - 2
     pv_legacy = [0.001; 4000];
 else
-    pv_legacy=[];
+    pv_legacy= zeros(size(pv_v,2));
 end
+
 %% Generic generator - e.g. gas turbine
 if ldg_on
     %%%[O&M ($/kWh)  -  1

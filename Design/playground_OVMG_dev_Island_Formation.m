@@ -1,7 +1,7 @@
 %% Playground file for OVMG Project
 clear all; close all; clc ; started_at = datetime('now'); startsim = tic;
 
-for crit_load_lvl = [7]%%[4 5 6 7] %%% Corresponding END around line 500 - after files have been saved
+for crit_load_lvl = [3]%%[4 5 6 7] %%% Corresponding END around line 500 - after files have been saved
     clearvars -except crit_load_lvl crit_load_lvl started_at startsim
 % crit_load_lvl = 5;
 % crit_load_lvl = [];
@@ -153,8 +153,8 @@ addpath(genpath('H:\_Research_\CEC_OVMG\Rates'))
 
 %% Loading/seperating building demand
 
-scenario = 'ues_baseline_update'
-
+% scenario = 'ues_baseline_update'
+scenario = 'baseline_retest_2B_v2';
 % scenario = 'UES_1b'
 % scenario = 'ues_1a_v2'
 % scenario = 'UES_2b'
@@ -357,7 +357,7 @@ for sim_idx = 5%:sim_end
     end
     
     
-    %%
+    %% Reducing load around each transformer
     xfmrs_loads = unique(xfmr_subset)
     elec_red = [];
     elec_res_red = [];
@@ -401,8 +401,16 @@ for sim_idx = 5%:sim_end
     crit_load_selection_OVMG    
     
     %% Utility Data
+    
+    %%%Loading in NEM 3.0 data
+    export_energy_credits = xlsread('Export_Energy_Credit_2023.xlsx');
+    
+    %%%Credit for NEM 3.0 customers
+    nem3_0_credit = 0.04;
+    nem3_0_credit_low_income = 0.09;
+    
     %%%Loading Utility Data and Generating Energy Charge Vectors
-    utility_SCE_2020
+    utility_SCE_2023
     
 %% Gas Costs - only when a fuel cell is available
 ng_cost = (1.*(strcmp(rate,'TOU8') + strcmp(rate,'GS1')) + 1.5.*strcmp(rate,'R1'))./29.3;
@@ -539,7 +547,7 @@ ng_cost = (1.*(strcmp(rate,'TOU8') + strcmp(rate,'GS1')) + 1.5.*strcmp(rate,'R1'
         
         %% Extract Variables
         variable_values_multi_node
-        return
+        
     end
 %     
 %     save(strcat('Sim_',num2str(sim_idx)))
@@ -555,68 +563,69 @@ ng_cost = (1.*(strcmp(rate,'TOU8') + strcmp(rate,'GS1')) + 1.5.*strcmp(rate,'R1'
     npbi_idx = 1;
     pbi_idx = 1;
     eq_idx = 1;
-    for ii = 1:length(bldg_ind)
-        %%%New import/export for each building
-        bldg(ii).elec_der = [var_util.import(:,ii) - (var_rees.rees_dchrg_nem(:,ii) + var_pv.pv_nem(:,ii))... %%%Net electricity flow
-            var_util.import(:,ii)... %%%All imports
-            (var_rees.rees_dchrg_nem(:,ii) + var_pv.pv_nem(:,ii))]; %%%All Exports
-        
-        
-        %%%DER Systems
-        bldg_base(bldg_ind(ii)).der_systems.pv_adopt = var_pv.pv_adopt(ii); %%%Adopted solar  (kW)
-        bldg_base(bldg_ind(ii)).der_systems.ees_adopt = var_ees.ees_adopt(ii); %%%Adopted EES  (kWh)
-        bldg_base(bldg_ind(ii)).der_systems.rees_adopt = var_rees.rees_adopt(ii); %%%Adopted REES  (kWh)
-        
-        bldg_base(bldg_ind(ii)).der_systems.import = var_util.import(:,ii);
-        bldg_base(bldg_ind(ii)).der_systems.pv_ops = [var_pv.pv_elec(:,ii) var_pv.pv_nem(:,ii)];
-        bldg_base(bldg_ind(ii)).der_systems.ees_ops = [var_ees.ees_soc(:,ii) var_ees.ees_chrg(:,ii) var_ees.ees_dchrg(:,ii)];
-        bldg_base(bldg_ind(ii)).der_systems.rees_ops = [var_rees.rees_soc(:,ii) var_rees.rees_chrg(:,ii) var_rees.rees_dchrg(:,ii) var_rees.rees_dchrg_nem(:,ii)];
-        
-        
-        %%%SGIP Values
-        if strcmp(bldg_type(bldg_ind(ii)),'MFm') || strcmp(bldg_type(bldg_ind(ii)),'Single-Family Detached') || strcmp(bldg_type(bldg_ind(ii)),'Residential')
-            if low_income(ii) == 1
-                bldg_base(bldg_ind(ii)).der_systems.sgip_pbi = [0;0;0];
-                bldg_base(bldg_ind(ii)).der_systems.sgip_npbi = 0;
-                bldg_base(bldg_ind(ii)).der_systems.sgip_equity = var_sgip.sgip_ees_npbi_equity(eq_idx);
-                eq_idx = eq_idx + 1;
-            else
-                bldg_base(bldg_ind(ii)).der_systems.sgip_pbi = [0;0;0];
-                bldg_base(bldg_ind(ii)).der_systems.sgip_npbi = var_sgip.sgip_ees_npbi(npbi_idx);
-                bldg_base(bldg_ind(ii)).der_systems.sgip_equity = 0;
-                npbi_idx = npbi_idx + 1;
-            end
-        else
-            bldg_base(bldg_ind(ii)).der_systems.sgip_pbi = var_sgip.sgip_ees_pbi(:,pbi_idx);
-            bldg_base(bldg_ind(ii)).der_systems.sgip_npbi = 0;
-            bldg_base(bldg_ind(ii)).der_systems.sgip_equity = 0;
-            pbi_idx = pbi_idx + 1;
-        end
-        
-        bldg_base(bldg_ind(ii)).der_systems.cap_mods = [pv_cap_mod(ii) ees_cap_mod(ii) rees_cap_mod(ii)];
-    end
+%     for ii = 1:length(bldg_ind)
+%         %%%New import/export for each building
+%         bldg(ii).elec_der = [var_util.import(:,ii) - (var_rees.rees_dchrg_nem(:,ii) + var_pv.pv_nem(:,ii))... %%%Net electricity flow
+%             var_util.import(:,ii)... %%%All imports
+%             (var_rees.rees_dchrg_nem(:,ii) + var_pv.pv_nem(:,ii))]; %%%All Exports
+%         
+%         
+%         %%%DER Systems
+%         bldg_base(bldg_ind(ii)).der_systems.pv_adopt = var_pv.pv_adopt(ii); %%%Adopted solar  (kW)
+%         bldg_base(bldg_ind(ii)).der_systems.ees_adopt = var_ees.ees_adopt(ii); %%%Adopted EES  (kWh)
+%         bldg_base(bldg_ind(ii)).der_systems.rees_adopt = var_rees.rees_adopt(ii); %%%Adopted REES  (kWh)
+%         
+%         bldg_base(bldg_ind(ii)).der_systems.import = var_util.import(:,ii);
+%         bldg_base(bldg_ind(ii)).der_systems.pv_ops = [var_pv.pv_elec(:,ii) var_pv.pv_nem(:,ii)];
+%         bldg_base(bldg_ind(ii)).der_systems.ees_ops = [var_ees.ees_soc(:,ii) var_ees.ees_chrg(:,ii) var_ees.ees_dchrg(:,ii)];
+%         bldg_base(bldg_ind(ii)).der_systems.rees_ops = [var_rees.rees_soc(:,ii) var_rees.rees_chrg(:,ii) var_rees.rees_dchrg(:,ii) var_rees.rees_dchrg_nem(:,ii)];
+%         
+%         
+%         %%%SGIP Values
+%         if strcmp(bldg_type(bldg_ind(ii)),'MFm') || strcmp(bldg_type(bldg_ind(ii)),'Single-Family Detached') || strcmp(bldg_type(bldg_ind(ii)),'Residential')
+%             if low_income(ii) == 1
+%                 bldg_base(bldg_ind(ii)).der_systems.sgip_pbi = [0;0;0];
+%                 bldg_base(bldg_ind(ii)).der_systems.sgip_npbi = 0;
+%                 bldg_base(bldg_ind(ii)).der_systems.sgip_equity = var_sgip.sgip_ees_npbi_equity(eq_idx);
+%                 eq_idx = eq_idx + 1;
+%             else
+%                 bldg_base(bldg_ind(ii)).der_systems.sgip_pbi = [0;0;0];
+%                 bldg_base(bldg_ind(ii)).der_systems.sgip_npbi = var_sgip.sgip_ees_npbi(npbi_idx);
+%                 bldg_base(bldg_ind(ii)).der_systems.sgip_equity = 0;
+%                 npbi_idx = npbi_idx + 1;
+%             end
+%         else
+%             bldg_base(bldg_ind(ii)).der_systems.sgip_pbi = var_sgip.sgip_ees_pbi(:,pbi_idx);
+%             bldg_base(bldg_ind(ii)).der_systems.sgip_npbi = 0;
+%             bldg_base(bldg_ind(ii)).der_systems.sgip_equity = 0;
+%             pbi_idx = pbi_idx + 1;
+%         end
+%         
+%         bldg_base(bldg_ind(ii)).der_systems.cap_mods = [pv_cap_mod(ii) ees_cap_mod(ii) rees_cap_mod(ii)];
+%     end
     
     %% recording resiliency results
     if sim_lvl >= 3 && acpf_sim == 1
-        save(strcat(scenario,'_',num2str(sim_idx),'_CriticalLoad_Island_formation_',num2str(crit_load_lvl)),'var_resiliency')
+%         save(strcat(scenario,'_',num2str(sim_idx),'_CriticalLoad_Island_formation_',num2str(crit_load_lvl)),'var_resiliency')
+        save(strcat(scenario,'_',num2str(sim_idx),'_w_pump_CL_',num2str(crit_load_lvl)))
         
     end
 end
 
 %% Update Utility Costs
-OVMG_updated_utility_costs
+% OVMG_updated_utility_costs
 
-save(strcat(scenario,'_',num2str(WHATS_THE_CRITICAL_LOAD)))
+% save(strcat(scenario,'_',num2str(WHATS_THE_CRITICAL_LOAD)))
 
 %% Saving Data
 bldg = bldg_base;
 
-if isempty(crit_load_lvl) || crit_load_lvl == 0
-    save_here = 1
-    save(strcat(sc_txt,'_DdER'),'bldg')
-else
-    save_here = 2
-    save(strcat(sc_txt,'_DER_Crit_Load_Circuit_Island_Formation_',num2str(crit_load_lvl)),'bldg')
-end
+% if isempty(crit_load_lvl) || crit_load_lvl == 0
+%     save_here = 1
+%     save(strcat(sc_txt,'_DdER'),'bldg')
+% else
+%     save_here = 2
+%     save(strcat(sc_txt,'_DER_Crit_Load_Circuit_Island_Formation_',num2str(crit_load_lvl)),'bldg')
+% end
 end
 return

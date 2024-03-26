@@ -1,0 +1,6 @@
+function [monthly_debt] = capital_cost_to_monthly_cost(capital_cost,equity,interest,period,required_return)
+
+monthly_debt = capital_cost*((1-equity)*(interest*(1+interest)^(period*12))...
+    /((1+interest)^(period*12)-1)+...%%%Money to pay back bank
+    (equity)*(required_return*(1+required_return)^(period*12))...
+    /((1+required_return)^(period*12)-1));
