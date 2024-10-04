@@ -69,19 +69,19 @@ if utility_exists == 1
 end
 
 %% Net Energy Metering
-if lpv_on || lrees_on || strcmp(class(var_pv.pv_nem),'sdpvar') || strcmp(class(var_rees.rees_dchrg_nem),'sdpvar') %%%If NEM related decision variables exist
-    for k=1:K
-        %%%Current Utility Rate
-        index=find(ismember(rate_labels,rate(k)));
-        
-        Constraints = [Constraints
-            (export_price(:,index)'*(var_rees.rees_dchrg_nem(:,k) + var_pv.pv_nem(:,k) + var_lrees.rees_dchrg_nem(:,k)) <= import_price(:,index)'*var_util.import(:,k)):'NEM Credits < Import Cost'];
-                
-        Constraints = [Constraints
-            (sum(var_rees.rees_dchrg_nem(:,k) + var_pv.pv_nem(:,k) + var_lrees.rees_dchrg_nem(:,k)) <= sum(var_util.import(:,k))):'NEM Energy < Import Energy'];
-        
-    end
-end
+% if lpv_on || lrees_on || strcmp(class(var_pv.pv_nem),'sdpvar') || strcmp(class(var_rees.rees_dchrg_nem),'sdpvar') %%%If NEM related decision variables exist
+%     for k=1:K
+%         %%%Current Utility Rate
+%         index=find(ismember(rate_labels,rate(k)));
+%         
+% %         Constraints = [Constraints
+% %             (export_price(:,index)'*(var_rees.rees_dchrg_nem(:,k) + var_pv.pv_nem(:,k) + var_lrees.rees_dchrg_nem(:,k)) <= import_price(:,index)'*var_util.import(:,k)):'NEM Credits < Import Cost'];
+%                 
+%         Constraints = [Constraints
+%             (sum(var_rees.rees_dchrg_nem(:,k) + var_pv.pv_nem(:,k) + var_lrees.rees_dchrg_nem(:,k)) <= 1.5*sum(var_util.import(:,k))):'NEM Energy < Import Energy'];
+%         
+%     end
+% end
 
 % %% Net Zero Energy
 % Constraints = [Constraints

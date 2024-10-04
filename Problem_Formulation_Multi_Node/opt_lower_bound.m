@@ -1,81 +1,3 @@
-%%% Lower Bounds
-%% Utility Variables
-if utility_exists
-    Constraints = [Constraints
-        (0 <= var_util.import):'Import value is >= 0'];
-    
-    if sum(dc_exist)>0
-        Constraints = [Constraints
-            (0 <= var_util.nontou_dc):'NonTOU Demand is >=0'];
-
-        if onpeak_count > 0
-            Constraints = [Constraints
-                (0 <= var_util.onpeak_dc):'On Peak Demand is >=0'];
-        end
-        
-        if midpeak_count > 0
-            Constraints = [Constraints
-                (0 <= var_util.midpeak_dc):'Mid Peak Demand is >=0'];
-        end
-    end
-end
-%% Solar PV && REES
-if isempty(pv_v) == 0
-    Constraints = [Constraints
-        (0 <= var_pv.pv_elec):'PV production >= 0'
-        (0 <= var_pv.pv_adopt):'PV Adoption >= 0'];
-    
-    if island == 0 && export_on == 1
-        Constraints = [Constraints
-            (0 <= var_pv.pv_nem):'PV NEM >=0'];
-    end
-    
-    if isempty(ees_v) == 0 && rees_on == 1
-        Constraints = [Constraints
-            (0 <= var_rees.rees_adopt):'REES Adoptiong >= 0'
-            (0 <= var_rees.rees_chrg):'REES Charging >= 0'
-            (0 <= var_rees.rees_dchrg):'REES Discharging >= 0'
-            (0 <= var_rees.rees_soc):'REES SOC >= 0'];
-        
-        if island ~= 1 % If not islanded, AEC can export NEM and wholesale for revenue
-            Constraints = [Constraints
-                (0 <= var_rees.rees_dchrg_nem):'REES NEM >=0'];
-        end
-    end
-end
-%% DG Binary & Continuous
-if dgb_on
-    Constraints = [Constraints
-        (0 <= var_dgb.dgb_adopt):'dgb Adoptiong >= 0'
-        (0 <= var_dgb.dgb_capacity):'dgb Capacity >= 0'
-        (0 <= var_dgb.dgb_elec):'dgb Elec >= 0'
-        (0 <= var_dgb.dgb_fuel):'dgb Fuel >= 0'];
-end
-%% DG Continuous
-if dgb_on
-    Constraints = [Constraints
-        (0 <= var_dgc.dgc_adopt):'dgb Adoptiong >= 0'
-        (0 <= var_dgc.dgc_elec):'dgb Elec >= 0'
-        (0 <= var_dgc.dgc_fuel):'dgb Fuel >= 0'];
-end
-%% EES
-if isempty(ees_v) == 0
-    Constraints = [Constraints
-        (0 <= var_ees.ees_adopt):'EES Adoptiong >= 0'
-        (0 <= var_ees.ees_chrg):'EES Charging >= 0'
-        (0 <= var_ees.ees_dchrg):'EES Discharging >= 0'
-        (0 <= var_ees.ees_soc):'EES SOC >= 0'];
-    if sgip_on
-%         Constraints = [Constraints
-%             (0 <= var_sgip.sgip_ees_pbi):'SGIP PBI >=0'
-%             (0 <= var_sgip.sgip_ees_npbi_equity):'SGIP Equity >=0'
-%             (0 <= var_sgip.sgip_ees_npbi):'SGIP NonPBI >=0'];
-        Constraints = [Constraints
-            (0 <= var_sgip.sgip_ees_pbi)
-            (0 <= var_sgip.sgip_ees_npbi_equity)
-            (0 <= var_sgip.sgip_ees_npbi)];
-    end
-end
 %% Legacy PV
 %%%Only need to add variables if new PV is not considered
 if isempty(pv_legacy) == 0 && isempty(pv_v) == 1
@@ -105,20 +27,18 @@ end
 if ~isempty(crit_load_lvl) && crit_load_lvl >0
     if ~isempty(pv_v) || ~isempty(pv_legacy)
         Constraints = [Constraints
-            (0 <= var_resiliency.pv_elec):'PV Reseliency >= 0'];
+            ];
         if sim_lvl == 3
         Constraints = [Constraints
-            (0 <= var_resiliency.pv_real):'PV Real Reseliency >= 0'
-            (0 <= var_resiliency.pv_reactive):'PV Reactive Reseliency >= 0'];
+            ];
         end
     end
     if dgb_on
         Constraints = [Constraints
-            (0 <= var_resiliency.dgb_elec):'dgb Reseliency >= 0'];
+            
         if sim_lvl == 3
         Constraints = [Constraints
-            (0 <= var_resiliency.dgb_real):'dgb Real Reseliency >= 0'
-            (0 <= var_resiliency.dgb_reactive):'dgb Reactive Reseliency >= 0'];
+            ];
         end        
     end
     if lees_on || lrees_on || ~isempty(ees_v)

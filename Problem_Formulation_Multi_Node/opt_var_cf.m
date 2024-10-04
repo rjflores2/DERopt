@@ -10,7 +10,12 @@ M = length(endpts);   %# of months in the simulation
 %% Utility Electricity
 if utility_exists
     %%%Electrical Import Variables
-    var_util.import=sdpvar(T,K,'full');
+    var_util.import = sdpvar(T,K,'full'); %%%Electricity Imports
+    var_util.export = sdpvar(T,K,'full'); %%%Electricity Export
+    %     var_util.net_flow = sdpvar(T,K,'full'); %%%Net Electricity Flow
+    if util_bin_on
+        var_util.elec_sign = binvar(T,K,'full'); %%%Net Electricity Flow
+    end
     
     %%%Demand Charge Variables
     %%%Only creating variables for # of months and number of applicable
@@ -40,34 +45,33 @@ if utility_exists
     dc_count=1;
     
     %%%Allocating space
-    temp_cf = zeros(size(elec));
-    
+    import_cost = zeros(size(elec));
+    export_value = zeros(size(elec));
     for i=1:K %%%Going through all buildings
         
         %%%Specify ESA eligible tenant fraction (Energy Savings Assistance Program (“ESA”)
         esa_frac = sum(apartment_types(i,1:2))/sum(apartment_types(i,:));
-        if ~esa_on
+        if ~esa_on || isnan(esa_frac)
             esa_frac = 0;
         end
         
         %%%Find the applicable utility rate
         index=find(ismember(rate_labels,rate(i)));
         
-        %%%Specifying cost function
-        temp_cf(:,i) = day_multi.*import_price(:,index).*(1-care_energy_rebate*esa_frac);
-        temp_cf(:,i) = day_multi.*import_price(:,index);
-%         temp_cf2(:,i) = day_multi.*import_price(:,index);
-%                 
-%         temp_cf3(:,i) = day_multi.*export_price(:,index).*(1-care_energy_rebate*esa_frac);
-%         temp_cf4(:,i) = day_multi.*export_price(:,index);
+        %%%Specifying cost function for Imported Electricity
+        import_cost(:,i) = day_multi.*import_price(:,index).*(1-care_energy_rebate*esa_frac);
+%         import_cost(:,i) = day_multi.*import_price(:,index);
+        
+        %%%Specifying cost function for exported Electricity
+        export_value(:,i) = -day_multi.*export_price(:,index) - (nem3_0_credit_low_income - nem3_0_credit)*esa_frac;
+
     end
     
     %%%Import Energy charges
-    Objective = sum(sum(var_util.import.*temp_cf));
+    Objective = sum(sum(var_util.import.*import_cost)) ...
+        +  sum(sum(var_util.export.*export_value));
 
     %%%Clearing temporary cost function matrix
-    clear temp_cf
-
     for i =1:K
         if dc_exist(i) == 1
             %%%Find the applicable utility rate
@@ -87,6 +91,8 @@ if utility_exists
 else
     %%%Electrical Import Variables
     var_util.import=zeros(T,K);
+    var_util.export=zeros(T,K);
+    var_util.net_flow=zeros(T,K);
     
     %%%Non TOU DC
     var_util.nontou_dc=zeros(M,sum(dc_exist));
@@ -109,48 +115,14 @@ if isempty(pv_v) == 0
     
     if island == 0 && export_on == 1  %If grid tied, then include NEM and wholesale export
         
-       
-        %%% Variables that exist when grid tied
-        var_pv.pv_nem = sdpvar(T,K,'full'); %%% PV Production exported w/ NEM
-             %  var_pv.pv_wholesale = sdpvar(T,K,'full'); %%% PV Production exported under NEM rates
-        
-        %%%PV Export - NEM (kWh)
-        temp_cf1 = zeros(size(elec));
-        tempc_f2 = zeros(size(elec));
-        for k = 1:K
-            %%%Utility rates for building k
-            index=find(ismember(rate_labels,rate(k)));
-             %%%Specify ESA eligible tenant fraction
-        esa_frac = sum(apartment_types(k,1:2))/sum(apartment_types(k,:));
-        
-        if ~esa_on
-            esa_frac = 0;
-        end
-        
-        nem3_0_credit_low_income - nem3_0_credit
-            %%%Filling in temp cost function arrays
-%             temp_cf1(:,k) = -day_multi.*export_price(:,index).*(1-care_energy_rebate*esa_frac) - (nem3_0_credit_low_income - nem3_0_credit)*esa_frac;
-            temp_cf1(:,k) = -day_multi.*export_price(:,index) - (nem3_0_credit_low_income - nem3_0_credit)*esa_frac;
-            %             temp_cf2(:,k) = -day_multi.*ex_wholesale;
-            
-        end
-        
-        %%%Adding values to the cost function
-        Objective = Objective...
-            + sum(sum(temp_cf1.*var_pv.pv_nem)); %%%NEM Revenue Cost
-        %              + sum(sum(temp_cf2.*pv_wholesale)); %%%Wholesale Revenue
-        
-        %%%Clearing temporary variables
-        clear temp_cf1 temp_cf2
     else
-        pv_nem = [];
+
     end
     
     %%%PV Cost
     Objective=Objective ...
         + sum(M*pv_mthly_debt.*pv_cap_mod'.*var_pv.pv_adopt)... %%%PV Capital Cost ($/kW installed)
-        + pv_v(3)*(sum(sum(repmat(day_multi,1,K).*(var_pv.pv_elec + var_pv.pv_nem)))); %%%PV O&M Cost ($/kWh generated)
-%         + pv_v(3)*(sum(sum(repmat(day_multi,1,K).*(pv_elec + pv_nem + pv_wholesale))) ); %%%PV O&M Cost ($/kWh generated)
+        + pv_v(3)*(sum(sum(repmat(day_multi,1,K).*(var_pv.pv_elec)))); %%%PV O&M Cost ($/kWh generated)
 
     %%% Allow for adoption of Renewable paired storage when enabled (REES)
     if isempty(ees_v) == 0 && rees_on == 1
@@ -161,68 +133,52 @@ if isempty(pv_v) == 0
         %%%REES Charging
         var_rees.rees_chrg=sdpvar(T,K,'full');
         %%%REES discharging
-        var_rees.rees_dchrg=sdpvar(T,K,'full');
-        
+        var_rees.rees_dchrg=sdpvar(T,K,'full');        
         %%%REES SOC
         var_rees.rees_soc=sdpvar(T,K,'full');
+        
+        
+        %%%REES Binary Variable
+        if ees_bin_on
+            var_rees.bin = binvar(T,K,'full');
+        end
+        
         %%%REES Cost Functions        
         Objective = Objective...
             + sum(rees_mthly_debt*M.*rees_cap_mod'.*var_rees.rees_adopt) ...%%%Capital Cost
             + ees_v(2)*sum(sum(repmat(day_multi,1,K).*var_rees.rees_chrg))... %%%Charging O&M
             + ees_v(3)*(sum(sum(repmat(day_multi,1,K).*(var_rees.rees_dchrg))));%%%Discharging O&M
         
-        if island ~= 1 % If not islanded, AEC can export NEM and wholesale for revenue
-            %%%REES NEM Export
-            %%%REES discharging to grid
-            var_rees.rees_dchrg_nem=sdpvar(T,K,'full');
-            
-            %%%Creating temp variables            
-            temp_cf = zeros(size(elec));
-            
-            for k = 1:K
-                %%%Applicable utility rate
-                index=find(ismember(rate_labels,rate(k)));
-                
-                %%%Specify ESA eligible tenant fraction
-                esa_frac = sum(apartment_types(i,1:2))/sum(apartment_types(i,:));
-         %%%Specify ESA eligible tenant fraction
-        esa_frac = sum(apartment_types(i,1:2))/sum(apartment_types(i,:));
-        
-        if ~esa_on
-            esa_frac = 0;
-        end
-                
-                temp_cf(:,k) = day_multi.*(ees_v(3) - export_price(:,index).*(1-care_energy_rebate*esa_frac));
-                temp_cf(:,k) = day_multi.*(ees_v(3) - export_price(:,index));
-               
-            end
-            %%% Setting objective function
-            Objective = Objective...
-                + sum(sum(temp_cf.*var_rees.rees_dchrg_nem));
-            
-        else
-             var_rees.rees_dchrg_nem=zeros(T,K);
-        end
     else
         var_rees.rees_adopt=zeros(1,K);
         var_rees.rees_chrg=zeros(T,K);
         var_rees.rees_dchrg=zeros(T,K);
-        var_rees.rees_dchrg_nem=zeros(T,K);
         var_rees.rees_soc=zeros(T,K);
     end
     
 else
     var_pv.pv_adopt=zeros([1 K]);
     var_pv.pv_elec=zeros([T K]);
-    var_pv.pv_nem=zeros([T K]);
     var_pv.pv_wholesale=zeros([T K]);
     var_rees.rees_adopt=zeros(1,K);
     var_rees.rees_chrg=zeros(T,K);
     var_rees.rees_dchrg=zeros(T,K);
-    var_rees.rees_dchrg_nem=zeros(T,K);
     var_rees.rees_soc=zeros(T,K);
 end
 toc
+
+%% SOMAH funding for Solar
+if somah > 0 && sum(low_income) > 0
+    var_somah.somah_capacity = sdpvar(1,sum(low_income>0),'full');
+    
+    Objective = Objective  ...
+        + -sum(M*pv_mthly_debt.*pv_cap_mod(low_income == 1)'.*var_somah.somah_capacity);
+    
+%     sum(M*pv_mthly_debt.*pv_cap_mod'.*var_pv.pv_adopt)
+else
+    var_somah.somah_capacity = 0;
+end
+
 %% Electrical Energy Storage
 if isempty(ees_v) == 0
     
@@ -288,35 +244,9 @@ toc
 if isempty(pv_legacy) == 0 && isempty(pv_v) == 1
     
     if island == 0 && export_on == 1 %If grid tied, then include NEM and wholesale export
-        %%% Variables that exist when grid tied
-        var_pv.pv_nem = sdpvar(T,K,'full'); %%% PV Production exported w/ NEM
-        %%%PV Export - NEM (kWh)
-        temp_cf1 = zeros(size(elec));
-        tempc_f2 = zeros(size(elec));
-        for k = 1:K
-            %%%Specify ESA eligible tenant fraction
-            esa_frac = sum(apartment_types(i,1:2))/sum(apartment_types(i,:));
-         %%%Specify ESA eligible tenant fraction
-        esa_frac = sum(apartment_types(i,1:2))/sum(apartment_types(i,:));
-        
-        if ~esa_on
-            esa_frac = 0;
-        end
-            %%%Utility rates for building k
-            index=find(ismember(rate_labels,rate(k)));
-            
-            %%%Filling in temp cost function arrays
-            temp_cf1(:,k) = -day_multi.*export_price(:,index).*(1-care_energy_rebate*esa_frac);
-            temp_cf1(:,k) = -day_multi.*export_price(:,index);
-            %             temp_cf2(:,k) = -day_multi.*ex_wholesale;
-            
-        end
-        %%%Adding values to the cost function
-        Objective = Objective...
-            + sum(sum(temp_cf1.*var_pv.pv_nem)); %%%NEM Revenue Cost
-         clear temp_cf1 temp_cf2
+      
     else
-        var_pv.pv_nem = [];
+     
     end
     
     %%%PV Generation to meet building demand (kWh)
@@ -324,7 +254,7 @@ if isempty(pv_legacy) == 0 && isempty(pv_v) == 1
     
     %%%Operating Costs
     Objective=Objective ...
-        + pv_legacy(1)*(sum(sum(repmat(day_multi,1,K).*(var_pv.pv_elec + var_pv.pv_nem))));
+        + pv_legacy(1)*(sum(sum(repmat(day_multi,1,K).*(var_pv.pv_elec))));
     
 end
 
@@ -369,35 +299,10 @@ if lrees_on
     
     
     if island ~= 1 % If not islanded, AEC can export NEM and wholesale for revenue
-        %%%REES NEM Export
-        %%%REES discharging to grid
-        var_lrees.rees_dchrg_nem = sdpvar(T,K,'full');
-        
-        %%%Creating temp variables
-        temp_cf = zeros(size(elec));
-        
-        for k = 1:K  
-        %%%Specify ESA eligible tenant fraction
-        esa_frac = sum(apartment_types(i,1:2))/sum(apartment_types(i,:));
-         %%%Specify ESA eligible tenant fraction
-        esa_frac = sum(apartment_types(i,1:2))/sum(apartment_types(i,:));
-        
-        if ~esa_on
-            esa_frac = 0;
-        end
-            %%%Applicable utility rate
-            index=find(ismember(rate_labels,rate(k)));
-            
-            temp_cf(:,k) = day_multi.*(rees_legacy(2) - export_price(:,index).*(1-care_energy_rebate*esa_frac));
-            temp_cf(:,k) = day_multi.*(rees_legacy(2) - export_price(:,index));
-            
-        end
-        %%% Setting objective function
-        Objective = Objective...
-            + sum(sum(temp_cf.*var_lrees.rees_dchrg_nem));
+
         
     else
-        var_lrees.rees_dchrg_nem = zeros(T,K);
+
     end
     
 else
@@ -405,7 +310,7 @@ else
     var_lrees.rees_soc=zeros(T,K);
     var_lrees.rees_chrg=zeros(T,K);
     var_lrees.rees_dchrg=zeros(T,K);
-    var_lrees.rees_dchrg_nem=zeros(T,K);
+
 end
 
 %% Electrical Infrastructure Constraints
@@ -452,6 +357,49 @@ else
     var_sofc.sofc_CO2 = zeros(T,1);        %%%CO2 saving (kg)
 end
 
+%% DGL - Linear DG Model
+if dgl_on
+   
+    var_dgl.dg_capacity = sdpvar(1,K,'full');      %%%SOFC installed capacity (kW)
+
+dgl_cap_mod = ones(size(var_dgl.dg_capacity ));
+dgl_cap_mod(res_idx) = 3300/2000;
+dgl_cap_mod(~res_idx) = 1500/2000;
+
+
+    Objective = Objective ...
+        + sum(M.*dgl_mthly_debt.*dgl_cap_mod.*var_dgl.dg_capacity);
+
+    if ~h2_systems_for_resiliency_only
+        var_dgl.dg_elec = sdpvar(T,K,'full');       %%%SOFC electricity produced (kWh)
+        if dgl_pipeline_fuel>0
+            Objective = Objective ...
+                + sum(sum(var_dgl.dg_elec)).*(dgl_pipeline_fuel./dgl_v(2));
+        end
+    else
+        var_dgl.dg_elec = zeros(T,K);
+    end
+else
+    var_dgl.dg_elec = zeros(T,K);
+end
+
+%% H2 Energy Storage
+if h2_storage_on
+    var_h2_storage.capacity = sdpvar(1,K,'full');      %%%H2 storage installed capacity (kWh)
+
+     Objective = Objective ...
+        + sum(M.*h2_storage_mthly_debt.*var_h2_storage.capacity); %%%H2 Storage Capital Cost
+    
+    if ~h2_systems_for_resiliency_only
+        var_h2_storage.soc = sdpvar(T,K,'full'); %%%H2 storage state of charge (kWh)
+        var_h2_storage.charge = sdpvar(T,K,'full'); %%%H2 Storage Charging
+        var_h2_storage.dicharge = sdpvar(T,K,'full'); %%%H2 Storage Discharging
+        var_h2_storage.vent = sdpvar(T,K,'full'); %%%H2 Storage Discharging
+
+         Objective = Objective ...
+             + (h2_delivery_fuel/h2_storage_v(8)).*sum(sum(var_h2_storage.charge)); %%% Fuel Purchase Cost
+    end
+end
 %% DG - Continuous Capacity after Binary Adoption
 if dgb_on
     %Variables

@@ -1,4 +1,4 @@
-for ii = 1%:length(bldg_base)
+for ii = 1:length(bldg_base)
     %%%Apply Residential Rates
     if strcmp(bldg_type(ii),'MFm') || strcmp(bldg_type(ii),'Single-Family Detached') || strcmp(bldg_type(ii),'Residential')
         %         for ii = 1:length(endpts)

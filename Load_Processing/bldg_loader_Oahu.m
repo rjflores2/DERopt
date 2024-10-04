@@ -13,32 +13,20 @@ e_adjust = 60/t_step;
 elec = elec.*(t_step/60);
 
 %% Loading/processing solar data
-solar_fixed = readtable('pvwatts_solar_fixed.csv');
-solar_tracking = readtable('pvwatts_solar_tracking.csv');
+% solar_fixed = readtable('pvwatts_solar_fixed.csv');
+solar_tracking = readtable('H:\_Tools_\DERopt\Data\Oahu\solar_tracking_Oahu.csv');
 
 %%%Extracting solar data from the loaded normalized factor
-solar = [solar_fixed.ACSystemOutput_kW_ solar_tracking.ACSystemOutput_kW_];
+solar = [solar_tracking.ACSystemOutput_W_];
 % solar = [solar_fixed.ACSystemOutput_kW_ ];
 
-%% Loading River Data
-river_power_potential = readtable('Iguigig_River_Power.xlsx','Sheet','Real_Hour');
-% river_power_potential = readtable('Iguigig_River_Power.xlsx','Sheet','Eff_plus_1_hour');
-% river_power_potential = readtable('Iguigig_River_Power.xlsx','Sheet','Eff_plus_25_hour');
-% river_power_potential = readtable('Iguigig_River_Power.xlsx','Sheet','Site1_Speed_Delta');
+%% Loading Wave Data
+wave_power_potential = readtable('Wave_Potential.xlsx');
 
-% %  repmat(river_power_potential.Site2_Power_kW,1,0)
-% river_power_potential = [repmat(river_power_potential.Site1_Power_kW,1,5)];
-% river_power_potential = river_power_potential(:,1);
-%% Finding the value of the RivGen system!!!
-river_power_potential = [river_power_potential.Normalized_Site1_Power river_power_potential.Normalized_Site2_Power];
-% river_power_potential = table2array(river_power_potential(:,30+outer_loop));
-% river_power_potential(:,2) = [river_power_potential.Properties.VariableNames{24}];
-% river_power_potential = [river_power_potential.Site1_Power_kW river_power_potential.Site2_Power_kW];
-% river_power_potential = zeros(8760,1);
+if wave_on
+    wave_power_potential = wave_power_potential.Normalized_Power;
+end
 
-%% eff_delta
-% eff_delta = [-10:1:10]./100;
-% river_power_potential = river_power_potential.*((0.4+eff_delta(outer_loop))/0.4);
 %% Setting Simulaiton Time
 
 %%%Date vectors for all time stamps

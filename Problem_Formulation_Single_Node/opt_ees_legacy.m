@@ -7,7 +7,8 @@ if ~isempty(ees_legacy)
             (var_lees.ees_soc(2:T,ii) == ees_legacy(10,ii)*var_lees.ees_soc(1:T-1,ii) + ees_legacy(8,ii)*var_lees.ees_chrg(2:T,ii)  - (1/ees_legacy(9,ii))*var_lees.ees_dchrg(2:T,ii)):'Legacy EES Balance'  %%%Legacy EES Balance
             (ees_legacy(4,ii)*ees_legacy(1,ii) <= var_lees.ees_soc(:,ii) <= ees_legacy(5,ii)*ees_legacy(1,ii)):'Legacy EES Min/Max SOC' %%%Legacy Min/Max SOC
             (var_lees.ees_chrg(:,ii) <= ees_legacy(6,ii)*ees_legacy(1,ii)):'Legacy EES Max Chrg'  %%%Legacy Max Charge Rate
-            (var_lees.ees_dchrg(:,ii) <= ees_legacy(7,ii)*ees_legacy(1,ii)):'Legacy EES Max Dchrg']; %%%Legacy Max Discharge Rate
+            (var_lees.ees_dchrg(:,ii) <= ees_legacy(7,ii)*ees_legacy(1,ii)):'Legacy EES Max Dchrg' %%%Legacy Max Discharge Rate
+            (var_lees.ees_soc(1,ii) <= var_lees.ees_soc(end,ii) ):'Legacy EES Final SOC is greater than or equal to starting SOC'];
         
         %% Renewable Tied EES
 %         if isempty(pv_v) == 0 && rees_on

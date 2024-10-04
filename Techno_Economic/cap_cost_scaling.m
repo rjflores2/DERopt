@@ -1,5 +1,10 @@
 function [cost_scale] = cap_cost_scaling(tr,tech_v,fin_v,scale_factor,debt,discount_rate,rebate)
-
+%% IRA
+if length(fin_v) >=4
+    ira = (tech_v(1) + scale_factor)*fin_v(4);
+else 
+    ira = 0;
+end
 %% MARCS Schedules
 %%%5 year schedule
 macrs5 = [0.2   %yr1
@@ -26,10 +31,17 @@ macrs7 = [0.1429%yr1
     0];         %yr10
 
 %% MACRS
+%%% IF IRA is active, MACRS is slightly reduced
+if length(fin_v) >= 4
+    macrs_mod = 1;
+else
+    macrs_mod = 1;
+end
+
 if fin_v(2) == 5
-    macrs = macrs5.*(tech_v(1) + scale_factor)*tr;
+    macrs = macrs5.*(tech_v(1) + scale_factor - ira*0.5)*tr.*macrs_mod;
 elseif fin_v(2) == 7
-    macrs = macrs7.*(tech_v(1) + scale_factor)*tr;
+    macrs = macrs7.*(tech_v(1) + scale_factor - ira*0.5)*tr.*macrs_mod;
 else
     macrs = zeros(size(macrs5));
 end
@@ -37,9 +49,11 @@ end
 %% ITC
 itc = (tech_v(1) + scale_factor)*tr*fin_v(3);
 
+
+
 %% Cashflows
 cashflow = debt - macrs;
-cashflow(1) = cashflow(1) - itc;
+cashflow(1) = cashflow(1) - itc - ira;
 
 %%%Adjsuted Cost
 npv_cost = pvvar(cashflow,discount_rate);

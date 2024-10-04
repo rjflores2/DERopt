@@ -1,11 +1,17 @@
 %% PV Constraints
 if ~isempty(pv_v) || ~isempty(pv_legacy)
+    %% If new PV is being sized
+    if ~isempty(pv_v)
+        Constraints = [Constraints
+            (0 <= var_pv.pv_elec):'PV production >= 0'
+            (0 <= var_pv.pv_adopt):'PV Adoption >= 0'];
+    end
     %% PV Energy balance when curtailment is allowed
     if curtail
-        Constraints = [Constraints, (var_pv.pv_elec + var_pv.pv_nem + var_rees.rees_chrg + var_lrees.rees_chrg <= (1/e_adjust).*repmat(solar,1,K).*(repmat(pv_legacy_cap,T,1) + repmat(var_pv.pv_adopt,T,1))):'PV Energy Balance - <='];
+        Constraints = [Constraints, (var_pv.pv_elec + var_rees.rees_chrg + var_lrees.rees_chrg <= (1/e_adjust).*repmat(solar,1,K).*(repmat(pv_legacy_cap,T,1) + repmat(var_pv.pv_adopt,T,1))):'PV Energy Balance - <='];
 %         Constraints = [Constraints, (pv_wholesale + pv_elec + pv_nem + rees_chrg <= repmat(solar,1,K).*repmat(pv_adopt,T,1)):'PV Energy Balance'];
     else
-        Constraints = [Constraints, (var_pv.pv_elec + var_pv.pv_nem + var_rees.rees_chrg + var_lrees.rees_chrg == (1/e_adjust).*repmat(solar,1,K).*(repmat(pv_legacy_cap,T,1) + repmat(var_pv.pv_adopt,T,1))):'PV Energy Balance - =='];
+        Constraints = [Constraints, (var_pv.pv_elec + var_rees.rees_chrg + var_lrees.rees_chrg == (1/e_adjust).*repmat(solar,1,K).*(repmat(pv_legacy_cap,T,1) + repmat(var_pv.pv_adopt,T,1))):'PV Energy Balance - =='];
 %         Constraints = [Constraints, (pv_wholesale + pv_elec + pv_nem + rees_chrg == repmat(solar,1,K).*repmat(pv_adopt,T,1)):'PV Energy Balance'];
     end
     %% Min PV to adopt: Forces 3 kW Adopted
@@ -24,6 +30,13 @@ if ~isempty(pv_v) || ~isempty(pv_legacy)
         Constraints = [Constraints, (var_pv.pv_adopt./pv_v(2) <= maxpv'):'Mav PV area'];
     end
     
+    %% SOMAH
+    if somah > 0 && sum(low_income) > 0
+       Constraints = [Constraints
+           (0 <= var_somah.somah_capacity):'SOMAH Is >=0'
+           (var_somah.somah_capacity <= var_pv.pv_adopt(low_income == 1)):'SOMAH size is limited by purchased PV'
+           (var_somah.somah_capacity.*sum(solar) <= sum(elec(:,low_income == 1),1)):'SOMAH is limited by building electric demand'];
+    end
     %% Don't curtail for residential
 %     residential = find(strcmp(rate,'R1') |strcmp(rate,'R2') | strcmp(rate,'R3')| strcmp(rate,'R4'));   
 %     Constraints = [Constraints,...

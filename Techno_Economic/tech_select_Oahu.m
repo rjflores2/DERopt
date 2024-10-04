@@ -13,7 +13,7 @@ if pv_on
     
     pv_v2=[0.7*(2300+216); 0.2 ; 0.001];
     
-    pv_v = [pv_v1 pv_v2];
+    pv_v = [pv_v1];
 %     pv_v = [pv_v1];
     
 %     %%%How pv capital cost is modified for different types of buildings
@@ -36,19 +36,24 @@ else
     pv_v = [];
 end
 
+%% wave power
+if exist('wave_on') && wave_on
+    wave_v = [0];
+end
+
 %% Run of river generator
 if ror_integer_on
     ror_integer_v = [ror_integer_cost.*[1 1] %%% Capital cost ($/kW)
         80 80 %%% Power Capacity (kW)
         18 18%%% Swept area (m^2)
-        20 20];%%% Site limit (#)
+        10 10];%%% Site limit (#)
 end
 
 %% PEM Fuel Cel
 if exist('pemfc_on') && pemfc_on
     %%%Capital Cost
     %%%Efficiency
-    pem_v = [2000+2.7 0.45 0.005 0.0];
+    pem_v = [2000+2.7 0.45 0.005 0];
     
 end
 

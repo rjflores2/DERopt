@@ -4,15 +4,24 @@ if opt_now==1
     
     % Export Model YALMIP -> CPLEX
     tic
-    [model,recoverymodel,diagnostic,internalmodel] = export(Constraints,Objective,sdpsettings('solver','cplex'));
-    
+    [model,recoverymodel,diagnostic,internalmodel] = export(Constraints,Objective,sdpsettings('solver','gurobi'));
+    % [model,recoverymodel,diagnostic,internalmodel] = export(Constraints,Objective);
+    model.lb(:) = 0;
+
+params.NodeLimit = 30000;
+params.NodeLimit = 20000;
+params.OutputFlag = 1;
+% params.StartNumber = solution.x;
+solution = gurobi(model,params)
+
+
     %%%Setting lower/upper bounds for all variables
-    lb=zeros(size(model.f));
-    ub=inf(size(lb));
-    elapsed = toc;
-    fprintf('Model Export took %.2f seconds \n', elapsed)
+    % lb=zeros(size(model.f));
+    % ub=inf(size(lb));
+    % elapsed = toc;
+    % fprintf('Model Export took %.2f seconds \n', elapsed)
     
-ops = sdpsettings('solver','cplex','verbose',1);
+% ops = sdpsettings('solver','cplex','verbose',1);
 
     % options = cplexoptimset;
     % options.Display='on';
@@ -27,14 +36,19 @@ ops = sdpsettings('solver','cplex','verbose',1);
     tic
     
 %         [x, fval, exitflag, output, lambda] = cplexlp(model.f, model.Aineq, model.bineq, model.Aeq, model.beq, lb, ub, [], options);
-    if sum(strfind(model.ctype,'B')>0) + sum(strfind(model.ctype,'I')>0)
-        opt_cplexmilp = 1
-        [x, fval, exitflag, output] = cplexmilp(model.f, model.Aineq, model.bineq, model.Aeq, model.beq, [],[],[],lb,ub,model.ctype,x,ops);        
-    else
-        opt_cplexlp = 1
-        [x, fval, exitflag, output, lambda] = cplexlp(model.f, model.Aineq, model.bineq, model.Aeq, model.beq, lb, ub, [], ops);        
-    end
-    
+%     if sum(strfind(model.ctype,'B')>0) + sum(strfind(model.ctype,'I')>0)
+%         opt_cplexmilp = 1
+%     options = cplexoptimset;
+% %     options.MaxNodes = 10;
+% 
+% %     ('Display', 'on', 'MaxNodes', 10);
+%         [x, fval, exitflag, output] = cplexmilp(model.f, model.Aineq, model.bineq, model.Aeq, model.beq, [],[],[],lb,ub,model.ctype,[],cplexoptimset);        
+%     else
+%         opt_cplexlp = 1
+%     options = cplexoptimset('Display', 'on', 'MaxNodes', 10);
+%         [x, fval, exitflag, output, lambda] = cplexlp(model.f, model.Aineq, model.bineq, model.Aeq, model.beq, lb, ub, [], options);        
+%     end
+%     aassshole
     elapsed = toc;
     fprintf('CPLEX took %.2f seconds \n', elapsed)
 
@@ -44,8 +58,8 @@ ops = sdpsettings('solver','cplex','verbose',1);
     %     cplex.Solution.miprelgap
     
     % Recovering data and assigning to the YALMIP variables
-    assign(recover(recoverymodel.used_variables),x)
-    
+    % assign(recover(recoverymodel.used_variables),x)
+    assign(recover(recoverymodel.used_variables),solution.x)
 end
 %% Optimize thru YALMIP
 if opt_now_yalmip==1  

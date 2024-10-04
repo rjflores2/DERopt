@@ -118,6 +118,14 @@ if ~isempty(crit_load_lvl) && crit_load_lvl >0
     end
     
     
+    
+    %% H2 delivery
+    var_resiliency.h2_delivery = sdpvar(size(elec_res,1),1,'full'); %kW
+    var_resiliency.h2_storage = sdpvar(size(elec_res,1),1,'full');
+    Objective = Objective...
+        + sum(var_resiliency.h2_delivery)*1;
+    
+    
 else
     
     var_resiliency.pv_elec = zeros(endpts(2),K);

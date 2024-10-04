@@ -70,7 +70,7 @@ if exist('ldiesel_on') && ldiesel_on
     %%% Engine Capacity (kW) - 1
     %%%Diesel engine efficiency (fraction)  - 2
     %%% Engine O&M ($/kWh) - 3
-    ldiesel_v = [100
+    ldiesel_v = [max(elec).*1.5
         0.33
         0.02];
 %    ldiesel_v = [ldiesel_v ldiesel_v];

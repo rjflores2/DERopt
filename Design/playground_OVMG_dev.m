@@ -1,10 +1,10 @@
 %% Playground file for OVMG Project
 clear all; close all; clc ; started_at = datetime('now'); startsim = tic;
+addpath('H:\_Research_\CEC_OVMG\URBANopt\UO_Processing')
+starttime = clock;
 
-
-
-for crit_load_lvl = [3]%[0 1 2 3 4 5 6 7];%%[4 5 6 7] %%% Corresponding END around line 500 - after files have been saved
-    clearvars -except crit_load_lvl crit_load_lvl started_at startsim
+for crit_load_lvl = [0]%[0 1 2 3 4 5 6 7];%%[4 5 6 7] %%% Corresponding END around line 500 - after files have been saved
+    clearvars -except crit_load_lvl crit_load_lvl started_at startsim starttime
 % crit_load_lvl = 5;
 % crit_load_lvl = [];
 % %%
@@ -30,10 +30,15 @@ if sim_lvl == 1 || sim_lvl == 3
 else
     acpf_sim = 1; %%Turn on for
 end
-acpf_sim = 1;
+% acpf_sim = [];
 %%%Are the transformer limits on or off?
 acpf_xfmr_on = 0;
 
+%%%Utility Binary Variables on or off??
+util_bin_all_sim_on = 1;
+
+%%% Battery Binary Variables on or off?
+ees_bin_on = 1;
 %% Downselection of building energy data?
 testing = 0;
 if ~testing
@@ -88,15 +93,14 @@ end
 testing
 downselection = 0
 
+
+hrs_on = 0;
 %% ESA On/Off (opt_var_cf)
 esa_on = 1; %Building RAtes are Adjusted for CARE Rates
 
 %% Include Critical Loads
 crit_tier = []; %%%Residential Critical Load Requirements (Load Tier)
 crit_tier_com = 0.15; %%%Commercial Critical Load Requirements (% of load)crit_load_lvl
-
-%% Critical Load Level6
-% crit_load_lvl = 5;
 
 %% Turning incentives and other financial tools on/off
 % sgip_on = 1;
@@ -132,7 +136,8 @@ xfmr_on = 0;
 island = 0;
 %% Adding paths
 %%%YALMIP Master Path
-addpath(genpath('H:\Matlab_Paths\YALMIP-master'))
+% addpath(genpath('H:\Matlab_Paths\YALMIP-master'))
+addpath(genpath('H:\Matlab_Funcitons\YALMIP-master')) %rjf path
 
 %%%CPLEX Path
 addpath(genpath('C:\Program Files\IBM\ILOG\CPLEX_Studio128\cplex\matlab\x64_win64'))
@@ -158,8 +163,7 @@ addpath(genpath('H:\_Research_\CEC_OVMG\Rates'))
 
 %% Loading/seperating building demand
 
-scenario = 'ues_baseline_update'
-scenario = 'baseline_retest_2B_v2'
+scenario = 'baseline_retest_2B_v2' %Baseline Loads!!
 % scenario = 'UES_1b'
 % scenario = 'ues_1a_v2'
 % scenario = 'UES_2b'
@@ -191,6 +195,10 @@ infrastructure_mapping_OVMG
 st_idx = [1 51 101 151 201 251 301];
 end_idx = [50 100 150 200 250 300 317];
 
+st_idx = [1:20:301];
+end_idx = st_idx + 19;
+end_idx(end) = 317;
+
 % st_idx = [1 6 11];
 % end_idx = [5 10 15];
 
@@ -198,21 +206,33 @@ st_idx = [1 11 21 31 41];
 end_idx = [10 20 30 40 50];
 
 
-st_idx = [1:20:311];
-end_idx = st_idx + 19;
-end_idx(end) = 317;
+st_idx = [1:2:317];
+end_idx = st_idx + 1;
+
+st_idx = [1:317];
+end_idx = [1:317];
+
+% st_idx = [3];
+% end_idx = [3];
+% st_idx = [1:20:311];
+% end_idx = st_idx + 19;
+% end_idx(end) = 317;
+
+% temp_idx_testing %%%Temporary index tester
+
 
 adopted.pv = [];
 adopted.rees = [];
 adopted.ees = [];
 adopted.mean_elec = [];
+adopted.fval = [];
 
 %% Simulation indicies based on resiliency constraints
-if sim_lvl == 1 && (~acpf_sim || isempty(acpf_sim)) %%%If resiliency is examined per building and no linearized ACPF/infrastructure constraints are implemented 
+if sim_lvl == 1 && ( isempty(acpf_sim) || ~acpf_sim) %%%If resiliency is examined per building and no linearized ACPF/infrastructure constraints are implemented 
     sim_end = length(st_idx);
-elseif sim_lvl == 2 ||  ((~acpf_sim || isempty(acpf_sim)) && xfmr_on) %%%If resiliency is examined at each transformer, OR only xfmr constraints are implemented
+elseif sim_lvl == 2 |  ((~acpf_sim | isempty(acpf_sim)) & xfmr_on) %%%If resiliency is examined at each transformer, OR only xfmr constraints are implemented
     sim_end = length(xfmrs_unique);
-elseif sim_lvl == 3 && acpf_sim %%%If resiliency is examined on each individual branch OR ACPF is implemented
+elseif sim_lvl == 3 & acpf_sim %%%If resiliency is examined on each individual branch OR ACPF is implemented
     xfmr_2_circuit = readtable('H:\_Tools_\DERopt\Data\OVMG_Inputs\OV_Distribtuion_Circuit_Xfmrs.xlsx');
     %%%Temp hard coding of transformers
     sheets = {'Sm1','Sm2','Sm3','Sm4','Sm5','Sm6','St1'};
@@ -220,12 +240,16 @@ elseif sim_lvl == 3 && acpf_sim %%%If resiliency is examined on each individual 
 end
 
 %%
+bldg_bin_off = [97 98 99 100 103 104 174 231 243];
 
-
-for sim_idx = 1:sim_end
+for sim_idx = 1:5%sim_end
+    
+    
    %% Building indicies in the current simulation
-    if sim_lvl == 1 && (acpf_sim == 0 || isempty(acpf_sim))
+    if sim_lvl == 1 && ( isempty(acpf_sim) || ~acpf_sim)
         bldg_ind = [st_idx(sim_idx):end_idx(sim_idx)];
+%         bldg_ind = [11:20];
+
     elseif sim_lvl == 2  && (acpf_sim == 0 || isempty(acpf_sim))
         bldg_ind = find(strcmp(xfmrs_unique(sim_idx),xfmr_map));
         xfmrs = xfmrs_unique(sim_idx);
@@ -242,11 +266,17 @@ for sim_idx = 1:sim_end
         end
     end
     
+    if sum(ismember(bldg_ind , bldg_bin_off)) || util_bin_all_sim_on == 0
+        util_bin_on = 0
+    else
+        util_bin_on = 1
+    end
+    %%
     clear bldg
     bldg = bldg_base;
     
     %% Loadings relevant circuit data
-    if acpf_sim == 1 || sim_lvl >= 3
+    if ~isempty(acpf_sim) && (acpf_sim == 1 || sim_lvl >= 3)
         %%Branch/Bus matrix
         [branch_bus,bb_lbl] = xlsread('OV_Branch_bus_Matricies.xlsx',char(sheets(sim_idx)));
         %%% Eliminating NaN in branch bus matrix
@@ -281,7 +311,7 @@ for sim_idx = 1:sim_end
     rate = ri_txt(2:end,2); %%%Rate info for each building
     
     %%%Loading in NEM 3.0 data
-    export_energy_credits = xlsread('Export_Energy_Credit_2023.xlsx');
+    export_energy_credits = xlsread('Export_Energy_Credit_2024.xlsx');
     
     %%%Credit for NEM 3.0 customers
     nem3_0_credit = 0.04;
@@ -337,7 +367,7 @@ for sim_idx = 1:sim_end
     end
         
     
-    %% Reducing scope for testing
+    %% Reducing scope for simulation
     if ~isempty(bldg_ind)
         elec = elec(:,bldg_ind);
         if crit_load_lvl > 0
@@ -388,6 +418,7 @@ for sim_idx = 1:sim_end
     %%%Exsiting Technologies
     tech_legacy_OVMG
     % low_income = 1;
+    
     %%%Capital cost mofificaitons
     cap_cost_mod
 
@@ -420,6 +451,12 @@ for sim_idx = 1:sim_end
         fprintf('%s: General Inequalities. ', datestr(now,'HH:MM:SS'))
         tic
         opt_gen_inequalities
+        elapsed = toc;
+        fprintf('Took %.2f seconds \n', elapsed)
+        %% Utility Constraints
+        fprintf('%s: Electric Utility Constraints.', datestr(now,'HH:MM:SS'))
+         tic
+        opt_elec_utility
         elapsed = toc;
         fprintf('Took %.2f seconds \n', elapsed)
         %% Solar PV Constraints
@@ -477,6 +514,7 @@ for sim_idx = 1:sim_end
         elapsed = toc;
         fprintf('Took %.2f seconds \n', elapsed)
         %% Optimize
+        
         fprintf('%s: Optimizing \n....', datestr(now,'HH:MM:SS'))
         WHATS_THE_CRITICAL_LOAD = crit_load_lvl
         WHATS_THE_CIRCUIT = sim_idx
@@ -487,16 +525,30 @@ for sim_idx = 1:sim_end
         
         %% Extract Variables
         variable_values_multi_node
-        
+         
     end
-%     
+    pv_size = var_pv.pv_adopt
+    rees_size = var_rees.rees_adopt
+% butthole
 %     save(strcat('Sim_',num2str(sim_idx)))
-    
+ind = 1;
+outlet = [var_util.import(:,ind) ...
+    var_util.export(:,ind) ...
+    var_pv.pv_elec(:,ind) ...
+    var_rees.rees_dchrg(:,ind) + var_ees.ees_dchrg(:,ind) ...
+    elec(:,ind) ...
+    var_rees.rees_dchrg(:,ind)  + var_ees.ees_dchrg(:,ind)...
+    var_rees.rees_chrg(:,ind) + var_ees.ees_chrg(:,ind) ...
+    var_rees.rees_soc(:,ind) + var_ees.ees_soc(:,ind) ...
+    var_pv.pv_adopt(ind).*solar];
+
+
     %%
     adopted.pv = [adopted.pv  var_pv.pv_adopt];
     adopted.rees = [adopted.rees var_rees.rees_adopt];
     adopted.ees = [adopted.ees var_ees.ees_adopt];
     adopted.mean_elec = [adopted.mean_elec mean(elec)];
+    adopted.fval = [adopted.fval solution.objval];
     
     
     
@@ -505,9 +557,9 @@ for sim_idx = 1:sim_end
     eq_idx = 1;
     for ii = 1:length(bldg_ind)
         %%%New import/export for each building
-        bldg(ii).elec_der = [var_util.import(:,ii) - (var_rees.rees_dchrg_nem(:,ii) + var_pv.pv_nem(:,ii))... %%%Net electricity flow
+        bldg(ii).elec_der = [var_util.import(:,ii) - var_util.export(:,ii)... %%%Net electricity flow
             var_util.import(:,ii)... %%%All imports
-            (var_rees.rees_dchrg_nem(:,ii) + var_pv.pv_nem(:,ii))]; %%%All Exports
+            var_util.export(:,ii)]; %%%All Exports
         
         
         %%%DER Systems
@@ -515,10 +567,10 @@ for sim_idx = 1:sim_end
         bldg_base(bldg_ind(ii)).der_systems.ees_adopt = var_ees.ees_adopt(ii); %%%Adopted EES  (kWh)
         bldg_base(bldg_ind(ii)).der_systems.rees_adopt = var_rees.rees_adopt(ii); %%%Adopted REES  (kWh)
         
-        bldg_base(bldg_ind(ii)).der_systems.import = var_util.import(:,ii);
-        bldg_base(bldg_ind(ii)).der_systems.pv_ops = [var_pv.pv_elec(:,ii) var_pv.pv_nem(:,ii)];
+        bldg_base(bldg_ind(ii)).der_systems.import = [var_util.import(:,ii) var_util.export(:,ii)];
+        bldg_base(bldg_ind(ii)).der_systems.pv_ops = [var_pv.pv_elec(:,ii)];
         bldg_base(bldg_ind(ii)).der_systems.ees_ops = [var_ees.ees_soc(:,ii) var_ees.ees_chrg(:,ii) var_ees.ees_dchrg(:,ii)];
-        bldg_base(bldg_ind(ii)).der_systems.rees_ops = [var_rees.rees_soc(:,ii) var_rees.rees_chrg(:,ii) var_rees.rees_dchrg(:,ii) var_rees.rees_dchrg_nem(:,ii)];
+        bldg_base(bldg_ind(ii)).der_systems.rees_ops = [var_rees.rees_soc(:,ii) var_rees.rees_chrg(:,ii) var_rees.rees_dchrg(:,ii) ];
         
         
         %%%SGIP Values
@@ -527,17 +579,20 @@ for sim_idx = 1:sim_end
                 bldg_base(bldg_ind(ii)).der_systems.sgip_pbi = [0;0;0];
                 bldg_base(bldg_ind(ii)).der_systems.sgip_npbi = 0;
                 bldg_base(bldg_ind(ii)).der_systems.sgip_equity = var_sgip.sgip_ees_npbi_equity(eq_idx);
+                bldg_base(bldg_ind(ii)).der_systems.somah = var_somah.somah_capacity(eq_idx);
                 eq_idx = eq_idx + 1;
             else
                 bldg_base(bldg_ind(ii)).der_systems.sgip_pbi = [0;0;0];
                 bldg_base(bldg_ind(ii)).der_systems.sgip_npbi = var_sgip.sgip_ees_npbi(npbi_idx);
                 bldg_base(bldg_ind(ii)).der_systems.sgip_equity = 0;
+                bldg_base(bldg_ind(ii)).der_systems.somah = 0;
                 npbi_idx = npbi_idx + 1;
             end
         else
             bldg_base(bldg_ind(ii)).der_systems.sgip_pbi = var_sgip.sgip_ees_pbi(:,pbi_idx);
             bldg_base(bldg_ind(ii)).der_systems.sgip_npbi = 0;
             bldg_base(bldg_ind(ii)).der_systems.sgip_equity = 0;
+            bldg_base(bldg_ind(ii)).der_systems.somah = 0;
             pbi_idx = pbi_idx + 1;
         end
         
@@ -552,19 +607,20 @@ for sim_idx = 1:sim_end
 end
 
 %% Update Utility Costs
-OVMG_updated_utility_costs
+% OVMG_updated_utility_costs
 
-save(strcat(scenario,'_',num2str(WHATS_THE_CRITICAL_LOAD)))
+% save(strcat(scenario,'_',num2str(WHATS_THE_CRITICAL_LOAD)))
 
 %% Saving Data
 bldg = bldg_base;
 
 if isempty(crit_load_lvl) || crit_load_lvl == 0
     save_here = 1
-    save(strcat(sc_txt,'_DdER'),'bldg')
+    save(strcat(sc_txt,'_DER'),'bldg')
 else
     save_here = 2
     save(strcat(sc_txt,'_DER_Crit_Load_Circuit3_',num2str(crit_load_lvl)),'bldg')
 end
 end
+finishtime = clock-starttime;
 return

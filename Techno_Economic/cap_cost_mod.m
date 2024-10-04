@@ -65,6 +65,26 @@ if ~isempty(dgc_v)
     end
 end
 
+%%%Linear DG Model 
+if dgl_on
+    for ii=1:size(dgl_v,2)
+        dgl_mthly_debt(ii,1)=dgl_v(1,ii)*((1-equity)*(interest*(1+interest)^(period*12))...
+            /((1+interest)^(period*12)-1)+...%%%Money to pay back bank
+            req_return_on*(equity)*(required_return*(1+required_return)^(period*12))...
+            /((1+required_return)^(period*12)-1));        
+    end
+end
+
+%%%Linear DG Model 
+if h2_storage_on
+    for ii=1:size(dgl_v,2)
+        h2_storage_mthly_debt(ii,1)=h2_storage_v(1,ii)*((1-equity)*(interest*(1+interest)^(period*12))...
+            /((1+interest)^(period*12)-1)+...%%%Money to pay back bank
+            req_return_on*(equity)*(required_return*(1+required_return)^(period*12))...
+            /((1+required_return)^(period*12)-1));        
+    end
+end
+
 %%%Generic electrolyzer
 if ~isempty(el_v)
     for ii=1:size(el_v,2)
@@ -97,7 +117,7 @@ end
 
 
 %%%Hydrogen fueling station
-if exist('hrs_on') && hrs_on
+if exist('hrs_on') && ~isempty(hrs_on) && hrs_on
     hrs_mthly_debt = hrs_v(1)*((1-equity)*(interest*(1+interest)^(period*12))...
         /((1+interest)^(period*12)-1)+...%%%Money to pay back bank
         req_return_on*(equity)*(required_return*(1+required_return)^(period*12))...
@@ -198,7 +218,7 @@ if ~isempty(pv_v)
             
             %%%Scaling Factor
             %%%If is low income
-            if exist('low_income') && low_income(i) ~= 1
+%             if exist('low_income') && low_income(i) ~= 1
 %                 for ii = 1:length(pv_scale_factor)
                     %%%Decrease in cost due to scale
                     pv_scale_factor = pv_scale_factor*pv_fin(1,ii);
@@ -214,9 +234,14 @@ if ~isempty(pv_v)
                     
 %                 end
                 %%%If is low income
-            else
-                pv_cap_mod(i,ii) = 1 - somah/pv_v(1,ii);
-            end
+%             else
+%                 pv_cap_mod(i,ii) = 1 - somah/pv_v(1,ii);
+%                 
+%                 %%if SOMAH completely offsets capital costs
+%                 if pv_cap_mod(i,ii) < 0
+%                     pv_cap_mod(i,ii) = 0;
+%                 end
+%             end
             
         end
     end

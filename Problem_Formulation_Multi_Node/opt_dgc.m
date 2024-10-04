@@ -2,6 +2,9 @@
 
 if ~isempty(dgc_v)
     Constraints = [Constraints
+        (0 <= var_dgc.dgc_adopt):'dgb Adoptiong >= 0'
+        (0 <= var_dgc.dgc_elec):'dgb Elec >= 0'
+        (0 <= var_dgc.dgc_fuel):'dgb Fuel >= 0'
         (repmat(var_dgc.dgc_adopt.*dgc_v(4),size(var_dgc.dgc_elec,1),1) <= var_dgc.dgc_elec  <= repmat(var_dgc.dgc_adopt,size(var_dgc.dgc_elec,1),1)):'DGC Output Limits'
         (var_dgc.dgc_elec./dgc_v(3) == var_dgc.dgc_fuel):'DGC Fuel'];
 end

@@ -251,47 +251,47 @@ classdef CConfigurationManager < handle
 
             % General export
             obj.gen_export_on = 0;
-
+            
             % Fuel Related Toggles
             obj.biogas_limit = 0; % 491265*293.1; % kWh - biofuel availabe per year - based on Matt Gudorff emails/pptx
-
+            
             obj.h2_fuel_forced_fraction = []; % Energy fuel requirements
-
+            
             obj.sgip_on = 0; % incentives and other financial tools OFF
-
+            
             obj.h2_charging_rec = [];       % DOE H2 Integration required throughput per day
-
+            
             obj.maxpv = 300000;
             obj.toolittle_pv = 0;
             obj.curtail = 1;
-
+            
             obj.toolittle_storage = 1;
             obj.socc = 0;
-
+            
             obj.grid_import_on = 1;
             obj.import_limit = .6;
-
+            
             obj.dc_exist = 1;
             obj.low_income = 0;
             obj.sgip_pbi = 1;
             obj.res_units = 0;
-
+            
             %  Fixed Cost Defines
-
+            
             obj.t_and_d = 0.01; % ($/kWh)
-
+            
             % natural gas cost
             obj.ng_cost = 0.5/29.3; %$/kWh --> Converted from $/therm to $/kWh, 29.3 kWh / 1 Therm
             obj.rng_cost = 2.*obj.ng_cost;
             obj.rng_storage_cost = 0.2/29.3;
             obj.ng_inject = 0.05/29.3; %$/kWh --> Converted from $/therm to $/kWh, 29.3 kWh / 1 Therm
-
-%%%Regular H2 cost
-obj.h2_cost = 4/120*105.5 + 0*(8/120*105.5 + 0.6)/29.3;
-
+            
+            %%%Regular H2 cost
+            obj.h2_cost = 4/120*105.5 + 0*(8/120*105.5 + 0.6)/29.3;
+            
             % Including Required Return with Capital Payment (1 = Yes)
             obj.req_return_on = 1;
-
+            
             obj.onoff_model = 1;
 
             obj.interestRateOnLoans = 0.08;

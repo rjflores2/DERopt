@@ -60,6 +60,11 @@ if exist('ror_integer_on') && ror_integer_on
     var_ror_integer.units = value(var_ror_integer.units);
     var_ror_integer.elec = value(var_ror_integer.elec);
 end
+%% wave power
+if exist('wave_on') && wave_on
+    var_wave.electricity = value(var_wave.electricity);
+    var_wave.power = value(var_wave.power);
+end
 
 %% Dump variables
 var_dump.elec_dump = value(var_dump.elec_dump);
