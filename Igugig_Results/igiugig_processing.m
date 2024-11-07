@@ -1,5 +1,5 @@
-load diesel_2000.mat
-
+load diesel_8000.mat
+%%
 results_output.lcoe = solution.objval/sum(elec)
 
 results_output.energy_source = [sum(var_legacy_diesel_binary.electricity)

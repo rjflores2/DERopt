@@ -9,14 +9,15 @@ pv_area_range = [1:25 30:5:100 110:10:9000 9100:100:26000];
 % pv_area_range = [1 100:100:9000];
 % pv_area_range = [16100:100:26000];
 % ror_area_range = [0.1 1:100];
-ror_area_range = [0.1 1:18*3];
+ror_area_range = [0 0.1  .5 1:0.5:18*3];
+% ror_area_range = [0];
 
 shadow_rec = [];
 energy_mix = [];
 tech_adopt = [];
-for outer_loop = 1:2%1:19%1:29
+for outer_loop = 1:29
 for sim_loop = 1:length(ror_area_range)
-    clearvars -except sim_loop ror_area_range shadow_rec startsim energy_mix tech_adopt pv_area_range outer_loop hydro_utilizaiton hydro_max_utilizaiton
+    clearvars -except sim_loop ror_area_range shadow_rec startsim energy_mix tech_adopt pv_area_range outer_loop hydro_utilizaiton hydro_max_utilizaiton max_hkt_power
     ror_area = ror_area_range(sim_loop);
 %     pv_area = pv_area_range(sim_loop);
     %%% opt.m parameters
@@ -32,11 +33,13 @@ for sim_loop = 1:length(ror_area_range)
     rees_on = 0;  %Turn on REES
     
     ror_on = 0; % Turn On Run of river generator
+    ror_integer_on = 0;
     
     pemfc_on = 1;
     
     %%%Hydrogen technologies
     el_on = 1; %Turn on generic electrolyer
+    el_binary_on = 0;
     rel_on = 0; %Turn on renewable tied electrolyzer
     h2es_on = 1; %Hydrogen energy storage
     strict_h2es = 0; %Is H2 Energy Storage strict discharge or charge?
@@ -98,7 +101,7 @@ addpath(genpath('H:\Matlab_Funcitons\YALMIP-master')) %rjf path
     % month_idx = [9];
     % month_idx = [1];
     % month_idx = [];
-    bldg_loader_Igiugig
+    bldg_loader_Igiugig_LP
     
     
     %% Conventional Generator Data
@@ -109,6 +112,7 @@ addpath(genpath('H:\Matlab_Funcitons\YALMIP-master')) %rjf path
     else
         diesel_cost = 0.00001;
     end
+    diesel_cost = 10;
      % $/gallon
 %     diesel_cost = 5; % $/gallon
 %     diesel_cost = 2.734; % $/gallon
@@ -127,7 +131,7 @@ addpath(genpath('H:\Matlab_Funcitons\YALMIP-master')) %rjf path
     %% Tech Parameters/Costs
     clc
     %%%Technology Parameters
-    tech_select_Igiugig
+    tech_select_Igiugig_LP
     
     %%%Including Required Return with Capital Payment (1 = Yes)
     if pv_on
@@ -141,6 +145,9 @@ addpath(genpath('H:\Matlab_Funcitons\YALMIP-master')) %rjf path
     
     [rees_mthly_debt] = capital_cost_to_monthly_cost(ees_v(1,:),equity,interest,period,required_return);
     [el_mthly_debt] = capital_cost_to_monthly_cost(el_v(1,:),equity,interest,period,required_return);
+    if rel_on
+        [rel_mthly_debt] = capital_cost_to_monthly_cost(rel_v(1,:),equity,interest,period,required_return);
+    end
     [h2es_mthly_debt] = capital_cost_to_monthly_cost(h2es_v(1,:),equity,interest,period,required_return);
     [pem_mthly_debt] = capital_cost_to_monthly_cost(pem_v(1,:),equity,interest,period,required_return);
     
@@ -227,6 +234,7 @@ addpath(genpath('H:\Matlab_Funcitons\YALMIP-master')) %rjf path
         
         if sim_loop > 1
             prior_shadow = shadow_rec(outer_loop,sim_loop-1)
+            sim_loop
             if prior_shadow == 0
                 break 
             end
@@ -264,6 +272,13 @@ size(shadow_rec)
             sum(sum(var_pv.pv_elec,2))
             sum(sum(var_run_of_river.electricity,2))
             sum(sum(var_pem.elec,2))];
+
+        max_hkt_power(outer_loop,sim_loop) = max(var_run_of_river.electricity);
+        
+if -solution.pi(end) < 1
+    break
+end
+
         %         shadow_ror_potential = lambda.ineqlin(end-8761:end-1);
         % shadow_ror_swept_area = lambda.ineqlin(end);
 

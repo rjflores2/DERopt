@@ -19,8 +19,8 @@ ror_integer_on = 1;
 ror_integer_cost = 2000;
 pemfc_on = 1;
 %%%Hydrogen technologies
-el_on = 1; %Turn on generic electrolyer
-el_binary_on = 0;
+el_on = 0; %Turn on generic electrolyer
+el_binary_on = 1;
 rel_on = 0; %Turn on renewable tied electrolyzer
 h2es_on = 1; %Hydrogen energy storage
 strict_h2es = 0; %Is H2 Energy Storage strict discharge or charge?
@@ -30,7 +30,7 @@ lees_on = 1; %Legacy EES
 ltes_on = 0; %Legacy TES
 
 lror_on = 0; %Turn on legacy run of river
-ror_area = 200;
+% ror_area = 200;
 ldiesel_on = 0; %Turn on legacy diesel generators
 ldiesel_binary_on = 0; %Binary legacy diesel generators
 
@@ -76,14 +76,20 @@ cool = [];
 %%%Values to filter data by
 month_idx = [];
 
-
-
 % month_idx = [2];
 % month_idx = [9];
 % month_idx = [1];
 % month_idx = [];
 bldg_loader_Igiugig
 
+%%% Simulating an ice break up
+
+ice_break_up_duration = 0; %days
+if ice_break_up_duration > 0
+    april_index = find(datetimev(:,2) == 4);
+    april_index = april_index(1:ice_break_up_duration*24);
+    river_power_potential(april_index,:) = 0;
+end
 
 %% Conventional Generator Data
 %%%Diesel Cost
@@ -241,3 +247,4 @@ if opt_now
     %% Finding Lambda Values
 
 end
+

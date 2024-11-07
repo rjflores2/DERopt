@@ -174,11 +174,11 @@ addpath(genpath('H:\_Research_\CEC_OVMG\Rates'))
 
 %% Loading/seperating building demand
 
-% scenario = 'ues_baseline_update'
+% % % scenario = 'ues_baseline_update'
 % scenario = 'baseline_retest_2B_v2';
 % scenario = 'UES_1b'
 % scenario = 'ues_1a_v2'
-% scenario = 'UES_2b'
+% % % scenario = 'UES_2b'
 % scenario = 'ues_baseline_ASHP_HPWH_film_coating_int_ex_lite_AppElec_Plus_envelope'
 scenario = 'ues_baseline_passive_Int_Ex_Lite_AppElec_plus_envelope_rev'
 fprintf('%s: Loading UO Data.', datestr(now,'HH:MM:SS'))
@@ -260,7 +260,7 @@ end
 
 
 %%
-for sim_idx = 1:sim_end
+for sim_idx = 171%1:sim_end
    %% Building indicies in the current simulation
    if opt_resiliency_model == 0 %&& (acpf_sim == 0 || isempty(acpf_sim))
         bldg_ind = [st_idx(sim_idx):end_idx(sim_idx)]; 
@@ -765,7 +765,7 @@ bldg = bldg_base;
 %     save_here = 1
 if crit_load_lvl ==0
 %     save(strcat(sc_txt,'_DER_no_export_limit'),'bldg')
-    save(strcat(sc_txt,'_DER_run2_base_costs'),'bldg')
+    save(strcat(sc_txt,'_DER_run2_reduced_costs'),'bldg')
 elseif opt_resiliency_model == 1
     save(strcat(sc_txt,'_DER_bldg_nanogrid'),'bldg')
 elseif opt_resiliency_model == 2

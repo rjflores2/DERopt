@@ -41,14 +41,14 @@ if ror_integer_on
     ror_integer_v = [ror_integer_cost.*[1 1] %%% Capital cost ($/kW)
         80 80 %%% Power Capacity (kW)
         18 18%%% Swept area (m^2)
-        20 20];%%% Site limit (#)
+        2 2];%%% Site limit (#)
 end
 
 %% PEM Fuel Cel
 if exist('pemfc_on') && pemfc_on
     %%%Capital Cost
     %%%Efficiency
-    pem_v = [2000+2.7 0.45 0.005 0.5];
+    pem_v = [2000+2.7 0.45 0.005 0];
     
 end
 
