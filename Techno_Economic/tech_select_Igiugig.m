@@ -9,9 +9,9 @@ if pv_on
     %%% Efficiency / Conversion Percent at 1 kW/m^2
     %%% O&M ($/kWh generated)
    
-    pv_v1=[0.7*(3000+174); 0.2 ; 0.001];   
+    pv_v1=[0.7*(1000 +174); 0.4 ; 0.001];   
     
-    pv_v2=[0.7*(2300+216); 0.2 ; 0.001];
+    pv_v2=[0.7*(1000+216); 0.2 ; 0.001];
     
     pv_v = [pv_v1 pv_v2];
 %     pv_v = [pv_v1];
@@ -34,7 +34,7 @@ if pv_on
     end
 else
     pv_v = [];
-end
+end 
 
 %% Run of river generator
 if ror_integer_on

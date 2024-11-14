@@ -219,11 +219,11 @@ if ~isempty(rel_v)
     %%%Electrolyzer production
     var_rel.rel_prod = sdpvar(T,size(rel_v,2),'full');
     
-    if util_pv_wheel_lts
-        var_rel.rel_prod_wheel = sdpvar(T,size(el_v,2),'full');
-    else
-        var_rel.rel_prod_wheel = zeros(T,size(el_v,2));
-    end
+    % if util_pv_wheel_lts
+    %     var_rel.rel_prod_wheel = sdpvar(T,size(el_v,2),'full');
+    % else
+    %     var_rel.rel_prod_wheel = zeros(T,size(el_v,2));
+    % end
     
     for ii = 1:size(rel_v,2)
         %%%Electrolyzer Cost Functions

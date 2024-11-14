@@ -12,12 +12,12 @@ elec_dump = []; %%%Variable to "dump" electricity
 %% Diesel Only Toggles
 utility_exists=[]; %% Utility access
 pv_on = 1;        %Turn on PV
-ees_on = 1;       %Turn on EES/REES
+ees_on = 0;       %Turn on EES/REES
 rees_on = 0;  %Turn on REES
-ror_on = 1; % Turn On Run of river generator
+ror_on = 0; % Turn On Run of river generator
 ror_integer_on = 0;
 ror_integer_cost = 2000;
-pemfc_on = 1;
+pemfc_on = 0;
 %%%Hydrogen technologies
 el_on = 1; %Turn on generic electrolyer
 el_binary_on = 0;
@@ -41,17 +41,10 @@ ldiesel_binary_on = 0; %Binary legacy diesel generators
 maxpv = [30000];% ; %%%Maxpv 
 toolittle_pv = 0; %%% Forces solar PV adoption - value is defined by toolittle_pv value - kW
 curtail = 1; %%%Allows curtailment is = 1
-%% EES (opt_ees.m & opt_rees.m)
-toolittle_storage = 0; %%%Forces EES adoption - 13.5 kWh
-socc = 0; % SOC constraint: for each individual ees and rees, final SOC >= Initial SOC
 
 %% Adding paths
 %%%YALMIP Master Path
 addpath(genpath('D:\LAB DOCS\YALMIP\yalmip\YALMIP-master')) %rjf path
-
-%%%CPLEX Path
-% addpath(genpath('C:\Program Files\IBM\ILOG\CPLEX_Studio128\cplex\matlab\x64_win64')) %rjf path
-% addpath(genpath('C:\Program Files\IBM\ILOG\CPLEX_Studio1263\cplex\matlab\x64_win64')) %cyc path
 
 %%%DERopt paths
 addpath(genpath('C:\Users\typde\Downloads\Lab\DERopt\DERopt\Design'))
@@ -68,6 +61,8 @@ addpath(genpath('C:\Users\typde\Downloads\Lab\DERopt\Igiugig'))
 dt = readtable('C:\Users\typde\Downloads\Lab\DERopt\Igiugig\Igiugig\Igiugig_Load_Growth_added_time.csv');
 
 time = datenum(dt.Date);
+n = height(dt);
+dt.ElectricDemand_kW_ = 45-(cos(pi*(1:n)/n).*(5*rand(1, n)))';
 elec = dt.ElectricDemand_kW_;
 heat = [];
 cool = [];
@@ -75,8 +70,6 @@ cool = [];
 %%% Formatting Building Data
 %%%Values to filter data by
 month_idx = [];
-
-
 
 % month_idx = [2];
 % month_idx = [9];
@@ -87,7 +80,7 @@ bldg_loader_Igiugig
 
 %% Conventional Generator Data
 %%%Diesel Cost
-diesel_cost = 10; % $/gallon
+diesel_cost = 6; % $/gallon
 diesel_cost = diesel_cost./128488.*3412.14; % Conversion to $/kWh (1gallon:128,488 Btu, 1 kWh:3412.14 Btu)
 %% Financing CRAP
 interest=0.08; %%%Interest rates on any loans
@@ -128,7 +121,6 @@ if pemfc_on
 end
 %%% Capital modifiers
 pv_cap_mod = ones(1,size(pv_v,2));
-% ees_mthly_debt = ones(size(pv_v,2));
 
 %% Legacy Technologies
 tech_legacy_Igiugig
@@ -148,13 +140,6 @@ if opt_now
     opt_gen_equalities %%%Does not include NEM and wholesale in elec equality constraint
     elapsed = toc;
     fprintf('Took %.2f seconds \n', elapsed)
-    
-    %% General Inequality Constraints
-%     fprintf('%s: General Inequalities. ', datestr(now,'HH:MM:SS'))
-%     tic
-%     opt_gen_inequalities
-%     elapsed = toc;
-%     fprintf('Took %.2f seconds \n', elapsed)
    
     %% Legacy Diesel Constraints
     fprintf('%s: Legacy Diesel Constraints. ', datestr(now,'HH:MM:SS'))
@@ -163,12 +148,6 @@ if opt_now
     elapsed = toc;
     fprintf('Took %.2f seconds \n', elapsed)
    
-    %% Legacy Diesel Binary Constraints
-    fprintf('%s: Legacy Diesel Binary Constraints. ', datestr(now,'HH:MM:SS'))
-    tic
-    opt_diesel_binary_legacy
-    elapsed = toc;
-    fprintf('Took %.2f seconds \n', elapsed)
     %% Solar PV Constraints
     fprintf('%s: PV Constraints.', datestr(now,'HH:MM:SS'))
     tic
@@ -225,19 +204,5 @@ if opt_now
     
     %% Variable Conversion
     variable_values_igiugig
-
-
-    %% Metrics
-    lcoe = solution.objval/sum(elec);
-    % co2_emisisons = sum(var_legacy_diesel_binary.electricity).*(1./ldiesel_binary_v(2,:)) ...
-    %     .*(3.6) ... %%% Convert from kWh to MJ
-    %     .*(1/135.6) ... %%% Convert from MJ to Gallons diesel fuel
-    %     .*(10.19); %%%Convert from gallons to kg CO2
-
-% co2_emisisons/sum(elec);
-
-        % .*(0.85) ... %%% Convert from liters to kg
-
-    %% Finding Lambda Values
 
 end

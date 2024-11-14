@@ -215,7 +215,7 @@ ylabel('H_2 Storage  (kg)','FontSize',16)
 hold off
 set(gcf,'Position',[10 10 700 500])
 %%
-close all
+% close all
 figure
 tiledlayout(2,1)
 nexttile
@@ -257,7 +257,7 @@ box on
 set(gcf,'Position',[10 10 800 225])
 ylabel('Shadow Price ($)','FontSize',16)
 %%
-close all
+% close all
 figure
 hold on
 plot([0:100/8759:100],sort(sum(var_legacy_diesel.electricity,2),'descend'),'LineWidth',2)
