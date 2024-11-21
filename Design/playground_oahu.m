@@ -4,7 +4,8 @@ clear all; close all; clc ; started_at = datetime('now'); startsim = tic;
 
 results = [];
 wave_range = [0:50:6000];
-wave_range = [6050:50:15000];
+wave_range = [0:50:15000];
+wave_range = [20000];
 for wave_num = 1:length(wave_range)
     clearvars -except results wave_range wave_num startsim
     %% Parameters
@@ -40,7 +41,7 @@ for wave_num = 1:length(wave_range)
 
     lror_on = 0; %Turn on legacy run of river
 
-    ldiesel_on = 1; %Turn on legacy diesel generators
+    ldiesel_on = 0; %Turn on legacy diesel generators
     ldiesel_binary_on = 0; %Binary legacy diesel generators
 
     %% PV (opt_pv.m)
@@ -134,6 +135,9 @@ for wave_num = 1:length(wave_range)
     end
     if pemfc_on
         [pem_mthly_debt] = capital_cost_to_monthly_cost(pem_v(1,:),equity,interest,period,required_return);
+    end
+    if exist('wave_on') && wave_on
+        [wave_mthly_debt] = capital_cost_to_monthly_cost(wave_v(1,:),equity,interest,period,required_return);
     end
     %%% Capital modifiers
     pv_cap_mod = ones(1,size(pv_v,2));

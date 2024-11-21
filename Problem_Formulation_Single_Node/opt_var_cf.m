@@ -489,8 +489,8 @@ if exist('wave_on') && wave_on
    var_wave.power = sdpvar(1,size(wave_power_potential,2),'full');
    
     Objective=Objective ...
-        + sum(sum(wave_v.*var_wave.electricity)) ...
-        + 0.*sum(var_wave.power);
+        + sum(sum(wave_v(2).*var_wave.electricity)) ...
+        + wave_mthly_debt.*M.*var_wave.power;
    
 else
     var_wave.electricity = zeros(T,1);

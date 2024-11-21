@@ -13,7 +13,7 @@ if pv_on
     
     pv_v2=[0.7*(2300+216); 0.2 ; 0.001];
     
-    pv_v = [pv_v1];
+    pv_v = [pv_v2];
 %     pv_v = [pv_v1];
     
 %     %%%How pv capital cost is modified for different types of buildings
@@ -38,7 +38,8 @@ end
 
 %% wave power
 if exist('wave_on') && wave_on
-    wave_v = [0];
+    wave_v = [10000
+        0];
 end
 
 %% Run of river generator
@@ -53,7 +54,10 @@ end
 if exist('pemfc_on') && pemfc_on
     %%%Capital Cost
     %%%Efficiency
-    pem_v = [2000+2.7 0.45 0.005 0];
+    pem_v = [2000+2.7
+        0.45
+        0.005
+        0];
     
 end
 

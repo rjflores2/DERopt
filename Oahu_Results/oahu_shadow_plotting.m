@@ -1,6 +1,6 @@
 clc, clear all, close all
 
-dt = readtable("shadow_results.xlsx");
+dt = readtable("shadow_results_nodiesel.xlsx");
 
 wave_potential = readtable("H:\_Tools_\DERopt\Data\Oahu\Wave_Potential.xlsx");
 
@@ -11,7 +11,7 @@ wave_power = table2array(dt(1,2:end));
 
 wave_value = table2array(dt(16,2:end));
 
-wave_value = -pvfix(0.06,10,wave_value);
+wave_value = -pvfix(0.08,10,wave_value);
 
 energy = table2array(dt(8:10,2:end));
 energy_fraction = table2array(dt(12:14,2:end));
@@ -48,14 +48,14 @@ plot(wave_power./1000,wave_value./1000,'LineWidth',2)
 box on
 grid on
 set(gca,'FontSize',14,...
-    'YTick',[0:6],...
+    'YTick',[0:10],...
     'YColor',[0 0 0])
 xlabel('Wave Power Capacity','FontSize',16)
 ylabel({'Marginal Value of','Wave Power ($1000/kW)'},'FontSize',16)
 
 yyaxis right
 plot(wave_power./1000,wave_utilization,'LineWidth',2)
-plot(wave_power./1000,wave_marginal_utilization,'LineWidth',2)
+% plot(wave_power./1000,wave_marginal_utilization,'LineWidth',2)
 ylabel({'Wave Potential','Utilization (%))'},'FontSize',16)
 ylim([0 100])
 set(gca,'FontSize',14,...
