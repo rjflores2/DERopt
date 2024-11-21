@@ -29,6 +29,9 @@ lpv_on = 0; %Turn on legacy PV
 lees_on = 1; %Legacy EES
 ltes_on = 0; %Legacy TES
 
+%%% Experimental
+titus_on = 1;
+
 lror_on = 0; %Turn on legacy run of river
 ror_area = 200;
 ldiesel_on = 1; %Turn on legacy diesel generators
@@ -126,6 +129,10 @@ end
 if pemfc_on
     [pem_mthly_debt] = capital_cost_to_monthly_cost(pem_v(1,:),equity,interest,period,required_return);
 end
+%%%
+if titus_on
+    [titus_monthly_debt] = capital_cost_to_monthly_cost(titus_v(5),equity,interest,period,required_return);
+end
 %%% Capital modifiers
 pv_cap_mod = ones(1,size(pv_v,2));
 % ees_mthly_debt = ones(size(pv_v,2));
@@ -210,11 +217,19 @@ if opt_now
     fprintf('Took %.2f seconds \n', elapsed)
     
     %% BRAND NEW RUN OF RIVER CONSTRAINTS
-   fprintf('%s: Integer Run of River Constraints.', datestr(now,'HH:MM:SS'))
+    fprintf('%s: Integer Run of River Constraints.', datestr(now,'HH:MM:SS'))
     tic
     opt_integer_run_of_river
     elapsed = toc;
     fprintf('Took %.2f seconds \n', elapsed)
+
+    %% Titus Constraints
+    fprintf('%s: Titus Constraints.', datestr(now,'HH:MM:SS'))
+    tic
+    opt_titus
+    elapsed = toc;
+    fprintf('Took %.2f seconds \n', elapsed)
+
 
     %% Optimize
     fprintf('%s: Optimizing \n....', datestr(now,'HH:MM:SS'))

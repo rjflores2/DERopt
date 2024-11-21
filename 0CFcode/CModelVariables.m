@@ -130,7 +130,8 @@ util_h2
         util_h2_store           % var_util_h2_inject.h2_store
 
         
-
+        titus_elec                % var_util_titus.titus_elec
+        titus_adopt               % var_util_titus.titus_adopt
     end
 
     properties (SetAccess = public)
@@ -158,6 +159,8 @@ util_h2
             obj.Objective = 0;
 
         end
+
+
         
 
         %% Utility Electricity
@@ -223,6 +226,20 @@ util_h2
                 obj.util_midpeak_dc = zeros(midpeak_count,1);
                 
             end
+        end
+
+        %% Titus-Generator
+
+        function SetupUtilityTitus(obj)
+
+            obj.titus_elec = sdpvar(T, size(titus_v, 2), 'full');
+            obj.titus_adopt = sdpvar(1, size(titus_v, 2), 'full');
+
+            Cost = M*monthly_debt.*mod.*obj.titus_adopt;
+
+            OaM = sum((titus_v(3,:).*day_multi).*(var_gen.gen_elec));
+
+            obj.Objective = obj.Objective + sum(Cost) + sum(OaM)
         end
         
         %% Utility Hydrogen

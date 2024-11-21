@@ -98,6 +98,8 @@ if exist('river_power_potential')
    l_run_of_river_v = [0.000]; %O&M
 end
 
+
+
 %% Electrical Energy Storage
 if lees_on
     %%%[Capacity (kWh) [1]

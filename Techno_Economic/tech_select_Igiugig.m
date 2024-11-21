@@ -171,6 +171,18 @@ else
     h2es_v = [];
 end
 
+%% Titus 
+
+e_curve = @(x) .5*(1+exp(-x)).^(-1);
+
+max_output = 5;  % Max power output in kW
+
+prop_capacity = 1;   % proportion of output power produced
+
+if titus_on
+    titus_v = [max_output, e_curve(prop_capacity), 200, .02, 3000]';
+end
+
 %% Building space
 %%%[space available for PV (m^2)
 %%%Cooling loop input (C)

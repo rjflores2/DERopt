@@ -90,6 +90,13 @@ else
 end
 
 %% Technologies That Can Be Adopted at Each Building Energy Hub
+
+%% Titus
+
+if titus_on
+    var_titus.titus_elec = sdpvar(T, size(titus_v, 2), 'full');
+    var_titus.titus_adopt = sdpvar(1, size(titus_v, 2), 'full');
+end
 %% Solar PV
 if pv_on 
     

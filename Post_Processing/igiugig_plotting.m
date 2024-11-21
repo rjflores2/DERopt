@@ -4,7 +4,7 @@
 % shadow_ror_swept_area = lambda.ineqlin(end);
 % pvfix(0.06,10,shadow_ror_swept_area)./1000
 %% Adopted technologies and costs
-adopted = [var_pv.pv_adopt var_ees.ees_adopt var_el.el_adopt var_h2es.h2es_adopt]
+adopted = [var_pv.pv_adopt var_ees.ees_adopt var_el.el_adopt var_h2es.h2es_adopt, var_titus.titus_adopt]
 solution.objval/sum(elec)
 shadow_value_ror = [];
 if exist('lambda')
