@@ -2,20 +2,20 @@
 
 %% Paths
 
-%%%YALMIP Master Path
-addpath(genpath('D:\LAB DOCS\YALMIP\yalmip\YALMIP-master')) %rjf path
+% %%%YALMIP Master Path
+% addpath(genpath('D:\LAB DOCS\YALMIP\yalmip\YALMIP-master')) %rjf path
 
 %%%DERopt paths
-addpath(genpath('C:\Users\typde\Downloads\Lab\DERopt\DERopt\Design'))
-addpath(genpath('C:\Users\typde\Downloads\Lab\DERopt\DERopt\Input_Data'))
-addpath(genpath('C:\Users\typde\Downloads\Lab\DERopt\DERopt\Load_Processing'))
-addpath(genpath('C:\Users\typde\Downloads\Lab\DERopt\DERopt\Post_Processing'))
-addpath(genpath('C:\Users\typde\Downloads\Lab\DERopt\DERopt\Problem_Formulation_Single_Node'))
-addpath(genpath('C:\Users\typde\Downloads\Lab\DERopt\DERopt\Techno_Economic'))
-addpath(genpath('C:\Users\typde\Downloads\Lab\DERopt\DERopt\Utilities'))
-addpath(genpath('C:\Users\typde\Downloads\Lab\DERopt\Igiugig'))
+addpath(genpath('C:\Users\typde\Downloads\Lab docs\APEP\DERopt\Design'))
+addpath(genpath('C:\Users\typde\Downloads\Lab docs\APEP\DERopt\Input_Data'))
+addpath(genpath('C:\Users\typde\Downloads\Lab docs\APEP\DERopt\Load_Processing'))
+addpath(genpath('C:\Users\typde\Downloads\Lab docs\APEP\DERopt\Post_Processing'))
+addpath(genpath('C:\Users\typde\Downloads\Lab docs\APEP\DERopt\Problem_Formulation_Single_Node'))
+addpath(genpath('C:\Users\typde\Downloads\Lab docs\APEP\DERopt\Techno_Economic'))
+addpath(genpath('C:\Users\typde\Downloads\Lab docs\APEP\DERopt\Utilities'))
+addpath(genpath('C:\Users\typde\Downloads\Lab docs\APEP\DERopt\Igiugig'))
 
-dt = readtable('C:\Users\typde\Downloads\Lab\DERopt\Igiugig\Igiugig\Igiugig_Load_Growth_added_time.csv');
+dt = readtable('C:\Users\typde\Downloads\Lab docs\APEP\DERopt\Igiugig\Igiugig\Igiugig_Load_Growth_added_time.csv');
 
 
 
@@ -25,6 +25,35 @@ e_curve = @(x) .5*(1+exp(-x)).^(-1);
 max_output = 5;  % Max power output in kW
 
 prop_capacity = .5;   % proportion of output power produced
+
+%% Toggles
+
+utility_exists=[]; %% Utility access
+pv_on = 1;        %Turn on PV
+ees_on = 1;       %Turn on EES/REES
+rees_on = 0;  %Turn on REES
+ror_on = 1; % Turn On Run of river generator
+ror_integer_on = 0;
+ror_integer_cost = 2000;
+pemfc_on = 1;
+%%%Hydrogen technologies
+el_on = 1; %Turn on generic electrolyer
+el_binary_on = 0;
+rel_on = 0; %Turn on renewable tied electrolyzer
+h2es_on = 1; %Hydrogen energy storage
+strict_h2es = 0; %Is H2 Energy Storage strict discharge or charge?
+%%% Legacy System Toggles
+lpv_on = 0; %Turn on legacy PV 
+lees_on = 1; %Legacy EES
+ltes_on = 0; %Legacy TES
+
+%%% Experimental
+titus_on = 1;
+
+lror_on = 0; %Turn on legacy run of river
+ror_area = 200;
+ldiesel_on = 1; %Turn on legacy diesel generators
+ldiesel_binary_on = 0; %Binary legacy diesel generators
 
 %% Costs
 
@@ -62,7 +91,7 @@ titus_v = [max_output, e_curve(prop_capacity), start_cost+end_cost, OM_cost]';
 %% Other Toggles
 
 utility_exists=[]; %% Utility access
-pv_on = 1;        %Turn on PV
+pv_on = 0;        %Turn on PV
 ees_on = 0;       %Turn on EES/REES
 rees_on = 0;  %Turn on REES
 ror_on = 0; % Turn On Run of river generator
@@ -92,6 +121,8 @@ tech_legacy_Igiugig
 opt_var_cf
 
 opt_gen_equalities
+
+
 %%
 
 %{ 

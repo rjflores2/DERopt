@@ -129,9 +129,12 @@ util_h2
         util_h2_inject_adopt    % var_util_h2_inject.h2_inject_adopt
         util_h2_store           % var_util_h2_inject.h2_store
 
-        
-        titus_elec                % var_util_titus.titus_elec
-        titus_adopt               % var_util_titus.titus_adopt
+        rsoc_capacity           % var_util_rsoc.rsoc_capacity
+        rsoc_elec               % var_util_rsoc.rsoc_elec 
+        rsoc_gen                % var_util_rsoc.rsoc_gen  
+        rsoc_adopt              % var_util_rsoc.rsoc_adopt
+        rsoc_fuel               % var_util_rsoc.rsoc_fuel
+        rsoc_hfuel              %var_util_rsoc.rsoc_hfuel
     end
 
     properties (SetAccess = public)
@@ -228,18 +231,25 @@ util_h2
             end
         end
 
-        %% Titus-Generator
+        %% RSOC
 
-        function SetupUtilityTitus(obj)
+        function SetupUtilityrsoc(obj)
 
-            obj.titus_elec = sdpvar(T, size(titus_v, 2), 'full');
-            obj.titus_adopt = sdpvar(1, size(titus_v, 2), 'full');
+            obj.rsoc_adopt = sdpvar(1, size(rsoc_v, 2), 'full');
+            obj.rsoc_capacity = sdpvar(obj.T, size(rsoc_v, 2), 'full');
+            obj.rsoc_elec = sdpvar(obj.T, size(rsoc_v, 2), 'full');
+            obj.rsoc_gen = sdpvar(obj.T, size(rsoc_v, 2), 'full');
+            obj.rsoc_fuel = sdpvar(obj.T, size(rsoc_v, 2), 'full');
+            obj.rsoc_hfuel = sdpvar(obj.T, size(rsoc_v, 2), 'full');
 
-            Cost = M*monthly_debt.*mod.*obj.titus_adopt;
 
-            OaM = sum((titus_v(3,:).*day_multi).*(var_gen.gen_elec));
 
-            obj.Objective = obj.Objective + sum(Cost) + sum(OaM)
+            Cost = obj.M*monthly_debt.*mod.*obj.rsoc_adopt;
+
+            OaM = sum((rsoc_v(3,:).*day_multi).*(var_gen.gen_elec));
+
+            obj.Objective = obj.Objective + sum(Cost) + sum(OaM)...
+                            + obj.
         end
         
         %% Utility Hydrogen

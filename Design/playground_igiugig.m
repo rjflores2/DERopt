@@ -30,7 +30,7 @@ lees_on = 1; %Legacy EES
 ltes_on = 0; %Legacy TES
 
 %%% Experimental
-titus_on = 1;
+rsoc_on = 1;
 
 lror_on = 0; %Turn on legacy run of river
 ror_area = 200;
@@ -50,25 +50,25 @@ socc = 0; % SOC constraint: for each individual ees and rees, final SOC >= Initi
 
 %% Adding paths
 %%%YALMIP Master Path
-addpath(genpath('D:\LAB DOCS\YALMIP\yalmip\YALMIP-master')) %rjf path
+addpath(genpath('C:\Users\typde\Downloads\Lab docs\APEP\Yalmip\YALMIP-master'))
 
 %%%CPLEX Path
 % addpath(genpath('C:\Program Files\IBM\ILOG\CPLEX_Studio128\cplex\matlab\x64_win64')) %rjf path
 % addpath(genpath('C:\Program Files\IBM\ILOG\CPLEX_Studio1263\cplex\matlab\x64_win64')) %cyc path
 
 %%%DERopt paths
-addpath(genpath('C:\Users\typde\Downloads\Lab\DERopt\DERopt\Design'))
-addpath(genpath('C:\Users\typde\Downloads\Lab\DERopt\DERopt\Input_Data'))
-addpath(genpath('C:\Users\typde\Downloads\Lab\DERopt\DERopt\Load_Processing'))
-addpath(genpath('C:\Users\typde\Downloads\Lab\DERopt\DERopt\Post_Processing'))
-addpath(genpath('C:\Users\typde\Downloads\Lab\DERopt\DERopt\Problem_Formulation_Single_Node'))
-addpath(genpath('C:\Users\typde\Downloads\Lab\DERopt\DERopt\Techno_Economic'))
-addpath(genpath('C:\Users\typde\Downloads\Lab\DERopt\DERopt\Utilities'))
-addpath(genpath('C:\Users\typde\Downloads\Lab\DERopt\Igiugig'))
+addpath(genpath('C:\Users\typde\Downloads\Lab docs\APEP\DERopt\Design'))
+addpath(genpath('C:\Users\typde\Downloads\Lab docs\APEP\DERopt\Input_Data'))
+addpath(genpath('C:\Users\typde\Downloads\Lab docs\APEP\DERopt\Load_Processing'))
+addpath(genpath('C:\Users\typde\Downloads\Lab docs\APEP\DERopt\Post_Processing'))
+addpath(genpath('C:\Users\typde\Downloads\Lab docs\APEP\DERopt\Problem_Formulation_Single_Node'))
+addpath(genpath('C:\Users\typde\Downloads\Lab docs\APEP\DERopt\Techno_Economic'))
+addpath(genpath('C:\Users\typde\Downloads\Lab docs\APEP\DERopt\Utilities'))
+addpath(genpath('C:\Users\typde\Downloads\Lab docs\APEP\DERopt\Igiugig'))
 
 %% Loading building demand
 %%%Loading Data
-dt = readtable('C:\Users\typde\Downloads\Lab\DERopt\Igiugig\Igiugig\Igiugig_Load_Growth_added_time.csv');
+dt = readtable('C:\Users\typde\Downloads\Lab docs\APEP\DERopt\Igiugig\Igiugig\Igiugig_Load_Growth_added_time.csv');
 
 time = datenum(dt.Date);
 elec = dt.ElectricDemand_kW_;
@@ -130,8 +130,8 @@ if pemfc_on
     [pem_mthly_debt] = capital_cost_to_monthly_cost(pem_v(1,:),equity,interest,period,required_return);
 end
 %%%
-if titus_on
-    [titus_monthly_debt] = capital_cost_to_monthly_cost(titus_v(5),equity,interest,period,required_return);
+if rsoc_on
+    [rsoc_monthly_debt] = capital_cost_to_monthly_cost(rsoc_v(5),equity,interest,period,required_return);
 end
 %%% Capital modifiers
 pv_cap_mod = ones(1,size(pv_v,2));
@@ -223,10 +223,10 @@ if opt_now
     elapsed = toc;
     fprintf('Took %.2f seconds \n', elapsed)
 
-    %% Titus Constraints
-    fprintf('%s: Titus Constraints.', datestr(now,'HH:MM:SS'))
+    %% rsoc Constraints
+    fprintf('%s: rsoc Constraints.', datestr(now,'HH:MM:SS'))
     tic
-    opt_titus
+    opt_rsoc
     elapsed = toc;
     fprintf('Took %.2f seconds \n', elapsed)
 
