@@ -249,7 +249,7 @@ util_h2
             OaM = sum((rsoc_v(3,:).*day_multi).*(var_gen.gen_elec));
 
             obj.Objective = obj.Objective + sum(Cost) + sum(OaM)...
-                            + obj.
+                            + 
         end
         
         %% Utility Hydrogen
