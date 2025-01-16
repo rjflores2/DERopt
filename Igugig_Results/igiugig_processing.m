@@ -28,7 +28,8 @@ results_output.adopted_tech = [var_ror_integer.units'
     var_ees.ees_adopt
     var_el_binary.el_adopt
     var_h2es.h2es_adopt
-    var_pem.cap]
+    var_pem.cap
+    var_rsoc.rsoc_capacity]
 
 var_ror_integer.old_elec = var_ror_integer.elec;
 var_pv.old_pv_elec = var_pv.pv_elec;

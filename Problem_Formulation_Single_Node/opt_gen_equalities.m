@@ -3,9 +3,9 @@
 %%For  all timesteps t
 %Vectorized
 Constraints = [Constraints
-    (sum(var_util.import,2) + sum(var_legacy_diesel.electricity,2) + sum(var_pv.pv_elec,2) + sum(var_ees.ees_dchrg,2) + sum(var_lees.ees_dchrg,2) + sum(var_rees.rees_dchrg,2) + sum(var_ldg.ldg_elec,2) + sum(var_legacy_diesel_binary.electricity,2) + sum(var_lbot.lbot_elec,2) + sum(var_run_of_river.electricity,2) + sum(var_pem.elec,2)  + sum(var_ror_integer.elec,2) + sum(var_wave.electricity,2)+sum(var_rsoc.rsoc_elec, 2)... %%%Production
+    (sum(var_util.import,2) + sum(var_legacy_diesel.electricity,2) + sum(var_pv.pv_elec,2) + sum(var_ees.ees_dchrg,2) + sum(var_lees.ees_dchrg,2) + sum(var_rees.rees_dchrg,2) + sum(var_ldg.ldg_elec,2) + sum(var_legacy_diesel_binary.electricity,2) + sum(var_lbot.lbot_elec,2) + sum(var_run_of_river.electricity,2) + sum(var_pem.elec,2)  + sum(var_ror_integer.elec,2) + sum(var_wave.electricity,2)+sum(var_rsoc.rsoc_fuel_cell, 2)... %%%Production
     ==...
-    elec + sum(var_ees.ees_chrg,2) + sum(var_lees.ees_chrg,2) + var_vc.generic_cool./4  + sum(var_lvc.lvc_cool.*vc_cop,2) + sum(el_binary_eff.*var_el_binary.el_prod,2) + sum(el_eff.*var_el.el_prod,2) + sum(h2_chrg_eff.*var_h2es.h2es_chrg,2) + var_util.gen_export + var_hrs.hrs_supply.*hrs_chrg_eff + var_dump.elec_dump):'Electricity Balance']; %%%Demand
+    elec + sum(var_rsoc.rsoc_electrolyzer, 2) + sum(var_ees.ees_chrg,2) + sum(var_lees.ees_chrg,2) + var_vc.generic_cool./4  + sum(var_lvc.lvc_cool.*vc_cop,2) + sum(el_binary_eff.*var_el_binary.el_prod,2) + sum(el_eff.*var_el.el_prod,2) + sum(h2_chrg_eff.*var_h2es.h2es_chrg,2) + var_util.gen_export + var_hrs.hrs_supply.*hrs_chrg_eff + var_dump.elec_dump):'Electricity Balance']; %%%Demand
 
 %% Heat Balance
 if ~isempty(heat) && sum(heat>0)>0
@@ -25,10 +25,10 @@ end
 %% Chemical ennergy conversion balance - Hydrogen
 if ~isempty(el_v) || ~isempty(rel_v) || ~isempty(el_binary_v) || ~isempty(rsoc_v)
     Constraints = [Constraints
-       (sum(var_rel.rel_prod,2) + sum(var_el.el_prod,2) + sum(var_el_binary.el_prod,2) + sum(var_rel.rel_prod_wheel,2) + sum(var_el.el_prod_wheel,2) + sum(var_h2es.h2es_dchrg,2) == sum(var_pem.elec./0.5,2) + sum(var_ldg.ldg_hfuel,2) + sum(var_ldg.db_hfire,2) + sum(var_boil.boil_hfuel,2) + sum(var_h2es.h2es_chrg,2) + var_hrs.hrs_supply + var_h2_inject.h2_inject + var_h2_inject.h2_store):'Hydrogen Balance'];
+       ((sum(var_rsoc.rsoc_electrolyzer, 2)/rsoc_v(3)) + sum(var_rel.rel_prod,2) + sum(var_el.el_prod,2) + sum(var_el_binary.el_prod,2) + sum(var_rel.rel_prod_wheel,2) + sum(var_el.el_prod_wheel,2) + sum(var_h2es.h2es_dchrg,2) == (sum(var_rsoc.rsoc_fuel_cell, 2)/rsoc_v(2)) + sum(var_pem.elec./0.5,2) + sum(var_ldg.ldg_hfuel,2) + sum(var_ldg.db_hfire,2) + sum(var_boil.boil_hfuel,2) + sum(var_h2es.h2es_chrg,2) + var_hrs.hrs_supply + var_h2_inject.h2_inject + var_h2_inject.h2_store):'Hydrogen Balance'];
 
 end
-
+%%% Providing energy on left hand side-- Electrolyzer
 %% H2 Transportation
 if exist('hrs_on') && hrs_on
     Constraints = [Constraints

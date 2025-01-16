@@ -181,9 +181,9 @@ if rsoc_on
     
     prop_capacity = 1;   % proportion of output power produced
 
-    % [max_output, efficiency, OaM, cost/kW, price]
+    % [max_output, fuel_cell_efficiency, electrolyzer_efficiency, OaM, Capital]
 
-    rsoc_v = [max_output, e_curve(prop_capacity), 200, .02, 3000]';
+    rsoc_v = [max_output, e_curve(prop_capacity), e_curve(prop_capacity), 200, 3000]';
 end
 
 %% Building space

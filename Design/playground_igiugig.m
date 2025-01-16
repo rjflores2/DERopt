@@ -12,21 +12,21 @@ elec_dump = []; %%%Variable to "dump" electricity
 %% Diesel Only Toggles
 utility_exists=[]; %% Utility access
 pv_on = 1;        %Turn on PV
-ees_on = 1;       %Turn on EES/REES
+ees_on = 0;       %Turn on EES/REES
 rees_on = 0;  %Turn on REES
-ror_on = 1; % Turn On Run of river generator
+ror_on = 0; % Turn On Run of river generator
 ror_integer_on = 0;
 ror_integer_cost = 2000;
-pemfc_on = 1;
+pemfc_on = 0;
 %%%Hydrogen technologies
-el_on = 1; %Turn on generic electrolyer
+el_on = 0; %Turn on generic electrolyer
 el_binary_on = 0;
 rel_on = 0; %Turn on renewable tied electrolyzer
 h2es_on = 1; %Hydrogen energy storage
 strict_h2es = 0; %Is H2 Energy Storage strict discharge or charge?
 %%% Legacy System Toggles
 lpv_on = 0; %Turn on legacy PV 
-lees_on = 1; %Legacy EES
+lees_on = 0; %Legacy EES
 ltes_on = 0; %Legacy TES
 
 %%% Experimental

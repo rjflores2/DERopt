@@ -235,21 +235,23 @@ util_h2
 
         function SetupUtilityrsoc(obj)
 
-            obj.rsoc_adopt = sdpvar(1, size(rsoc_v, 2), 'full');
+%             obj.rsoc_adopt = binvar(1, size(rsoc_v, 2), 'full');
             obj.rsoc_capacity = sdpvar(obj.T, size(rsoc_v, 2), 'full');
-            obj.rsoc_elec = sdpvar(obj.T, size(rsoc_v, 2), 'full');
-            obj.rsoc_gen = sdpvar(obj.T, size(rsoc_v, 2), 'full');
-            obj.rsoc_fuel = sdpvar(obj.T, size(rsoc_v, 2), 'full');
-            obj.rsoc_hfuel = sdpvar(obj.T, size(rsoc_v, 2), 'full');
-
-
+            obj.rsoc_electrolyzer = sdpvar(obj.T, size(rsoc_v, 2), 'full');
+            obj.rsoc_fuel_cell = sdpvar(obj.T, size(rsoc_v, 2), 'full');
 
             Cost = obj.M*monthly_debt.*mod.*obj.rsoc_adopt;
 
-            OaM = sum((rsoc_v(3,:).*day_multi).*(var_gen.gen_elec));
+%             OaM = sum((rsoc_v(3,:).*day_multi).*(var_gen.gen_elec));
 
-            obj.Objective = obj.Objective + sum(Cost) + sum(OaM)...
-                            + 
+            obj.Objective = obj.Objective + sum(Cost) + sum(OaM);
+
+            %%% Cost with electrolyzer and cost with fuel cell production
+            % 60% efficiency for both
+            % OAM is fixed cost ~3-15% of the fuel cell electrolyzer cost
+            % Capital Cost associated with fuel cell and electrolyzer 
+
+            
         end
         
         %% Utility Hydrogen

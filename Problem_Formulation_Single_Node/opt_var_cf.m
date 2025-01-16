@@ -94,8 +94,18 @@ end
 %% RSOC
 
 if rsoc_on
-    var_rsoc.rsoc_elec = sdpvar(T, size(rsoc_v, 2), 'full');
-    var_rsoc.rsoc_adopt = sdpvar(1, size(rsoc_v, 2), 'full');
+    var_rsoc.rsoc_electrolyzer = sdpvar(T, size(rsoc_v, 2), 'full');
+    var_rsoc.rsoc_capacity = sdpvar(1, size(rsoc_v, 2), 'full');
+    var_rsoc.rsoc_fuel_cell = sdpvar(1, size(rsoc_v, 2), 'full');
+
+    Fuel_Cell_OaM = .5*rsoc_monthly_debt;
+    Electrolyzer_OaM = Fuel_Cell_OaM;
+
+    constant = 4;
+    Cost = M*rsoc_monthly_debt.*constant.*var_rsoc.rsoc_capacity;
+
+    Objective = Objective ...
+        + sum(Cost) + sum(Fuel_Cell_OaM)+sum(Electrolyzer_OaM);
 end
 %% Solar PV
 if pv_on 
