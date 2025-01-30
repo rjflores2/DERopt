@@ -25,7 +25,7 @@ end
 %% Chemical ennergy conversion balance - Hydrogen
 if ~isempty(el_v) || ~isempty(rel_v) || ~isempty(el_binary_v) || ~isempty(rsoc_v)
     Constraints = [Constraints
-       ((sum(var_rsoc.rsoc_electrolyzer, 2)/rsoc_v(3)) + sum(var_rel.rel_prod,2) + sum(var_el.el_prod,2) + sum(var_el_binary.el_prod,2) + sum(var_rel.rel_prod_wheel,2) + sum(var_el.el_prod_wheel,2) + sum(var_h2es.h2es_dchrg,2) == (sum(var_rsoc.rsoc_fuel_cell, 2)/rsoc_v(2)) + sum(var_pem.elec./0.5,2) + sum(var_ldg.ldg_hfuel,2) + sum(var_ldg.db_hfire,2) + sum(var_boil.boil_hfuel,2) + sum(var_h2es.h2es_chrg,2) + var_hrs.hrs_supply + var_h2_inject.h2_inject + var_h2_inject.h2_store):'Hydrogen Balance'];
+       ((sum(var_rsoc.rsoc_electrolyzer, 2)*rsoc_v(3)) + sum(var_rel.rel_prod,2) + sum(var_el.el_prod,2) + sum(var_el_binary.el_prod,2) + sum(var_rel.rel_prod_wheel,2) + sum(var_el.el_prod_wheel,2) + sum(var_h2es.h2es_dchrg,2) == (sum(var_rsoc.rsoc_fuel_cell, 2)/rsoc_v(2)) + sum(var_pem.elec./0.5,2) + sum(var_ldg.ldg_hfuel,2) + sum(var_ldg.db_hfire,2) + sum(var_boil.boil_hfuel,2) + sum(var_h2es.h2es_chrg,2) + var_hrs.hrs_supply + var_h2_inject.h2_inject + var_h2_inject.h2_store):'Hydrogen Balance'];
 
 end
 %%% Providing energy on left hand side-- Electrolyzer

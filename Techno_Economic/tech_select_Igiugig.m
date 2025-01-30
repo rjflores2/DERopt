@@ -177,13 +177,13 @@ if rsoc_on
 
     e_curve = @(x) .5*(1+exp(-x)).^(-1);
     
-    max_output = 5;  % Max power output in kW
+    max_output = 1;  % Max power output in kW
     
     prop_capacity = 1;   % proportion of output power produced
 
-    % [max_output, fuel_cell_efficiency, electrolyzer_efficiency, OaM, Capital]
+    % [max_output, fuel_cell_efficiency, electrolyzer_efficiency, OaM, Capital, Ramp Rate]
 
-    rsoc_v = [max_output, e_curve(prop_capacity), e_curve(prop_capacity), 200, 3000]';
+    rsoc_v = [max_output, 2*e_curve(prop_capacity), e_curve(prop_capacity), 100, 3000, .1]';
 end
 
 %% Building space
