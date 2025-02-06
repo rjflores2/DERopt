@@ -12,26 +12,29 @@ elec_dump = []; %%%Variable to "dump" electricity
 %% Diesel Only Toggles
 utility_exists=[]; %% Utility access
 pv_on = 1;        %Turn on PV
-ees_on = 1;       %Turn on EES/REES
+ees_on = 0;       %Turn on EES/REES
 rees_on = 0;  %Turn on REES
 ror_on = 0; % Turn On Run of river generator
-ror_integer_on = 1;
+ror_integer_on = 0;
 ror_integer_cost = 2000;
-pemfc_on = 1;
+pemfc_on = 0;
 %%%Hydrogen technologies
-el_on = 1; %Turn on generic electrolyer
+el_on = 0; %Turn on generic electrolyer
 el_binary_on = 0;
 rel_on = 0; %Turn on renewable tied electrolyzer
 h2es_on = 1; %Hydrogen energy storage
 strict_h2es = 0; %Is H2 Energy Storage strict discharge or charge?
 %%% Legacy System Toggles
 lpv_on = 0; %Turn on legacy PV 
-lees_on = 1; %Legacy EES
+lees_on = 0; %Legacy EES
 ltes_on = 0; %Legacy TES
+
+%%% Experimental
+rsoc_on = 1;
 
 lror_on = 0; %Turn on legacy run of river
 ror_area = 200;
-ldiesel_on = 0; %Turn on legacy diesel generators
+ldiesel_on = 1; %Turn on legacy diesel generators
 ldiesel_binary_on = 0; %Binary legacy diesel generators
 
 %% PV (opt_pv.m)
@@ -47,25 +50,25 @@ socc = 0; % SOC constraint: for each individual ees and rees, final SOC >= Initi
 
 %% Adding paths
 %%%YALMIP Master Path
-addpath(genpath('H:\Matlab_Funcitons\YALMIP-master')) %rjf path
+addpath(genpath('C:\Users\typde\Downloads\Lab docs\APEP\Yalmip\YALMIP-master'))
 
 %%%CPLEX Path
 % addpath(genpath('C:\Program Files\IBM\ILOG\CPLEX_Studio128\cplex\matlab\x64_win64')) %rjf path
 % addpath(genpath('C:\Program Files\IBM\ILOG\CPLEX_Studio1263\cplex\matlab\x64_win64')) %cyc path
 
 %%%DERopt paths
-addpath(genpath('H:\_Tools_\DERopt\Design'))
-addpath(genpath('H:\_Tools_\DERopt\Input_Data'))
-addpath(genpath('H:\_Tools_\DERopt\Load_Processing'))
-addpath(genpath('H:\_Tools_\DERopt\Post_Processing'))
-addpath(genpath('H:\_Tools_\DERopt\Problem_Formulation_Single_Node'))
-addpath(genpath('H:\_Tools_\DERopt\Techno_Economic'))
-addpath(genpath('H:\_Tools_\DERopt\Utilities'))
-addpath(genpath('H:\_Tools_\DERopt\Data'))
+addpath(genpath('C:\Users\typde\Downloads\Lab docs\APEP\DERopt\Design'))
+addpath(genpath('C:\Users\typde\Downloads\Lab docs\APEP\DERopt\Input_Data'))
+addpath(genpath('C:\Users\typde\Downloads\Lab docs\APEP\DERopt\Load_Processing'))
+addpath(genpath('C:\Users\typde\Downloads\Lab docs\APEP\DERopt\Post_Processing'))
+addpath(genpath('C:\Users\typde\Downloads\Lab docs\APEP\DERopt\Problem_Formulation_Single_Node'))
+addpath(genpath('C:\Users\typde\Downloads\Lab docs\APEP\DERopt\Techno_Economic'))
+addpath(genpath('C:\Users\typde\Downloads\Lab docs\APEP\DERopt\Utilities'))
+addpath(genpath('C:\Users\typde\Downloads\Lab docs\APEP\DERopt\Igiugig'))
 
 %% Loading building demand
 %%%Loading Data
-dt = readtable('H:\_Tools_\DERopt\Data\Igiugig\Igiugig_Load_Growth_added_time.csv');
+dt = readtable('C:\Users\typde\Downloads\Lab docs\APEP\DERopt\Igiugig\Igiugig\Igiugig_Load_Growth_added_time.csv');
 
 time = datenum(dt.Date);
 elec = dt.ElectricDemand_kW_;
@@ -125,6 +128,10 @@ if h2es_on
 end
 if pemfc_on
     [pem_mthly_debt] = capital_cost_to_monthly_cost(pem_v(1,:),equity,interest,period,required_return);
+end
+%%%
+if rsoc_on
+    [rsoc_monthly_debt] = capital_cost_to_monthly_cost(rsoc_v(5),equity,interest,period,required_return);
 end
 %%% Capital modifiers
 pv_cap_mod = ones(1,size(pv_v,2));
@@ -210,11 +217,19 @@ if opt_now
     fprintf('Took %.2f seconds \n', elapsed)
     
     %% BRAND NEW RUN OF RIVER CONSTRAINTS
-   fprintf('%s: Integer Run of River Constraints.', datestr(now,'HH:MM:SS'))
+    fprintf('%s: Integer Run of River Constraints.', datestr(now,'HH:MM:SS'))
     tic
     opt_integer_run_of_river
     elapsed = toc;
     fprintf('Took %.2f seconds \n', elapsed)
+
+    %% rsoc Constraints
+    fprintf('%s: rsoc Constraints.', datestr(now,'HH:MM:SS'))
+    tic
+    opt_rsoc
+    elapsed = toc;
+    fprintf('Took %.2f seconds \n', elapsed)
+
 
     %% Optimize
     fprintf('%s: Optimizing \n....', datestr(now,'HH:MM:SS'))

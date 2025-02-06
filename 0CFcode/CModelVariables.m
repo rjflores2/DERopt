@@ -129,6 +129,12 @@ util_h2
         util_h2_inject_adopt    % var_util_h2_inject.h2_inject_adopt
         util_h2_store           % var_util_h2_inject.h2_store
 
+        rsoc_capacity           % var_util_rsoc.rsoc_capacity
+        rsoc_elec               % var_util_rsoc.rsoc_elec 
+        rsoc_gen                % var_util_rsoc.rsoc_gen  
+        rsoc_adopt              % var_util_rsoc.rsoc_adopt
+        rsoc_fuel               % var_util_rsoc.rsoc_fuel
+        rsoc_hfuel              %var_util_rsoc.rsoc_hfuel
     end
 
     properties (SetAccess = public)
@@ -156,6 +162,8 @@ util_h2
             obj.Objective = 0;
 
         end
+
+
         
 
         %% Utility Electricity
@@ -221,6 +229,29 @@ util_h2
                 obj.util_midpeak_dc = zeros(midpeak_count,1);
                 
             end
+        end
+
+        %% RSOC
+
+        function SetupUtilityrsoc(obj)
+
+%             obj.rsoc_adopt = binvar(1, size(rsoc_v, 2), 'full');
+            obj.rsoc_capacity = sdpvar(obj.T, size(rsoc_v, 2), 'full');
+            obj.rsoc_electrolyzer = sdpvar(obj.T, size(rsoc_v, 2), 'full');
+            obj.rsoc_fuel_cell = sdpvar(obj.T, size(rsoc_v, 2), 'full');
+
+            Cost = obj.M*monthly_debt.*mod.*obj.rsoc_adopt;
+
+%             OaM = sum((rsoc_v(3,:).*day_multi).*(var_gen.gen_elec));
+
+            obj.Objective = obj.Objective + sum(Cost) + sum(OaM);
+
+            %%% Cost with electrolyzer and cost with fuel cell production
+            % 60% efficiency for both
+            % OAM is fixed cost ~3-15% of the fuel cell electrolyzer cost
+            % Capital Cost associated with fuel cell and electrolyzer 
+
+            
         end
         
         %% Utility Hydrogen

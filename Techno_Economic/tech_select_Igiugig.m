@@ -9,9 +9,9 @@ if pv_on
     %%% Efficiency / Conversion Percent at 1 kW/m^2
     %%% O&M ($/kWh generated)
    
-    pv_v1=[0.7*(3000+174); 0.2 ; 0.001];   
+    pv_v1=[0.7*(1000 +174); 0.4 ; 0.001];   
     
-    pv_v2=[0.7*(2300+216); 0.2 ; 0.001];
+    pv_v2=[0.7*(1000+216); 0.2 ; 0.001];
     
     pv_v = [pv_v1 pv_v2];
 %     pv_v = [pv_v1];
@@ -34,7 +34,7 @@ if pv_on
     end
 else
     pv_v = [];
-end
+end 
 
 %% Run of river generator
 if ror_integer_on
@@ -169,6 +169,21 @@ if h2es_on
     h2es_cap = h2es_v(1);
 else
     h2es_v = [];
+end
+
+%% RSOC
+
+if rsoc_on
+
+    e_curve = @(x) .5*(1+exp(-x)).^(-1);
+    
+    max_output = 1;  % Max power output in kW
+    
+    prop_capacity = 1;   % proportion of output power produced
+
+    % [max_output, fuel_cell_efficiency, electrolyzer_efficiency, OaM, Capital, Ramp Rate, Current Density, Voltage for Fuel Cell, Voltage for Electrolyzer]
+
+    rsoc_v = [max_output, 2*e_curve(prop_capacity), e_curve(prop_capacity), 100, 3000, .1, 2, 1.1, 1.5]';
 end
 
 %% Building space

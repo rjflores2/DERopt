@@ -90,6 +90,24 @@ else
 end
 
 %% Technologies That Can Be Adopted at Each Building Energy Hub
+
+%% RSOC
+
+if rsoc_on
+    var_rsoc.rsoc_electrolyzer = sdpvar(T, size(rsoc_v, 2), 'full');
+    var_rsoc.rsoc_capacity = sdpvar(1, size(rsoc_v, 2), 'full');
+    var_rsoc.rsoc_fuel_cell = sdpvar(T, size(rsoc_v, 2), 'full');
+    var_rsoc.rsoc_onoff = binvar(T, size(rsoc_v, 2), 'full');
+
+    Fuel_Cell_OaM = .5*rsoc_monthly_debt;
+    Electrolyzer_OaM = Fuel_Cell_OaM;
+    start_cost = 50;
+
+    Objective = Objective ...
+        + sum(M*(rsoc_monthly_debt+Fuel_Cell_OaM+Electrolyzer_OaM).*4*var_rsoc.rsoc_capacity+start_cost*var_rsoc.rsoc_onoff);
+
+    
+end
 %% Solar PV
 if pv_on 
     
@@ -219,11 +237,11 @@ if ~isempty(rel_v)
     %%%Electrolyzer production
     var_rel.rel_prod = sdpvar(T,size(rel_v,2),'full');
     
-    if util_pv_wheel_lts
-        var_rel.rel_prod_wheel = sdpvar(T,size(el_v,2),'full');
-    else
-        var_rel.rel_prod_wheel = zeros(T,size(el_v,2));
-    end
+    % if util_pv_wheel_lts
+    %     var_rel.rel_prod_wheel = sdpvar(T,size(el_v,2),'full');
+    % else
+    %     var_rel.rel_prod_wheel = zeros(T,size(el_v,2));
+    % end
     
     for ii = 1:size(rel_v,2)
         %%%Electrolyzer Cost Functions
