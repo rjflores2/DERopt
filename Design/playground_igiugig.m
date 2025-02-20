@@ -11,7 +11,7 @@ opt_now_yalmip = 0; %YALMIP
 elec_dump = []; %%%Variable to "dump" electricity
 %% Diesel Only Toggles
 utility_exists=[]; %% Utility access
-pv_on = 0;        %Turn on PV
+pv_on = 1;        %Turn on PV
 ees_on = 0;       %Turn on EES/REES
 rees_on = 0;  %Turn on REES
 ror_on = 0; % Turn On Run of river generator
@@ -34,7 +34,7 @@ rsoc_on = 1;
 
 lror_on = 0; %Turn on legacy run of river
 ror_area = 200;
-ldiesel_on = 1; %Turn on legacy diesel generators
+ldiesel_on = 0; %Turn on legacy diesel generators
 ldiesel_binary_on = 0; %Binary legacy diesel generators
 
 %% PV (opt_pv.m)
