@@ -102,7 +102,7 @@ if rsoc_on
 
     Fuel_Cell_OaM = .5*rsoc_monthly_debt;
     Electrolyzer_OaM = Fuel_Cell_OaM;
-    start_cost = 50;
+    start_cost = 5;
 
     Objective = Objective ...
         + sum(M*(rsoc_monthly_debt+Fuel_Cell_OaM+Electrolyzer_OaM).*4*var_rsoc.rsoc_capacity+start_cost*(sum(var_rsoc.rsoc_fc_onoff)+sum(var_rsoc.rsoc_e_onoff)));
