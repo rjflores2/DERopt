@@ -61,6 +61,23 @@ if ~isempty(crit_load_lvl) && crit_load_lvl >0
         var_resiliency.dgc_real = 0;
             var_resiliency.dgc_reactive = 0;
     end
+
+    %%% DGL exists
+    if ~isempty(dgl_v)
+        var_resiliency.dgl_elec = sdpvar(size(elec_res,1),K,'full');
+        if sim_lvl == 3
+            var_resiliency.dgl_real = sdpvar(size(elec_res,1),K,'full');
+            var_resiliency.dgl_reactive = sdpvar(size(elec_res,1),K,'full');
+        else
+            var_resiliency.dgl_real = 0;
+            var_resiliency.dgl_reactive = 0;
+        end
+    else
+        var_resiliency.dgl_elec = zeros(size(elec_res,1),K);
+        var_resiliency.dgl_real = 0;
+        var_resiliency.dgl_reactive = 0;
+    end
+
     
     %%%If Storage Exists
     if lees_on || lrees_on || ~isempty(ees_v)

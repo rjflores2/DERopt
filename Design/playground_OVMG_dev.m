@@ -20,7 +20,7 @@ opt_now_yalmip = 0; %YALMIP
 %%% 1) = at each building
 %%% 2) = at the transformer
 %%% 3) = at the circuit
-sim_lvl = 3;
+sim_lvl = 1;
 
 %% Infrastructure Cosntraints
 %%%AC Power Flow Simulation
@@ -53,6 +53,8 @@ if ~testing
     ees_on = sz_on;
     rees_on = sz_on;
         dgb_on = 1;
+        dgl_on = 0;
+        h2_storage_on = 0;
     dgc_on = 1;
     sofc_on = 0;
     lpv_on = 1-sz_on;
@@ -242,7 +244,7 @@ end
 %%
 bldg_bin_off = [97 98 99 100 103 104 174 231 243];
 
-for sim_idx = 1:5%sim_end
+for sim_idx = 1:sim_end
     
     
    %% Building indicies in the current simulation

@@ -38,6 +38,11 @@ else
     macrs_mod = 1;
 end
 
+%%% MACRS does not apply to resdiential systems
+if tr == 0.2
+    macrs_mod = 0;
+end
+
 if fin_v(2) == 5
     macrs = macrs5.*(tech_v(1) + scale_factor - ira*0.5)*tr.*macrs_mod;
 elseif fin_v(2) == 7

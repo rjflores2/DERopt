@@ -4,8 +4,13 @@ if crit_load_lvl>0 && ~isempty(opt_resiliency_model) &&  opt_resiliency_model ==
     T_resiliency_length = T_res(2) - T_res(1) + 1;
     %% Declaring Variables First
     %% Import/export at each node
-    var_resiliency.import = sdpvar(size(elec_res(T_res(1):T_res(2),:),1),K,'full');
-    var_resiliency.export = sdpvar(size(elec_res(T_res(1):T_res(2),:),1),K,'full');
+    if K > 1
+        var_resiliency.import = sdpvar(size(elec_res(T_res(1):T_res(2),:),1),K,'full');
+        var_resiliency.export = sdpvar(size(elec_res(T_res(1):T_res(2),:),1),K,'full');
+    else
+        var_resiliency.import = zeros(size(elec_res(T_res(1):T_res(2),:),1),K);
+        var_resiliency.export = zeros(size(elec_res(T_res(1):T_res(2),:),1),K);
+    end
     %% Solar PV
     if ~isempty(pv_v) || ~isempty(pv_legacy)
         var_resiliency.pv_elec = sdpvar(size(elec_res(T_res(1):T_res(2),:),1),K,'full');
@@ -69,10 +74,12 @@ if crit_load_lvl>0 && ~isempty(opt_resiliency_model) &&  opt_resiliency_model ==
         var_resiliency.export + var_resiliency.ees_chrg + elec_res(T_res(1):T_res(2),:)):'Critical electric load energy balance'];
 
     %% Import/export balance
-    Constraints = [Constraints
-        (0 <= var_resiliency.import):'Reisliency Import >= 0'
-        (0 <= var_resiliency.export):'Resiliency Export >= 0'
-        (sum(var_resiliency.import,2) == sum(var_resiliency.export,2)):'Resiliency Import/Export Balance at Nodes'];
+    if K > 1
+        Constraints = [Constraints
+            (0 <= var_resiliency.import):'Reisliency Import >= 0'
+            (0 <= var_resiliency.export):'Resiliency Export >= 0'
+            (sum(var_resiliency.import,2) == sum(var_resiliency.export,2)):'Resiliency Import/Export Balance at Nodes'];
+    end
     %% Solar Limits
     if ~isempty(pv_v) || ~isempty(pv_legacy)
         Constraints = [Constraints

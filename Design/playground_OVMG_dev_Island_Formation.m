@@ -1,7 +1,7 @@
 %% Playground file for OVMG Project
 clear all; close all; clc ; started_at = datetime('now'); startsim = tic;
 
-for crit_load_lvl = [0]%%[4 5 6 7] %%% Corresponding END around line 500 - after files have been saved
+for crit_load_lvl = [3]%%[4 5 6 7] %%% Corresponding END around line 500 - after files have been saved
     clearvars -except crit_load_lvl crit_load_lvl started_at startsim
 % crit_load_lvl = 5;
 % crit_load_lvl = [];
@@ -18,7 +18,7 @@ opt_now_yalmip = 0; %YALMIP
 %%%2) at the xfmr
 %%%3) at the circuit
 %%%4) at the circuit with linearized ACPF
-opt_resiliency_model = 0;
+opt_resiliency_model = 3;
 
 %% Resiliency Simulation level
 %%% 1) = at each building
@@ -27,7 +27,7 @@ opt_resiliency_model = 0;
 sim_lvl = 1;
 
 %%%Include pumping station? yes or no
-include_pump_station = 0;
+include_pump_station = 1;
 %% Infrastructure Cosntraints
 %%%AC Power Flow Simulation
 %%% 1) LinDistFlow
@@ -175,35 +175,51 @@ addpath(genpath('H:\_Research_\CEC_OVMG\Rates'))
 %% Loading/seperating building demand
 
 % % % scenario = 'ues_baseline_update'
-% scenario = 'baseline_retest_2B_v2';
+scenario = 'baseline_retest_2B_v2';
 % scenario = 'UES_1b'
 % scenario = 'ues_1a_v2'
 % % % scenario = 'UES_2b'
 % scenario = 'ues_baseline_ASHP_HPWH_film_coating_int_ex_lite_AppElec_Plus_envelope'
-scenario = 'ues_baseline_passive_Int_Ex_Lite_AppElec_plus_envelope_rev'
+% scenario = 'ues_baseline_passive_Int_Ex_Lite_AppElec_plus_envelope_rev'
 fprintf('%s: Loading UO Data.', datestr(now,'HH:MM:SS'))
 tic
 %%%Loading Data
 sc_txt = strcat('H:\_Research_\CEC_OVMG\URBANopt\UO_Results_0.5.x\',scenario);
 load(strcat(sc_txt,'.mat'));
 % bldg = bldg(1:50);
-bldg_base = bldg;
-compare = load(strcat('H:\_Research_\CEC_OVMG\URBANopt\UO_Results_0.5.x\',scenario,'.mat'));
+% compare = load(strcat('H:\_Research_\CEC_OVMG\URBANopt\UO_Results_0.5.x\',scenario,'.mat'));
 elapsed = toc;
 fprintf('Took %.2f seconds \n', elapsed)
 bldg_rec = [];
 
+
 %% Loading Critical Loads
 if crit_load_lvl > 0
-%     elec_resiliency_full = xlsread(strcat('H:\_Research_\CEC_OVMG\URBANopt\Resiliency\UES_2a_Crit_Loads.xlsx'),strcat('Crit_Load_',num2str(crit_load_lvl)));
+    %     elec_resiliency_full = xlsread(strcat('H:\_Research_\CEC_OVMG\URBANopt\Resiliency\UES_2a_Crit_Loads.xlsx'),strcat('Crit_Load_',num2str(crit_load_lvl)));
     elec_resiliency_full = xlsread(strcat('H:\_Research_\CEC_OVMG\URBANopt\Resiliency\',scenario,'_Crit_Loads.xlsx'),strcat('Crit_Load_',num2str(crit_load_lvl)));
 else
     elec_resiliency_full = [];
 end
 
+%% Loading water pumping station data
+if include_pump_station
+    load('H:\_Research_\CEC_OVMG\URBANopt\Resiliency\HB_Water_Pumping_Station\pump_station_2018.mat');
+    pump_station_index = 5;
+    xfmr_map{318} = 'T20';
+    elec_resiliency_full(:,318) = pump_elec;
+
+    bldg(318).elec_loads = array2table(pump_elec,"VariableNames","Total");
+    bldg(318).gas_loads = array2table(zeros(size(pump_elec)),"VariableNames","Total");
+    bldg(318).type = 'Pump';
+    bldg(318).units = 0;
+    bldg(318).xfmr = {'T20'};
+    bldg(318).roof_area = 286.9333;
+end
+bldg_base = bldg;
 %% electrical infrastructure links
 % elec_infrastructure_OVMG
 infrastructure_mapping_OVMG
+
 %% Loops
 st_idx = [1 51 101 151 201 251 301];
 end_idx = [50 100 150 200 250 300 317];
@@ -220,7 +236,7 @@ end_idx = st_idx + 19;
 end_idx(end) = 318;
 
 
-st_idx = 1:317;
+st_idx = 1:318;
 end_idx = st_idx;
 
 % st_idx = 220:240;
@@ -249,18 +265,8 @@ elseif opt_resiliency_model == 3 %|| acpf_sim %%%If resiliency is examined on ea
     sim_end = width(xfmr_2_circuit) - 1;
 end
 
-%% Loading water pumping station data
-if include_pump_station
-    load('H:\_Research_\CEC_OVMG\URBANopt\Resiliency\HB_Water_Pumping_Station\pump_station_2018.mat');
-    pump_station_index = 5;
-    xfmr_map{318} = 'T20';
-    elec_resiliency_full(:,318) = pump_elec;
-end
-
-
-
 %%
-for sim_idx = 171%1:sim_end
+for sim_idx = 1:sim_end
    %% Building indicies in the current simulation
    if opt_resiliency_model == 0 %&& (acpf_sim == 0 || isempty(acpf_sim))
         bldg_ind = [st_idx(sim_idx):end_idx(sim_idx)]; 
@@ -375,7 +381,7 @@ for sim_idx = 171%1:sim_end
         
     %% Adding pumping station
     if include_pump_station
-        elec(:,318) =  pump_elec;
+%         elec(:,318) =  pump_elec;
         dc_exist(318) = 1;
         rate{318} = 'TOU8';
         low_income(318) = 0;
@@ -733,6 +739,11 @@ bldg_base(bldg_ind(ii)).der_systems.resiliency.ees_dchrg = var_resiliency.ees_dc
 bldg_base(bldg_ind(ii)).der_systems.resiliency.ees_soc = var_resiliency.ees_soc(:,ii);
 bldg_base(bldg_ind(ii)).der_systems.resiliency.dg_elec = var_resiliency.dg_elec(:,ii);
 
+if opt_resiliency_model == 2 || opt_resiliency_model == 3
+bldg_base(bldg_ind(ii)).der_systems.resiliency.import = var_resiliency.import(:,ii);
+bldg_base(bldg_ind(ii)).der_systems.resiliency.exportc = var_resiliency.export(:,ii);
+end
+
             end
         end
 
@@ -765,7 +776,7 @@ bldg = bldg_base;
 %     save_here = 1
 if crit_load_lvl ==0
 %     save(strcat(sc_txt,'_DER_no_export_limit'),'bldg')
-    save(strcat(sc_txt,'_DER_run2_reduced_costs'),'bldg')
+    save(strcat(sc_txt,'_DER_baseline'),'bldg')
 elseif opt_resiliency_model == 1
     save(strcat(sc_txt,'_DER_bldg_nanogrid'),'bldg')
 elseif opt_resiliency_model == 2
