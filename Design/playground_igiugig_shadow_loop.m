@@ -10,14 +10,16 @@ pv_area_range = [1:25 30:5:100 110:10:9000 9100:100:26000];
 % pv_area_range = [16100:100:26000];
 % ror_area_range = [0.1 1:100];
 ror_area_range = [0 0.1  .5 1:0.5:18*3];
+ror_area_range = [0 0.1  .5 1:1:18*3];
+% ror_area_range = [0 0.1  .5 1:1:18*1];
 % ror_area_range = [0];
 
 shadow_rec = [];
 energy_mix = [];
 tech_adopt = [];
-for outer_loop = 1:29
+for outer_loop = 1%:29
 for sim_loop = 1:length(ror_area_range)
-    clearvars -except sim_loop ror_area_range shadow_rec startsim energy_mix tech_adopt pv_area_range outer_loop hydro_utilizaiton hydro_max_utilizaiton max_hkt_power
+    clearvars -except sim_loop ror_area_range shadow_rec startsim energy_mix tech_adopt pv_area_range outer_loop hydro_utilizaiton hydro_max_utilizaiton max_hkt_power shadow_rec_turbo
     ror_area = ror_area_range(sim_loop);
 %     pv_area = pv_area_range(sim_loop);
     %%% opt.m parameters
@@ -224,32 +226,31 @@ addpath(genpath('H:\Matlab_Funcitons\YALMIP-master')) %rjf path
         opt_run_of_river
         elapsed = toc;
         fprintf('Took %.2f seconds \n', elapsed)
-        
-        
+
+
         %% Solar Aarea Cosntraint
-%         Constraints = [Constraints
-%             var_pv.pv_adopt <= pv_area.*pv_v(2)];
+        %         Constraints = [Constraints
+        %             var_pv.pv_adopt <= pv_area.*pv_v(2)];
         %% Optimize
         fprintf('%s: Optimizing \n....', datestr(now,'HH:MM:SS'))
-        
-        if sim_loop > 1
+
+        if sim_loop > 1 && exist(shadow_rec)
             prior_shadow = shadow_rec(outer_loop,sim_loop-1)
             sim_loop
             if prior_shadow == 0
-                break 
+                break
             end
         end
-%         pv_area
-ror_area
-size(shadow_rec)
+        ror_area
+        size(shadow_rec)
         opt
-        
+
         %% Timer
         finish = datetime('now') ; totalelapsed = toc(startsim)
-        
+
         %% Variable Conversion
         variable_values_igiugig
-        
+
         %% Finding Lambda Values
         tech_adopt(:,sim_loop) = [var_pv.pv_adopt'
             var_ees.ees_adopt + var_rees.rees_adopt
@@ -258,53 +259,29 @@ size(shadow_rec)
             var_pem.cap];
         %         fval_rec(sim_loop) = fval
 
-        shadow_rec(outer_loop,sim_loop) = [solution.pi(end)];
+        % shadow_rec(outer_loop,sim_loop) = [solution.pi(end)];
+        shadow_rec_turbo(:,sim_loop) = [solution.pi(end-1:end)];
 %         shadow_rec(:,sim_loop) = [lambda.ineqlin(end) lambda.ineqlin(end-8761:end-1)'];
         %         shadow_rec(:,sim_loop) = [lambda.ineqlin(end)];
         
-        hydro_utilizaiton(outer_loop,sim_loop) = sum(var_run_of_river.electricity)./(sum(river_power_potential).*var_run_of_river.swept_area);
-
-        river_power_potential(river_power_potential==0) = 80/18;
-        
-        hydro_max_utilizaiton(outer_loop,sim_loop) = sum(var_run_of_river.electricity)./(sum(river_power_potential).*var_run_of_river.swept_area);
-        
-        energy_mix(:,sim_loop) = [sum(sum(var_legacy_diesel.electricity,2))
-            sum(sum(var_pv.pv_elec,2))
-            sum(sum(var_run_of_river.electricity,2))
-            sum(sum(var_pem.elec,2))];
-
-        max_hkt_power(outer_loop,sim_loop) = max(var_run_of_river.electricity);
+        % hydro_utilizaiton(outer_loop,sim_loop) = sum(var_run_of_river.electricity)./(sum(river_power_potential).*var_run_of_river.swept_area);
+        % 
+        % river_power_potential(river_power_potential==0) = 80/18;
+        % 
+        % hydro_max_utilizaiton(outer_loop,sim_loop) = sum(var_run_of_river.electricity)./(sum(river_power_potential).*var_run_of_river.swept_area);
+        % 
+        % energy_mix(:,sim_loop) = [sum(sum(var_legacy_diesel.electricity,2))
+        %     sum(sum(var_pv.pv_elec,2))
+        %     sum(sum(var_run_of_river.electricity,2))
+        %     sum(sum(var_pem.elec,2))];
+        % 
+        % max_hkt_power(outer_loop,sim_loop) = max(var_run_of_river.electricity);
         
 if -solution.pi(end) < 1
     break
 end
 
-        %         shadow_ror_potential = lambda.ineqlin(end-8761:end-1);
-        % shadow_ror_swept_area = lambda.ineqlin(end);
-
-
-        %     lambda_range = [min([min(find(model.bineq == river_power_potential(1,1))) min(find(model.bineq == river_power_potential(1,2)))])
-        % max([max(find(model.bineq == river_power_potential(end,1))) max(find(model.bineq == river_power_potential(end,2)))])]
-        % shadow_value_ror./fval
-        % sum(lambda.ineqlin(min(find(model.bineq == river_power_potential(1,1))):max(find(model.bineq == river_power_potential(end,1)))))
-
-        %
-        %
-        % lambda_range = [min(find(model.bineq == river_power_potential(1,1))) min(find(model.bineq == river_power_potential(1,1)))+8759
-        %     max(find(model.bineq == river_power_potential(end,2)))-8759 max(find(model.bineq == river_power_potential(end,2)))];
-        % %
-        % %
-        % sum(lambda.ineqlin(lambda_range(1,1):lambda_range(1,2)))
-        % sum(lambda.ineqlin(lambda_range(2,1):lambda_range(2,2)))
-        % sum(model.bineq(lambda_range(1,1):lambda_range(2,2)))
-        % sum(model.bineq(175204:192723))
-
-
-
-
-        %     max(find(model.bineq == river_power_potential(end,2))) - 8759
-        % sum(lambda.ineqlin(lambda_range(2):lambda_range(2)+8759))
-        % sum(lambda.ineqlin(lambda_range(1)-8759:lambda_range(1)))
+        
     end
 end
 end

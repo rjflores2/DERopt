@@ -43,10 +43,10 @@ util_bin_on = 0;
 ees_bin_on = 0;
 
 %%% Are H2 systems for resiliency only?
-h2_systems_for_resiliency_only = 0;
+h2_systems_for_resiliency_only = 1;
 %% Downselection of building energy data?
 testing = 0;
-h2_tech_on = 0;
+h2_tech_on = 1;
 if ~testing
     downselection = 0;
     if downselection == 1
@@ -61,7 +61,7 @@ if ~testing
     dgb_on = 0;
     dgc_on = 0;
     dgl_on = h2_tech_on;
-    h2_storage_on = h2_tech_on;
+    h2_storage_on = 0*h2_tech_on;
     sofc_on = 0;
     lpv_on = 1-sz_on;
     lees_on = 1-sz_on;
@@ -151,7 +151,7 @@ addpath(genpath('H:\Matlab_Paths\YALMIP-master'))
 addpath('C:\gurobi1103\win64\matlab')
 
 %%%CPLEX Path
-addpath(genpath('C:\Program Files\IBM\ILOG\CPLEX_Studio128\cplex\matlab\x64_win64'))
+% addpath(genpath('C:\Program Files\IBM\ILOG\CPLEX_Studio128\cplex\matlab\x64_win64'))
 
 %%%Source of URBANopt Results
 addpath('H:\_Research_\CEC_OVMG\URBANopt\UO_Results_0.5.x')
@@ -656,12 +656,12 @@ ng_cost = (6/120*105.5 + 0.6)/29.3;
     adopted.ees = [adopted.ees var_ees.ees_adopt];
     adopted.mean_elec = [adopted.mean_elec mean(elec)];
 
-            if dgl_on
-                adopted.dgl = [adopted.dgl var_dgl.dg_capacity];
-            end
-            if h2_storage_on
-                adopted.h2es = [adopted.h2es var_h2_storage.capacity];
-            end
+    if dgl_on
+        adopted.dgl = [adopted.dgl var_dgl.dg_capacity];
+    end
+    if h2_storage_on
+        adopted.h2es = [adopted.h2es var_h2_storage.capacity];
+    end
 
 
 
@@ -687,7 +687,7 @@ ng_cost = (6/120*105.5 + 0.6)/29.3;
 
         bldg_base(bldg_ind(ii)).der_systems.ees_adopt = var_ees.ees_adopt(ii); %%%Adopted EES  (kWh)
         bldg_base(bldg_ind(ii)).der_systems.rees_adopt = var_rees.rees_adopt(ii); %%%Adopted REES  (kWh)
-        
+
         bldg_base(bldg_ind(ii)).der_systems.utility = table;
         bldg_base(bldg_ind(ii)).der_systems.utility.import = [var_util.import(:,ii) ];
         bldg_base(bldg_ind(ii)).der_systems.utility.export = [ var_util.export(:,ii)];
@@ -700,12 +700,12 @@ ng_cost = (6/120*105.5 + 0.6)/29.3;
         bldg_base(bldg_ind(ii)).der_systems.ees_ops.soc = var_ees.ees_soc(:,ii);
         bldg_base(bldg_ind(ii)).der_systems.ees_ops.charge = var_ees.ees_chrg(:,ii);
         bldg_base(bldg_ind(ii)).der_systems.ees_ops.discharge = var_ees.ees_dchrg(:,ii);
-     
+
         bldg_base(bldg_ind(ii)).der_systems.rees_ops = table;
         bldg_base(bldg_ind(ii)).der_systems.rees_ops.soc = var_rees.rees_soc(:,ii);
         bldg_base(bldg_ind(ii)).der_systems.rees_ops.charge = var_rees.rees_chrg(:,ii);
         bldg_base(bldg_ind(ii)).der_systems.rees_ops.discharge = var_rees.rees_dchrg(:,ii);
-       
+
         if h2_storage_on
             bldg_base(bldg_ind(ii)).der_systems.h2_storage = var_h2_storage.capacity(ii); %%%Adopted H2 storage capacity  (kWh)
         end
@@ -731,19 +731,24 @@ ng_cost = (6/120*105.5 + 0.6)/29.3;
 
         if opt_resiliency_model >= 0
             if opt_resiliency_model >= 1
-bldg_base(bldg_ind(ii)).der_systems.resiliency = table;
-bldg_base(bldg_ind(ii)).der_systems.resiliency.load = elec_res(T_res(1):T_res(2),ii);
-bldg_base(bldg_ind(ii)).der_systems.resiliency.pv_elec = var_resiliency.pv_elec(:,ii);
-bldg_base(bldg_ind(ii)).der_systems.resiliency.ees_chrg = var_resiliency.ees_chrg(:,ii);
-bldg_base(bldg_ind(ii)).der_systems.resiliency.ees_dchrg = var_resiliency.ees_dchrg(:,ii);
-bldg_base(bldg_ind(ii)).der_systems.resiliency.ees_soc = var_resiliency.ees_soc(:,ii);
-bldg_base(bldg_ind(ii)).der_systems.resiliency.dg_elec = var_resiliency.dg_elec(:,ii);
+                bldg_base(bldg_ind(ii)).der_systems.resiliency = table;
+                bldg_base(bldg_ind(ii)).der_systems.resiliency.load = elec_res(T_res(1):T_res(2),ii);
+                bldg_base(bldg_ind(ii)).der_systems.resiliency.pv_elec = var_resiliency.pv_elec(:,ii);
+                bldg_base(bldg_ind(ii)).der_systems.resiliency.ees_chrg = var_resiliency.ees_chrg(:,ii);
+                bldg_base(bldg_ind(ii)).der_systems.resiliency.ees_dchrg = var_resiliency.ees_dchrg(:,ii);
+                bldg_base(bldg_ind(ii)).der_systems.resiliency.ees_soc = var_resiliency.ees_soc(:,ii);
+                bldg_base(bldg_ind(ii)).der_systems.resiliency.dg_elec = var_resiliency.dg_elec(:,ii);
 
-if opt_resiliency_model == 2 || opt_resiliency_model == 3
-bldg_base(bldg_ind(ii)).der_systems.resiliency.import = var_resiliency.import(:,ii);
-bldg_base(bldg_ind(ii)).der_systems.resiliency.exportc = var_resiliency.export(:,ii);
-end
+                if opt_resiliency_model == 2 || opt_resiliency_model == 3
+                    bldg_base(bldg_ind(ii)).der_systems.resiliency.import = var_resiliency.import(:,ii);
+                    bldg_base(bldg_ind(ii)).der_systems.resiliency.exportc = var_resiliency.export(:,ii);
+                end
 
+                 if h2_storage_on
+bldg_base(bldg_ind(ii)).der_systems.resiliency.h2_soc = var_resiliency.h2_soc(:,ii);
+bldg_base(bldg_ind(ii)).der_systems.resiliency_h2_charge.h2_charge = var_resiliency.h2_charge(:,ii);
+bldg_base(bldg_ind(ii)).der_systems.resiliency.h2_discharge = var_resiliency.h2_discharge(:,ii);
+                 end
             end
         end
 
@@ -755,12 +760,12 @@ end
 
         bldg_base(bldg_ind(ii)).der_systems.cap_mods = [pv_cap_mod(ii) ees_cap_mod(ii) rees_cap_mod(ii)];
     end
-    
+
     %% recording resiliency results
     if opt_resiliency_model >= 3 && acpf_sim == 1
-%         save(strcat(scenario,'_',num2str(sim_idx),'_CriticalLoad_Island_formation_',num2str(crit_load_lvl)),'var_resiliency')
-%         save(strcat(scenario,'_',num2str(sim_idx),'_wout_pump_CL_',num2str(crit_load_lvl)))
-        
+        %         save(strcat(scenario,'_',num2str(sim_idx),'_CriticalLoad_Island_formation_',num2str(crit_load_lvl)),'var_resiliency')
+        %         save(strcat(scenario,'_',num2str(sim_idx),'_wout_pump_CL_',num2str(crit_load_lvl)))
+
     end
 end
 

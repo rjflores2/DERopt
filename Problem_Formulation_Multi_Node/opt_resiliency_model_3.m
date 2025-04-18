@@ -35,10 +35,13 @@ if crit_load_lvl>0 && ~isempty(opt_resiliency_model) &&  opt_resiliency_model ==
     if dgl_on
         var_resiliency.dg_elec = sdpvar(size(elec_res(T_res(1):T_res(2),:),1),K,'full');       %%%SOFC electricity produced (kWh)
 
-        if dgl_pipeline_fuel>0
+        %%%Pipeline fuel is available only when storage is not avaialble
+        if ~h2_storage_on
             Objective = Objective ...
                 + sum(sum(var_resiliency.dg_elec)).*(dgl_pipeline_fuel./dgl_v(2));
         end
+
+         
 
     else
         var_resiliency.dg_elec =  zeros(size(elec_res(T_res(1):T_res(2),:),1),K);
@@ -98,6 +101,8 @@ if crit_load_lvl>0 && ~isempty(opt_resiliency_model) &&  opt_resiliency_model ==
     if dgl_on
         Constraints = [Constraints
             (0 <=  var_resiliency.dg_elec <= repmat(var_dgl.dg_capacity,T_resiliency_length,1)):'DGL Resiliency limits'];
+
+       
     end
     %% H2 Energy Storage Constraints
     if h2_storage_on

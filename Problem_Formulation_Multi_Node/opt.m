@@ -8,11 +8,16 @@ if opt_now==1
      [model,recoverymodel,diagnostic,internalmodel] = export(Constraints,Objective,sdpsettings('solver','gurobi'));
    [model,recoverymodel,diagnostic,internalmodel] = export(Constraints,Objective);
    model.lb(:) = 0;
-
+clear params
 params.NodeLimit = 100;
 params.OutputFlag = 1;
 % params.Method = -1;
 params.PreSparsify = 2;
+if sim_idx == 7 && opt_resiliency_model == 3
+    params.Threads = 2;
+else
+    params.Threads = 36;
+end
 solution = gurobi(model,params)
     %%%Setting lower/upper bounds for all variables
     %     lb=zeros(size(model.f));

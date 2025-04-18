@@ -15,12 +15,12 @@ pv_on = 1;        %Turn on PV
 ees_on = 1;       %Turn on EES/REES
 rees_on = 0;  %Turn on REES
 ror_on = 0; % Turn On Run of river generator
-ror_integer_on = 1;
+ror_integer_on = 0;
 ror_integer_cost = 2000;
 pemfc_on = 1;
 %%%Hydrogen technologies
-el_on = 0; %Turn on generic electrolyer
-el_binary_on = 1;
+el_on = 1; %Turn on generic electrolyer
+el_binary_on = 0;
 rel_on = 0; %Turn on renewable tied electrolyzer
 h2es_on = 1; %Hydrogen energy storage
 strict_h2es = 0; %Is H2 Energy Storage strict discharge or charge?
@@ -38,9 +38,9 @@ ldiesel_binary_on = 0; %Binary legacy diesel generators
 %%%maxpv is maximum capacity that can be installed. If includes different
 %%%orientations, set maxpv to row vector: for example maxpv =
 %%%[max_north_capacity  max_east/west_capacity  max_flat_capacity  max_south_capacity]
-maxpv = [30000];% ; %%%Maxpv 
+maxpv = [];% ; %%%Maxpv 
 toolittle_pv = 0; %%% Forces solar PV adoption - value is defined by toolittle_pv value - kW
-curtail = 1; %%%Allows curtailment is = 1
+curtail = 0; %%%Allows curtailment is = 1
 %% EES (opt_ees.m & opt_rees.m)
 toolittle_storage = 0; %%%Forces EES adoption - 13.5 kWh
 socc = 0; % SOC constraint: for each individual ees and rees, final SOC >= Initial SOC
@@ -48,10 +48,6 @@ socc = 0; % SOC constraint: for each individual ees and rees, final SOC >= Initi
 %% Adding paths
 %%%YALMIP Master Path
 addpath(genpath('H:\Matlab_Funcitons\YALMIP-master')) %rjf path
-
-%%%CPLEX Path
-% addpath(genpath('C:\Program Files\IBM\ILOG\CPLEX_Studio128\cplex\matlab\x64_win64')) %rjf path
-% addpath(genpath('C:\Program Files\IBM\ILOG\CPLEX_Studio1263\cplex\matlab\x64_win64')) %cyc path
 
 %%%DERopt paths
 addpath(genpath('H:\_Tools_\DERopt\Design'))
@@ -65,22 +61,25 @@ addpath(genpath('H:\_Tools_\DERopt\Data'))
 
 %% Loading building demand
 %%%Loading Data
-dt = readtable('H:\_Tools_\DERopt\Data\Igiugig\Igiugig_Load_Growth_added_time.csv');
+dt = readtable('H:\_Tools_\DERopt\Data\Steel\EAF renewables.xlsx');
 
-time = datenum(dt.Date);
-elec = dt.ElectricDemand_kW_;
+elec = dt.Load(4:end).*1000;
+time = datenum([2020 1 1 0 0 0]);
+for ii = 2:8760
+    time(ii,1) = time(ii-1)+1/24;
+end
 heat = [];
 cool = [];
 
 %%% Formatting Building Data
 %%%Values to filter data by
 month_idx = [];
-month_idx = [2 3 8 9];
+% month_idx = [2 3 8 9];
 % month_idx = [2];
 % month_idx = [9];
 % month_idx = [1];
 % month_idx = [];
-bldg_loader_Igiugig
+bldg_loader_Steel
 
 %%% Simulating an ice break up
 

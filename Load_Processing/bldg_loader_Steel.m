@@ -13,11 +13,9 @@ e_adjust = 60/t_step;
 elec = elec.*(t_step/60);
 
 %% Loading/processing solar data
-solar_fixed = readtable('pvwatts_solar_fixed.csv');
-solar_tracking = readtable('pvwatts_solar_tracking.csv');
 
 %%%Extracting solar data from the loaded normalized factor
-solar = [solar_fixed.ACSystemOutput_kW_ solar_tracking.ACSystemOutput_kW_];
+solar = [dt.GenerationPotential(4:end) dt.Var4(4:end)];
 % solar = [solar_fixed.ACSystemOutput_kW_ ];
 
 %% Loading River Data

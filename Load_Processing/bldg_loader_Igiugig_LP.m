@@ -21,17 +21,17 @@ solar = [solar_fixed.ACSystemOutput_kW_ solar_tracking.ACSystemOutput_kW_];
 % solar = [solar_fixed.ACSystemOutput_kW_ ];
 
 %% Loading River Data
-% river_power_potential = readtable('Iguigig_River_Power.xlsx','Sheet','Real_Hour');
+river_power_potential = readtable('Iguigig_River_Power.xlsx','Sheet','Real_Hour');
 % river_power_potential = readtable('Iguigig_River_Power.xlsx','Sheet','Eff_plus_1_hour');
 % river_power_potential = readtable('Iguigig_River_Power.xlsx','Sheet','Eff_plus_25_hour');
-river_power_potential = readtable('Iguigig_River_Power.xlsx','Sheet','Site1_Speed_Delta');
+% river_power_potential = readtable('Iguigig_River_Power.xlsx','Sheet','Site1_Speed_Delta');
 
 % %  repmat(river_power_potential.Site2_Power_kW,1,0)
 % river_power_potential = [repmat(river_power_potential.Site1_Power_kW,1,5)];
 % river_power_potential = river_power_potential(:,1);
 %% Finding the value of the RivGen system!!!
-% river_power_potential = [river_power_potential.Normalized_Site2_Power];
-river_power_potential = table2array(river_power_potential(:,30+outer_loop));
+river_power_potential = [river_power_potential.Normalized_Site1_Power river_power_potential.Normalized_Site2_Power];
+% river_power_potential = table2array(river_power_potential(:,30+outer_loop));
 % river_power_potential(:,2) = [river_power_potential.Properties.VariableNames{24}];
 % river_power_potential = [river_power_potential.Site1_Power_kW river_power_potential.Site2_Power_kW];
 % river_power_potential = zeros(8760,1);

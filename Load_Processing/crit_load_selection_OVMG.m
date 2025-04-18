@@ -2,7 +2,7 @@
 %%% development
 if ~isempty(crit_load_lvl) && crit_load_lvl > 0
     %%%Length of resiliency model
-    days_include = 7;
+    days_include = 2;
     res_loads = [];
     for ii = 1:floor(8760/(24*days_include))
         strt_id = (ii-1)*24*days_include+1;

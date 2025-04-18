@@ -144,7 +144,7 @@ if h2_storage_on
     %%% (10) State of charge holdover
     %%% (11) when H2 is delivered (hour into resiliency event)
     h2es_v = [60;0.001;0.001;0.01;1;1;1;0.95;1;1];
-    h2_storage_v =  [22;0.001;0.001;0.01;1;1;1;1;1;0.9995; 12];
+    h2_storage_v =  [22;0.001;0.001;0.01;1;1;1;1;1;0.9995; 0+1*(12+24*3)];
 
     h2_delivery_fuel = [6.*(3.6/120)]; %%% cost of delivered fuel ($/kWh)
 
