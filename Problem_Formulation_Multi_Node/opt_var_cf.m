@@ -171,8 +171,13 @@ toc
 if somah > 0 && sum(low_income) > 0
     var_somah.somah_capacity = sdpvar(1,sum(low_income>0),'full');
     
+somah_factor = somah/pv_v(1)
+if somah_factor > 1
+    somah_factor = 1;
+end
+
     Objective = Objective  ...
-        + -sum(M*pv_mthly_debt.*pv_cap_mod(low_income == 1)'.*var_somah.somah_capacity);
+        + -sum(somah_factor.*M.*pv_mthly_debt.*pv_cap_mod(low_income == 1)'.*var_somah.somah_capacity);
     
 %     sum(M*pv_mthly_debt.*pv_cap_mod'.*var_pv.pv_adopt)
 else

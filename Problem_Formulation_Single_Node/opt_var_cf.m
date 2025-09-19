@@ -14,7 +14,14 @@ M = length(endpts);   %# of months in the simulation
 if utility_exists 
     %%%Electrical Import Variables
     var_util.import = sdpvar(T,1,'full');
-    
+    if export_on
+        var_util.export = sdpvar(T,1,'full'); %%%Electricity Export
+        if util_bin_on
+            var_util.elec_sign = binvar(T,1,'full'); %%%Net Electricity Flow
+        end
+    else
+        var_util.export = zeros(T,1);
+    end
     %%%Demand Charge Variables
     %%%Only creating variables for # of months and number of applicable
     %%%rates, as defined with the binary dc_on input
@@ -40,53 +47,47 @@ if utility_exists
     
     %%%Find the applicable utility rate
     index=find(ismember(rate_labels,rate(1)));
-    
+
     %%%Import Energy charges
     %     Objective = sum(sum(var_util.import.*temp_cf));
     Objective = sum(sum(var_util.import.*(day_multi.*import_price(:,index))));
-    
+
+    import_cost = import_price(:,index);
+
     %%%Clearing temporary cost function matrix
     clear temp_cf
-    
+
     if dc_exist == 1
         %%%Find the applicable utility rate
         index=find(ismember(rate_labels,rate(1)));
-        
+
         Objective =  Objective ...
             + sum(dc_nontou(index)*var_util.nontou_dc(:,dc_count))... %%%non TOU DC
             + sum(dc_on(index)*var_util.onpeak_dc(:,dc_count)) ... %%%On Peak DC
             + sum(dc_mid(index)*var_util.midpeak_dc(:,dc_count)); %%%Mid Peak DC
         %%% Utility_import * Demand_charge_rate
-        
+
         %%%Index of DCs
         dc_count=dc_count+1;
     end
-%     end   
-    
+
+    if export_on
+        Objective =  Objective ...
+            + -sum(var_util.export.*export_price);
+    end
+
 else
     Objective = 0;
     %%%Electrical Import Variables
     var_util.import=zeros(T,1);
-    
+    var_util.export = zeros(T,1);
+
     %%%Non TOU DC
     var_util.nontou_dc=zeros(M,1);
-    
+
     %%%On Peak/ Mid Peak TOU DC
     var_util.onpeak_dc=zeros(T,1);
     var_util.midpeak_dc=zeros(T,1);
-end
-
-%% General export
-%%% General export allows export from any onsite resource, regardless of
-%%% fuel source
-if exist('gen_export_on') && gen_export_on
-    var_util.gen_export = sdpvar(T,1,'full');
-    var_util.import_state = binvar(T,1,'full');
-    Objective =  Objective ...
-         + -sum(var_util.gen_export.*export_price);
-else
-    var_util.gen_export = zeros(T,1);
-    var_util.import_state = ones(T,1);
 end
 
 %% Technologies That Can Be Adopted at Each Building Energy Hub
@@ -401,7 +402,7 @@ else
     el_eff = zeros(T,1);
 end
 
-%%
+%% PEMFC
 if exist('pemfc_on') && pemfc_on
     var_pem.cap = sdpvar(1,1,'full');
     var_pem.elec = sdpvar(T,1,'full');
@@ -423,6 +424,35 @@ else
     var_pem.elec = zeros(T,1);
     var_pem.onoff = [];
 end
+
+%% SOFC for Easier Implementation
+if exist('sofc_on') && sofc_on
+    var_sofc.capacity = sdpvar(1,1,'full')
+    var_sofc.electricity = sdpvar(T,1,'full');
+
+    Objective = Objective ...
+        + sum(M.*sofc_mthly_debt.*var_sofc.capacity) ... %PEM Capital Cost
+        + sum((sofc_v(4) + gas_rates/sofc_v(2)).*var_sofc.electricity); %Varable O&M
+
+else
+    var_sofc.electricity = zeros(T,1);
+end
+
+% %% SOFC
+% if sofc_on
+% 
+%     var_sofc.adopted_sofc = intvar(1,1,'full');
+%     %%% operational_decisions = 12 if monthly on/off decision
+%     %%% operational_decisions = 52 if weekly on/off decision
+%     %%% operational_decisions = 365 if daily on/off decisions
+%     var_sofc.sofc_operational_state = intvar(operational_decisions,1,'full');
+%     var_sofc.sofc_electricity = sdpvvar(8760,1,'full');
+% 
+%     Objective = Objective ...
+%         + var_sofc.adopted_sofc.*fuel_cell_cost ...
+%         + sum(var_sofc.sofc_electricity).*(fuel_cell_maintenance_cost + ng_cost./fuel_cell_efficiency);
+% 
+% end
 
 %% HRS equipment
 if exist('hrs_on') && hrs_on
@@ -838,3 +868,4 @@ if ~isempty(elec_dump)
 else
     var_dump.elec_dump = zeros(T,1);
 end
+

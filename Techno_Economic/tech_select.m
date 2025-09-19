@@ -10,6 +10,7 @@ if pv_on
     %pv_v=[3500; 0.2 ; 0.001];
     pv_v=[3190*0.849496321; 0.2 ; 0.001]; %pv_v=[2650; 0.2 ; 0.001];
     pv_v=[3190; 0.2 ; 0.001]; %pv_v=[2650; 0.2 ; 0.001];
+    pv_v=[3340; 0.2 ; 0.014]; %pv_v=[2650; 0.2 ; 0.001]; ---> NREL Costs
      
     pv_cap=pv_v(1,:);
     
@@ -22,6 +23,11 @@ if pv_on
         5; ... %%%MACRS Schedule Modified Accelerated Cost Recovery System (tax)
         0; ... %%%ITC Solar Investment Tax Credit (ITC)
         0.3]; %IRA Tax Credits
+
+     pv_fin = [-0.4648; ... %%%Scaling linear factor - Based on Lazards cost of electricity
+        5; ... %%%MACRS Schedule Modified Accelerated Cost Recovery System (tax)
+        0; ... %%%ITC Solar Investment Tax Credit (ITC)
+        0.0]; %IRA Tax Credits
         
     
     %%%Solar on multifamily affordable homes (SOMAH)
@@ -59,6 +65,7 @@ if ees_on
         ees_v=[830; 0.001; 0.001; 0.1; 0.95; 0.5; 0.5; .90; .90; .9999];
         ees_v=[1218; 0.00; 0.00; 0.1; 0.95; 0.5; 0.5; .90; .90; .9999];
         ees_v=[1200; 0.00; 0.00; 0.1; 0.95; 0.5; 0.5; .90; .90; .9999];
+        ees_v=[1300; 0.002; 0.002; 0.1; 0.95; 0.5; 0.5; .90; .90; .9999];
 % ees_v=[162; 0.001; 0.001; 0.05; 0.98; 0.9; 0.2; .95; .99; .9999];
     ees_cap=ees_v(1);
     
@@ -87,6 +94,17 @@ if ees_on
         5; ... %%%MACRS Schedule
         0; ... %%%ITC Benefit
         0.3]; %%%IRA
+
+     ees_fin = [-0.1306;... %%%Scaling linear factor - Based on Lazards cost of electricity
+        7; ... %%%MACRS Schedule
+        0; ... %%%ITC Benefit
+        0.0]; %%%IRA
+        
+    %%%Financial Aspects - EES
+    rees_fin = [-0.1306;... %%%Scaling linear factor - Based on Lazards cost of electricity
+        5; ... %%%MACRS Schedule
+        0; ... %%%ITC Benefit
+        0.0]; %%%IRA
 else
 ees_v = [];
 rees_v = [];
@@ -144,7 +162,7 @@ if h2_storage_on
     %%% (10) State of charge holdover
     %%% (11) when H2 is delivered (hour into resiliency event)
     h2es_v = [60;0.001;0.001;0.01;1;1;1;0.95;1;1];
-    h2_storage_v =  [22;0.001;0.001;0.01;1;1;1;1;1;0.9995; 0+1*(12+24*3)];
+    h2_storage_v =  [22;0.001;0.001;0.01;1;1;1;1;1;0.9995; 0+1*(12+24* 1.4166666666666666666666666666666666666667)];
 
     h2_delivery_fuel = [6.*(3.6/120)]; %%% cost of delivered fuel ($/kWh)
 

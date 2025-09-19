@@ -7,7 +7,7 @@ wave_range = [0:50:6000];
 wave_range = [0:50:15000];
 wave_range = [20000];
 fc_limit = [0:0.1:20];
-for fc_num = 1:length(fc_limit)
+for fc_num = 1%:length(fc_limit)
     clearvars -except results wave_range wave_num startsim
     %% Parameters
 
@@ -22,11 +22,16 @@ for fc_num = 1:length(fc_limit)
     pv_on = 1;        %Turn on PV
     ees_on = 1;       %Turn on EES/REES
     rees_on = 1;  %Turn on REES
+    pemfc_on = 0; %Turn on PEMFC
+    sofc_on = 1; %Turn on SOFC
 
+
+    tdv_on = 1;
+    export_on = 1;
+    util_bin_on = 0;
     %% Turning everything else off
     ror_on = 0; % Turn On Run of river generator
     ror_integer_on = 0;
-    pemfc_on = 0;
 
     %%%Hydrogen technologies
     el_on = 0; %Turn on generic electrolyer
@@ -43,7 +48,10 @@ for fc_num = 1:length(fc_limit)
 
     ldiesel_on = 0; %Turn on legacy diesel generators
     ldiesel_binary_on = 0; %Binary legacy diesel generators
-
+ %% Turning incentives and other financial tools on/off
+        sgip_on = 0; %Self-Generation Incentive Program (SGIP)
+        dc_exist = 0;
+        rate = {'R1'};
     %% PV (opt_pv.m)
     %%%maxpv is maximum capacity that can be installed. If includes different
     %%%orientations, set maxpv to row vector: for example maxpv =
@@ -75,8 +83,9 @@ for fc_num = 1:length(fc_limit)
 
     %% Loading building demand
     %%%Building file details
-    cz = 'CZ16';
-    file_name = strcat('Data\SCG_Nanogrid\Loads\',cz,'_Loader.xlsx');
+    cz_name = 'CZ06';
+    yr = 2030;
+    file_name = strcat('Data\SCG_Nanogrid\Loads\',cz_name,'_Loader.xlsx');
     %%% Loading Data
     dt = readtable(file_name,'Sheet','Premium_Heat_Pump');
     time = (dt.HoursSince00_00Jan1 - 0.5)./24;
@@ -97,8 +106,24 @@ for fc_num = 1:length(fc_limit)
     % month_idx = [1];
     % month_idx = [];
     bldg_loader_scg
-assss
 
+    %% Utility Data
+
+    %%%Loading in NEM 3.0 data
+    export_energy_credits = xlsread('Export_Energy_Credit_2023.xlsx');
+
+    %%%Credit for NEM 3.0 customers - Schedule NBT
+    nem3_0_credit = 0.024; %0.04; in 2023
+    nem3_0_credit_low_income = 0.056; %0.09; in 2023
+
+    %%%Loading Utility Data and Generating Energy Charge Vectors
+    utility_SCE_2023
+    import_price = import_price(:,3);
+    rate_labels = rate_labels{3};
+    export_price = export_price(:,3);
+
+    %%% Fuel Rates
+    gas_rates = 1/29.3*(55/50); %$/kWh
     %% Conventional Generator Data
     %%%Diesel Cost
     diesel_cost = 4.722; % $/gallon
@@ -112,6 +137,7 @@ assss
     required_return=nthroot(required_return+1,12)-1; % Converting from annual to monthly rate for compounding required return
     equity_return=10;% Length at which equity + required return will be paid off (Years)
     discount_rate = 0.08;
+    
     %% Tech Parameters/Costs
     clc
     %%%Technology Parameters
@@ -143,6 +169,9 @@ assss
     if exist('wave_on') && wave_on
         [wave_mthly_debt] = capital_cost_to_monthly_cost(wave_v(1,:),equity,interest,period,required_return);
     end
+    if exist('sofc_on') && sofc_on
+       [sofc_mthly_debt] = capital_cost_to_monthly_cost(sofc_v(1,:),equity,interest,period,required_return);
+    end
     %%% Capital modifiers
     pv_cap_mod = ones(1,size(pv_v,2));
     % ees_mthly_debt = ones(size(pv_v,2));
@@ -152,9 +181,11 @@ assss
 
     %% DERopt
     if opt_now
+
         %% Setting up variables and cost function
         fprintf('%s: Objective Function.', datestr(now,'HH:MM:SS'))
         tic
+        
         opt_var_cf %%%Added NEM and wholesale export to the PV Section
         elapsed = toc;
         fprintf('Took %.2f seconds \n', elapsed)
@@ -219,13 +250,30 @@ assss
         opt_pemfc
         elapsed = toc
         fprintf('Took %.2f seconds \n', elapsed)
-
+        %% SOFC Constraints
+        fprintf('%s: SOFC Constraints.', datestr(now,'HH:MM:SS'))
+        tic
+        opt_sofc
+        elapsed = toc
+        fprintf('Took %.2f seconds \n', elapsed)
+         %% Utility Constraints
+        fprintf('%s: Utility Constraints.', datestr(now,'HH:MM:SS'))
+        tic
+        opt_elec_utility
+        elapsed = toc
+        fprintf('Took %.2f seconds \n', elapsed)
+         %% TDV Constraints
+        fprintf('%s: TDV Constraints.', datestr(now,'HH:MM:SS'))
+        tic
+        opt_tdv
+        elapsed = toc
+        fprintf('Took %.2f seconds \n', elapsed)
         %% Optimize
         fprintf('%s: Optimizing \n....', datestr(now,'HH:MM:SS'))
 
-        if fc_num>1
-             results.fc_value(fc_num-1) 
-        end
+        % if fc_num>1
+        %      results.fc_value(fc_num-1) 
+        % end
         opt
 
         %% Timer

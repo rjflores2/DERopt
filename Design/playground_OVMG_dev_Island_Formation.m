@@ -10,8 +10,7 @@ for crit_load_lvl = [3]%%[4 5 6 7] %%% Corresponding END around line 500 - after
 
 %%% opt.m parameters
 %%%Choose optimizaiton solver
-opt_now = 1; %CPLEX
-opt_now_yalmip = 0; %YALMIP
+opt_now = 0; %GUROBI
 
 %% Optimization resileincy models
 %%%1) at the building
@@ -61,7 +60,7 @@ if ~testing
     dgb_on = 0;
     dgc_on = 0;
     dgl_on = h2_tech_on;
-    h2_storage_on = 0*h2_tech_on;
+    h2_storage_on = 1*h2_tech_on;
     sofc_on = 0;
     lpv_on = 1-sz_on;
     lees_on = 1-sz_on;

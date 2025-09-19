@@ -91,6 +91,26 @@ if ice_break_up_duration > 0
     river_power_potential(april_index,:) = 0;
 end
 
+
+fc_operational_state = binvar(12,1,'full');
+fc_electricity_production = sdpvar(8760,1,'full')'
+
+%%%Indexing for a week
+day_number = time - time(1);
+week_number = floor(day_number./7);
+
+
+day_number = day(datevec(time),'dayofyear');
+
+
+for ii = 1:max(week_number)
+idx = find(week_number == ii);
+
+Constraints = [Constraints
+fc_electricity_production(idx)<= fc_operational_state(ii)*fuel_capacity]
+
+end
+
 %% Conventional Generator Data
 %%%Diesel Cost
 diesel_cost = 10; % $/gallon

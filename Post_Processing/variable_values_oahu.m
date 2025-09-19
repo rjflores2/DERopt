@@ -11,6 +11,13 @@ var_ees.ees_chrg = value(var_ees.ees_chrg);
 var_ees.ees_dchrg = value(var_ees.ees_dchrg);
 var_ees.ees_soc = value(var_ees.ees_soc);
 
+if rees_on
+    var_rees.rees_adopt = value(var_rees.rees_adopt);
+    var_rees.rees_chrg = value(var_rees.rees_chrg);
+    var_rees.rees_dchrg = value(var_rees.rees_dchrg);
+    var_rees.rees_soc = value(var_rees.rees_soc);
+end
+
 %% H2 Production - Electrolyzer
 var_el.el_adopt = value(var_el.el_adopt);
 var_el.el_prod = value(var_el.el_prod);
@@ -29,12 +36,24 @@ if h2es_on
     var_h2es.h2es_soc = value(var_h2es.h2es_soc);
     var_h2es.h2es_bin = value(var_h2es.h2es_bin);
 end
+%% PEMFC
 if pemfc_on
     var_pem.cap = value(var_pem.cap);
     var_pem.elec = value(var_pem.elec);
     if pem_v(4)>0
         var_pem.onoff = value(var_pem.onoff);
     end
+end
+%% SOFC
+if sofc_on
+ var_sofc.capacity = value(var_sofc.capacity);
+    var_sofc.electricity = value(var_sofc.electricity);
+end
+%% Utility values
+ 
+if utility_exists
+    var_util.import = value(var_util.import);
+    var_util.export = value(var_util.export);
 end
 %% Legacy technologies %%
 %% EES

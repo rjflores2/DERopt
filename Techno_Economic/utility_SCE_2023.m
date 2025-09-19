@@ -12,6 +12,11 @@ rates_res.tou_1 = xlsread('Res_TOU.xlsx','4-9PM');
 rates_res.tou_2 = xlsread('Res_TOU.xlsx','5-8PM');
 rates_res.tou_3 = xlsread('Res_TOU.xlsx','PRIME');
 
+% rates_res.tou_fix = xlsread('C:\Users\rjf\OneDrive - UC Irvine\Papers\SCG_Nanogrid_Experiments\Fast Dynamics (May 15-30)\Res_TOU_2025.xlsx','Fixed');
+% rates_res.tou_1 = xlsread('C:\Users\rjf\OneDrive - UC Irvine\Papers\SCG_Nanogrid_Experiments\Fast Dynamics (May 15-30)\Res_TOU_2025.xlsx','4-9PM');
+% rates_res.tou_2 = xlsread('C:\Users\rjf\OneDrive - UC Irvine\Papers\SCG_Nanogrid_Experiments\Fast Dynamics (May 15-30)\Res_TOU_2025.xlsx','5-8PM');
+% rates_res.tou_3 = xlsread('C:\Users\rjf\OneDrive - UC Irvine\Papers\SCG_Nanogrid_Experiments\Fast Dynamics (May 15-30)\Res_TOU_2025.xlsx','PRIME');
+
 %%%General TOU Rates
 rates_gen.fix = xlsread('Gen_TOU.xlsx','Fixed');
 rates_gen.dc = xlsread('Gen_TOU.xlsx','DC');

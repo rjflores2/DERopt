@@ -6,6 +6,7 @@ if ~isempty(pv_v) || ~isempty(pv_legacy)
             (0 <= var_pv.pv_elec):'PV production >= 0'
             (0 <= var_pv.pv_adopt):'PV Adoption >= 0'];
     end
+
     %% PV Energy balance when curtailment is allowed
     if curtail
         Constraints = [Constraints, (var_pv.pv_elec + var_rees.rees_chrg + var_lrees.rees_chrg <= (1/e_adjust).*repmat(solar,1,K).*(repmat(pv_legacy_cap,T,1) + repmat(var_pv.pv_adopt,T,1))):'PV Energy Balance - <='];

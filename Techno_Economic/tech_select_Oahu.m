@@ -9,12 +9,12 @@ if pv_on
     %%% Efficiency / Conversion Percent at 1 kW/m^2
     %%% O&M ($/kWh generated)
    
-    pv_v1=[0.7*(3000+174); 0.2 ; 0.001];   
+    pv_v1=[0.7*(3000); 0.2 ; 0.001];   
     
     pv_v2=[0.7*(2300+216); 0.2 ; 0.001];
     
-    pv_v = [pv_v2];
-%     pv_v = [pv_v1];
+    % pv_v = [pv_v2];
+    pv_v = [pv_v1];
     
 %     %%%How pv capital cost is modified for different types of buildings
 %     pv_cap_mod = [2/2.65 %%%Commercial/industrial
@@ -61,6 +61,18 @@ if exist('pemfc_on') && pemfc_on
     
 end
 
+%% SOFC
+if exist('sofc_on') && sofc_on
+    %%%Capital Cost
+    %%%Efficiency
+    sofc_v = [6000 %%%Capital Cost 1
+        0.55 %%%Elec Efficiency 2
+        0.3 %%%Thermal efficiency 3
+        0.005 %%% O&M 4
+        0.35 %Min Load 5
+        10 %Max Capacity 6
+        0]; %%Forced Adoption 7
+end
 %% Electrical Energy Storage
 if ees_on
     %%% (1) Capital Cost ($/kWh installed)
@@ -82,6 +94,7 @@ if ees_on
     %%%How pv capital cost is modified for different types of buildings
     ees_cap_mod = [575/830 %%%Commercial/industrial
         830/830]; %%%Residential
+    rees_cap_mod = ees_cap_mod;
     
     %%%Financial Aspects - EES
     ees_fin = [-0.1306;... %%%Scaling linear factor - Based on Lazards cost of electricity

@@ -15,8 +15,7 @@ if isempty(ees_v) == 0
             %%%SOC Equality / Energy Balance
             Constraints = [Constraints
                 (var_rees.rees_soc(1,ii) <= var_rees.rees_soc(T,ii)):'Initial REES SOC <= Final SOC'
-                (var_rees.rees_dchrg_nem(1,ii) == 0):'No REES NEM in 1st time step'
-                (var_rees.rees_soc(2:T,ii) == ees_v(10,ii)*var_rees.rees_soc(1:T-1,ii) + ees_v(8,ii)*var_rees.rees_chrg(2:T,ii)  - (1/ees_v(9,ii))*(var_rees.rees_dchrg(2:T,ii) + var_rees.rees_dchrg_nem(2:T,ii))):'REES Balance'  %%%Minus discharging of battery
+                (var_rees.rees_soc(2:T,ii) == ees_v(10,ii)*var_rees.rees_soc(1:T-1,ii) + ees_v(8,ii)*var_rees.rees_chrg(2:T,ii)  - (1/ees_v(9,ii))*(var_rees.rees_dchrg(2:T,ii))):'REES Balance'  %%%Minus discharging of battery
                 (ees_v(4,ii)*var_rees.rees_adopt(ii) <= var_rees.rees_soc(:,ii) <= ees_v(5,ii)*var_rees.rees_adopt(ii)):'REES Min/Max SOC' %%%Min/Max SOC
                 (var_rees.rees_chrg(:,ii) <= ees_v(6,ii)*var_rees.rees_adopt(ii)):'REES Max Chrg' %%%Max Charge Rate
                 (var_rees.rees_dchrg(:,ii) <= ees_v(7,ii)*var_rees.rees_adopt(ii)):'REES Max Dchrg']; %%%Max Discharge Rate

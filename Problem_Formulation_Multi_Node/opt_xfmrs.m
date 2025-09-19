@@ -1,6 +1,6 @@
 %%%Transformer Cosntraints
-% if xfmr_on
-if (xfmr_on && acpf_sim) || (acpf_sim >= 1)
+if xfmr_on
+% if (xfmr_on && acpf_sim) || (acpf_sim >= 1)
     %%%Unique transformers
     xfmr_subset_unique = unique(xfmr_subset);
     
@@ -11,17 +11,23 @@ if (xfmr_on && acpf_sim) || (acpf_sim >= 1)
     C = [cos(theta)' sin(theta)']; %cos/sin of theta for each polygon
     %     s = t_rating*cos(theta(1)); %s rating around archimedes circle
     pf = 0.95.*ones(1,size(elec,2));
-    
+
+t_rating =xfmr_tbl.Rating_kVA_(strcmp(xfmr_tbl.XFMRNAME, xfmrs));
+
     if xfmr_on && acpf_sim == 0
         for ii = 1:length(t_rating)
             %%%Buildings connected to the current transformer
-            idx = find(t_map == ii);
+            % idx = find(t_map == ii);
             %%%Setting reactive power demand
             
-            var_xfmr.Qinj(:,ii) = sum(elec(:,idx).*repmat(tan(acos(pf(idx))),length(elec),1),2);
+            var_xfmr.Qinj(ii,:) = sum(elec.*repmat(tan(acos(pf)),length(elec),1),2);
             Constraints = [Constraints
-                (var_xfmr.Pinj(ii,:)' == sum(var_util.import(:,idx),2) - sum(var_pv.pv_nem(:,idx),2) - sum(var_rees.rees_dchrg_nem(:,idx),2)):'Real Power Equality'
+                (var_xfmr.Pinj(ii,:)' == sum(var_util.import,2) - sum(var_util.export,2)):'Real Power Equality'
                 (C*[var_xfmr.Pinj(ii,:); var_xfmr.Qinj(ii,:)] <= t_alpha.*t_rating(ii)):'Polygon Xfmr Constraints'];
+
+ % var_xfmr.Qinj(:,ii) = sum(elec(:,idx).*repmat(tan(acos(pf(idx))),length(elec),1),2);
+                % (var_xfmr.Pinj(ii,:)' == sum(var_util.import(:,idx),2) - sum(var_pv.pv_nem(:,idx),2) - sum(var_rees.rees_dchrg_nem(:,idx),2)):'Real Power Equality'
+         % (C*[var_xfmr.Pinj(ii,:); var_xfmr.Qinj(ii,:)] <= t_alpha.*t_rating(ii)):'Polygon Xfmr Constraints'];
         end
     elseif xfmr_on && acpf_sim >= 1
         for ii = 1:length(xfmr_subset_unique)%N

@@ -1,13 +1,13 @@
 %%%Calculating how capital costs are handled at each building/site
 %% Financing CRAP
-interest=0.08; %%%Interest rates on any loans
+interest=0.06; %%%Interest rates on any loans
 interest=nthroot(interest+1,12)-1; %Converting from annual to monthly rate for compounding interest
 period=10;%%%Length of any loans (years)
 equity=0.2; %%%Percent of investment made by investors
-required_return=.12; %%%Required return on equity investment
+required_return=0.06; %%%Required return on equity investment
 required_return=nthroot(required_return+1,12)-1; % Converting from annual to monthly rate for compounding required return
 equity_return=10;% Length at which equity + required return will be paid off (Years)
-discount_rate = 0.08;
+discount_rate = 0.06;
 
 %%%Tax Rates
 tax_rates = [0.2 0.3]; %%%Residential and commercial rates

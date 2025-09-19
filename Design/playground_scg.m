@@ -71,7 +71,7 @@ island = 0;
 addpath(genpath('H:\Matlab_Paths\YALMIP-master'))
 
 %%%CPLEX Path
-addpath(genpath('C:\Program Files\IBM\ILOG\CPLEX_Studio128\cplex\matlab\x64_win64'))
+% addpath(genpath('C:\Program Files\IBM\ILOG\CPLEX_Studio128\cplex\matlab\x64_win64'))
 
 %%%Source of URBANopt Results
 addpath('H:\_Research_\CEC_OVMG\URBANopt\UO_Results_0.5.x')
@@ -115,14 +115,14 @@ maxpv = 20;
 %%% Col3: >200% poverty limit units
 apartment_types = [0 0 1];
 %
-
+assss
 
 %% Formatting Building Data
 bldg_loader_scg
 
 %% Utility Data
 %%%Loading Utility Data and Generating Energy Charge Vectors
-utility_SCE_2020
+utility_SCE_2023
 
 %% Tech Parameters/Costs
 %%%Technology Parameters

@@ -66,6 +66,10 @@ npv_cost = pvvar(cashflow,discount_rate);
 %% Cost Scaling
 cost_scale = npv_cost/tech_v(1);
 
+if sum(macrs) + itc + ira == 0
+    cost_scale = 1;
+end
+
 if cost_scale < 0
     cost_scale = 0;
 end
